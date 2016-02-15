@@ -1,0 +1,19 @@
+<configuration debug="true">
+  <evaluator name="TEST_EVALUATOR">
+    <expression>logger.contains("test") &amp;&amp;
+	message.contains("TestTest")</expression>
+  </evaluator>
+  
+  
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <withJansi>true</withJansi>
+    <encoder>
+      <pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%highlight(%-5level)) %-25(%cyan(%logger{32})) - %msg%n%throwable%caller{2, TEST_EVALUATOR}</pattern>
+	  <!--<pattern>%-20(%d{HH:mm:ss.SSS} [%thread]) %-20(%-5level %logger{32} -) %msg%n</pattern>-->
+	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->
+    </encoder>
+  </appender>
+  <root level="TRACE">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

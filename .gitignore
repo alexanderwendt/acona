@@ -1,0 +1,8 @@
+src/*/bin
+
+log/*
+/src/*/.gradle
+/src/*/.settings
+/*.txt
+/src/JadeCommunicator/MTPs-MainContainer.txt
+/src/JadeCommunicator/APDescription.txt
