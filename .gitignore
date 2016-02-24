@@ -1,5 +1,6 @@
 src/*/bin
 
+src/*/build
 log/*
 /src/*/.gradle
 /src/*/.settings

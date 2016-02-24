@@ -9,8 +9,8 @@ public interface Communicator {
 	 * @param receiver
 	 * @throws Exception
 	 */
-	public void sendAsynchronousMessageToAgent(String message, String receiver) throws Exception;
-	public String sendSynchronousMessageToAgent(String message, String receiver) throws Exception;
+	public void sendAsynchronousMessageToAgent(String message, String receiver, String messageType) throws Exception;
+	public String sendSynchronousMessageToAgent(String message, String receiver, String messageType) throws Exception;
 	public void init();
 	public void shutDown();
 	/**

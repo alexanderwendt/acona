@@ -13,8 +13,6 @@ import at.tuwien.ict.kore.communicator.datastructurecontainer.BlackboardBean;
 import at.tuwien.ict.kore.communicator.datastructurecontainer.CommunicationMode;
 import jade.core.Profile;
 import jade.util.leap.Properties;
-import jade.wrapper.ControllerException;
-import jade.wrapper.StaleProxyException;
 import jade.wrapper.gateway.JadeGateway;
 
 public class CommunicatorImpl extends Thread implements Communicator {
@@ -89,18 +87,19 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	}
 
 	@Override
-	public void sendAsynchronousMessageToAgent(String message, String receiver) throws Exception {
+	public void sendAsynchronousMessageToAgent(String message, String receiver, String type) throws Exception {
 		BlackboardBean board = new BlackboardBean();
 		
 		//synchronized (this.board) {
 		board.setReceiver(receiver);
 		board.setMessage(message);
+		board.setType(type);
 		JadeGateway.execute(board);
 		//}
 	}
 
 	@Override
-	public String sendSynchronousMessageToAgent(String message, String receiver) throws Exception {
+	public String sendSynchronousMessageToAgent(String message, String receiver, String messageType) throws Exception {
 		String result = "";
 		
 		BlackboardBean board = new BlackboardBean();
@@ -110,6 +109,7 @@ public class CommunicatorImpl extends Thread implements Communicator {
 			//Construct the message
 		board.setReceiver(receiver);
 		board.setMessage(message);
+		board.setType(messageType);
 		JadeGateway.execute(board);
 			
 			//Get the result

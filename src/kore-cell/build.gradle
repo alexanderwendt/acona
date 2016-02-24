@@ -46,6 +46,7 @@ dependencies {
     compile 'org.codehaus.janino:janino:2.7.8'	//For color
     compile 'org.codehaus.janino:commons-compiler:2.7.8'
     compile 'org.fusesource.jansi:jansi:1.11'
+	compile project(':kore-jadecommunicator')
     
     //Jade library
     compile files('../../../libs/jade.jar')
@@ -68,14 +69,14 @@ jar {
   	manifest { 
 	  	version = project.version.replace('-','.');		//Create a version in the manifest from the variable "version" of this file
     	//symbolicName = bundleSymbolicName
-    	name = "KORE JadeCommunicator"
+    	name = "KORE Cell"
   	}
  }
 
 configure(install.repositories.mavenInstaller) {
    	pom.project {
-       	groupId 'at.tuwien.ict.kore.communicator'
-      	artifactId 'kore-jadecommunicator'
+       	groupId 'at.tuwien.ict.kore.cell'
+      	artifactId 'kore-cell'
        	version '0.1.0'
        	inceptionYear '2016'
        	packaging 'jar'
@@ -96,5 +97,4 @@ uploadArchives {
         }
     }
 }
-
 

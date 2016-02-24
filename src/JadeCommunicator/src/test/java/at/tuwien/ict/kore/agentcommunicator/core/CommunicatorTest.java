@@ -82,7 +82,7 @@ public class CommunicatorTest {
 			args[0] = "ControlGateway";
 			args[1] = expectedAnswer;
 			
-			this.comm.sendAsynchronousMessageToAgent("init", "DF");
+			this.comm.sendAsynchronousMessageToAgent("init", "DF", "");
 			
 			this.util.createAgent("InitiatorAgent", InitiatorAgent.class, args, agentContainer);
 			
@@ -127,7 +127,7 @@ public class CommunicatorTest {
 			this.util.createAgent("PongAgent", PongAgent.class, args, agentContainer);
 						
 			//Send Message
-			this.comm.sendAsynchronousMessageToAgent(message, "PongAgent");
+			this.comm.sendAsynchronousMessageToAgent(message, "PongAgent", "");
 			
 			log.debug("wait for agent to answer");
 			synchronized (this) {
@@ -160,7 +160,7 @@ public class CommunicatorTest {
 			this.util.createAgent("PongAgent", PongAgent.class, args, agentContainer);
 			
 			//Send Message
-			this.comm.sendAsynchronousMessageToAgent(message, "PongAgent");
+			this.comm.sendAsynchronousMessageToAgent(message, "PongAgent", "");
 			
 //			log.debug("wait for agent to answer");
 //			synchronized (this) {

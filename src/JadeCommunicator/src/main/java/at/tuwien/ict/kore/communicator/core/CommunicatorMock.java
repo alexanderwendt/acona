@@ -3,13 +3,13 @@ package at.tuwien.ict.kore.communicator.core;
 public class CommunicatorMock implements Communicator {
 
 	@Override
-	public void sendAsynchronousMessageToAgent(String message, String receiver) throws Exception {
+	public void sendAsynchronousMessageToAgent(String message, String receiver, String type) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public String sendSynchronousMessageToAgent(String message, String receiver) throws Exception {
+	public String sendSynchronousMessageToAgent(String message, String receiver, String type) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

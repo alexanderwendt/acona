@@ -46,7 +46,8 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 			msg.addReceiver(new AID(receiveBoard.getReceiver(), AID.ISLOCALNAME));
 			//msg.setConversationId(CONVERSATIONID);
 			msg.setInReplyTo(CONVERSATIONID);
-			msg.setContent(receiveBoard.getMessage());			    
+			msg.setContent(receiveBoard.getMessage());
+			msg.setOntology(this.receiveBoard.getType());
 			
 			receiveBoard.setMessage("ACK");
 			

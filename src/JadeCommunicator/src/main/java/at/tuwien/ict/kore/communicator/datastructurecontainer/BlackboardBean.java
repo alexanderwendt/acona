@@ -8,6 +8,8 @@ public class BlackboardBean implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	private String message = new String("");
 	private String receiver = new String("");
+	private String type = new String("");
+
 	private CommunicationMode communicationMode = CommunicationMode.ASYNC;
 
 	//Use builderpattern here instead
@@ -44,6 +46,14 @@ public class BlackboardBean implements java.io.Serializable {
 	
 	public void setReceiver(String receiver)	{
 		this.receiver=receiver;
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	@Override
