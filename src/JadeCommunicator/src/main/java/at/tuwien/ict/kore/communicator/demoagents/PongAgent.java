@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import jade.core.AID;
+import at.tuwien.ict.kore.communicator.core.JsonMessage;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -12,6 +12,10 @@ import jade.lang.acl.ACLMessage;
 
 public class PongAgent extends Agent {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static Logger log = LoggerFactory.getLogger("main");
 	
 	protected void setup() {
@@ -37,6 +41,11 @@ public class PongAgent extends Agent {
 		
 		// pong behaviour
 		addBehaviour(new CyclicBehaviour(this) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void action() {
 				ACLMessage msg = receive();
 				String content= "";
@@ -47,10 +56,10 @@ public class PongAgent extends Agent {
 							content = newMessage;
 							break;
 						case 1:
-							content = msg.getContent() + newMessage;
+							content = JsonMessage.toJson(msg.getContent()).get(JsonMessage.CONTENT).getAsString() + newMessage;
 							break;
 						case 2:
-							content = msg.getContent();
+							content = JsonMessage.toJson(msg.getContent()).get(JsonMessage.CONTENT).getAsString();
 							break;
 						default:
 						try {
@@ -62,7 +71,7 @@ public class PongAgent extends Agent {
 					
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative( ACLMessage.INFORM);
-					reply.setContent(content);
+					reply.setContent(JsonMessage.toContentString(content));
 					
 					for (int i=0;i<3;i++) {
 						synchronized(this) {

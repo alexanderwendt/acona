@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import at.tuwien.ict.kore.communicator.core.JsonMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -11,6 +12,11 @@ import jade.lang.acl.ACLMessage;
 
 public class InitiatorAgent extends Agent {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private static Logger log = LoggerFactory.getLogger("main");
 	
 	protected void setup() {
@@ -35,11 +41,16 @@ public class InitiatorAgent extends Agent {
 		// pong behaviour
 		addBehaviour(new TickerBehaviour(this, 1000) {
 			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected void onTick() {
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 				msg.addReceiver(gatewayAgent);
-				msg.setContent(newMessage);
+				msg.setContent(JsonMessage.toContentString(newMessage));
 				myAgent.send(msg);
 				log.info("Message send={} to agent={}", msg.getContent(), msg.getAllReceiver().toString());
 			}

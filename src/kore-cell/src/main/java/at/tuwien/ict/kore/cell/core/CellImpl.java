@@ -14,7 +14,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class CellImpl extends Agent implements Cell {
 
-	private String identifier = "";
+	//private String identifier = "";
 	private DataStorage dataStorage = new DataStorageImpl();
 	
 	/**

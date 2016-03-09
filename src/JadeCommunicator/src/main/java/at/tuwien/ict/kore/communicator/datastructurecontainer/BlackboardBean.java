@@ -1,14 +1,19 @@
 package at.tuwien.ict.kore.communicator.datastructurecontainer;
 
+import com.google.gson.JsonObject;
+
+import at.tuwien.ict.kore.communicator.core.JsonMessage;
+
 public class BlackboardBean implements java.io.Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String message = new String("");
-	private String receiver = new String("");
-	private String type = new String("");
+	private JsonObject message = new JsonObject();
+	//private String message = new String("");
+	//private String receiver = new String("");
+	//private String type = new String("");
 
 	private CommunicationMode communicationMode = CommunicationMode.ASYNC;
 
@@ -32,38 +37,43 @@ public class BlackboardBean implements java.io.Serializable {
 		return result;
 	}
 	
-	public String getMessage()	{
-		  	return message;
+	public JsonObject getMessage()	{
+		return message;
 	}
 	
-	public void setMessage(String str)	{
+	public String getMessageBodyAsString() {
+		JsonObject messageBody = this.message.get(JsonMessage.BODY).getAsJsonObject();
+		return messageBody.toString();
+	}	
+	
+	public void setMessage(JsonObject str)	{
 		message=str;
 	}
 	
-	public String getReceiver()	{
-		return receiver;
-	}
+//	public String getReceiver()	{
+//		return receiver;
+//	}
 	
-	public void setReceiver(String receiver)	{
-		this.receiver=receiver;
-	}
+//	public void setReceiver(String receiver)	{
+//		this.receiver=receiver;
+//	}
 	
-	public String getType() {
-		return type;
-	}
+//	public String getType() {
+//		return type;
+//	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
+//	public void setType(String type) {
+//		this.type = type;
+//	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Receiver=");
-		builder.append(receiver);
+		//builder.append("Receiver=");
+		//builder.append(receiver);
 		builder.append(", message=");
 		builder.append(message);
-		builder.append(", mode=");
+		//builder.append(", mode=");
 		builder.append(communicationMode);
 		return builder.toString();
 	}

@@ -1,5 +1,7 @@
 package at.tuwien.ict.kore.communicator.core;
 
+import com.google.gson.JsonObject;
+
 public interface Communicator {
 
 	/**
@@ -9,14 +11,16 @@ public interface Communicator {
 	 * @param receiver
 	 * @throws Exception
 	 */
-	public void sendAsynchronousMessageToAgent(String message, String receiver, String messageType) throws Exception;
-	public String sendSynchronousMessageToAgent(String message, String receiver, String messageType) throws Exception;
-	public void init();
+	public void sendAsynchronousMessageToAgent(String messagebody, String receiver, String messageType) throws Exception;
+	public void sendAsynchronousMessageToAgent(JsonObject object) throws Exception;
+	public JsonObject sendSynchronousMessageToAgent(String messagebody, String receiver, String messageType) throws Exception;
+	public JsonObject sendSynchronousMessageToAgent(JsonObject object) throws Exception;
+	public void init() throws Exception;
 	public void shutDown();
 	/**
 	 * Add a component that listens for pushed messages from the agent system
 	 */
 	public void addListener(ListenerModule listener);
-	public String getMessageFromAgent() throws InterruptedException;
-	public String getMessageFromAgent(long timeout) throws InterruptedException;
+	public JsonObject getMessageFromAgent() throws InterruptedException;
+	public JsonObject getMessageFromAgent(long timeout) throws InterruptedException;
 }

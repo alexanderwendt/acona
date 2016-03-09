@@ -5,6 +5,8 @@ import jade.wrapper.ContainerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 import at.tuwien.ict.kore.communicator.core.Communicator;
 import at.tuwien.ict.kore.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.kore.communicator.core.ListenerModule;
@@ -94,7 +96,7 @@ public class CommunicatorLauncher extends Thread implements ListenerModule {
 	}
 
 	@Override
-	public void updateValue(String message) {
+	public void updateValue(JsonObject message) {
 		log.info("Message received from agent system={}", message);
 		synchronized (this) {
 			this.notify();

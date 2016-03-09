@@ -5,5 +5,7 @@ log/*
 /src/*/.gradle
 /src/*/.settings
 /*.txt
-/src/JadeCommunicator/MTPs-MainContainer.txt
-/src/JadeCommunicator/APDescription.txt
+/src/*/MTPs-MainContainer.txt
+/src/*/APDescription.txt
+/src/*/build
+/src/*/gradle

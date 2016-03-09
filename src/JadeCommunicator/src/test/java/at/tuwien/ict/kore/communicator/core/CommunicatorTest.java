@@ -1,4 +1,4 @@
-package at.tuwien.ict.kore.agentcommunicator.core;
+package at.tuwien.ict.kore.communicator.core;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import at.tuwien.ict.kore.communicator.core.Communicator;
 import at.tuwien.ict.kore.communicator.core.CommunicatorImpl;
@@ -27,6 +31,9 @@ public class CommunicatorTest {
 	
 	@Before
 	public void setup() {
+		//Message syntax:
+		//receiver, type, message as JSonObject that can be transformed into a Cell data structure
+		
 		try {
 			//Create container
 			log.debug("Create or get main container");
@@ -75,16 +82,28 @@ public class CommunicatorTest {
 		try {
 			String returnmessage = "pong";
 			String expectedAnswer = "pingpong";
+			String sendContent = "ping";
 			String realanswer = "";
+			
+			//Create JsonMessage with String message, String receiver, String type
+//			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String receiver = "InitiatorAgent";
+//			String type = "read";
+//			String sourceString = "{\"receiver\": \""+ receiver + "\", "
+//								+  "\"type\": \"" + type + "\", "
+//								+  "\"body\" : {\"content\" : \"" + sendContent + "\"}}"; 
+//			log.debug("source string={}", sourceString);
+//			JsonObject message = gson.fromJson(sourceString, JsonObject.class);
 			
 			//Create agent in the system
 			Object[] args = new String[2];
 			args[0] = "ControlGateway";
 			args[1] = expectedAnswer;
 			
-			this.comm.sendAsynchronousMessageToAgent("init", "DF", "");
+			//Send anything to init the gateway
+			//OBSOLETE this.comm.sendAsynchronousMessageToAgent("init", "DF", "");
 			
-			this.util.createAgent("InitiatorAgent", InitiatorAgent.class, args, agentContainer);
+			this.util.createAgent(receiver, InitiatorAgent.class, args, agentContainer);
 			
 			//createmessage
 			//String message = "ping";
@@ -104,12 +123,13 @@ public class CommunicatorTest {
 			
 			log.debug("Wait ended. Take message from agent gateway");
 			
-			realanswer = this.comm.getMessageFromAgent(1000);
+			realanswer = this.comm.getMessageFromAgent(1000).get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsString();
 			
 			log.info("Test finished. Expected message={}, received message={}", expectedAnswer, realanswer);
 			assertEquals(expectedAnswer, realanswer);
+			log.info("Test passed");
 		} catch (Exception e) {
-			log.error("Cannot init system", e);
+			log.error("Cannot test system", e);
 			fail("Error");
 		}
 	}
@@ -117,8 +137,17 @@ public class CommunicatorTest {
 	@Test
 	public void asynchronResponderTest() {
 		try {
-			//createmessage
-			String message = "ping";
+			//create message
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String receiver = "PongAgent";
+			String type = "read";
+			String sendContent = "ping";
+			String sourceString = "{\"receiver\": [\""+ receiver + "\"], "
+								+  "\"type\": \"" + type + "\", "
+								+  "\"body\" : {\"content\" : \"" + sendContent + "\"}}"; 
+			log.debug("source string={}", sourceString);
+			JsonObject message = gson.fromJson(sourceString, JsonObject.class);
+			//String message = "ping";
 			String expectedAnswer  = "pingpong";
 			String answer = "";
 			
@@ -127,7 +156,7 @@ public class CommunicatorTest {
 			this.util.createAgent("PongAgent", PongAgent.class, args, agentContainer);
 						
 			//Send Message
-			this.comm.sendAsynchronousMessageToAgent(message, "PongAgent", "");
+			this.comm.sendAsynchronousMessageToAgent(message);
 			
 			log.debug("wait for agent to answer");
 			synchronized (this) {
@@ -138,9 +167,12 @@ public class CommunicatorTest {
 				}
 			}
 			
-			answer = this.comm.getMessageFromAgent();
+			//JsonObject obj = this.comm.getMessageFromAgent();
+			
+			answer = this.comm.getMessageFromAgent().get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsJsonPrimitive().getAsString();
 			
 			assertEquals(expectedAnswer, answer);
+			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Cannot init system", e);
 			fail("Error");
@@ -160,7 +192,7 @@ public class CommunicatorTest {
 			this.util.createAgent("PongAgent", PongAgent.class, args, agentContainer);
 			
 			//Send Message
-			this.comm.sendAsynchronousMessageToAgent(message, "PongAgent", "");
+			this.comm.sendAsynchronousMessageToAgent(JsonMessage.toContentString(message), "PongAgent", "");
 			
 //			log.debug("wait for agent to answer");
 //			synchronized (this) {
@@ -171,9 +203,10 @@ public class CommunicatorTest {
 //				}
 //			}
 			
-			answer = this.comm.getMessageFromAgent();
+			answer = this.comm.getMessageFromAgent().get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsJsonPrimitive().getAsString();
 			
 			assertEquals(expectedAnswer, answer);
+			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Cannot init system", e);
 			fail("Error");
