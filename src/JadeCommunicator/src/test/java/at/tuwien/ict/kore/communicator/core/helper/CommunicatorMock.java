@@ -62,4 +62,11 @@ public class CommunicatorMock implements Communicator {
 		return null;
 	}
 
+	@Override
+	public JsonObject sendSynchronousMessageToAgent(String messagebody, String receiver, String messageType,
+			int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

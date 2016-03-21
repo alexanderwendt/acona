@@ -29,44 +29,13 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 	private SynchronousQueue<JsonObject> blockingQueue;
 	BlackboardBean receiveBoard = null;
 	
+	private String inReplyWith = ""; 
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	/* (non-Javadoc)
-	 * @see jade.wrapper.gateway.GatewayAgent#processCommand(java.lang.Object)
-	 */
-	protected void processCommand(Object obj) {
-		//This method is called by the gateway to transfer a message to an agent
-		
-		if (obj instanceof BlackboardBean)	{
-			receiveBoard = (BlackboardBean)obj;
-			log.info("Command received={}", receiveBoard);
-			
-			//Set the receiver and send the command to the receiver
-			ACLMessage msg = JsonMessage.convertToACL(receiveBoard.getMessage());
-					
-					
-//			new ACLMessage(ACLMessage.REQUEST);
-//			msg.addReceiver(new AID(receiveBoard.getMessage().get(Message.RECEIVER).getAsString(), AID.ISLOCALNAME));
-//			//msg.setConversationId(CONVERSATIONID);
-//			msg.setInReplyTo(Message.CONVERSATIONID);
-//			String content = receiveBoard.getMessageBodyAsString();
-//			msg.setContent(content);
-//			msg.setOntology(this.receiveBoard.getMessage().get(Message.TYPE).getAsString());	//Ontology used as type
-			
-			receiveBoard.setMessage(JsonMessage.createMessage(JsonMessage.toContentString("ACK"), "", ""));
-			
-			//If sync, then no release command until message has been processed
-			if (this.receiveBoard.isSyncronizedRequest()==false) {
-				this.releaseCommand(receiveBoard);
-			}
-			
-			send(msg);
-		}
-	}
-
 	public void setup()	{
 		log.info("Starting gateway agent={}", this.getLocalName());
 		//Get arguments
@@ -85,6 +54,44 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		super.setup();
 	}
 	
+	/* (non-Javadoc)
+	 * @see jade.wrapper.gateway.GatewayAgent#processCommand(java.lang.Object)
+	 */
+	protected void processCommand(Object obj) {
+		//This method is called by the gateway to transfer a message to an agent
+		
+		if (obj instanceof BlackboardBean)	{
+			receiveBoard = (BlackboardBean)obj;
+			log.info("Command received={}", receiveBoard);
+			
+			//Set the receiver and send the command to the receiver
+			ACLMessage msg = JsonMessage.convertToACL(receiveBoard.getMessage());
+			
+					
+//			new ACLMessage(ACLMessage.REQUEST);
+//			msg.addReceiver(new AID(receiveBoard.getMessage().get(Message.RECEIVER).getAsString(), AID.ISLOCALNAME));
+//			msg.setConversationId(CONVERSATIONID);
+//			msg.setInReplyTo(JsonMessage.CONVERSATIONIDREQUEST);
+			
+//			String content = receiveBoard.getMessageBodyAsString();
+//			msg.setContent(content);
+//			msg.setOntology(this.receiveBoard.getMessage().get(Message.TYPE).getAsString());	//Ontology used as type
+			
+			receiveBoard.setMessage(JsonMessage.createMessage(JsonMessage.toContentString("ACK"), "", ""));
+			
+			//If sync, then no release command until message has been processed
+			if (this.receiveBoard.isSyncronizedRequest()==false) {
+				this.releaseCommand(receiveBoard);
+			} else {
+				msg.setConversationId(JsonMessage.SYNCREQUEST);
+				//msg.setReplyWith(JsonMessage.CONVERSATIONIDREQUEST);
+				//this.inReplyWith = msg.getConversationId();
+			}
+			
+			send(msg);
+		}
+	}
+	
 	public class ReceiveAsynchronousBehaviour extends CyclicBehaviour {
 		/**
 		 * 
@@ -100,10 +107,13 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		
 		@Override
 		public void action() {
-			MessageTemplate template = MessageTemplate.not(MessageTemplate.MatchReplyWith(JsonMessage.CONVERSATIONID));
+			MessageTemplate template = MessageTemplate.not(MessageTemplate.MatchConversationId(JsonMessage.SYNCREQUEST));
 			ACLMessage msg = receive(template);
+			//ACLMessage msg = receive();
+			//log.debug("Asynchron message receival={}", msg);
 			
-			if (msg!=null)	{				
+			if (msg!=null)	{
+				log.debug("Asynchron message receival={}", msg);
 				log.debug("Received from={}, message={}", msg.getSender().getLocalName(), msg.getContent());
 				
 				try {
@@ -129,13 +139,22 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		
 		@Override
 		public void action() {
-			MessageTemplate template = MessageTemplate.MatchReplyWith(JsonMessage.CONVERSATIONID);
+			//MessageTemplate template = MessageTemplate.MatchReplyWith(JsonMessage.CONVERSATIONIDREQUEST);
+			log.debug("AID={}", this.myAgent.getAID().getName());
+			MessageTemplate template = MessageTemplate.MatchConversationId(JsonMessage.SYNCREQUEST);
 			ACLMessage msg = receive(template);
+			//ACLMessage msg = receive();
 			
 			if ((msg!=null) && (receiveBoard!=null))	{				
-				receiveBoard.setMessage(gson.fromJson(msg.getContent(), JsonObject.class));
-				releaseCommand(receiveBoard);				
+				try {
+					receiveBoard.setMessage(JsonMessage.convertToJson(msg));	
+				} catch (Exception e) {
+					log.error("Cannot convert message to JSON={}. Abort operation", msg, e);
+				}
+				
+				releaseCommand(receiveBoard);
 			} else {
+				//log.warn("Message not supposed as reply for this agent={}", msg);
 				block();
 			}
 			

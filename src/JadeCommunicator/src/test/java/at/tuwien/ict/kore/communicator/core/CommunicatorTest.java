@@ -142,9 +142,9 @@ public class CommunicatorTest {
 			String receiver = "PongAgent";
 			String type = "read";
 			String sendContent = "ping";
-			String sourceString = "{\"receiver\": [\""+ receiver + "\"], "
-								+  "\"type\": \"" + type + "\", "
-								+  "\"body\" : {\"content\" : \"" + sendContent + "\"}}"; 
+			String sourceString = "{\"RECEIVER\": [\""+ receiver + "\"], "
+								+  "\"TYPE\": \"" + type + "\", "
+								+  "\"BODY\" : {\"CONTENT\" : \"" + sendContent + "\"}}"; 
 			log.debug("source string={}", sourceString);
 			JsonObject message = gson.fromJson(sourceString, JsonObject.class);
 			//String message = "ping";
@@ -167,9 +167,11 @@ public class CommunicatorTest {
 				}
 			}
 			
+			log.debug("Waiting 5000ms finished");
+			
 			//JsonObject obj = this.comm.getMessageFromAgent();
 			
-			answer = this.comm.getMessageFromAgent().get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsJsonPrimitive().getAsString();
+			answer = this.comm.getMessageFromAgent(1000).get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsJsonPrimitive().getAsString();
 			
 			assertEquals(expectedAnswer, answer);
 			log.info("Test passed");
@@ -191,10 +193,18 @@ public class CommunicatorTest {
 			String[] args = {"1", "pong"};
 			this.util.createAgent("PongAgent", PongAgent.class, args, agentContainer);
 			
-			//Send Message
-			this.comm.sendAsynchronousMessageToAgent(JsonMessage.toContentString(message), "PongAgent", "");
+			synchronized (this) {
+				try {
+					this.wait(500);
+				} catch (InterruptedException e) {
+					
+				}
+			}
 			
-//			log.debug("wait for agent to answer");
+			//Send Message
+			JsonObject reply = this.comm.sendSynchronousMessageToAgent(JsonMessage.toContentString(message), "PongAgent", "", 100000);
+			
+			log.debug("got reply={}", reply);
 //			synchronized (this) {
 //				try {
 //					this.wait(5000);
@@ -203,7 +213,7 @@ public class CommunicatorTest {
 //				}
 //			}
 			
-			answer = this.comm.getMessageFromAgent().get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsJsonPrimitive().getAsString();
+			answer = reply.get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsJsonPrimitive().getAsString();
 			
 			assertEquals(expectedAnswer, answer);
 			log.info("Test passed");

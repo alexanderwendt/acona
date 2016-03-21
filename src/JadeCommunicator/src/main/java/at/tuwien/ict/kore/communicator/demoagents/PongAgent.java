@@ -85,7 +85,7 @@ public class PongAgent extends Agent {
 					}
 					
 					send(reply);
-					log.info("Response={}", content);
+					log.info("Pong agent sent response={}", reply);
 				} else {
 					block();
 				}

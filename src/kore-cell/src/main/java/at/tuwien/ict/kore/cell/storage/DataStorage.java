@@ -1,5 +1,8 @@
 package at.tuwien.ict.kore.cell.storage;
 
+import java.util.List;
+import java.util.Map;
+
 import at.tuwien.ict.kore.cell.datastructures.Datapackage;
 
 public interface DataStorage {
@@ -13,4 +16,6 @@ public interface DataStorage {
 	
 	public void subscribeDatapoint(String address, String caller);
 	public void unsubscribeDatapoint(String address, String caller);
+	
+	public Map<String, List<String>> getSubscribers();
 }

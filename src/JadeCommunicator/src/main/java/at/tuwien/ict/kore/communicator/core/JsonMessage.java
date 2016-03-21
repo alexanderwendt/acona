@@ -2,11 +2,9 @@ package at.tuwien.ict.kore.communicator.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -15,23 +13,30 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
 public class JsonMessage {
-	public final static String CONVERSATIONID = "externalRequest";
-	public final static String RECEIVER = "receiver";
-	public final static String TYPE = "type";
-	public final static String CONTENT = "content";
-	public final static String BODY = "body";
+	public final static String SYNCREQUEST = "EXTERNALSYNCREQUEST";
+	public final static String RECEIVER = "RECEIVER";
+	public final static String TYPE = "TYPE";
+	public final static String CONTENT = "CONTENT";
+	public final static String BODY = "BODY";
+	public final static String DATAPOINTADDRESS = "DATAPOINT";
+	public final static String VALUE = "VALUE";
+	public final static String SERVICEREAD = "READ";
+	public final static String SERVICEWRITE = "WRITE";
+	public final static String SERVICESUBSCRIBE = "SUBSCRIBE";
+	public final static String SERVICEUNSUBSCRIBE = "UNSUBSCRIBE";
+	public final static String ACKNOWLEDGE = "ACKNOWLEDGE";
 	
-	public static JsonObject createMessage(String jsonContent, String receiver, String type) {
-		return createMessage(jsonContent, Arrays.asList(receiver), type);
+	public static JsonObject createMessage(String bodyAsJsonString, String receiver, String type) {
+		return createMessage(bodyAsJsonString, Arrays.asList(receiver), type);
 	}
 	
-	public static JsonObject createMessage(String jsonContent, List<String> receivers, String type) {
+	public static JsonObject createMessage(String bodyAsJsonString, List<String> receivers, String type) {
 		
 		//JsonObject contentValue = new JsonObject();
 		//contentValue.addProperty(JsonMessage.CONTENT, content);
 		
 		JsonObject result = new JsonObject();
-		result.add(BODY, toJson(jsonContent));
+		result.add(BODY, toJson(bodyAsJsonString));
 		JsonArray receiverArray = new JsonArray();
 		for (int i=0; i<receivers.size(); i++) {
 			receiverArray.add(new JsonPrimitive(receivers.get(i)));
@@ -43,13 +48,13 @@ public class JsonMessage {
 		return result;
 	}
 	
-	public static JsonObject createMessage(JsonObject content, List<String> receivers, String type) {
+	public static JsonObject createMessage(JsonObject bodyAsJsonString, List<String> receivers, String type) {
 		
 		//JsonObject contentValue = new JsonObject();
 		//contentValue.addProperty(JsonMessage.CONTENT, content);
 		
 		JsonObject result = new JsonObject();
-		result.add(BODY, content);
+		result.add(BODY, bodyAsJsonString);
 		JsonArray receiverArray = new JsonArray();
 		for (int i=0; i<receivers.size(); i++) {
 			receiverArray.add(new JsonPrimitive(receivers.get(i)));
@@ -68,8 +73,8 @@ public class JsonMessage {
 		return receivers;
 	}
 	
-	public static JsonObject getBody(JsonObject message) {
-		return message.getAsJsonObject(BODY);
+	public static JsonObject getBody(JsonObject body) {
+		return body.getAsJsonObject(BODY);
 	}
 	
 	public static String getType(JsonObject message) {
@@ -105,7 +110,7 @@ public class JsonMessage {
 		}
 		
 		//msg.setConversationId(CONVERSATIONID);
-		msg.setInReplyTo(JsonMessage.CONVERSATIONID);
+		//msg.setConversationId(JsonMessage.SYNCREQUEST);
 		String content = message.get(BODY).toString();
 		msg.setContent(content);
 		msg.setOntology(message.get(JsonMessage.TYPE).getAsString());	//Ontology used as type
@@ -114,8 +119,12 @@ public class JsonMessage {
 	}
 	
 	public static String toContentString(String input) {
+		return toJsonObjectString(CONTENT, input);
+	}
+	
+	public static String toJsonObjectString(String name, String value) {
 		JsonObject contentValue = new JsonObject();
-		contentValue.addProperty(JsonMessage.CONTENT, input);
+		contentValue.addProperty(name, value);
 		
 		return contentValue.toString();
 	}

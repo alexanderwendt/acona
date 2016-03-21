@@ -76,4 +76,6 @@ public interface Datapackage extends Serializable {
 	 * Clear the whole datapackage from all concepts
 	 */
 	public void clear();
+	
+	public boolean isEmpty();
 }

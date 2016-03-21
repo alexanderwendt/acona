@@ -14,6 +14,7 @@ public interface Communicator {
 	public void sendAsynchronousMessageToAgent(String messagebody, String receiver, String messageType) throws Exception;
 	public void sendAsynchronousMessageToAgent(JsonObject object) throws Exception;
 	public JsonObject sendSynchronousMessageToAgent(String messagebody, String receiver, String messageType) throws Exception;
+	public JsonObject sendSynchronousMessageToAgent(String messagebody, String receiver, String messageType, int timeout) throws Exception;
 	public JsonObject sendSynchronousMessageToAgent(JsonObject object) throws Exception;
 	public void init() throws Exception;
 	public void shutDown();

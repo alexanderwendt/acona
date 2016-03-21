@@ -133,4 +133,9 @@ public class DatapackageImpl implements Datapackage {
 		return builder.toString();
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return this.availableConcepts.isEmpty();
+	}
+
 }

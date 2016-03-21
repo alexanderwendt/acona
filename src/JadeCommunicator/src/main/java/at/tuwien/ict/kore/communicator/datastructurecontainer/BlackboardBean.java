@@ -69,11 +69,9 @@ public class BlackboardBean implements java.io.Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		//builder.append("Receiver=");
-		//builder.append(receiver);
-		builder.append(", message=");
+		builder.append("Message=");
 		builder.append(message);
-		//builder.append(", mode=");
+		builder.append(", mode=");
 		builder.append(communicationMode);
 		return builder.toString();
 	}

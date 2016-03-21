@@ -26,7 +26,7 @@ public class MessageTester {
 			String expectedreceiver = "receiver";
 			String expectedMessage = "testmessage";
 			String expectedType = "type";
-			JsonObject testObject = JsonMessage.createMessage("testmessage", "receiver", "type");
+			JsonObject testObject = JsonMessage.createMessage(JsonMessage.toContentString(expectedMessage), expectedreceiver, expectedType);
 			
 			String actualreceiver = testObject.get(JsonMessage.RECEIVER).getAsString();
 			String actualMessage = testObject.get(JsonMessage.BODY).getAsJsonObject().get(JsonMessage.CONTENT).getAsString();

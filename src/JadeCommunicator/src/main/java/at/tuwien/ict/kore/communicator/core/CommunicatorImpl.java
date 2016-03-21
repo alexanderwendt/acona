@@ -18,11 +18,13 @@ import jade.util.leap.Properties;
 import jade.wrapper.gateway.JadeGateway;
 
 public class CommunicatorImpl extends Thread implements Communicator {
-	private static Logger log = LoggerFactory.getLogger("main");
+	private static Logger log = LoggerFactory.getLogger(CommunicatorImpl.class);
 	
 	private List<ListenerModule> listeners= new LinkedList<ListenerModule>();
 	//private String messageFromAgent= "";
 	private SynchronousQueue<JsonObject> blockingQueue = new SynchronousQueue<JsonObject>();
+	
+	private final static int TIMEOUT = 5000;
 	
 	/**
 	 * Queue for all incoming messages
@@ -120,7 +122,16 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	}
 	
 	@Override
+	public JsonObject sendSynchronousMessageToAgent(String message, String receiver, String messageType, int timeout) throws Exception {
+		return this.sendSynchronousMessageToAgent(JsonMessage.createMessage(message, receiver, messageType), timeout);
+	}
+	
+	@Override
 	public JsonObject sendSynchronousMessageToAgent(JsonObject object) throws Exception {
+		return sendSynchronousMessageToAgent(object, TIMEOUT);
+	}
+	
+	public JsonObject sendSynchronousMessageToAgent(JsonObject object, int timeout) throws Exception {
 		JsonObject result = null;
 		
 		BlackboardBean board = new BlackboardBean();
@@ -132,7 +143,7 @@ public class CommunicatorImpl extends Thread implements Communicator {
 		//board.setReceiver(receiver);
 		//board.setMessage(message);
 		//board.setType(messageType);
-		JadeGateway.execute(board);
+		JadeGateway.execute(board, timeout);
 			
 			//Get the result
 		result = board.getMessage();

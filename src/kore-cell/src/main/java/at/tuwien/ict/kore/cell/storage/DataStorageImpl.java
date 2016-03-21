@@ -1,5 +1,6 @@
 package at.tuwien.ict.kore.cell.storage;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,15 @@ public class DataStorageImpl implements DataStorage {
 
 	@Override
 	public void write(String address, Datapackage datapackage, String caller) {
-		log.debug("write address={} data={}", address, datapackage);
-		this.data.put(address, datapackage);
-		this.notifySubscribers(address, datapackage, caller);
+		//Get data
+		Datapackage previousDatapackage = this.read(address);
+		//Only update subscribers if value has changed and one of them were empty before
+		if (datapackage.isEmpty()==false && datapackage.isEmpty()==false) {
+			log.debug("write address={} data={}", address, datapackage);
+			this.data.put(address, datapackage);
+			
+			this.notifySubscribers(address, datapackage, caller);
+		}
 	}
 
 	@Override
@@ -66,8 +73,9 @@ public class DataStorageImpl implements DataStorage {
 		subscribers.remove(caller);
 		
 		//Trigger subscriber behavior
-		this.subscriberNotificator.notifySubscribers(subscribers, address, datapackage);
-		
+		if (subscribers.isEmpty()==false && address.equals("")==false && datapackage!=null) {
+			this.subscriberNotificator.notifySubscribers(subscribers, address, datapackage);
+		}
 	}
 
 	@Override
@@ -99,6 +107,22 @@ public class DataStorageImpl implements DataStorage {
 		this.data.remove(address);
 		this.notifySubscribers(address, DatapackageImpl.newDatapackage(), caller);
 		
+	}
+
+	@Override
+	public Map<String, List<String>> getSubscribers() {
+		return Collections.unmodifiableMap(this.subscribers);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DataStorageImpl [data=");
+		builder.append(data);
+		builder.append(", subscribers=");
+		builder.append(subscribers);
+		builder.append("]");
+		return builder.toString();
 	}
 	
 }
