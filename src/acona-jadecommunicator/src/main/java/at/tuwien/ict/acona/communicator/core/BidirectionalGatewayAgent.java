@@ -5,11 +5,9 @@ import java.util.concurrent.SynchronousQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
+import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import at.tuwien.ict.acona.communicator.datastructurecontainer.BlackboardBean;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
@@ -25,12 +23,11 @@ import jade.wrapper.gateway.GatewayAgent;
  */
 public class BidirectionalGatewayAgent extends GatewayAgent {
 	
-	private static Logger log = LoggerFactory.getLogger("main");
-	private Gson gson;
+	private static Logger log = LoggerFactory.getLogger(BidirectionalGatewayAgent.class);
 	private SynchronousQueue<Message> blockingQueue;
 	BlackboardBean receiveBoard = null;
 	
-	private String inReplyWith = ""; 
+	//private String inReplyWith = ""; 
 	
 	/**
 	 * 
@@ -44,9 +41,6 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		if (args!=null && args[0] instanceof SynchronousQueue) {
 			this.blockingQueue = (SynchronousQueue<Message>) args[0];
 		}
-		
-		//Start gson
-		gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		// Waiting for the answer
 		addBehaviour(new ReceiveAsynchronousBehaviour(this.blockingQueue));
@@ -79,7 +73,7 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 //			msg.setOntology(this.receiveBoard.getMessage().get(Message.TYPE).getAsString());	//Ontology used as type
 			
 			
-			receiveBoard.setMessage(Message.newMessage()); //JsonMessage.createMessage(JsonMessage.toContentString("ACK"), "", ""));
+			//receiveBoard.setMessage(Message.newMessage()); //JsonMessage.createMessage(JsonMessage.toContentString("ACK"), "", ""));
 			
 			//If sync, then no release command until message has been processed
 			if (this.receiveBoard.isSyncronizedRequest()==false) {
@@ -109,7 +103,9 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		
 		@Override
 		public void action() {
-			MessageTemplate template = MessageTemplate.not(MessageTemplate.MatchConversationId(MessageInfo.SYNCREQUEST));
+			//ACLMessage customTemplate = new ACLMessage(ACLMessage.REQUEST);
+			//customTemplate.addUserDefinedParameter(Keys.MODE.toString(), AconaSync.ASYNCHRONIZED.toString());
+			MessageTemplate template = MessageTemplate.MatchEncoding(AconaSync.ASYNCHRONIZED.toString());//.MatchCustom(customTemplate, true);
 			ACLMessage msg = receive(template);
 			//ACLMessage msg = receive();
 			//log.debug("Asynchron message receival={}", msg);
@@ -141,14 +137,18 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		
 		@Override
 		public void action() {
-			//MessageTemplate template = MessageTemplate.MatchReplyWith(JsonMessage.CONVERSATIONIDREQUEST);
 			log.debug("AID={}", this.myAgent.getAID().getName());
-			MessageTemplate template = MessageTemplate.MatchConversationId(MessageInfo.SYNCREQUEST);
+			//ACLMessage customTemplate = new ACLMessage(ACLMessage.INFORM);
+			//customTemplate.addUserDefinedParameter(Keys.MODE.toString(), AconaSync.SYNCHRONIZED.toString());
+			//MessageTemplate template = MessageTemplate.MatchCustom(customTemplate, false);
+			MessageTemplate template = MessageTemplate.MatchEncoding(AconaSync.SYNCHRONIZED.toString());
+			//MessageTemplate template = MessageTemplate.MatchConversationId(MessageInfo.SYNCREQUEST);
 			ACLMessage msg = receive(template);
-			//ACLMessage msg = receive();
 			
 			if ((msg!=null) && (receiveBoard!=null))	{				
 				try {
+					log.debug("Synchron message receival={}", msg);
+					log.debug("Received from={}, message={}", msg.getSender().getLocalName(), msg.getContent());
 					receiveBoard.setMessage(ACLUtils.convertToMessage(msg));	
 				} catch (Exception e) {
 					log.error("Cannot convert message to JSON={}. Abort operation", msg, e);

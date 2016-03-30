@@ -115,11 +115,10 @@ public class DataStorageImpl implements DataStorage {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DataStorageImpl [data=");
+		builder.append("data=");
 		builder.append(data);
 		builder.append(", subscribers=");
 		builder.append(subscribers);
-		builder.append("]");
 		return builder.toString();
 	}
 	

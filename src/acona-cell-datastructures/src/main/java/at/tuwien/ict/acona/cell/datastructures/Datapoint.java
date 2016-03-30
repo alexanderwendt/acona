@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.cell.datastructures;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,8 +12,10 @@ public class Datapoint {
 	private final static String KEYTYPE = "TYPE";
 	private final static String KEYVALUE = "VALUE";
 	
-	
+	private final static Gson gson = new Gson();
 	private final JsonObject jsondatapoint;
+	
+	private static Logger log = LoggerFactory.getLogger(Datapoint.class);
 	
 	private Datapoint(String address) {
 		jsondatapoint = new JsonObject();
@@ -40,8 +45,8 @@ public class Datapoint {
 		return result;
 	}
 	
-	public static Datapoint toDatapoint(String data) {
-		Gson gson = new Gson();
+	public static Datapoint toDatapoint(String data) throws Exception {
+		log.debug("Datapoint to convert={}", data);
 		JsonObject jsonData = gson.fromJson(data, JsonObject.class);
 		return Datapoint.toDatapoint(jsonData);
 	}

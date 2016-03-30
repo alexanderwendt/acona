@@ -129,9 +129,11 @@ public class CellServiceTester {
 //				}
 //			}
 			
-			String answer = result.getContent().getAsString();
+			String answer = Datapoint.toDatapoint(result.getContent().getAsJsonObject()).getValue().getAsString();
+			log.debug("correct value={}, actual value={}", value, answer);
 			
 			assertEquals(value, answer);
+			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Cannot init system", e);
 			fail("Error");
@@ -235,7 +237,7 @@ public class CellServiceTester {
 	
 	@Test
 	public void unsubscribeNotifyTest() {
-		int minWaitTime = 5;
+		int minWaitTime = 10;
 		//Create 2 agents. One shall subscribe the other. One shall be written to. The subscribing agent shall be notified.
 	
 		
@@ -299,6 +301,7 @@ public class CellServiceTester {
 				}
 			}
 			
+			//Both shall have the same value
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getCell().getDataStorage());
 			//log.debug("Registered subscribers = {}", cellControlPublisher.getCell().getDataStorage().getSubscribers());

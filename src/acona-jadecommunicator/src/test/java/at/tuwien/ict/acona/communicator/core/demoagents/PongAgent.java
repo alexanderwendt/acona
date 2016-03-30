@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -50,15 +52,16 @@ public class PongAgent extends Agent {
 				String content= "";
 				
 				if (msg!=null) {
+					Message aconamessage = ACLUtils.convertToMessage(msg);
 					switch (newMode) {
 						case 0: 
 							content = newMessage;
 							break;
 						case 1:
-							content = msg.getContent() + newMessage;
+							content = aconamessage.getStringContent() + newMessage;
 							break;
 						case 2:
-							content = msg.getContent();
+							content = aconamessage.getStringContent();
 							break;
 						default:
 						try {
@@ -70,6 +73,9 @@ public class PongAgent extends Agent {
 					
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.INFORM);
+					
+					ACLUtils.enhanceACLMessageWithCustomParameters(reply, aconamessage);
+					
 					reply.setContent(content);
 					
 					for (int i=0;i<3;i++) {
@@ -95,6 +101,7 @@ public class PongAgent extends Agent {
 		
 	 protected void takeDown() {
 		 try {
+			 this.doDelete();
 			 DFService.deregister(this);
 			 log.info("{} removed", this.getAID().getLocalName());
 		 } 	catch (Exception e) {

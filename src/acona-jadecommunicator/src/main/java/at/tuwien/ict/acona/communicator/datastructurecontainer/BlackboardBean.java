@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.communicator.datastructurecontainer;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 
 public class BlackboardBean implements java.io.Serializable {
 
@@ -11,9 +12,6 @@ public class BlackboardBean implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Message message = Message.newMessage();
-	//private String message = new String("");
-	//private String receiver = new String("");
-	//private String type = new String("");
 
 	private CommunicationMode communicationMode = CommunicationMode.ASYNC;
 
@@ -25,6 +23,7 @@ public class BlackboardBean implements java.io.Serializable {
 	
 	public void setCommunicationMode(CommunicationMode mode) {
 		this.communicationMode = mode;
+		this.message.setMode(AconaSync.SYNCHRONIZED);
 	}
 	
 	public boolean isSyncronizedRequest() {
@@ -53,22 +52,6 @@ public class BlackboardBean implements java.io.Serializable {
 	public void setMessage(Message message)	{
 		this.message=message;
 	}
-	
-//	public String getReceiver()	{
-//		return receiver;
-//	}
-	
-//	public void setReceiver(String receiver)	{
-//		this.receiver=receiver;
-//	}
-	
-//	public String getType() {
-//		return type;
-//	}
-
-//	public void setType(String type) {
-//		this.type = type;
-//	}
 
 	@Override
 	public String toString() {

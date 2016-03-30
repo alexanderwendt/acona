@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.communicator.datastructurecontainer.BlackboardBean;
 import at.tuwien.ict.acona.communicator.datastructurecontainer.CommunicationMode;
 import jade.core.Profile;
@@ -59,7 +61,7 @@ public class CommunicatorImpl extends Thread implements Communicator {
 			JadeGateway.init("at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent", args, p);
 			
 			//Init the agents and the gateway
-			this.sendAsynchronousMessageToAgent(Message.newMessage().setReceiver("DF").setContent("init"));
+			this.sendAsynchronousMessageToAgent(Message.newMessage().setReceiver("DF").setContent("init").setService(AconaService.WRITE));
 		
 			log.info("Gateway active={}", JadeGateway.isGatewayActive());
 			
@@ -94,18 +96,6 @@ public class CommunicatorImpl extends Thread implements Communicator {
 			this.listeners.forEach((ListenerModule l)->l.updateValue(latestMessage));
 		}
 	}
-
-//	@Override
-//	public void sendAsynchronousMessageToAgent(Message message) throws Exception {
-//		//BlackboardBean board = new BlackboardBean();
-//		this.sendAsynchronousMessageToAgent(JsonMessage.createMessage(message, receiver, type));
-//		//synchronized (this.board) {
-//		//board.setReceiver(receiver);
-//		//board.setMessage(message);
-//		//board.setType(type);
-//		//JadeGateway.execute(board);
-//		//}
-//	}
 	
 	@Override
 	public void sendAsynchronousMessageToAgent(Message message) throws Exception {
@@ -122,31 +112,22 @@ public class CommunicatorImpl extends Thread implements Communicator {
 		return this.sendSynchronousMessageToAgent(message);
 	}
 	
-//	@Override
-//	public JsonObject sendSynchronousMessageToAgent(Message message, int timeout) throws Exception {
-//		return this.sendSynchronousMessageToAgent(JsonMessage.createMessage(message, receiver, messageType), timeout);
-//	}
-	
-//	@Override
-//	public JsonObject sendSynchronousMessageToAgent(JsonObject object) throws Exception {
-//		return sendSynchronousMessageToAgent(object, TIMEOUT);
-//	}
-	
 	public Message sendSynchronousMessageToAgent(Message message, int timeout) throws Exception {
 		Message result = null;
 		
-		BlackboardBean board = new BlackboardBean();
-		board.setCommunicationMode(CommunicationMode.SYNC);
+		BlackboardBean board = new BlackboardBean();		
 		
 		//synchronized (this.board) {
 			//Construct the message
+		message.setMode(AconaSync.SYNCHRONIZED);
+		board.setCommunicationMode(CommunicationMode.SYNC);
 		board.setMessage(message);
 		//board.setReceiver(receiver);
 		//board.setMessage(message);
 		//board.setType(messageType);
 		JadeGateway.execute(board, timeout);
 			
-			//Get the result
+		//Get the result
 		result = board.getMessage();
 		//}
 		

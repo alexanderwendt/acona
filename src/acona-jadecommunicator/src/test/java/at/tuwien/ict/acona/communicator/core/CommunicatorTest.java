@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.core.demoagents.InitiatorAgent;
@@ -124,7 +125,7 @@ public class CommunicatorTest {
 			
 			log.debug("Wait ended. Take message from agent gateway");
 			
-			realanswer = this.comm.getMessageFromAgent(100000).getContent().getAsString();
+			realanswer = this.comm.getMessageFromAgent(100000).getStringContent();
 			
 			log.info("Test finished. Expected message={}, received message={}", expectedAnswer, realanswer);
 			assertEquals(expectedAnswer, realanswer);
@@ -141,7 +142,7 @@ public class CommunicatorTest {
 			//create message
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String receiver = "PongAgent";
-			String type = "read";
+			AconaService type = AconaService.READ;
 			String sendContent = "ping";
 			Message message = Message.newMessage().setReceiver(receiver).setService(type).setContent(sendContent);
 //			String sourceString = "{\"RECEIVER\": [\""+ receiver + "\"], "
@@ -174,7 +175,7 @@ public class CommunicatorTest {
 			
 			//JsonObject obj = this.comm.getMessageFromAgent();
 			
-			answer = this.comm.getMessageFromAgent(20000).getContent().getAsString();
+			answer = this.comm.getMessageFromAgent(20000).getStringContent();
 			
 			assertEquals(expectedAnswer, answer);
 			log.info("Test passed");
@@ -216,8 +217,9 @@ public class CommunicatorTest {
 //				}
 //			}
 			
-			answer = reply.getContent().getAsString();
+			answer = reply.getStringContent();
 			
+			log.debug("received reply={}. Correct answer={}", answer, expectedAnswer);
 			assertEquals(expectedAnswer, answer);
 			log.info("Test passed");
 		} catch (Exception e) {

@@ -3,9 +3,11 @@ package at.tuwien.ict.acona.communicator.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonObject;
-
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
+import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
@@ -14,7 +16,10 @@ public class ACLUtils {
 	public static Message convertToMessage(ACLMessage message) {
 		
 		String content = message.getContent(); //as String
-		String type = message.getOntology(); //for type
+		//AconaService type = AconaService.valueOf(message.getUserDefinedParameter(Keys.SERVICE.toString())); //for type
+		AconaService type = AconaService.valueOf(message.getOntology()); //for type
+		//AconaSync mode = AconaSync.valueOf(message.getUserDefinedParameter(Keys.MODE.toString())); //for type
+		AconaSync mode = AconaSync.valueOf(message.getEncoding()); //for type
 		//Get all receivers in a list
 		List<Object> receivers = new ArrayList<Object>();
 		List<String> localReceivers = new ArrayList<String>();
@@ -24,7 +29,10 @@ public class ACLUtils {
 			localReceivers.add(name);
 		});
 		
-		Message result = Message.newMessage().setReceivers(localReceivers).setService(type).setContent(content); 
+		//Check if content String is a JSON file
+		
+		
+		Message result = Message.newMessage().setReceivers(localReceivers).setService(type).setContent(content).setMode(mode); 
 		
 		return result;
 	}
@@ -41,10 +49,45 @@ public class ACLUtils {
 		
 		//msg.setConversationId(CONVERSATIONID);
 		//msg.setConversationId(JsonMessage.SYNCREQUEST);
-		String content = message.getContent().toString();
+		//Check if JSON or normal string
+		String content = "";
+		if (message.getContent().isJsonPrimitive()==true) {
+			content = message.getContent().getAsJsonPrimitive().getAsString();
+		} else {
+			content = message.getContent().toString();
+		}
+		
 		msg.setContent(content);
-		msg.setOntology(message.getService());	//Ontology used as type
+		//msg.addUserDefinedParameter(Keys.SERVICE.toString(), message.getService().toString());	//Ontology used as type
+		msg.setOntology(message.getService().toString());
+		//msg.addUserDefinedParameter(Keys.MODE.toString(), message.getMode().toString());
+		msg.setEncoding(message.getMode().toString());
 		
 		return msg;
+	}
+	
+	public static void enhanceACLMessageWithCustomParameters(ACLMessage reply, Message message) {
+		//reply.addUserDefinedParameter(Keys.SERVICE.toString(), message.getService().toString());	//Ontology used as type
+		//reply.addUserDefinedParameter(Keys.MODE.toString(), message.getMode().toString());
+		reply.setOntology(message.getService().toString());
+		reply.setEncoding(message.getMode().toString());
+	}
+	
+	public static ACLMessage createReply(ACLMessage originalMessage, Datapoint content) {
+		ACLMessage replyTemplate = originalMessage.createReply();
+		replyTemplate.setEncoding(originalMessage.getEncoding());
+		replyTemplate.setOntology(originalMessage.getOntology());
+		
+		Message replyMessage = ACLUtils.convertToMessage(replyTemplate);
+		replyMessage.setContent(content);
+		//replyMessage.setMode(input.getMode());
+		//replyMessage.setService(input.getService());
+		
+		//ACLUtils.enhanceACLMessageWithCustomParameters(reply, input);
+		//reply.setContent(content.getValue().toString());
+		
+		ACLMessage reply = ACLUtils.convertToACL(replyMessage);
+		
+		return reply;
 	}
 }

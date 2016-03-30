@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.communicator.core;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.datastructures.Message;
 
 public interface Communicator {

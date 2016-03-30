@@ -10,7 +10,9 @@ import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -39,31 +41,38 @@ public class ReadDataServiceBehavior extends CyclicBehaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
-		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaService.READ));
+		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaService.READ.toString()));
 		ACLMessage msg = this.callerCell.receive(mt);
 		if (msg != null) {
-			//Get content, i.e. the address to be read
-			String addressMessage = msg.getContent();
-			log.debug("Received from sender={}, content={}", msg.getSender().toString(), msg.getContent());
-			
-			//Convert to datapoint
-			Datapoint datapoint = Datapoint.toDatapoint(addressMessage);
-			
-			//Get datapointaddress from message
-			//String address = datapoint.getAddress(); //JsonMessage.toJson(addressMessage).get(JsonMessage.DATAPOINTADDRESS).getAsString();
-			
-			//Read data from storage
-			Datapoint readData = this.callerCell.getDataStorage().read(datapoint.getAddress());
-			//Get value
-			String value = readData.getValue().toString();
-			datapoint.setValue(value);
-			
-			//Send back
-			ACLMessage reply = msg.createReply();
-			reply.setContent(datapoint.toJsonObject().toString());
-			
-			this.callerCell.send(reply);
-			
+			Datapoint datapoint=null;
+			try {
+				Message message = ACLUtils.convertToMessage(msg);
+				//Get content, i.e. the address to be read
+				//String addressMessage = msg.getContent();
+				log.debug("Received read request. Message={}", message);
+				
+				//Convert to datapoint
+				datapoint = Datapoint.toDatapoint(message.getContent().getAsJsonObject());
+				
+
+				//Get datapointaddress from message
+				//String address = datapoint.getAddress(); //JsonMessage.toJson(addressMessage).get(JsonMessage.DATAPOINTADDRESS).getAsString();
+				
+				//Read data from storage
+				Datapoint readData = this.callerCell.getDataStorage().read(datapoint.getAddress());
+				//Get value
+				//String value = readData.getValue().toString();
+				//datapoint.setValue(readData.getValue());
+				
+				//Send back
+				ACLMessage reply = ACLUtils.createReply(msg, readData);
+				//reply.setContent(readData.toString());
+				
+				this.callerCell.send(reply);
+				
+			} catch (Exception e) {
+				log.error("Datapoint error of datapoint={}", datapoint, e);
+			}
 		} else {
 			block();
 		} 

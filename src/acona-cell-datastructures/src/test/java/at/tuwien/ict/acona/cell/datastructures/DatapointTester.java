@@ -43,7 +43,7 @@ public class DatapointTester {
 			Datapoint resultDp = Datapoint.toDatapoint(dpString);
 			
 			assertEquals(value, resultDp.getValue().getAsString());
-			log.info("Test passed");
+			log.info("Test passed. Result={}", resultDp);
 		} catch (Exception e) {
 			log.error("Cannot init system", e);
 			fail("Error");
@@ -55,17 +55,19 @@ public class DatapointTester {
 	public void datapointConversionTest() {
 		log.info("Start datapoint conversion tester");
 		try {
-			//String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"Wrong value\"}";
-			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"MuHaahAhaAaahAAHA\"}";
+			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"Wrong value\"}";
+			//String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"MuHaahAhaAaahAAHA\"}";
 			
 			Datapoint dp = Datapoint.toDatapoint(input);
 			
 			assertEquals("Wrong value", dp.getValue().getAsString());
-			log.info("Test passed");
+			log.info("Test passed. Input={}", input);
 		} catch (Exception e) {
 			log.error("Cannot init system", e);
 			fail("Error");
 		}
 	}
+	
+	
 	
 }

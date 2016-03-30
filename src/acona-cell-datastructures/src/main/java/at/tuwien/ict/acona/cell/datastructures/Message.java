@@ -9,19 +9,26 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
+import at.tuwien.ict.acona.cell.datastructures.types.Keys;
+
 public class Message {
 	public final static String KEYRECEIVER = "RECEIVER";
-	//public final static String KEYTYPE = "TYPE";
+	public final static String KEYMODE = "MODE";
 	public final static String KEYSERVICE = "SERVICE";
 	public final static String KEYCONTENT = "CONTENT";
 	
+	
+	private final static Gson gson = new Gson();	
 	private final JsonObject jsondatapoint;
 	
 	private Message() {
 		jsondatapoint = new JsonObject();
 		this.jsondatapoint.add(KEYRECEIVER, new JsonArray());
-		this.jsondatapoint.addProperty(KEYSERVICE, "");
-		this.jsondatapoint.add(KEYCONTENT, new JsonObject());
+		this.jsondatapoint.addProperty(Keys.SERVICE.toString(), AconaService.NONE.toString());
+		this.jsondatapoint.addProperty(KEYCONTENT, "");
+		this.jsondatapoint.addProperty(Keys.MODE.toString(), AconaSync.ASYNCHRONIZED.toString());
 	}
 	
 	public static Message newMessage() {
@@ -37,7 +44,11 @@ public class Message {
 		
 		try {
 			if (Message.isMessage(data)==true) {
-				result = Message.newMessage().setReceivers(data.get(Message.KEYRECEIVER).getAsJsonArray()).setService(data.get(KEYSERVICE).getAsString()).setContent(data.get(Message.KEYCONTENT));
+				result = Message.newMessage()
+						.setReceivers(data.get(Message.KEYRECEIVER).getAsJsonArray())
+						.setService(AconaService.valueOf(data.get(KEYSERVICE).getAsString()))
+						.setMode(AconaSync.valueOf(data.get(KEYMODE).getAsString()))
+						.setContent(data.get(Message.KEYCONTENT));
 			} else {
 				throw new IllegalArgumentException("Cannot cast json data to datapoint");
 			}
@@ -57,7 +68,10 @@ public class Message {
 	public static boolean isMessage(JsonObject data) {
 		boolean result = false;
 		
-		if (data.has(Message.KEYRECEIVER) && data.has(Message.KEYSERVICE) && data.has(Message.KEYCONTENT)) {
+		if (data.has(Message.KEYRECEIVER) && 
+				data.has(Message.KEYSERVICE) && 
+				data.has(Message.KEYCONTENT) &&
+				data.has(Message.KEYMODE)) {
 			result = true;
 		}
 		
@@ -75,7 +89,6 @@ public class Message {
 		//String jsonString = "{\"" + key + "\":" + jsonString
 		
 		//Convert to json
-		Gson gson = new Gson();
 		JsonObject jsonData = gson.fromJson(jsonString, JsonObject.class);
 		return jsonData;
 	}
@@ -122,14 +135,27 @@ public class Message {
 		return this;
 	}
 	
-	public Message setService(String type) {
-		this.jsondatapoint.addProperty(KEYSERVICE, type);
+	public Message setService(AconaService type) {
+		this.jsondatapoint.addProperty(KEYSERVICE, type.toString());
+		
+		return this;
+	}
+	
+	public Message setMode(AconaSync mode) {
+		this.jsondatapoint.addProperty(KEYMODE, mode.toString());
 		
 		return this;
 	}
 	
 	public Message setContent(String value) {
-		this.jsondatapoint.addProperty(KEYCONTENT, value);
+		//Check if it is a json object
+		boolean isJsonObject = JSONUtils.isJSONValid(value);
+		if (isJsonObject==true) {
+			JsonObject object = gson.fromJson(value, JsonObject.class);
+			this.jsondatapoint.add(KEYCONTENT, object);
+		} else {
+			this.jsondatapoint.addProperty(KEYCONTENT, value);
+		}
 		
 		return this;
 	}
@@ -151,17 +177,25 @@ public class Message {
 	}
 	
 	public String[] getReceivers() {
-		Gson gson = new Gson();
 		String[] receivers = gson.fromJson(this.jsondatapoint.get(KEYRECEIVER).getAsJsonArray(), String[].class);
 		return receivers;
 	}
 	
-	public String getService() {
-		return this.jsondatapoint.get(KEYSERVICE).getAsString();
+	public AconaService getService() {
+		return AconaService.valueOf(this.jsondatapoint.get(KEYSERVICE).getAsString());
+	}
+	
+	public AconaSync getMode() {
+		return AconaSync.valueOf(this.jsondatapoint.get(KEYMODE).getAsString());
 	}
 	
 	public JsonElement getContent() {
 		JsonElement content = this.jsondatapoint.get(KEYCONTENT);
+		return content;
+	}
+	
+	public String getStringContent() {
+		String content = this.jsondatapoint.get(KEYCONTENT).getAsJsonPrimitive().getAsString();
 		return content;
 	}
 

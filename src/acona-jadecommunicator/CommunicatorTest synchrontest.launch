@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/acona-cell/src/test/java/at/tuwien/ict/acona/cell/storage/DataStorageTester.java"/>
+<listEntry value="/acona-jadecommunicator/src/test/java/at/tuwien/ict/acona/communicator/core/CommunicatorTest.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
 <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
-<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
+<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value="synchronResponderTest"/>
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit4"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="at.tuwien.ict.acona.cell.storage.DataStorageTester"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="acona-cell"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="at.tuwien.ict.acona.communicator.core.CommunicatorTest"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="acona-jadecommunicator"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlogback.configurationFile=conf/logback.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc}/acona"/>
 </launchConfiguration>

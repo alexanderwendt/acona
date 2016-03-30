@@ -33,7 +33,7 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
-		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaService.SUBSCRIBE));
+		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaService.SUBSCRIBE.toString()));
 		ACLMessage msg = this.callerCell.receive(mt);
 		if (msg != null) {
 			try {
@@ -83,7 +83,7 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 				
 			} catch (Exception e) {
 				log.error("Cannot write data", e);
-				throw e;
+				//throw e;
 			}
 		} else {
 			block();
