@@ -7,6 +7,7 @@ import jade.core.behaviours.CyclicBehaviour;
 
 public abstract class CellFunctionBehavior extends CyclicBehaviour {
 
+	protected final String name;
 	protected JsonObject settings;
 	
 	/**
@@ -18,8 +19,9 @@ public abstract class CellFunctionBehavior extends CyclicBehaviour {
 	
 	protected final Cell caller;
 	
-	public CellFunctionBehavior(Cell caller) {
+	public CellFunctionBehavior(String name, Cell caller) {
 		this.caller = caller;
+		this.name = name;
 	}
 	
 	public void init(JsonObject settings) {
@@ -32,13 +34,26 @@ public abstract class CellFunctionBehavior extends CyclicBehaviour {
 	
 	@Override
 	public void action() {
-		//Execute function on restart
-		this.function(data);
-		
 		//Block the behavior
 		block();
+		//Execute function on restart
+		this.function(data);
 	}
 	
 	public abstract void function(Datapackage data);
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("name=");
+		builder.append(name);
+		builder.append(", settings=");
+		builder.append(settings);
+		builder.append(", data=");
+		builder.append(data);
+		builder.append(", caller=");
+		builder.append(caller);
+		return builder.toString();
+	}
 
 }

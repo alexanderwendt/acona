@@ -12,7 +12,6 @@ import at.tuwien.ict.acona.cell.core.behaviors.ReadDataServiceBehavior;
 import at.tuwien.ict.acona.cell.core.behaviors.SubscribeDataServiceBehavior;
 import at.tuwien.ict.acona.cell.core.behaviors.UnsubscribeDataServiceBehavior;
 import at.tuwien.ict.acona.cell.core.behaviors.WriteDataServiceBehavior;
-import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
@@ -141,6 +140,17 @@ public class CellImpl extends Agent implements Cell, DataStorageSubscriberNotifi
 		//	log.warn("Notify subscribers erroneously called");
 		//}
 
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.getLocalName());
+		builder.append("> dataStorage=");
+		builder.append(dataStorage);
+		//builder.append(", activationHandler=");
+		//builder.append(activationHandler);
+		return builder.toString();
 	}
 	
 	

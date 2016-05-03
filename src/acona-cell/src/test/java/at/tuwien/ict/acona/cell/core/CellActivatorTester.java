@@ -89,7 +89,7 @@ public class CellActivatorTester {
 			log.debug("wait for agent to answer");
 			synchronized (this) {
 				try {
-					this.wait(200);
+					this.wait(2000000);
 				} catch (InterruptedException e) {
 					
 				}

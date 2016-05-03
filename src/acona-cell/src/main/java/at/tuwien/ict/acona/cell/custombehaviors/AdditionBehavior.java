@@ -9,16 +9,16 @@ import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 
 public class AdditionBehavior extends CellFunctionBehavior {
 	
+	protected static Logger log = LoggerFactory.getLogger(AdditionBehavior.class);
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AdditionBehavior(Cell caller) {
-		super(caller);
+	public AdditionBehavior(String name, Cell caller) {
+		super(name, caller);
 	}
-
-	protected static Logger log = LoggerFactory.getLogger(AdditionBehavior.class);
 
 	@Override
 	public void function(Datapackage data) {
