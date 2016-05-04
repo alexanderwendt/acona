@@ -21,7 +21,7 @@ public interface ActivationHandler {
 	 * @param datapointAddress
 	 * @param activatorInstance
 	 */
-	public void registerActivatorInstance(String datapointAddress, ActivatorInstance activatorInstance);
+	public void registerActivatorInstance(String datapointAddress, Activator activatorInstance);
 	
 	/**
 	 * Deregister an activator instance for a certain datapoint address
@@ -29,6 +29,6 @@ public interface ActivationHandler {
 	 * @param datapointAddress
 	 * @param activatorInstanceName
 	 */
-	public void deregisterActivatorInstance(String datapointAddress, ActivatorInstance activatorInstanceName);
+	public void deregisterActivatorInstance(String datapointAddress, Activator activatorInstanceName);
 	
 }

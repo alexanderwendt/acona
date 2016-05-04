@@ -5,17 +5,31 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class ConditionIsNotEmpty extends ConditionImpl {
 
+	private String test = "";
+	
 	@Override
 	public boolean testCondition(Datapoint data) {
 		boolean result = false;
 		
-		if (data.getValue().isJsonNull()==false) {
+		
+		if (data.getValue().isJsonNull()==false && data.getValue().getAsString().equals("")==false) {
 			result = true;
 		}
 		
 		log.debug("Condition gives={}", result);
 		
 		return result;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Check if a datapoint is empty";
+	}
+
+	@Override
+	protected void subInit() {
+		//test = (this.conf!=null?"":this.conf.get("TEST").getAsString());
+		
 	}
 
 }

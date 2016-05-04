@@ -12,12 +12,18 @@ public abstract class ConditionImpl implements Condition {
 	protected static Logger log = LoggerFactory.getLogger(ConditionImpl.class);
 	
 	protected String name = "";
+	protected JsonObject conf = new JsonObject();
 	
 	@Override
 	public void init(String name, JsonObject settings) {
 		this.name = name;
+		this.conf = settings;
 		
+		//Inidividual init
+		this.subInit();
 	}
+	
+	protected abstract void subInit();
 
 	@Override
 	public String getName() {
@@ -26,6 +32,9 @@ public abstract class ConditionImpl implements Condition {
 
 	@Override
 	public abstract boolean testCondition(Datapoint data);
+	
+	@Override
+	public abstract String getDescription();
 
 	@Override
 	public String toString() {

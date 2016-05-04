@@ -63,15 +63,14 @@ public class CellImpl extends Agent implements Cell, DataStorageSubscriberNotifi
 		 
 		 //Init internally
 		 this.internalInit();
+		 
+		 log.trace("Cell {}> initialized", this.getName());
 	}
 	
 	protected void internalInit() {
 		//Setup activations and behaviors
-		
-		
-		
-		
-		
+		//Overwrite method with own init
+
 	}
 	
 	private void createBasicBehaviors() {
@@ -127,6 +126,7 @@ public class CellImpl extends Agent implements Cell, DataStorageSubscriberNotifi
 
 		//Remove the caller from the subscibers to be notified. The system shall not notify itself, except internal data exchange has happened
 		if (subscribers.contains(this.getLocalName())) {
+			log.trace("activate local behaviors");
 			this.activationHandler.activateLocalBehaviors(subscribedData);
 		}
 		

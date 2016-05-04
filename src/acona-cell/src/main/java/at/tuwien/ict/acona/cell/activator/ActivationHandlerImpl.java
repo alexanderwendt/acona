@@ -14,23 +14,24 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 public class ActivationHandlerImpl implements ActivationHandler {
 
 	private static Logger log = LoggerFactory.getLogger(ActivationHandlerImpl.class);
-	private final Map<String, List<ActivatorInstance>> activatorMap = new ConcurrentHashMap<String, List<ActivatorInstance>>();
+	private final Map<String, List<Activator>> activatorMap = new ConcurrentHashMap<String, List<Activator>>();
 	
 	private Cell caller;
 	
 	@Override
 	public void activateLocalBehaviors(Datapoint subscribedData) {
-		List<ActivatorInstance> instanceList = activatorMap.get(subscribedData.getAddress());
+		List<Activator> instanceList = activatorMap.get(subscribedData.getAddress());
 		
 		//run all activations of that datapoint in parallel
-		instanceList.forEach((ActivatorInstance a)->a.runActivation(subscribedData));
+		log.trace("Test activations for dp={}", subscribedData);
+		instanceList.forEach((Activator a)->a.runActivation(subscribedData));
 	}
 
 	@Override
-	public void registerActivatorInstance(String address, ActivatorInstance activatorInstance) {
+	public void registerActivatorInstance(String address, Activator activatorInstance) {
 		if (this.activatorMap.containsKey(address)==false) {
 			//Add new entry
-			List<ActivatorInstance> activators = new LinkedList<ActivatorInstance>();
+			List<Activator> activators = new LinkedList<Activator>();
 			activators.add(activatorInstance);
 			this.activatorMap.put(address, activators);
 			
@@ -44,7 +45,7 @@ public class ActivationHandlerImpl implements ActivationHandler {
 	}
 
 	@Override
-	public void deregisterActivatorInstance(String address, ActivatorInstance activatorInstanceName) {
+	public void deregisterActivatorInstance(String address, Activator activatorInstanceName) {
 		if (this.activatorMap.containsKey(address)==true) {
 			this.activatorMap.get(address).remove(activatorInstanceName);
 			if (this.activatorMap.get(address).isEmpty()==true) {

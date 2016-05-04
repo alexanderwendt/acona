@@ -1,0 +1,148 @@
+package at.tuwien.ict.acona.cell.activator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import at.tuwien.ict.acona.cell.core.CellFunctionBehavior;
+import at.tuwien.ict.acona.cell.core.CellImpl;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+
+public class ActivatorImpl implements Activator {
+
+	protected static Logger log = LoggerFactory.getLogger(ActivatorImpl.class);
+	
+	private String name;
+	private CellFunctionBehavior behavior;
+	private CellImpl caller;
+	//Mapping of one condition to a datapoint. N X M mapping possible. Datapoint to m Conditions
+	private final Map<String, List<ActivatorConditionManager>> conditionMapping = new ConcurrentHashMap<String, List<ActivatorConditionManager>>();
+	
+	//FIXME temporary solution, where the number of filfilled conditions it count. If all conditions are fulfilled, the currentCount=Maxcount
+	//All conditions must be fulfilled for the behavior to be activated
+	private int conditionMaxCount=0;
+	private volatile int conditionCurrentCount = 0;
+
+	@Override
+	public void init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehavior behavior, CellImpl caller) {
+		log.trace("activator {} init", this.name);
+		this.name = name;
+		this.behavior = behavior;
+		this.caller = caller;
+		
+		//Set conditions and 
+		subscriptionCondition.entrySet().forEach((Entry<String, List<Condition>> e)->{
+			
+			//Create an activator condition
+			List<ActivatorConditionManager> conditionManagerList = new LinkedList<ActivatorConditionManager>();
+			e.getValue().forEach((Condition c)->{
+				//Create new condition manager from mapping
+				ActivatorConditionManager conditionManager = new ActivatorConditionManager(c, e.getKey());
+				conditionManagerList.add(conditionManager);
+			});
+			
+			conditionMapping.put(e.getKey(), conditionManagerList);
+			
+			//Subscribe datapoint
+			this.caller.getDataStorage().subscribeDatapoint(e.getKey(), caller.getLocalName());
+		});
+		
+		//Count table
+		this.conditionMaxCount = calculateTotalCount(subscriptionCondition);
+
+		//Add and activate behavior
+		this.caller.addBehaviour(behavior);
+
+		
+	}
+
+	/**
+	 * Calculate the total count for elements in a map with a list within
+	 * 
+	 * @param subscriptionCondition
+	 * @return
+	 */
+	private int calculateTotalCount(Map<String, List<Condition>> subscriptionCondition) {
+		int conditionMaxCount=0;
+		for (Entry<String, List<Condition>> entry: subscriptionCondition.entrySet()) {
+			conditionMaxCount += entry.getValue().size();	//Values of conditions in subtables
+		}
+		
+		return conditionMaxCount;
+	}
+
+	@Override
+	public boolean runActivation(Datapoint subscribedData) {
+		//This method is activated as soon as conditions shall be tested
+		List<ActivatorConditionManager> conditions;
+		if (this.conditionMapping.containsKey(subscribedData.getAddress())==true) {
+			conditions = this.conditionMapping.get(subscribedData.getAddress());
+		} else {
+			conditions = new LinkedList<ActivatorConditionManager>(); 
+		}
+			
+		//Check all conditions
+		log.trace("Test activation for activator={} on data={}", this.name, subscribedData);
+		//boolean isActivate=true;
+		
+		//Run all conditions for this datapoint (ActivatorConditionManager c {do c....}
+		conditions.forEach(c->{
+			boolean previousState = c.isConditionFulfilled();
+			boolean currentState = c.testCondition(subscribedData);
+			
+			//If state changed from false to true, increment. In the other direction, decrement
+			if (currentState==true && previousState==false) {
+				conditionCurrentCount++;
+			} else if (currentState==false && previousState==true) {
+				conditionCurrentCount--;
+			}
+		});
+		
+		//Check if all conditions are fulfilled
+		boolean result = false;
+		if (this.conditionCurrentCount==this.conditionMaxCount) {
+			result = true;
+			
+			//Extract all stored datapoints from the table
+			//Create datapointlist
+			final Map<String, Datapoint> currentDatapointList = new ConcurrentHashMap<String, Datapoint>();
+			//For each entry in the condition mapping, get all datapoints from the first element in the activation manager list 
+			conditionMapping.forEach((k, v)->currentDatapointList.put(k, v.get(0).getCurrentValue()));
+			
+			
+			behavior.setData(currentDatapointList);	//Add data that shall be used in the behavior
+			behavior.setRunPermission(true);	//Set permission true to start
+			behavior.restart();	//Start behavior
+		}
+		
+		return result;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("name=");
+		builder.append(name);
+		builder.append(", behavior=");
+		builder.append(behavior);
+		builder.append(", caller=");
+		builder.append(caller);
+		builder.append(", conditions=");
+		builder.append(conditionMapping);
+		return builder.toString();
+	}
+
+}

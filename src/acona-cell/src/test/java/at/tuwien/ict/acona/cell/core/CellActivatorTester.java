@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.core.CellInspectorController;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
@@ -77,6 +78,7 @@ public class CellActivatorTester {
 	public void activatorTest() {
 		try {
 			String activatorAgentName = "activatoragent";
+			String datapointsource = "activator.test.address";
 			
 			//Create cell inspector controller for the subscriber
 			CellInspectorController cellControlPublisher = new CellInspectorController();
@@ -89,16 +91,24 @@ public class CellActivatorTester {
 			log.debug("wait for agent to answer");
 			synchronized (this) {
 				try {
-					this.wait(2000000);
+					this.wait(200);
 				} catch (InterruptedException e) {
 					
 				}
 			}
 			log.debug("State={}", publisherController.getState());
 			
+			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(datapointsource).setValue(""), cellControlPublisher.getCell().getLocalName());
 			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+					
+				}
+			}
 			
-			
+			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(datapointsource).setValue("hallo"), cellControlPublisher.getCell().getLocalName());
 			
 			
 		} catch (Exception e) {

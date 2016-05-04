@@ -1,14 +1,9 @@
 package at.tuwien.ict.acona.cell.core.behaviors;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
