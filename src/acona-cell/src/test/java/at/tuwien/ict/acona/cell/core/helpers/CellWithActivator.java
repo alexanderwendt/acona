@@ -1,15 +1,18 @@
 package at.tuwien.ict.acona.cell.core.helpers;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehavior;
+import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.CellInspector;
-import at.tuwien.ict.acona.cell.custombehaviors.AdditionBehavior;
-import jade.core.behaviours.Behaviour;
+import at.tuwien.ict.acona.cell.custombehaviours.AdditionBehavior;
 
 public class CellWithActivator extends CellInspector {
 
@@ -20,26 +23,32 @@ public class CellWithActivator extends CellInspector {
 	
 	protected void internalInit() {
 		//Address
-		String datapointsource = "activator.test.address";
+		//String datapointsource = "activator.test.address";
 		String activatorName = "testactivator";
 		String conditionName = "isNotEmpty";
+		JsonObject additionBehaviourConf = new JsonObject();
+		additionBehaviourConf.addProperty("operand1", "data.op1");
+		additionBehaviourConf.addProperty("operand2", "data.op2");
+		additionBehaviourConf.addProperty("result", "data.result");
 		
 		Activator activator = new ActivatorImpl();
-		CellFunctionBehavior activateBehaviour = new AdditionBehavior("AdditionBehavior", this);
+		CellFunctionBehaviour activateBehaviour = new AdditionBehavior(this).init("AdditionBehaviour", additionBehaviourConf);
+		
 		//Create condition
-		Condition condition = new ConditionIsNotEmpty();
-		condition.init(conditionName, null);
-		
-		
-		
+		Condition condition1 = new ConditionIsNotEmpty().init(conditionName, new JsonObject());
+		Condition condition2 = new ConditionIsNotEmpty().init(conditionName, new JsonObject());
+
+		Map<String, List<Condition>> conditionMapping = new HashMap<String, List<Condition>>();
+		conditionMapping.put(additionBehaviourConf.get("operand1").getAsString(), Arrays.asList(condition1));
+		conditionMapping.put(additionBehaviourConf.get("operand2").getAsString(), Arrays.asList(condition2));
 		//this.addBehaviour(activateBehaviour);
 		
 		
 		//activateBehaviour
-		activator.init(activatorName, Arrays.asList(datapointsource), "test", Arrays.asList(condition), activateBehaviour, this);
+		activator.init(activatorName, conditionMapping, "", activateBehaviour, this);
 		//activator.registerCondition(new ConditionIsNotEmpty());
 		
-		this.getActivationHandler().registerActivatorInstance(datapointsource, activator);
+		this.getActivationHandler().registerActivatorInstance(activator);
 		
 		log.debug("Activator registered");
 	}

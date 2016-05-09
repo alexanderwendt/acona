@@ -1,11 +1,10 @@
 package at.tuwien.ict.acona.cell.activator;
 
-import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public interface ActivationHandler {
 	
-	public void init(Cell caller);
+	//public void init(Cell caller);
 	
 	/**
 	 * Test if behaviors can be activated. The internal activations to trigger a behavior
@@ -16,19 +15,17 @@ public interface ActivationHandler {
 	public void activateLocalBehaviors(Datapoint subscribedData);
 	
 	/**
-	 * Register an activator for a certain datapoint address
+	 * Register an activator that is linked to datapoints through its activations
 	 * 
-	 * @param datapointAddress
 	 * @param activatorInstance
 	 */
-	public void registerActivatorInstance(String datapointAddress, Activator activatorInstance);
+	public void registerActivatorInstance(Activator activatorInstance);
 	
 	/**
-	 * Deregister an activator instance for a certain datapoint address
+	 * Deregister an activator instance that is linked to datapoints through its activations
 	 * 
-	 * @param datapointAddress
 	 * @param activatorInstanceName
 	 */
-	public void deregisterActivatorInstance(String datapointAddress, Activator activatorInstanceName);
+	public void deregisterActivatorInstance(Activator activatorInstanceName);
 	
 }

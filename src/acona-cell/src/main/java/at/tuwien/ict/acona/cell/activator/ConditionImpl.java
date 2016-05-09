@@ -15,12 +15,14 @@ public abstract class ConditionImpl implements Condition {
 	protected JsonObject conf = new JsonObject();
 	
 	@Override
-	public void init(String name, JsonObject settings) {
+	public Condition init(String name, JsonObject conf) {
 		this.name = name;
-		this.conf = settings;
+		this.conf = conf;
 		
 		//Inidividual init
 		this.subInit();
+		
+		return this;
 	}
 	
 	protected abstract void subInit();

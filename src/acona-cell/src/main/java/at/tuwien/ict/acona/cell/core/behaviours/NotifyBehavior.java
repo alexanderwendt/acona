@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.core.behaviors;
+package at.tuwien.ict.acona.cell.core.behaviours;
 
 import java.util.LinkedList;
 import java.util.List;

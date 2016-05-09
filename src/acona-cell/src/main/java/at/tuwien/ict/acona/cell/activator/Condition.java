@@ -10,7 +10,7 @@ public interface Condition {
 	 * @param name
 	 * @param settings
 	 */
-	public void init(String name, final JsonObject settings);
+	public Condition init(String name, final JsonObject settings);
 	
 	/**
 	 * @return

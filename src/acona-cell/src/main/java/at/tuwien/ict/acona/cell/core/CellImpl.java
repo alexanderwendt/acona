@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.activator.ActivationHandler;
 import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
-import at.tuwien.ict.acona.cell.core.behaviors.NotifyBehavior;
-import at.tuwien.ict.acona.cell.core.behaviors.ReadDataServiceBehavior;
-import at.tuwien.ict.acona.cell.core.behaviors.SubscribeDataServiceBehavior;
-import at.tuwien.ict.acona.cell.core.behaviors.UnsubscribeDataServiceBehavior;
-import at.tuwien.ict.acona.cell.core.behaviors.WriteDataServiceBehavior;
+import at.tuwien.ict.acona.cell.core.behaviours.NotifyBehavior;
+import at.tuwien.ict.acona.cell.core.behaviours.ReadDataServiceBehavior;
+import at.tuwien.ict.acona.cell.core.behaviours.SubscribeDataServiceBehavior;
+import at.tuwien.ict.acona.cell.core.behaviours.UnsubscribeDataServiceBehavior;
+import at.tuwien.ict.acona.cell.core.behaviours.WriteDataServiceBehavior;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
@@ -125,7 +125,7 @@ public class CellImpl extends Agent implements Cell, DataStorageSubscriberNotifi
 		//Check inputs
 
 		//Remove the caller from the subscibers to be notified. The system shall not notify itself, except internal data exchange has happened
-		if (subscribers.contains(this.getLocalName())) {
+		if (subscribers.contains(this.getName())) {
 			log.trace("activate local behaviors");
 			this.activationHandler.activateLocalBehaviors(subscribedData);
 		}

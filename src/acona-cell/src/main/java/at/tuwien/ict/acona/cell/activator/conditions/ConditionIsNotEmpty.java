@@ -16,7 +16,7 @@ public class ConditionIsNotEmpty extends ConditionImpl {
 			result = true;
 		}
 		
-		log.debug("Condition gives={}", result);
+		log.trace("{}>result={}", this.name, result);
 		
 		return result;
 	}

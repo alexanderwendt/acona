@@ -78,7 +78,13 @@ public class CellActivatorTester {
 	public void activatorTest() {
 		try {
 			String activatorAgentName = "activatoragent";
-			String datapointsource = "activator.test.address";
+			String op1address = "data.op1";
+			String op2address = "data.op2";
+			String resultaddress = "data.result";
+			
+			double op1 = 1;
+			double op2 = 2;
+			double expectedResult = 3;
 			
 			//Create cell inspector controller for the subscriber
 			CellInspectorController cellControlPublisher = new CellInspectorController();
@@ -98,7 +104,8 @@ public class CellActivatorTester {
 			}
 			log.debug("State={}", publisherController.getState());
 			
-			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(datapointsource).setValue(""), cellControlPublisher.getCell().getLocalName());
+			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(op1address).setValue(String.valueOf(op1)), cellControlPublisher.getCell().getName());
+			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(op2address).setValue(String.valueOf(op2)), cellControlPublisher.getCell().getName());
 			
 			synchronized (this) {
 				try {
@@ -108,8 +115,9 @@ public class CellActivatorTester {
 				}
 			}
 			
-			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(datapointsource).setValue("hallo"), cellControlPublisher.getCell().getLocalName());
+			double actualResult = cellControlPublisher.getCell().getDataStorage().read(resultaddress).getValue().getAsDouble();
 			
+			assertEquals(actualResult, expectedResult, 0.0001);
 			
 		} catch (Exception e) {
 			log.error("Cannot init system", e);

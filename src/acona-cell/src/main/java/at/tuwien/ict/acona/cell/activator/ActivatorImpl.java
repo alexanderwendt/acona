@@ -1,8 +1,7 @@
 package at.tuwien.ict.acona.cell.activator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.core.CellFunctionBehavior;
-import at.tuwien.ict.acona.cell.core.CellImpl;
+import at.tuwien.ict.acona.cell.core.Cell;
+import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class ActivatorImpl implements Activator {
@@ -21,8 +20,8 @@ public class ActivatorImpl implements Activator {
 	protected static Logger log = LoggerFactory.getLogger(ActivatorImpl.class);
 	
 	private String name;
-	private CellFunctionBehavior behavior;
-	private CellImpl caller;
+	private CellFunctionBehaviour behavior;
+	private Cell caller;
 	//Mapping of one condition to a datapoint. N X M mapping possible. Datapoint to m Conditions
 	private final Map<String, List<ActivatorConditionManager>> conditionMapping = new ConcurrentHashMap<String, List<ActivatorConditionManager>>();
 	
@@ -32,8 +31,7 @@ public class ActivatorImpl implements Activator {
 	private volatile int conditionCurrentCount = 0;
 
 	@Override
-	public void init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehavior behavior, CellImpl caller) {
-		log.trace("activator {} init", this.name);
+	public Activator init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell caller) {
 		this.name = name;
 		this.behavior = behavior;
 		this.caller = caller;
@@ -52,16 +50,20 @@ public class ActivatorImpl implements Activator {
 			conditionMapping.put(e.getKey(), conditionManagerList);
 			
 			//Subscribe datapoint
-			this.caller.getDataStorage().subscribeDatapoint(e.getKey(), caller.getLocalName());
+			this.caller.getDataStorage().subscribeDatapoint(e.getKey(), caller.getName());
 		});
 		
 		//Count table
 		this.conditionMaxCount = calculateTotalCount(subscriptionCondition);
 
 		//Add and activate behavior
-		this.caller.addBehaviour(behavior);
-
+		//INFO: Instead of letting the caller add the jade behavior, the cell behavior adds itself
+		behavior.addBehaviourToCallerCell(caller);
+		//this.caller.addBehaviour(behavior);
 		
+		log.trace("{}> initialization finished", this.name);
+
+		return this;
 	}
 
 	/**
@@ -90,19 +92,20 @@ public class ActivatorImpl implements Activator {
 		}
 			
 		//Check all conditions
-		log.trace("Test activation for activator={} on data={}", this.name, subscribedData);
+		//log.trace("{}> on data={}", this.name, subscribedData);
 		//boolean isActivate=true;
 		
 		//Run all conditions for this datapoint (ActivatorConditionManager c {do c....}
 		conditions.forEach(c->{
 			boolean previousState = c.isConditionFulfilled();
 			boolean currentState = c.testCondition(subscribedData);
+			log.trace("{}>Test condition={}. Result={}", this.name, c, currentState);
 			
 			//If state changed from false to true, increment. In the other direction, decrement
 			if (currentState==true && previousState==false) {
-				conditionCurrentCount++;
+				this.conditionCurrentCount++;
 			} else if (currentState==false && previousState==true) {
-				conditionCurrentCount--;
+				this.conditionCurrentCount--;
 			}
 		});
 		
@@ -117,10 +120,11 @@ public class ActivatorImpl implements Activator {
 			//For each entry in the condition mapping, get all datapoints from the first element in the activation manager list 
 			conditionMapping.forEach((k, v)->currentDatapointList.put(k, v.get(0).getCurrentValue()));
 			
-			
 			behavior.setData(currentDatapointList);	//Add data that shall be used in the behavior
 			behavior.setRunPermission(true);	//Set permission true to start
-			behavior.restart();	//Start behavior
+			behavior.startBehaviour();	//Start behavior
+		} else {
+			log.trace("{}> No activation. Condition(s) did not match.", this.name);
 		}
 		
 		return result;
@@ -143,6 +147,11 @@ public class ActivatorImpl implements Activator {
 		builder.append(", conditions=");
 		builder.append(conditionMapping);
 		return builder.toString();
+	}
+
+	@Override
+	public List<String> getLinkedDatapoints() {
+		return Collections.unmodifiableList(new ArrayList<String>(this.conditionMapping.keySet()));
 	}
 
 }

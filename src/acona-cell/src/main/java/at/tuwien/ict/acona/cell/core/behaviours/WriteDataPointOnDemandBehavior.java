@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.core.behaviors;
+package at.tuwien.ict.acona.cell.core.behaviours;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;

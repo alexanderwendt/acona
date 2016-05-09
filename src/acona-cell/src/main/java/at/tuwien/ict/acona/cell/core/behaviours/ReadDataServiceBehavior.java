@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.core.behaviors;
+package at.tuwien.ict.acona.cell.core.behaviours;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

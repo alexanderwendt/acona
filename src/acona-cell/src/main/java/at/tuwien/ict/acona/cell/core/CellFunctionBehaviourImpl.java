@@ -11,11 +11,11 @@ import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import jade.core.behaviours.CyclicBehaviour;
 
-public abstract class CellFunctionBehavior extends CyclicBehaviour {
+public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implements CellFunctionBehaviour {
 
-	protected static Logger log = LoggerFactory.getLogger(CellFunctionBehavior.class);
-	protected final String name;
-	protected JsonObject settings;
+	protected static Logger log = LoggerFactory.getLogger(CellFunctionBehaviourImpl.class);
+	protected String name;
+	protected JsonObject conf;
 	//protected final Activator activator;
 	
 	private static final long serialVersionUID = 1L;
@@ -25,21 +25,26 @@ public abstract class CellFunctionBehavior extends CyclicBehaviour {
 	
 	protected final Cell caller;
 	
-	public CellFunctionBehavior(String name, Cell caller) {
+	public CellFunctionBehaviourImpl(Cell caller) {
 		this.caller = caller;
+	}
+	
+	@Override
+	public CellFunctionBehaviour init(String name, JsonObject conf) {
 		this.name = name;
-	}
-	
-	public void init(JsonObject settings) {
-		this.settings = settings;
+		this.conf = conf;
 		this.isAllowedToRun = false;
+		
+		return this;
 	}
 	
+	@Override
 	public void setData(Map<String, Datapoint> data) {
 		this.data = data;
 		log.trace("Cell {}> data set={}", this.name, this.data);
 	}
 	
+	@Override
 	public void setRunPermission(boolean isAllowedToRun) {
 		this.isAllowedToRun=isAllowedToRun;
 	}
@@ -63,6 +68,17 @@ public abstract class CellFunctionBehavior extends CyclicBehaviour {
 			block();
 		}		
 	}
+
+	@Override
+	public void startBehaviour() {
+		//Proxy
+		this.restart();
+	}
+	
+	@Override
+	public void addBehaviourToCallerCell(Cell caller) {
+		caller.addBehaviour(this);
+	}
 	
 	public abstract void function(Map<String, Datapoint> data);
 
@@ -72,12 +88,14 @@ public abstract class CellFunctionBehavior extends CyclicBehaviour {
 		builder.append("name=");
 		builder.append(name);
 		builder.append(", settings=");
-		builder.append(settings);
+		builder.append(conf);
 		builder.append(", data=");
 		builder.append(data);
 		builder.append(", caller=");
 		builder.append(caller);
 		return builder.toString();
 	}
+
+
 
 }

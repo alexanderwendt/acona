@@ -51,15 +51,14 @@ public class ActivatorConditionManager {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("ActivatorConditionManager [condition=");
+		builder.append("condition=");
 		builder.append(condition);
-		builder.append(", currentValue=");
-		builder.append(currentValue);
-		builder.append(", previousValue=");
-		builder.append(previousValue);
 		builder.append(", datapointAddress=");
 		builder.append(datapointAddress);
-		builder.append("]");
+		builder.append(", currentVal=");
+		builder.append((currentValue!=null?currentValue.getValue():"null"));
+		builder.append(", previousVal=");
+		builder.append((previousValue!=null?previousValue.getValue():null));
 		return builder.toString();
 	}
 
