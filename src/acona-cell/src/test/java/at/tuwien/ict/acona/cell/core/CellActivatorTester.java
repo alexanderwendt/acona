@@ -8,7 +8,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.core.CellInspectorController;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
+import at.tuwien.ict.acona.cell.config.ActivatorConfig;
+import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.BehaviourConfig;
+import at.tuwien.ict.acona.cell.config.ConditionConfig;
+import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.communicator.core.Communicator;
@@ -17,7 +27,6 @@ import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
-import jade.wrapper.State;
 
 public class CellActivatorTester {
 
@@ -26,14 +35,13 @@ public class CellActivatorTester {
 	private Communicator comm;
 	
 	private ContainerController agentContainer;
-	private ContainerController mainContainerController;
-
+	
 	@Before
 	public void setUp() throws Exception {
 		try {
 			//Create container
 			log.debug("Create or get main container");
-			mainContainerController = this.util.createMainJADEContainer("localhost", 1099, "MainContainer");
+			this.util.createMainJADEContainer("localhost", 1099, "MainContainer");
 					
 			log.debug("Create subcontainer");
 			agentContainer = this.util.createAgentContainer("localhost", 1099, "Subcontainer"); 
@@ -87,9 +95,10 @@ public class CellActivatorTester {
 			double expectedResult = 3;
 			
 			//Create cell inspector controller for the subscriber
-			CellInspectorController cellControlPublisher = new CellInspectorController();
-			Object[] argsPublisher = new Object[1];
-			argsPublisher[0] = cellControlPublisher;
+			InspectorCellClient cellControlPublisher = new InspectorCellClient();
+			Object[] argsPublisher = new Object[2];
+			argsPublisher[0] = new JsonObject();
+			argsPublisher[1] = cellControlPublisher;
 			//Create agent in the system
 			AgentController publisherController = this.util.createAgent(activatorAgentName, CellWithActivator.class, argsPublisher, agentContainer);
 			log.debug("State={}", publisherController.getState());
@@ -118,6 +127,67 @@ public class CellActivatorTester {
 			double actualResult = cellControlPublisher.getCell().getDataStorage().read(resultaddress).getValue().getAsDouble();
 			
 			assertEquals(actualResult, expectedResult, 0.0001);
+			
+		} catch (Exception e) {
+			log.error("Cannot init system", e);
+			fail("Error");
+		}
+	}
+	
+	@Test
+	public void createConfigurableAdditionNetwork() {
+		try {
+			//Create config JSON
+			CellConfig cell = CellConfig.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.cellInspector");
+			cell.setClass(InspectorCell.class);
+			cell.addCondition(ConditionConfig.newConfig("operand1", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
+			cell.addCondition(ConditionConfig.newConfig("operand2", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
+			cell.addBehaviour(BehaviourConfig.newConfig("additionBehaviour", "at.tuwien.ict.acona.cell.custombehaviours.AdditionBehaviour")
+					.setProperty("operand1", "data.op1")
+					.setProperty("operand2", "data.op2")
+					.setProperty("result", "data.result"));
+			cell.addActivator(ActivatorConfig.newConfig("AdditionActivator").setBehaviour("additionBehaviour").setActivatorLogic("")
+					.addMapping("data.op1", "operand1")
+					.addMapping("data.op2", "operand2"));
+
+			double op1 = 12;
+			double op2 = 23;
+			double expectedResult = 35;
+			
+			//Create cell inspector controller for the subscriber
+			InspectorCellClient externalController = new InspectorCellClient();
+			Object[] argsPublisher = new Object[2];
+			argsPublisher[0] = cell.toJsonObject();
+			argsPublisher[1] = externalController;
+			//Create agent in the system
+			AgentController agentController = this.util.createAgent(cell.getName(), cell.getClassToInvoke(), argsPublisher, agentContainer);
+			log.debug("State={}", agentController.getState());
+			
+			log.debug("wait for agent to answer");
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+					
+				}
+			}
+			log.debug("State={}", agentController.getState());
+			
+			externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op1").setValue(String.valueOf(op1)), externalController.getCell().getName());
+			externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op2").setValue(String.valueOf(op2)), externalController.getCell().getName());
+			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+					
+				}
+			}
+			
+			double actualResult = externalController.getCell().getDataStorage().read("data.result").getValue().getAsDouble();
+			
+			assertEquals(actualResult, expectedResult, 0.0);
+			log.info("Test passed");
 			
 		} catch (Exception e) {
 			log.error("Cannot init system", e);

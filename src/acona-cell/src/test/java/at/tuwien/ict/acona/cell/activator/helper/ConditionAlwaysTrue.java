@@ -11,7 +11,11 @@ public class ConditionAlwaysTrue extends ConditionImpl {
 
 	@Override
 	protected void subInit() {
-		//Nothing to init	
+		if (this.conf!=null && this.conf.has("option1")==true && this.conf.has("option2")==true) {
+			log.info("Got info from config: option1={}, option2={}", this.conf.getAsJsonPrimitive("option1").getAsString(), this.conf.getAsJsonPrimitive("option2").getAsString());
+		} else {
+			log.info("No configuration was passed");
+		}
 	}
 
 	@Override

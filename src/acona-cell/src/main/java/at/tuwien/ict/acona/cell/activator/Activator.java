@@ -2,6 +2,7 @@ package at.tuwien.ict.acona.cell.activator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
@@ -38,4 +39,6 @@ public interface Activator {
 	 * @return
 	 */
 	public List<String> getLinkedDatapoints();
+	
+	public Map<String, List<ActivatorConditionManager>> getConditionMapping();
 }

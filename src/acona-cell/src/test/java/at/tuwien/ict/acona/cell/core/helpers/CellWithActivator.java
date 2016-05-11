@@ -11,10 +11,10 @@ import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
-import at.tuwien.ict.acona.cell.core.CellInspector;
-import at.tuwien.ict.acona.cell.custombehaviours.AdditionBehavior;
+import at.tuwien.ict.acona.cell.core.InspectorCell;
+import at.tuwien.ict.acona.cell.custombehaviours.AdditionBehaviour;
 
-public class CellWithActivator extends CellInspector {
+public class CellWithActivator extends InspectorCell {
 
 	/**
 	 * 
@@ -32,7 +32,7 @@ public class CellWithActivator extends CellInspector {
 		additionBehaviourConf.addProperty("result", "data.result");
 		
 		Activator activator = new ActivatorImpl();
-		CellFunctionBehaviour activateBehaviour = new AdditionBehavior(this).init("AdditionBehaviour", additionBehaviourConf);
+		CellFunctionBehaviour activateBehaviour = new AdditionBehaviour().init("AdditionBehaviour", additionBehaviourConf, this);
 		
 		//Create condition
 		Condition condition1 = new ConditionIsNotEmpty().init(conditionName, new JsonObject());

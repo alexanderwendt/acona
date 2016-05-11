@@ -23,17 +23,22 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 	private Map<String, Datapoint> data= new HashMap<String, Datapoint>();
 	private boolean isAllowedToRun=false;
 	
-	protected final Cell caller;
+	protected Cell caller;
 	
-	public CellFunctionBehaviourImpl(Cell caller) {
-		this.caller = caller;
+	public CellFunctionBehaviourImpl() {
+		
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 	
 	@Override
-	public CellFunctionBehaviour init(String name, JsonObject conf) {
+	public CellFunctionBehaviour init(String name, JsonObject conf, Cell caller) {
 		this.name = name;
 		this.conf = conf;
 		this.isAllowedToRun = false;
+		this.caller = caller;
 		
 		return this;
 	}

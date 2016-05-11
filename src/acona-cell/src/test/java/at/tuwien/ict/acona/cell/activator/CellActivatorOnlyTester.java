@@ -68,7 +68,7 @@ public class CellActivatorOnlyTester {
 			
 			//Create behaviour
 			DummyBehaviour activateBehaviour = new DummyBehaviour();
-			activateBehaviour.init(activatorName, null);
+			activateBehaviour.init(activatorName, null, cell);
 			
 			//Create condition
 			Condition condition1 = new ConditionAlwaysTrue().init(conditionName, null);
@@ -135,7 +135,7 @@ public class CellActivatorOnlyTester {
 			
 			//Create behaviour
 			DummyBehaviour activateBehaviour = new DummyBehaviour();
-			activateBehaviour.init(activatorName, null);
+			activateBehaviour.init(activatorName, null, cell);
 			
 			//Create condition
 			Condition condition1 = new ConditionAlwaysTrue().init(conditionName, null);

@@ -12,9 +12,9 @@ import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviourImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class AdditionBehavior extends CellFunctionBehaviourImpl {
+public class AdditionBehaviour extends CellFunctionBehaviourImpl {
 	
-	protected static Logger log = LoggerFactory.getLogger(AdditionBehavior.class);
+	protected static Logger log = LoggerFactory.getLogger(AdditionBehaviour.class);
 	
 	private static final String OPERAND1ADDRESS = "operand1";
 	private static final String OPERAND2ADDRESS = "operand2";
@@ -25,8 +25,8 @@ public class AdditionBehavior extends CellFunctionBehaviourImpl {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AdditionBehavior(Cell caller) {
-		super(caller);
+	public AdditionBehaviour() {
+		super();
 	}
 
 	@Override
@@ -44,7 +44,6 @@ public class AdditionBehavior extends CellFunctionBehaviourImpl {
 		//Write result in memory
 		this.caller.getDataStorage().write(Datapoint.newDatapoint(conf.get(RESULTADDRESS).getAsString()).setValue(String.valueOf(result)), caller.getName());
 		log.info("{}> Add {} + {} = {}", this.name, operand1, operand2, result);
-		
 		
 		
 	}

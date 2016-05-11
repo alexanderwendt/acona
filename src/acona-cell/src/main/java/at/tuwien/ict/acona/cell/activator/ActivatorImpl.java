@@ -154,4 +154,9 @@ public class ActivatorImpl implements Activator {
 		return Collections.unmodifiableList(new ArrayList<String>(this.conditionMapping.keySet()));
 	}
 
+	@Override
+	public Map<String, List<ActivatorConditionManager>> getConditionMapping() {
+		return this.conditionMapping;
+	}
+
 }

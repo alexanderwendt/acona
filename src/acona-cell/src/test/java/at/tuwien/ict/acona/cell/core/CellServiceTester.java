@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.CellInspector;
-import at.tuwien.ict.acona.cell.core.CellInspectorController;
+import at.tuwien.ict.acona.cell.core.InspectorCell;
+import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
@@ -87,16 +87,15 @@ public class CellServiceTester {
 	@Test
 	public void writeAndReadTest() {
 		try {
-			//create message
-			//String messageTypeRead = "read";
-			//String messageTypeWrite  ="write";
 			String receiver = "CellAgent";
 			String datapointaddress = "testaddress";
 			String value = "testvalue";
 			
 			//Create agent in the system
 			//String[] args = {"1", "pong"};
-			AgentController cellAgent = this.util.createAgent(receiver, CellImpl.class, agentContainer);
+			Object[] args = new Object[1];
+			args[0] = new JsonObject();
+			AgentController cellAgent = this.util.createAgent(receiver, CellImpl.class, args, agentContainer);
 			
 			//Send Write command
 			Message writeMessage = Message.newMessage()
@@ -155,18 +154,20 @@ public class CellServiceTester {
 			String value2 = "MuHaahAhaAaahAAHA";
 			
 			//Create cell inspector controller for the subscriber
-			CellInspectorController cellControlSubscriber = new CellInspectorController();
-			Object[] argsSubscriber = new Object[1];
-			argsSubscriber[0] = cellControlSubscriber;
+			InspectorCellClient cellControlSubscriber = new InspectorCellClient();
+			Object[] argsSubscriber = new Object[2];
+			argsSubscriber[0] = new JsonObject();
+			argsSubscriber[1] = cellControlSubscriber;
 			//Create agent in the system
-			this.util.createAgent(subscriberAgentName, CellInspector.class, argsSubscriber, agentContainer);
+			this.util.createAgent(subscriberAgentName, InspectorCell.class, argsSubscriber, agentContainer);
 			
 			//Create cell inspector controller for the subscriber
-			CellInspectorController cellControlPublisher = new CellInspectorController();
-			Object[] argsPublisher = new Object[1];
-			argsPublisher[0] = cellControlPublisher;
+			InspectorCellClient cellControlPublisher = new InspectorCellClient();
+			Object[] argsPublisher = new Object[2];
+			argsPublisher[0] = new JsonObject();
+			argsPublisher[1] = cellControlPublisher;
 			//Create agent in the system
-			AgentController publisherController = this.util.createAgent(publisherAgentName, CellInspector.class, argsPublisher, agentContainer);
+			AgentController publisherController = this.util.createAgent(publisherAgentName, InspectorCell.class, argsPublisher, agentContainer);
 			log.debug("State={}", publisherController.getState());
 			State state = publisherController.getState();
 			
@@ -250,25 +251,27 @@ public class CellServiceTester {
 			String value2 = "MuHaahAhaAaahAAHA";
 			
 			//Create cell inspector controller for the subscriber
-			CellInspectorController cellControlSubscriber = new CellInspectorController();
-			Object[] argsSubscriber = new Object[1];
-			argsSubscriber[0] = cellControlSubscriber;
+			InspectorCellClient cellControlSubscriber = new InspectorCellClient();
+			Object[] argsSubscriber = new Object[2];
+			argsSubscriber[0] = new JsonObject();
+			argsSubscriber[1] = cellControlSubscriber;
 			//Create agent in the system
-			this.util.createAgent(subscriberAgentName, CellInspector.class, argsSubscriber, agentContainer);
+			this.util.createAgent(subscriberAgentName, InspectorCell.class, argsSubscriber, agentContainer);
 			
 			//Create cell inspector controller for the subscriber
-			CellInspectorController cellControlPublisher = new CellInspectorController();
-			Object[] argsPublisher = new Object[1];
-			argsPublisher[0] = cellControlPublisher;
+			InspectorCellClient cellControlPublisher = new InspectorCellClient();
+			Object[] argsPublisher = new Object[2];
+			argsPublisher[0] = new JsonObject();
+			argsPublisher[1] = cellControlPublisher;
 			//Create agent in the system
-			AgentController publisherController = this.util.createAgent(publisherAgentName, CellInspector.class, argsPublisher, agentContainer);
+			AgentController publisherController = this.util.createAgent(publisherAgentName, InspectorCell.class, argsPublisher, agentContainer);
 			log.debug("State={}", publisherController.getState());
 			State state = publisherController.getState();
 			
 			log.debug("wait for agent to answer");
 			synchronized (this) {
 				try {
-					this.wait(200);
+					this.wait(2000);
 				} catch (InterruptedException e) {
 					
 				}
@@ -373,16 +376,17 @@ public class CellServiceTester {
 			String value2 = "MuHaahAhaAaahAAHA";
 			
 			//Create X=5 agents
-			List<CellInspectorController> inspectors = new ArrayList<CellInspectorController>();
+			List<InspectorCellClient> inspectors = new ArrayList<InspectorCellClient>();
 			List<AgentController> controllers = new ArrayList<AgentController>();
 			for (int i=0; i<numberOfAgents; i++) {
 				//Create cell inspector controller for the subscriber
-				CellInspectorController cellControlSubscriber = new CellInspectorController();
-				Object[] argsSubscriber = new Object[1];
-				argsSubscriber[0] = cellControlSubscriber;
+				InspectorCellClient cellControlSubscriber = new InspectorCellClient();
+				Object[] argsSubscriber = new Object[2];
+				argsSubscriber[0] = new JsonObject();
+				argsSubscriber[1] = cellControlSubscriber;
 				//Create agent in the system
 				inspectors.add(cellControlSubscriber);
-				AgentController controller = this.util.createAgent(agentNameTemplate + i, CellInspector.class, argsSubscriber, agentContainer);
+				AgentController controller = this.util.createAgent(agentNameTemplate + i, InspectorCell.class, argsSubscriber, agentContainer);
 				controllers.add(controller);
 			}
 			
@@ -400,8 +404,8 @@ public class CellServiceTester {
 			
 			//Set subscriptions
 			for (int i=1;i<numberOfAgents;i++) {
-				CellInspectorController thisController = inspectors.get(i);
-				CellInspectorController previousController = inspectors.get(i-1);
+				InspectorCellClient thisController = inspectors.get(i);
+				InspectorCellClient previousController = inspectors.get(i-1);
 				
 				//Subscribe a datapoint of the publisher agent
 				//Create Message
