@@ -126,7 +126,7 @@ public class MessageDatapointTester {
 			AconaService actualType = testObject.getService();
 			
 			//Now, the message would be sent and received. Convert back to datapoint
-			String dpback = messageout.getStringContent();
+			String dpback = messageout.getContentAsString();
 			
 			log.debug("Got receiver={}, type={}, message={}", actualreceiver, actualType, dpback);
 			

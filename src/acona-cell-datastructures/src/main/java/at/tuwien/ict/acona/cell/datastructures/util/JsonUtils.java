@@ -1,13 +1,13 @@
-package at.tuwien.ict.acona.cell.datastructures;
+package at.tuwien.ict.acona.cell.datastructures.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-public class JSONUtils {
+public class JsonUtils {
 	 private static final Gson gson = new Gson();
 
-	  private JSONUtils(){}
+	  private JsonUtils(){}
 
 	  public static boolean isJSONValid(String JSON_STRING) {
 	      try {

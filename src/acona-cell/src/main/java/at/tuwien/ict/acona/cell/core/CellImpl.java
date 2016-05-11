@@ -215,14 +215,9 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		}
 		
 		//Revove it from the list before sending to external application
-		subscribers.remove(caller);
+		subscribers.remove(this.getName());
 		
 		this.addBehaviour(new NotifyBehavior(subscribers, subscribedData));
-			
-			
-		//} else {
-		//	log.warn("Notify subscribers erroneously called");
-		//}
 
 	}
 

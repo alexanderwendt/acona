@@ -21,8 +21,6 @@ public class DataStorageImpl implements DataStorage {
 	private final Map<String, List<String>> subscribers = new ConcurrentHashMap<String, List<String>>();
 	private DataStorageSubscriberNotificator subscriberNotificator;
 	
-	
-	
 	@Override
 	public DataStorage init(DataStorageSubscriberNotificator subscriberManager) {
 		this.subscriberNotificator = subscriberManager;

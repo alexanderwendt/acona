@@ -46,6 +46,18 @@ public class JadeContainerUtil {
 		agentController = containerController.createNewAgent(name, className, args);
 		agentController.start();
 		
+		//Wait until the agent has been initialized
+		//FIXME: This is a unsaubere solution. Listener would be better
+		while (agentController.getState().getCode()!=3) {
+			synchronized (this) {
+				try {
+					this.wait(10);
+				} catch (InterruptedException e) {
+					
+				}
+			}
+		}
+		
 		return agentController;
 	}
 	

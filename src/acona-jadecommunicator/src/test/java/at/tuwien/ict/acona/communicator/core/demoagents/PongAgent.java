@@ -58,10 +58,10 @@ public class PongAgent extends Agent {
 							content = newMessage;
 							break;
 						case 1:
-							content = aconamessage.getStringContent() + newMessage;
+							content = aconamessage.getContentAsString() + newMessage;
 							break;
 						case 2:
-							content = aconamessage.getStringContent();
+							content = aconamessage.getContentAsString();
 							break;
 						default:
 						try {

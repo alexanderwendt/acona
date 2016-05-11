@@ -9,7 +9,10 @@ import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
+import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -37,8 +40,10 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 		ACLMessage msg = this.callerCell.receive(mt);
 		if (msg != null) {
 			try {
+				Message message = ACLUtils.convertToMessage(msg);
+				
 				//Get content, i.e. the address to be read
-				Datapoint dp = Datapoint.toDatapoint(msg.getContent());
+				Datapoint dp = message.getContentAsDatapoint(); //Datapoint.toDatapoint(msg.getContent());
 				log.debug("Subscribe request: received from sender={}, content={}", msg.getSender().toString(), msg.getContent());
 				
 				//Get datapointaddress from message
@@ -52,34 +57,21 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 				
 				log.debug("caller={} subscribes={}", msg.getSender().getLocalName(), dp.getAddress());
 				
-				//Send back
-//				ACLMessage reply = msg.createReply();
-//				reply.setReplyWith(msg.getReplyWith());
-//				String replyMessage = JsonMessage.toContentString(JsonMessage.ACKNOWLEDGE);
-//				reply.setPerformative(ACLMessage.CONFIRM);
-//				reply.setContent(replyMessage);
-//				
-//				this.callerCell.send(reply);
-//				log.debug("Reply sent");
-				
-				
-				
-//				//Write value of datapoint to subscriber, in order to provide with initial value
-//				//Create send message without target
-				
-				//Create message body
-//				JsonObject writeBody = new JsonObject();
-//				writeBody.addProperty(JsonMessage.DATAPOINTADDRESS, address);
-//				writeBody.addProperty(JsonMessage.VALUE, this.callerCell.getDataStorage().read(address).get(address).getDefaultValue());
+				//Send back if synchronized call
+				if (message.getMode().equals(AconaSync.SYNCHRONIZED)) {
+					ACLMessage reply = msg.createReply();
+					reply.setReplyWith(msg.getReplyWith());
+					reply.setPerformative(ACLMessage.CONFIRM);
+					String replyMessage = "ACK";
+					reply.setContent(replyMessage);
+					ACLUtils.enhanceACLMessageWithCustomParameters(reply, message);
+					
+					this.callerCell.send(reply);
+					log.debug("Reply sent");
+				}
 				
 				this.myAgent.addBehaviour(new WriteDataPointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress())));
 				log.debug("Initial value sent to {}", msg.getSender().getLocalName());
-//				ACLMessage notifyMessage = new ACLMessage(ACLMessage.REQUEST);
-//				notifyMessage.setOntology(JsonMessage.SERVICEWRITE);
-//				
-//				notifyMessage.setContent(writeBody.toString());
-//				notifyMessage.addReceiver(msg.getSender());
-//				this.callerCell.send(notifyMessage);
 				
 			} catch (Exception e) {
 				log.error("Cannot write data", e);

@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.communicator.core.helper;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.ListenerModule;
@@ -54,6 +52,18 @@ public class CommunicatorMock implements Communicator {
 	public Message getMessageFromAgent(long timeout) throws InterruptedException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void subscribeDatapoint(String agentName, String datapointName) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unsubscribeDatapoint(String agentName, String datapointName) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

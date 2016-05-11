@@ -8,12 +8,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
 import at.tuwien.ict.acona.cell.config.ActivatorConfig;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.BehaviourConfig;
@@ -21,6 +17,8 @@ import at.tuwien.ict.acona.cell.config.ConditionConfig;
 import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Message;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
@@ -163,34 +161,36 @@ public class CellActivatorTester {
 			AgentController agentController = this.util.createAgent(cell.getName(), cell.getClassToInvoke(), argsPublisher, agentContainer);
 			log.debug("State={}", agentController.getState());
 			
-			log.debug("wait for agent to answer");
-			synchronized (this) {
-				try {
-					this.wait(200);
-				} catch (InterruptedException e) {
-					
-				}
-			}
-			log.debug("State={}", agentController.getState());
+			this.comm.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(cell.getName())
+					.setService(AconaService.WRITE)
+					.setContent(Datapoint.newDatapoint("data.op1").setValue(String.valueOf(op1))));
+			this.comm.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(cell.getName())
+					.setService(AconaService.WRITE)
+					.setContent(Datapoint.newDatapoint("data.op2").setValue(String.valueOf(op2))));
 			
-			externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op1").setValue(String.valueOf(op1)), externalController.getCell().getName());
-			externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op2").setValue(String.valueOf(op2)), externalController.getCell().getName());
+			//externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op1").setValue(String.valueOf(op1)), externalController.getCell().getName());
+			//externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op2").setValue(String.valueOf(op2)), externalController.getCell().getName());
 			
-			synchronized (this) {
-				try {
-					this.wait(200);
-				} catch (InterruptedException e) {
-					
-				}
-			}
+//			synchronized (this) {
+//				try {
+//					this.wait(200);
+//				} catch (InterruptedException e) {
+//					
+//				}
+//			}
+			//log.debug("test");
 			
-			double actualResult = externalController.getCell().getDataStorage().read("data.result").getValue().getAsDouble();
+			this.comm.subscribeDatapoint(cell.getName(), "data.result");
 			
+			double actualResult = this.comm.getMessageFromAgent(5000).getContentAsDatapoint().getValue().getAsDouble();
+			//double actualResult = externalController.getCell().getDataStorage().read("data.result").getValue().getAsDouble();
+			
+			//Message x = this.comm.getMessageFromAgent(1000);
 			assertEquals(actualResult, expectedResult, 0.0);
 			log.info("Test passed");
 			
 		} catch (Exception e) {
-			log.error("Cannot init system", e);
+			log.error("Error at test execution", e);
 			fail("Error");
 		}
 	}

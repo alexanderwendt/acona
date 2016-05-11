@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
-import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import at.tuwien.ict.acona.communicator.datastructurecontainer.BlackboardBean;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
@@ -62,26 +61,11 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 			//Set the receiver and send the command to the receiver
 			ACLMessage msg = ACLUtils.convertToACL(receiveBoard.getMessage());
 			
-					
-//			new ACLMessage(ACLMessage.REQUEST);
-//			msg.addReceiver(new AID(receiveBoard.getMessage().get(Message.RECEIVER).getAsString(), AID.ISLOCALNAME));
-//			msg.setConversationId(CONVERSATIONID);
-//			msg.setInReplyTo(JsonMessage.CONVERSATIONIDREQUEST);
-			
-//			String content = receiveBoard.getMessageBodyAsString();
-//			msg.setContent(content);
-//			msg.setOntology(this.receiveBoard.getMessage().get(Message.TYPE).getAsString());	//Ontology used as type
-			
-			
-			//receiveBoard.setMessage(Message.newMessage()); //JsonMessage.createMessage(JsonMessage.toContentString("ACK"), "", ""));
-			
 			//If sync, then no release command until message has been processed
 			if (this.receiveBoard.isSyncronizedRequest()==false) {
 				this.releaseCommand(receiveBoard);
 			} else {
 				msg.setConversationId(MessageInfo.SYNCREQUEST);
-				//msg.setReplyWith(JsonMessage.CONVERSATIONIDREQUEST);
-				//this.inReplyWith = msg.getConversationId();
 			}
 			
 			send(msg);
@@ -138,11 +122,7 @@ public class BidirectionalGatewayAgent extends GatewayAgent {
 		@Override
 		public void action() {
 			log.debug("AID={}", this.myAgent.getAID().getName());
-			//ACLMessage customTemplate = new ACLMessage(ACLMessage.INFORM);
-			//customTemplate.addUserDefinedParameter(Keys.MODE.toString(), AconaSync.SYNCHRONIZED.toString());
-			//MessageTemplate template = MessageTemplate.MatchCustom(customTemplate, false);
 			MessageTemplate template = MessageTemplate.MatchEncoding(AconaSync.SYNCHRONIZED.toString());
-			//MessageTemplate template = MessageTemplate.MatchConversationId(MessageInfo.SYNCREQUEST);
 			ACLMessage msg = receive(template);
 			
 			if ((msg!=null) && (receiveBoard!=null))	{				

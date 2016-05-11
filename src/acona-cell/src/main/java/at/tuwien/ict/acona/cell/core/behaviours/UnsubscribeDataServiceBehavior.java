@@ -7,6 +7,7 @@ import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -36,31 +37,28 @@ public class UnsubscribeDataServiceBehavior extends CyclicBehaviour {
 		if (msg != null) {
 			try {
 				Message message = ACLUtils.convertToMessage(msg);
+				
 				//Get content, i.e. the address to be read
 				Datapoint dp = Datapoint.toDatapoint(message.getContent().getAsJsonObject());
 				log.debug("Unsubscribe request: received from sender={}, content={}", msg.getSender().toString(), msg.getContent());
 				
-				//Get datapointaddress from message
-				//Format, address, value, callerID
-				//String address = JsonMessage.toJson(inputMessage).get(JsonMessage.DATAPOINTADDRESS).getAsString();
-				//String value = JsonMessage.toJson(inputMessage).get(JsonMessage.VALUE).getAsString();
-				
-				//Datapackage dataPackageToWrite = DatapackageImpl.newDatapackage(address, value);
 				//Read data from storage
 				this.callerCell.getDataStorage().unsubscribeDatapoint(dp.getAddress(), msg.getSender().getLocalName());
 				
 				log.debug("caller={} unsubscribes={}", msg.getSender().getLocalName(), dp.getAddress());
 				
-				//Send back
-//				ACLMessage reply = msg.createReply();
-//				reply.setReplyWith(msg.getReplyWith());
-//				String replyMessage = JsonMessage.toContentString(JsonMessage.ACKNOWLEDGE);
-//				reply.setPerformative(ACLMessage.CONFIRM);
-//				reply.setContent(replyMessage);
-				
-//				this.callerCell.send(reply);
-//				log.debug("Confirmation of unsubscription sent");
-				
+				//Send back if synchronized call
+				if (message.getMode().equals(AconaSync.SYNCHRONIZED)) {
+					ACLMessage reply = msg.createReply();
+					reply.setReplyWith(msg.getReplyWith());
+					reply.setPerformative(ACLMessage.CONFIRM);
+					String replyMessage = "ACK";
+					reply.setContent(replyMessage);
+					ACLUtils.enhanceACLMessageWithCustomParameters(reply, message);
+					
+					this.callerCell.send(reply);
+					log.debug("Reply sent");
+				}
 			} catch (Exception e) {
 				log.error("Cannot unsubscribe", e);
 				//throw e;

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
@@ -32,7 +33,7 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	/**
 	 * Queue for all incoming messages
 	 */
-	private LinkedBlockingQueue<Message> agentMessages = new LinkedBlockingQueue<Message>(10);
+	private LinkedBlockingQueue<Message> agentMessages = new LinkedBlockingQueue<Message>(32);
 	
 	private Message message = Message.newMessage();
 	
@@ -109,7 +110,7 @@ public class CommunicatorImpl extends Thread implements Communicator {
 
 	@Override
 	public Message sendSynchronousMessageToAgent(Message message) throws Exception {
-		return this.sendSynchronousMessageToAgent(message);
+		return this.sendSynchronousMessageToAgent(message, 0);
 	}
 	
 	public Message sendSynchronousMessageToAgent(Message message, int timeout) throws Exception {
@@ -117,19 +118,14 @@ public class CommunicatorImpl extends Thread implements Communicator {
 		
 		BlackboardBean board = new BlackboardBean();		
 		
-		//synchronized (this.board) {
-			//Construct the message
+		//Construct the message
 		message.setMode(AconaSync.SYNCHRONIZED);
 		board.setCommunicationMode(CommunicationMode.SYNC);
 		board.setMessage(message);
-		//board.setReceiver(receiver);
-		//board.setMessage(message);
-		//board.setType(messageType);
 		JadeGateway.execute(board, timeout);
 			
 		//Get the result
 		result = board.getMessage();
-		//}
 		
 		return result;
 	}
@@ -141,7 +137,15 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	
 	@Override
 	public Message getMessageFromAgent(long timeout) throws InterruptedException {
-		return this.agentMessages.poll(timeout, TimeUnit.MILLISECONDS);
+		Message result = null;
+		try {
+			result = this.agentMessages.poll(timeout, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			log.error("Time out from getMessage");
+			throw e;
+		}
+		
+		return result; 
 	}
 
 	@Override
@@ -153,5 +157,20 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	public void shutDown() {
 		log.info("Shutting down Jade gateway");
 		JadeGateway.shutdown();
+	}
+
+	@Override
+	public void subscribeDatapoint(String agentName, String datapointName) throws Exception {
+		this.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(agentName)
+				.setService(AconaService.SUBSCRIBE)
+				.setContent(Datapoint.newDatapoint(datapointName)));
+	}
+
+	@Override
+	public void unsubscribeDatapoint(String agentName, String datapointName) throws Exception {
+		this.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(agentName)
+				.setService(AconaService.UNSUBSCRIBE)
+				.setContent(Datapoint.newDatapoint(datapointName)));
+		
 	}
 }

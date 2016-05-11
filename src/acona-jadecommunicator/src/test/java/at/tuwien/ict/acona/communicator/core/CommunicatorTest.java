@@ -125,7 +125,7 @@ public class CommunicatorTest {
 			
 			log.debug("Wait ended. Take message from agent gateway");
 			
-			realanswer = this.comm.getMessageFromAgent(100000).getStringContent();
+			realanswer = this.comm.getMessageFromAgent(100000).getContentAsString();
 			
 			log.info("Test finished. Expected message={}, received message={}", expectedAnswer, realanswer);
 			assertEquals(expectedAnswer, realanswer);
@@ -175,7 +175,7 @@ public class CommunicatorTest {
 			
 			//JsonObject obj = this.comm.getMessageFromAgent();
 			
-			answer = this.comm.getMessageFromAgent(20000).getStringContent();
+			answer = this.comm.getMessageFromAgent(20000).getContentAsString();
 			
 			assertEquals(expectedAnswer, answer);
 			log.info("Test passed");
@@ -217,7 +217,7 @@ public class CommunicatorTest {
 //				}
 //			}
 			
-			answer = reply.getStringContent();
+			answer = reply.getContentAsString();
 			
 			log.debug("received reply={}. Correct answer={}", answer, expectedAnswer);
 			assertEquals(expectedAnswer, answer);

@@ -44,9 +44,9 @@ public class CellBuilder {
 	
 	private static Logger log = LoggerFactory.getLogger(CellBuilder.class);
 	
-	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
-	private final Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap = new HashMap<String, CellFunctionBehaviour>();
-	private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
+	private final Map<String, Condition> conditionMap = new ConcurrentHashMap<String, Condition>();
+	private final Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap = new ConcurrentHashMap<String, CellFunctionBehaviour>();
+	private final Map<String, Activator> activatorMap = new ConcurrentHashMap<String, Activator>();
 	
 	public void initializeCellConfig(JsonObject config, CellInitialization caller) throws Exception {
 		//Instantiate the cell itself
@@ -94,6 +94,9 @@ public class CellBuilder {
 				cellActivators.forEach(activatorConfig->{
 					try {
 						Activator activator = this.createActivatorFromConfig(activatorConfig.getAsJsonObject(), this.conditionMap, this.cellFunctionBehaviourMap, caller);
+						if (activator==null) {
+							throw new NullPointerException("activator does not exist");
+						}
 						this.activatorMap.put(activator.getName(), activator);
 					} catch (Exception e) {
 						log.info("Cannot create activator from {}", activatorConfig);
@@ -113,7 +116,7 @@ public class CellBuilder {
 				
 			}
 		} catch (Exception e) {
-			log.error("Cannot create cell");
+			log.error("Cannot create cell", e);
 			throw new Exception(e.getMessage());
 		}
 		

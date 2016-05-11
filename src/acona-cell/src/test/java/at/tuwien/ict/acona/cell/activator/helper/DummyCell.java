@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.activator.ActivationHandler;
+import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
@@ -26,6 +27,7 @@ public class DummyCell implements CellInitialization {
 	private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
 
 	private DataStorage data = new DataStorageImpl().init(null);
+	private ActivationHandler activationHandler = new ActivationHandlerImpl();
 	
 	@Override
 	public DataStorage getDataStorage() {
@@ -34,8 +36,7 @@ public class DummyCell implements CellInitialization {
 
 	@Override
 	public ActivationHandler getActivationHandler() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.activationHandler;
 	}
 
 	@Override

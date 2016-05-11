@@ -12,6 +12,7 @@ import com.google.gson.JsonPrimitive;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.cell.datastructures.types.Keys;
+import at.tuwien.ict.acona.cell.datastructures.util.JsonUtils;
 
 public class Message {
 	public final static String KEYRECEIVER = "RECEIVER";
@@ -149,7 +150,7 @@ public class Message {
 	
 	public Message setContent(String value) {
 		//Check if it is a json object
-		boolean isJsonObject = JSONUtils.isJSONValid(value);
+		boolean isJsonObject = JsonUtils.isJSONValid(value);
 		if (isJsonObject==true) {
 			JsonObject object = gson.fromJson(value, JsonObject.class);
 			this.jsondatapoint.add(KEYCONTENT, object);
@@ -194,7 +195,12 @@ public class Message {
 		return content;
 	}
 	
-	public String getStringContent() {
+	public Datapoint getContentAsDatapoint() {
+		Datapoint content = Datapoint.toDatapoint(this.jsondatapoint.getAsJsonObject(KEYCONTENT));
+		return content;
+	}
+	
+	public String getContentAsString() {
 		String content = this.jsondatapoint.get(KEYCONTENT).getAsJsonPrimitive().getAsString();
 		return content;
 	}
