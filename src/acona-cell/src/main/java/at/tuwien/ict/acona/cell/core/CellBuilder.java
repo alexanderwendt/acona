@@ -74,7 +74,7 @@ public class CellBuilder {
 						Condition c = this.createConditionFromConfig(conditionConfig.getAsJsonObject());
 						this.conditionMap.put(c.getName(), c);
 					} catch (Exception e) {
-						log.info("Cannot create condition from {}", conditionConfig);
+						log.error("Cannot create condition from {}", conditionConfig, e);
 					}			
 				});
 				
@@ -85,7 +85,7 @@ public class CellBuilder {
 						CellFunctionBehaviour behaviour = this.createCellFunctionBehaviourFromConfig(behaviourConfig.getAsJsonObject(), caller);
 						this.cellFunctionBehaviourMap.put(behaviour.getName(), behaviour);
 					} catch (Exception e) {
-						log.info("Cannot create behaviour from {}", behaviourConfig);
+						log.error("Cannot create behaviour from {}", behaviourConfig, e);
 					}	
 					
 				});
@@ -99,7 +99,7 @@ public class CellBuilder {
 						}
 						this.activatorMap.put(activator.getName(), activator);
 					} catch (Exception e) {
-						log.info("Cannot create activator from {}", activatorConfig);
+						log.error("Cannot create activator from {}", activatorConfig, e);
 					}	
 					
 				});
