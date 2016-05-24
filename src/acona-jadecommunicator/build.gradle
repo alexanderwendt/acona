@@ -31,7 +31,7 @@ repositories {
     mavenCentral()
     //mavenLocal()
     flatDir {		//If no repository is used, the flat file structure can be used here
-    	dirs '../../../libs'
+    	dirs '../../../SharedLibs/libs'
   	}
   	//mavenCentral artifactUrls:['file://${basedir}/lib']
 }
@@ -48,10 +48,10 @@ dependencies {
     compile 'org.fusesource.jansi:jansi:1.11'
     
     //Jade library
-    compile files('../../../libs/jade.jar')
+    compile files('../../../SharedLibs/libs/jade.jar')
     
     //GSON for representing data structures
-    compile files('../../../libs/gson-2.3.1.jar')
+    compile files('../../../SharedLibs/libs/gson-2.3.1.jar')
 	
 	//Internal projects
 	compile project(':acona-cell-datastructures')
