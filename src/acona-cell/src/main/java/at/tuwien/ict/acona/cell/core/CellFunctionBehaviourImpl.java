@@ -85,6 +85,14 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 		caller.addBehaviour(this);
 	}
 	
+	protected void writeToDataStorage(Datapoint datapoint) {
+		this.caller.getDataStorage().write(datapoint, caller.getName());
+	}
+	
+	protected Datapoint readFromDataStorage(String address) {
+		return this.caller.getDataStorage().read(address);
+	}
+	
 	public abstract void function(Map<String, Datapoint> data);
 
 	@Override
