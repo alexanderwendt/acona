@@ -12,7 +12,6 @@ import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
-import at.tuwien.ict.acona.cell.custombehaviours.AdditionBehaviour;
 
 public class CellWithActivator extends InspectorCell {
 

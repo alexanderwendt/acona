@@ -70,7 +70,7 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 					log.debug("Reply sent");
 				}
 				
-				this.myAgent.addBehaviour(new WriteDataPointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress())));
+				this.myAgent.addBehaviour(new SendDatapointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress()), AconaService.WRITE));
 				log.debug("Initial value sent to {}", msg.getSender().getLocalName());
 				
 			} catch (Exception e) {

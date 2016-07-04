@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysFalse;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysTrue;
+import at.tuwien.ict.acona.cell.activator.helper.ConditionIsOne;
 import at.tuwien.ict.acona.cell.activator.helper.DummyBehaviour;
 import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
 import at.tuwien.ict.acona.cell.core.Cell;
@@ -48,6 +49,7 @@ public class CellActivatorOnlyTester {
 
 	@Test
 	public void activateBehaviorFalseMultipleConditionsTest() {
+		log.debug("Start activateBehaviorFalseMultipleConditionsTest");
 		try {
 			//Address
 			String datapointsource1 = "activator.test.address1";
@@ -173,6 +175,68 @@ public class CellActivatorOnlyTester {
 			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
 			
 			assertEquals(true, activateBehaviour.hasRun());
+			log.info("Test passed");
+			
+		} catch (Exception e) {
+			log.error("Cannot init system", e);
+			fail("Error");
+		}
+	}
+	
+	/**
+	 * The idea of the test is to let the system run once with a constant condition that is only executed once. A IsAlwaysTrue condition is used. The other value is conditional and activates behaviour if it is = 1.0. The variable value is changed 2 times and only if this value is 1.0, 
+	 * the behaviour shall execute.
+	 * 
+	 */
+	@Test
+	public void constantValueTest() {
+		log.debug("Start constant value tester");
+		try {
+			//Address
+			String datapointsource1 = "activator.test.addressconstantvalue";
+			String datapointsource2 = "activator.test.addressvariablevalue";
+			
+			
+			String activatorName = "testactivator";
+			String conditionNameIsTrue = "isTrue";
+			String conditionNameIsOne = "isOne";
+			final int constanceData = 12;
+			int variableData = 0;
+			
+			//Create activator
+			Activator activator = new ActivatorImpl();
+			
+			//Create behaviour
+			DummyBehaviour activateBehaviour = new DummyBehaviour();
+			activateBehaviour.init(activatorName, null, cell);
+			
+			//Create condition
+			Condition condition1 = new ConditionAlwaysTrue().init(conditionNameIsTrue, null);
+			Condition condition2 = new ConditionIsOne().init(conditionNameIsOne, null);
+			
+			//condition1.init(conditionName, null);
+			Map<String, List<Condition>> conditionMapping = new HashMap<String, List<Condition>>();
+			conditionMapping.put(datapointsource1, Arrays.asList(condition1));
+			conditionMapping.put(datapointsource2, Arrays.asList(condition2));
+			
+			//activateBehaviour
+			activator.init(activatorName, conditionMapping, "", activateBehaviour, cell);
+			
+			this.handler.registerActivatorInstance(activator);
+			log.debug("Activator registered in handler. System initialized");
+			
+			//Run the first run and init the constant condition of the constant data
+			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(constanceData)));
+			
+			//Run the variable data
+			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));
+			
+			//Increment variable data and run again. Now it shall activate the behaviour
+			variableData++;
+			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));			
+			
+			assertEquals(true, activateBehaviour.hasRun());
+			log.info("Test passed");
 			
 		} catch (Exception e) {
 			log.error("Cannot init system", e);

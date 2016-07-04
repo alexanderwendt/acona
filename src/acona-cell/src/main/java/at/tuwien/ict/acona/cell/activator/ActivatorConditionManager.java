@@ -1,8 +1,13 @@
 package at.tuwien.ict.acona.cell.activator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class ActivatorConditionManager {
+	
+	private static Logger log = LoggerFactory.getLogger(ActivatorConditionManager.class);
 	
 	private final Condition condition;
 	private Datapoint currentValue = null;
@@ -32,7 +37,12 @@ public class ActivatorConditionManager {
 	}
 	
 	public boolean testCondition(Datapoint value) {
-		 boolean result = this.condition.testCondition(value);
+		 boolean result=false;
+		 try {
+			 result = this.condition.testCondition(value);
+		 } catch (Exception e) {
+		     log.error("Condition cannot be executed. return false as result", e);
+		 }
 		 
 		 this.previousValue = this.currentValue;
 		 

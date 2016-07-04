@@ -20,8 +20,9 @@ public interface Condition {
 	/**
 	 * @param data
 	 * @return
+	 * @throws Exception 
 	 */
-	public boolean testCondition(final Datapoint data);
+	public boolean testCondition(final Datapoint data) throws Exception;
 	
 	/**
 	 * @return

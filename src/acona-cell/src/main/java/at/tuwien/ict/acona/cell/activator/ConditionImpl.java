@@ -33,7 +33,7 @@ public abstract class ConditionImpl implements Condition {
 	}
 
 	@Override
-	public abstract boolean testCondition(Datapoint data);
+	public abstract boolean testCondition(Datapoint data) throws Exception;
 	
 	@Override
 	public abstract String getDescription();

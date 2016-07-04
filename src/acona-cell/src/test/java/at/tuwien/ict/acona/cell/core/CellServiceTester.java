@@ -400,6 +400,7 @@ public class CellServiceTester {
 					
 				}
 			}
+			
 			log.debug("State={}", controllers.get(controllers.size()-1).getState());
 			
 			//Set subscriptions

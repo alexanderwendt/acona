@@ -8,7 +8,7 @@ import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-public class WriteDataPointOnDemandBehavior extends OneShotBehaviour {
+public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
 
 	/**
 	 * 
@@ -17,12 +17,14 @@ public class WriteDataPointOnDemandBehavior extends OneShotBehaviour {
 	
 	private final AID receiver;
 	private final Datapoint datapoint;
+	private final AconaService service;
 
 	
 	
-	public WriteDataPointOnDemandBehavior(AID receiver, Datapoint datapoint) {
+	public SendDatapointOnDemandBehavior(AID receiver, Datapoint datapoint, AconaService serviceToUse) {
 		this.receiver = receiver;
 		this.datapoint = datapoint;
+		this.service = serviceToUse;
 	}
 	
 	@Override
@@ -30,7 +32,7 @@ public class WriteDataPointOnDemandBehavior extends OneShotBehaviour {
 		//Write value of datapoint to subscriber, in order to provide with initial value
 		//Create send message without target
 		ACLMessage notifyMessage = ACLUtils.convertToACL(Message.newMessage()
-				.setService(AconaService.WRITE)
+				.setService(this.service)
 				.setContent(datapoint.toString()));
 		notifyMessage.setPerformative(ACLMessage.REQUEST);
 		//ACLMessage notifyMessage = new ACLMessage(ACLMessage.REQUEST);

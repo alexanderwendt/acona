@@ -35,7 +35,7 @@ public class ActivatorImpl implements Activator {
 		this.name = name;
 		this.behavior = behavior;
 		this.caller = caller;
-		
+			
 		//Set conditions and 
 		subscriptionCondition.entrySet().forEach((Entry<String, List<Condition>> e)->{
 			
@@ -51,15 +51,22 @@ public class ActivatorImpl implements Activator {
 			
 			//Subscribe datapoint
 			this.caller.getDataStorage().subscribeDatapoint(e.getKey(), caller.getName());
+			
 		});
 		
 		//Count table
 		this.conditionMaxCount = calculateTotalCount(subscriptionCondition);
-
+		
 		//Add and activate behavior
 		//INFO: Instead of letting the caller add the jade behavior, the cell behavior adds itself
 		behavior.addBehaviourToCallerCell(caller);
-		//this.caller.addBehaviour(behavior);
+		
+		
+		//Read the initial value from the datapoint to trigger the conditions, especially the always true conditions
+		subscriptionCondition.entrySet().forEach((Entry<String, List<Condition>> e)->{
+			this.runActivation(this.caller.getDataStorage().read(e.getKey()));
+		});
+		
 		
 		log.trace("{}> initialization finished", this.name);
 
