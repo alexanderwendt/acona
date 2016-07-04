@@ -9,3 +9,4 @@ log/*
 /src/*/APDescription.txt
 /src/*/build
 /src/*/gradle
+/src/*/.classpath

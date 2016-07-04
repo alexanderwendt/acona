@@ -23,6 +23,13 @@ def bundleSymbolicName = 'at.tuwien.ict.kore.communicator'
 def bundleName = 'ACONA Jade Communicator'
 def classpathprefix = 'lib/'
 
+eclipse {
+    classpath {
+        downloadJavadoc = true
+		downloadSources = true
+    }
+}
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
@@ -30,9 +37,14 @@ repositories {
     jcenter()
     mavenCentral()
     //mavenLocal()
-    flatDir {		//If no repository is used, the flat file structure can be used here
-    	dirs '../../../SharedLibs/libs'
-  	}
+    //flatDir {		//If no repository is used, the flat file structure can be used here
+    //	dirs '../../../SharedLibs/libs'
+  	//}
+	
+	maven {
+        url "http://jade.tilab.com/maven/"
+    }
+	
   	//mavenCentral artifactUrls:['file://${basedir}/lib']
 }
 
@@ -48,10 +60,12 @@ dependencies {
     compile 'org.fusesource.jansi:jansi:1.11'
     
     //Jade library
-    compile files('../../../SharedLibs/libs/jade.jar')
+	compile group: 'com.tilab.jade', name: 'jade', version: '4.4.0'
+    //compile files('../../../SharedLibs/libs/jade.jar')
     
     //GSON for representing data structures
-    compile files('../../../SharedLibs/libs/gson-2.3.1.jar')
+	// https://mvnrepository.com/artifact/com.google.code.gson/gson
+	compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
 	
 	//Internal projects
 	compile project(':acona-cell-datastructures')
