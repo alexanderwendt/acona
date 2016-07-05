@@ -15,8 +15,8 @@ apply plugin: 'eclipse'
 //Set the predefined variables
 version = '0.1.0'
 group = 'at.tuwien.ict.acona'
-sourceCompatibility = 1.8	//Java version
-targetCompatibility = 1.8
+//sourceCompatibility = 1.8	//Java version
+//targetCompatibility = 1.8
 
 //Define some custom variables that can be used within the file
 def bundleSymbolicName = 'at.tuwien.ict.acona.cell'

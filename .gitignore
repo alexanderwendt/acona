@@ -10,3 +10,5 @@ log/*
 /src/*/build
 /src/*/gradle
 /src/*/.classpath
+.metadata
+RemoteSystemsTempFiles
