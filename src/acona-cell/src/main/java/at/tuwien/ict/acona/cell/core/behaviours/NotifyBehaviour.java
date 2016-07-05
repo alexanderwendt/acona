@@ -20,7 +20,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-public class NotifyBehavior extends OneShotBehaviour {
+public class NotifyBehaviour extends OneShotBehaviour {
 	private List<String> subscribers = new LinkedList<String>();
 	private Datapoint subscribedData = Datapoint.newDatapoint("");
 	
@@ -29,9 +29,9 @@ public class NotifyBehavior extends OneShotBehaviour {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static Logger log = LoggerFactory.getLogger(NotifyBehavior.class);
+	private static Logger log = LoggerFactory.getLogger(NotifyBehaviour.class);
 	
-	public NotifyBehavior(List<String> subscribers, Datapoint subscribedData) {
+	public NotifyBehaviour(List<String> subscribers, Datapoint subscribedData) {
 		this.subscribers = subscribers;
 		this.subscribedData = subscribedData;
 	}

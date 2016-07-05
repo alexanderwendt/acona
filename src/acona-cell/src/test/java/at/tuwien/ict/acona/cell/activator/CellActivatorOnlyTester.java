@@ -99,13 +99,13 @@ public class CellActivatorOnlyTester {
 			log.debug("Activator registered in handler. System initialized");
 			
 			//Test actual behaviour
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
 			
 			assertEquals(false, activateBehaviour.hasRun());
 			
@@ -166,13 +166,13 @@ public class CellActivatorOnlyTester {
 			log.debug("Activator registered in handler. System initialized");
 			
 			//Test actual behaviour
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
 			
 			assertEquals(true, activateBehaviour.hasRun());
 			log.info("Test passed");
@@ -226,14 +226,14 @@ public class CellActivatorOnlyTester {
 			log.debug("Activator registered in handler. System initialized");
 			
 			//Run the first run and init the constant condition of the constant data
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(constanceData)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(constanceData)));
 			
 			//Run the variable data
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));
 			
 			//Increment variable data and run again. Now it shall activate the behaviour
 			variableData++;
-			this.handler.activateLocalBehaviors(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));			
+			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));			
 			
 			assertEquals(true, activateBehaviour.hasRun());
 			log.info("Test passed");

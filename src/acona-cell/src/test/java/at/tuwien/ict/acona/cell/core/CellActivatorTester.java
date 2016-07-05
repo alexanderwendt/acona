@@ -140,7 +140,7 @@ public class CellActivatorTester {
 			cell.setClass(InspectorCell.class);
 			cell.addCondition(ConditionConfig.newConfig("operand1", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
 			cell.addCondition(ConditionConfig.newConfig("operand2", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
-			cell.addBehaviour(BehaviourConfig.newConfig("additionBehaviour", "at.tuwien.ict.acona.cell.custombehaviours.AdditionBehaviour")
+			cell.addBehaviour(BehaviourConfig.newConfig("additionBehaviour", "at.tuwien.ict.acona.cell.core.helpers.AdditionBehaviour")
 					.setProperty("operand1", "data.op1")
 					.setProperty("operand2", "data.op2")
 					.setProperty("result", "data.result"));

@@ -12,7 +12,7 @@ public interface ActivationHandler {
 	 * @param address
 	 * @param subscribedData
 	 */
-	public void activateLocalBehaviors(Datapoint subscribedData);
+	public void activateLocalBehaviours(Datapoint subscribedData);
 	
 	/**
 	 * Register an activator that is linked to datapoints through its activations

@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.cell.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.SynchronousQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import at.tuwien.ict.acona.cell.activator.ActivationHandler;
 import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.core.behaviours.NotifyBehavior;
+import at.tuwien.ict.acona.cell.core.behaviours.NotifyBehaviour;
 import at.tuwien.ict.acona.cell.core.behaviours.ReadDataServiceBehavior;
 import at.tuwien.ict.acona.cell.core.behaviours.SubscribeDataServiceBehavior;
 import at.tuwien.ict.acona.cell.core.behaviours.UnsubscribeDataServiceBehavior;
@@ -209,15 +210,20 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		//Check inputs
 
 		//Remove the caller from the subscibers to be notified. The system shall not notify itself, except internal data exchange has happened
+		//Notify local behaviours
 		if (subscribers.contains(this.getName())) {
 			log.trace("activate local behaviors");
-			this.activationHandler.activateLocalBehaviors(subscribedData);
+			this.activationHandler.activateLocalBehaviours(subscribedData);
 		}
 		
-		//Revove it from the list before sending to external application
+		//Revove it from the list before sending to external application because this agent does not subscribe through external subscriptions
 		subscribers.remove(this.getName());
 		
-		this.addBehaviour(new NotifyBehavior(subscribers, subscribedData));
+		//Notify external agents that subscribe a value from this data storage
+		if (subscribers.isEmpty()==false) {
+			this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
+		}
+		
 
 	}
 

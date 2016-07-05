@@ -19,7 +19,7 @@ public class ActivationHandlerImpl implements ActivationHandler {
 	private Cell caller;
 	
 	@Override
-	public void activateLocalBehaviors(Datapoint subscribedData) {
+	public void activateLocalBehaviours(Datapoint subscribedData) {
 		List<Activator> instanceList = activatorMap.get(subscribedData.getAddress());
 		
 		//run all activations of that datapoint in parallel
