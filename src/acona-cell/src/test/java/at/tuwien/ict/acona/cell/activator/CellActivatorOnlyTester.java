@@ -26,7 +26,7 @@ public class CellActivatorOnlyTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellActivatorOnlyTester.class);
 	
-	private ActivationHandler handler = null;
+	private ActivationHandlerImpl handler = null;
 	private Cell cell = new DummyCell();
 
 	@Before
@@ -110,7 +110,7 @@ public class CellActivatorOnlyTester {
 			assertEquals(false, activateBehaviour.hasRun());
 			
 		} catch (Exception e) {
-			log.error("Cannot init system", e);
+			log.error("Cannot test system", e);
 			fail("Error");
 		}
 	}
@@ -178,7 +178,7 @@ public class CellActivatorOnlyTester {
 			log.info("Test passed");
 			
 		} catch (Exception e) {
-			log.error("Cannot init system", e);
+			log.error("Cannot test system", e);
 			fail("Error");
 		}
 	}
@@ -239,7 +239,61 @@ public class CellActivatorOnlyTester {
 			log.info("Test passed");
 			
 		} catch (Exception e) {
-			log.error("Cannot init system", e);
+			log.error("Cannot test system", e);
+			fail("Error");
+		}
+	}
+	
+	/**
+	 * Test if activator can register and deregister correctly. Register 2 activators and deregister one of them. After that, the list shall be with count 1
+	 */
+	@Test
+	public void registerDeregisterTest() {
+		log.debug("Start register/deregister tester");
+		try {
+			//Address
+			String datapointsource1 = "activator.test.addressconstantvalue";
+			String datapointsource2 = "activator.test.addressvariablevalue";
+			
+			
+			String activatorName1 = "testactivator1";
+			String activatorName2 = "testactivator2";
+			String conditionNameIsTrue = "isTrue";
+			String conditionNameIsOne = "isOne";
+			
+			//Create activator
+			Activator activator1 = new ActivatorImpl();
+			Activator activator2 = new ActivatorImpl();
+			
+			//Create behaviour
+			DummyBehaviour activateBehaviour1 = new DummyBehaviour();
+			activateBehaviour1.init(activatorName1, null, cell);
+			Condition condition1 = new ConditionAlwaysTrue().init(conditionNameIsTrue, null);
+			Map<String, List<Condition>> conditionMapping1 = new HashMap<String, List<Condition>>();
+			conditionMapping1.put(datapointsource1, Arrays.asList(condition1));
+			
+			activator1.init(activatorName1, conditionMapping1, "", activateBehaviour1, cell);
+			this.handler.registerActivatorInstance(activator1);
+			
+			DummyBehaviour activateBehaviour2 = new DummyBehaviour();
+			activateBehaviour2.init(activatorName2, null, cell);
+			Condition condition2 = new ConditionIsOne().init(conditionNameIsOne, null);
+			Map<String, List<Condition>> conditionMapping2 = new HashMap<String, List<Condition>>();
+			conditionMapping2.put(datapointsource2, Arrays.asList(condition2));
+
+			activator2.init(activatorName1, conditionMapping2, "", activateBehaviour2, cell);
+			this.handler.registerActivatorInstance(activator2);
+			log.debug("Activator registered in handler. System initialized with activators={}", this.handler.getActivatorMap());
+			
+			//Remove both activations
+			this.handler.deregisterActivatorInstance(activator1);
+			//this.handler.deregisterActivatorInstance(activator2);
+			
+			assertEquals(1, this.handler.getActivatorMap().size(), 0.0);
+			log.info("Test passed");
+			
+		} catch (Exception e) {
+			log.error("Cannot test system", e);
 			fail("Error");
 		}
 	}

@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.ThreadedBehaviourFactory;
 
 public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implements CellFunctionBehaviour {
 
@@ -40,8 +41,15 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 		this.isAllowedToRun = false;
 		this.caller = caller;
 		
+		//this.subInit();
+		
 		return this;
 	}
+	
+//	/**
+//	 * Init of the children of this behaviour
+//	 */
+//	protected abstract void subInit();
 	
 	@Override
 	public void setData(Map<String, Datapoint> data) {
@@ -82,6 +90,7 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 	
 	@Override
 	public void addBehaviourToCallerCell(Cell caller) {
+		//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 		caller.addBehaviour(this);
 	}
 	

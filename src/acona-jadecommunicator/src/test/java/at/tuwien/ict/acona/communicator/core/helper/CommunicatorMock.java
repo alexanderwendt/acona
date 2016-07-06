@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.communicator.core.helper;
 
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.ListenerModule;
@@ -64,6 +65,12 @@ public class CommunicatorMock implements Communicator {
 	public void unsubscribeDatapoint(String agentName, String datapointName) throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Datapoint getDatapointFromAgent(long timeout, boolean ignoreEmptyValues) throws InterruptedException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

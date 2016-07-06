@@ -22,8 +22,10 @@ public class ActivationHandlerImpl implements ActivationHandler {
 	public void activateLocalBehaviours(Datapoint subscribedData) {
 		List<Activator> instanceList = activatorMap.get(subscribedData.getAddress());
 		
+		//FIXME: Sometimes, the instancelist is empty, after keys have been deleted. Consider that
+		
 		//run all activations of that datapoint in parallel
-		log.trace("Test dp={}", subscribedData);
+		log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
 		instanceList.forEach((Activator a)->a.runActivation(subscribedData));
 	}
 
@@ -53,6 +55,9 @@ public class ActivationHandlerImpl implements ActivationHandler {
 
 	@Override
 	public void deregisterActivatorInstance(Activator activatorInstance) {
+		//Deregister activator -> deregister all datapoints in the datastorage itself
+		activatorInstance.closeActivator();
+		
 		//Get all subscribed addresses
 		List<String> activatorAddresses = activatorInstance.getLinkedDatapoints();
 				
@@ -62,6 +67,7 @@ public class ActivationHandlerImpl implements ActivationHandler {
 				this.activatorMap.get(address).remove(activatorInstance);
 				if (this.activatorMap.get(address).isEmpty()==true) {
 					this.activatorMap.remove(address);
+					
 				}
 				
 				log.info("Address={}, deregistered activator={}", address, activatorInstance);
@@ -69,7 +75,6 @@ public class ActivationHandlerImpl implements ActivationHandler {
 				log.warn("Address={}: Cannot deregister activator={}", address, activatorInstance);
 			}
 		});
-		
 		
 		
 	}
@@ -86,6 +91,10 @@ public class ActivationHandlerImpl implements ActivationHandler {
 		builder.append("ActivationHandler: activatorMap=");
 		builder.append(activatorMap);
 		return builder.toString();
+	}
+
+	protected Map<String, List<Activator>> getActivatorMap() {
+		return activatorMap;
 	}
 
 }

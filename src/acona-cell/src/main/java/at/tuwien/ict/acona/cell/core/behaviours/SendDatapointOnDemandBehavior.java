@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.cell.core.behaviours;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
@@ -9,6 +12,8 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
+	
+	private static Logger log = LoggerFactory.getLogger(SendDatapointOnDemandBehavior.class);
 
 	/**
 	 * 
@@ -44,6 +49,6 @@ public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
 		//notifyMessage.setContent(writeBody.toString());
 		notifyMessage.addReceiver(receiver);
 		this.myAgent.send(notifyMessage);
-		
+		log.debug("Datapoint={} sent to agent={} with service={}", datapoint, receiver.getLocalName(), service);
 	}
 }

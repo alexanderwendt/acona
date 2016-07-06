@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +16,12 @@ import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
 import at.tuwien.ict.acona.cell.config.BehaviourConfig;
+import at.tuwien.ict.acona.cell.core.behaviours.SendDatapointOnDemandBehavior;
 import at.tuwien.ict.acona.cell.custombehaviours.SynchronizedReadBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import jade.core.AID;
+import jade.core.behaviours.ThreadedBehaviourFactory;
 
 public class CellUtil {
 	private final static String CONDITIONNAME = "temporaryactivatorcondition";
@@ -38,16 +44,15 @@ public class CellUtil {
 	 * @param timeout in ms
 	 * @return
 	 */
-	public Datapoint remoteRead(String targetAgent, String datapointAddress, int timeout) throws InterruptedException {
+	public Datapoint remoteRead(String targetAgentName, String datapointAddress, int timeout) throws InterruptedException {
+		Datapoint result = null;	
 		
-		
-		Datapoint result = null;
-		
-		//Create new activator with only one condition
+		//Create new activator with only one condition as a handler for received messages
 		Activator activator = new ActivatorImpl();
 		
 		BehaviourConfig behaviourConfig = BehaviourConfig.newConfig(BEHAVIOURNAME, "at.tuwien.ict.acona.cell.custombehaviours.SynchronizedReadBehaviour").setProperty("timeout", String.valueOf(timeout));
-		SynchronizedReadBehaviour activateBehaviour = (SynchronizedReadBehaviour) new SynchronizedReadBehaviour().init(BEHAVIOURNAME, behaviourConfig.toJsonObject(), this.cell);
+		SynchronizedReadBehaviour activateBehaviour = new SynchronizedReadBehaviour();
+		activateBehaviour.init(BEHAVIOURNAME, behaviourConfig.toJsonObject(), this.cell);
 		
 		//Create condition
 		Condition condition = new ConditionIsNotEmpty().init(CONDITIONNAME, new JsonObject());
@@ -57,9 +62,18 @@ public class CellUtil {
 		//activator.registerCondition(new ConditionIsNotEmpty());
 		this.cell.getActivationHandler().registerActivatorInstance(activator);
 		
+		//Send read to target cell
+		//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+		//this.cell.addBehaviour(tbf.wrap(new SendDatapointOnDemandBehavior(id, Datapoint.newDatapoint(datapointAddress), AconaService.READ)));
+		
+		//Send read to target cell
+		AID id = new AID(targetAgentName, AID.ISLOCALNAME);
+		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+		this.cell.addBehaviour(new SendDatapointOnDemandBehavior(id, Datapoint.newDatapoint(datapointAddress), AconaService.READ));
+		
 		try {
-			result = activateBehaviour.poll();
-		} catch (InterruptedException e) {
+			result = activateBehaviour.poll();	//timeout in the config
+		} catch (Exception e) {
 			log.error("Timeout", e);
 			throw new InterruptedException(e.getMessage());
 		} finally {
@@ -82,6 +96,7 @@ public class CellUtil {
 //			log.warn("Timeout");
 //		}
 		
+		log.trace("Behaviour finished");
 		return result;
 	}
 }

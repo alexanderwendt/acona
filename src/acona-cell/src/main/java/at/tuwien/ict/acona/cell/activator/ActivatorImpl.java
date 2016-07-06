@@ -87,6 +87,14 @@ public class ActivatorImpl implements Activator {
 		
 		return conditionMaxCount;
 	}
+	
+	@Override
+	public void closeActivator() {
+		this.conditionMapping.forEach((e, v)->{
+			this.caller.getDataStorage().unsubscribeDatapoint(e, this.caller.getName());
+		});
+		
+	}
 
 	@Override
 	public boolean runActivation(Datapoint subscribedData) {

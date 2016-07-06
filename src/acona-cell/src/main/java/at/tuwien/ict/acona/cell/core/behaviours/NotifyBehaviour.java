@@ -38,7 +38,7 @@ public class NotifyBehaviour extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
-		log.debug("Start notify action for subscriber={}, data={}", this.subscribers, subscribedData.getAddress());
+		log.debug("Start notify action for subscriber={}, data={}", this.subscribers, subscribedData);
 		if (subscribers.isEmpty()==false && this.subscribedData.getAddress().equals("")==false && this.subscribedData!=null) {
 			log.debug("Notify the following subscribers={}", this.subscribers);
 			

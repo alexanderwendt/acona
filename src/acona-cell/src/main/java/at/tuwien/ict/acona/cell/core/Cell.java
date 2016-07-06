@@ -50,4 +50,12 @@ public interface Cell {
 	 * @throws Exception 
 	 */
 	public void setupCellFunctionBehaviours(JsonObject conf) throws Exception;
+	
+	
+	/**
+	 * Get cell utils with send methods
+	 * 
+	 * @return
+	 */
+	public CellUtil getCellUtil();
 }

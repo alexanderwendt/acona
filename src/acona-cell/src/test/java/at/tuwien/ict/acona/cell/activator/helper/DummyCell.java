@@ -12,6 +12,7 @@ import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.CellInitialization;
+import at.tuwien.ict.acona.cell.core.CellUtil;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import jade.core.behaviours.Behaviour;
@@ -101,6 +102,12 @@ public class DummyCell implements CellInitialization {
 	public void setupCellFunctionBehaviours(JsonObject conf) throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public CellUtil getCellUtil() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

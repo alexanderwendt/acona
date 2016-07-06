@@ -42,16 +42,13 @@ public class ReadDataServiceBehavior extends CyclicBehaviour {
 			Datapoint datapoint=null;
 			try {
 				Message message = ACLUtils.convertToMessage(msg);
+								
 				//Get content, i.e. the address to be read
 				//String addressMessage = msg.getContent();
-				log.debug("Received read request. Message={}", message);
+				log.debug("Received read request from={}. Message={}", msg.getSender().getLocalName(), message);
 				
 				//Convert to datapoint
 				datapoint = Datapoint.toDatapoint(message.getContent().getAsJsonObject());
-				
-
-				//Get datapointaddress from message
-				//String address = datapoint.getAddress(); //JsonMessage.toJson(addressMessage).get(JsonMessage.DATAPOINTADDRESS).getAsString();
 				
 				//Read data from storage
 				Datapoint readData = this.callerCell.getDataStorage().read(datapoint.getAddress());
@@ -61,7 +58,10 @@ public class ReadDataServiceBehavior extends CyclicBehaviour {
 				
 				//Send back
 				ACLMessage reply = ACLUtils.createReply(msg, readData);
-				//reply.setContent(readData.toString());
+				
+				//Set write service
+				//This is not a clean solution, but it will work
+				reply.setOntology(AconaService.WRITE.toString());
 				
 				this.callerCell.send(reply);
 				

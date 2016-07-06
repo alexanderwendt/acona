@@ -44,7 +44,7 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 				
 				//Get content, i.e. the address to be read
 				Datapoint dp = message.getContentAsDatapoint(); //Datapoint.toDatapoint(msg.getContent());
-				log.debug("Subscribe request: received from sender={}, content={}", msg.getSender().toString(), msg.getContent());
+				log.debug("Subscribe request: received from sender={}, content={}", msg.getSender().getLocalName(), msg.getContent());
 				
 				//Get datapointaddress from message
 				//Format, address, value, callerID

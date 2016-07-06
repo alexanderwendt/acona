@@ -8,8 +8,12 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
 import jade.core.AID;
 
-public class SendBehaviour extends CellFunctionBehaviourImpl {
+public class SendAsynchronousBehaviour extends CellFunctionBehaviourImpl {
 
+	private static final String RECEIVERDATAPOINTADDRESS = "receivername";
+	private static final String DATAPOINTADDRESS = "datapointaddress";
+	private static final String ACONASERVICEADDRESS = "aconaservice";
+	
 	/**
 	 * 
 	 */
@@ -20,6 +24,7 @@ public class SendBehaviour extends CellFunctionBehaviourImpl {
 		String receiverID = data.get("receiver").getValue().getAsString();
 		Datapoint value = data.get("datapoint");
 		
+		//this.myAgent.addBehaviour(new SendDatapointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress()), AconaService.WRITE));
 		// TODO Auto-generated method stub
 		
 		//Create an activator that listens to two predefined datapoints. Any data, which is put there is sent to that

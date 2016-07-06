@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.communicator.core;
 
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 
 public interface Communicator {
@@ -56,4 +57,6 @@ public interface Communicator {
 	public Message getMessageFromAgent() throws InterruptedException;
 	
 	public Message getMessageFromAgent(long timeout) throws InterruptedException;
+	
+	public Datapoint getDatapointFromAgent(long timeout, boolean ignoreEmptyValues) throws InterruptedException;
 }

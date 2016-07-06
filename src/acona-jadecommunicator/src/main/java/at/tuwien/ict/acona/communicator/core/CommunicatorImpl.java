@@ -139,13 +139,34 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	public Message getMessageFromAgent(long timeout) throws InterruptedException {
 		Message result = null;
 		try {
-			result = this.agentMessages.poll(timeout, TimeUnit.MILLISECONDS);
+			result = this.agentMessages.poll(timeout, TimeUnit.MILLISECONDS);				
 		} catch (InterruptedException e) {
-			log.error("Time out from getMessage");
+			log.error("Interruption");
 			throw e;
 		}
 		
 		return result; 
+	}
+	
+	@Override
+	public Datapoint getDatapointFromAgent(long timeout, boolean ignoreEmptyValues) throws InterruptedException {
+		Datapoint result = null;
+		
+		long startTime = System.currentTimeMillis();
+		long endTime = startTime  + timeout;
+		do {
+			Message message = getMessageFromAgent(timeout);
+
+			if (Datapoint.isDatapoint(message.getContent().getAsJsonObject())==true) {
+				Datapoint datapoint = Datapoint.toDatapoint(message.getContent().getAsJsonObject());
+				if (datapoint.getValue().toString().isEmpty()==false) {
+					result = datapoint;
+				}
+			}
+			
+		} while (result.getValue().getAsString().isEmpty()==true && System.currentTimeMillis()<endTime && ignoreEmptyValues==true);	
+		
+		return result;
 	}
 
 	@Override
