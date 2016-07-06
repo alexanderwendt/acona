@@ -12,3 +12,4 @@ log/*
 /src/*/.classpath
 .metadata
 RemoteSystemsTempFiles
+.recommenders

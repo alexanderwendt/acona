@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.core;
 
+import java.rmi.server.UID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,12 @@ import at.tuwien.ict.acona.cell.storage.DataStorageSubscriberNotificator;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREInitiator;
 
 public class CellImpl extends Agent implements CellInitialization, DataStorageSubscriberNotificator {
 
@@ -169,6 +174,61 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		this.addBehaviour(subscribeDataServiceBehavior);
 		UnsubscribeDataServiceBehavior unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
 		this.addBehaviour(unsubscribeDataServiceBehavior);
+		
+		
+	}
+	
+	/**
+	 * Helper method that provides unique ids (using {@link UID#toString()} of a newly created {@link UID}) to the {@link ACLMessage#setReplyWith(String)} and {@link ACLMessage#setConversationId(String)} methods
+	 * of the given {@code message}. Unique ids on these fields are neccessary for the message to be processable by the JADE implementations of FIPA complient protocol handlers.
+	 * 
+	 * @param message
+	 */
+	protected void prepareSyncMessage(ACLMessage message) {
+		message.setReplyWith(new UID().toString());
+		message.setConversationId(new UID().toString());
+		log.debug("ACL message after perpareSyncMessage:\n" + message.toString());
+	}
+	
+	/**
+	 * Prepares a template than can be used to identify a response to the message provided as {@code message}. The template attempty to match the protocol, conversation id and in-reply-to id
+	 * 
+	 * @param message The outgoing message that contains (at least) a protocol id, conversation id and reply-with id (which will turn into a in-reply-to id in the response)
+	 * @return A {@link MessageTemplate} that can be used to match replies to the provided {@code message}
+	 */
+	protected MessageTemplate prepareMessageTemplate(ACLMessage message) {
+		log.debug("Preparing message template for message with conversation id" + message.getConversationId());
+		return MessageTemplate.and(MessageTemplate.and(
+				MessageTemplate.MatchInReplyTo(message.getReplyWith()),
+				MessageTemplate.MatchProtocol(message.getProtocol())),
+				MessageTemplate.MatchConversationId(message.getConversationId()));
+	}
+	
+	/**
+	 * Sends the given {@code message} synchroniously. The method waits for a response (identified by protocol, conversation id and reply id) or the passage of {@code timeout} milliseconds before returning.
+	 * This method tries to provide appliance to the FIPA Request protocol (but this is not thoroughly tested)
+	 * 
+	 * @param message The ACL Message to send
+	 * @param timeout Maximum amount of miliseconds to wait for a reponse (use Integer.MAX_VALUE for almost-infinite waiting)
+	 * @return The response of the receiver or null if a timeout occured 
+	 */
+	public ACLMessage syncSend(ACLMessage message, int timeout) {
+		log.info("Sending synchronious message\n" + message.toString());
+		
+		ACLMessage response = null;
+		
+		prepareSyncMessage(message);
+		
+		send(message);
+		
+		log.info("Waiting for response");
+		
+		response = blockingReceive(prepareMessageTemplate(message), timeout);
+		log.debug("Response received or timeout");
+		
+		log.info("Waiting completed");
+
+		return response;
 	}
 	
 	private ServiceDescription createServiceDescription() {
