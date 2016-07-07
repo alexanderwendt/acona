@@ -17,9 +17,9 @@ include 'services:webservice'
 */
 
 include ':acona-jadecommunicator'
-project(':acona-jadecommunicator').projectDir = file('C:/Projekte/14_KORE/01_KORE_Workspace/acona/src/acona-jadecommunicator')
+project(':acona-jadecommunicator').projectDir = file('../acona-jadecommunicator')
 include ':acona-cell-datastructures'
-project(':acona-cell-datastructures').projectDir = file('C:/Projekte/14_KORE/01_KORE_Workspace/acona/src/acona-cell-datastructures')
+project(':acona-cell-datastructures').projectDir = file('../acona-cell-datastructures')
 include ':acona-cell'
-project(':acona-cell').projectDir = file('C:/Projekte/14_KORE/01_KORE_Workspace/acona/src/acona-cell')
+project(':acona-cell').projectDir = file('../acona-cell')
 rootProject.name = 'acona-framework'
