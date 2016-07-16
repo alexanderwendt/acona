@@ -178,6 +178,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		message.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		message.setReplyWith(new UID().toString());
 		message.setConversationId(new UID().toString());
+		message.setPerformative(ACLMessage.REQUEST);
 		log.debug("ACL message after perpareSyncMessage:\n" + message.toString());
 	}
 	
