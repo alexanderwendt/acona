@@ -12,7 +12,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.storage.DataStorageSubscriberNotificator;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.AID;
@@ -46,7 +46,7 @@ public class NotifyBehaviour extends OneShotBehaviour {
 			ACLMessage notifyMessage = ACLUtils.convertToACL(Message.newMessage()
 					.setContent(subscribedData.toJsonObject())
 					.addReceivers(subscribers)
-					.setService(AconaService.WRITE));
+					.setService(AconaServiceType.WRITE));
 					
 			notifyMessage.setPerformative(ACLMessage.REQUEST);
 //			notifyMessage.setOntology(JsonMessage.SERVICEWRITE);

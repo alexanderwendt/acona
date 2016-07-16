@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import at.tuwien.ict.acona.cell.datastructures.util.JsonUtils;
@@ -27,7 +27,7 @@ public class Message {
 	private Message() {
 		jsondatapoint = new JsonObject();
 		this.jsondatapoint.add(KEYRECEIVER, new JsonArray());
-		this.jsondatapoint.addProperty(Keys.SERVICE.toString(), AconaService.NONE.toString());
+		this.jsondatapoint.addProperty(Keys.SERVICE.toString(), AconaServiceType.NONE.toString());
 		this.jsondatapoint.addProperty(KEYCONTENT, "");
 		this.jsondatapoint.addProperty(Keys.MODE.toString(), AconaSync.ASYNCHRONIZED.toString());
 	}
@@ -47,7 +47,7 @@ public class Message {
 			if (Message.isMessage(data)==true) {
 				result = Message.newMessage()
 						.setReceivers(data.get(Message.KEYRECEIVER).getAsJsonArray())
-						.setService(AconaService.valueOf(data.get(KEYSERVICE).getAsString()))
+						.setService(AconaServiceType.valueOf(data.get(KEYSERVICE).getAsString()))
 						.setMode(AconaSync.valueOf(data.get(KEYMODE).getAsString()))
 						.setContent(data.get(Message.KEYCONTENT));
 			} else {
@@ -136,7 +136,7 @@ public class Message {
 		return this;
 	}
 	
-	public Message setService(AconaService type) {
+	public Message setService(AconaServiceType type) {
 		this.jsondatapoint.addProperty(KEYSERVICE, type.toString());
 		
 		return this;
@@ -182,8 +182,8 @@ public class Message {
 		return receivers;
 	}
 	
-	public AconaService getService() {
-		return AconaService.valueOf(this.jsondatapoint.get(KEYSERVICE).getAsString());
+	public AconaServiceType getService() {
+		return AconaServiceType.valueOf(this.jsondatapoint.get(KEYSERVICE).getAsString());
 	}
 	
 	public AconaSync getMode() {

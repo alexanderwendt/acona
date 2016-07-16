@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.CellServiceTester;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
@@ -78,7 +78,7 @@ public class MessageDatapointTester {
 	public void MessageConversionTestDatapoints() {
 		try {
 			String expectedreceiver = "receiver";
-			AconaService expectedType = AconaService.READ;
+			AconaServiceType expectedType = AconaServiceType.READ;
 			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"MuHaahAhaAaahAAHA\"}";
 			Datapoint dp = Datapoint.toDatapoint(input);
 			Message testObject = Message.newMessage().setReceiver(expectedreceiver).setService(expectedType).setContent(dp);
@@ -90,7 +90,7 @@ public class MessageDatapointTester {
 			
 			String actualreceiver = testObject.getReceivers()[0];
 			//String actualMessage = testObject.getContent().getAsString();
-			AconaService actualType = testObject.getService();
+			AconaServiceType actualType = testObject.getService();
 			
 			//Now, the message would be sent and received. Convert back to datapoint
 			Datapoint dpback = Datapoint.toDatapoint(messageout.getContent().toString());
@@ -111,7 +111,7 @@ public class MessageDatapointTester {
 	public void MessageConversionTestPlainStrings() {
 		try {
 			String expectedreceiver = "receiver";
-			AconaService expectedType = AconaService.READ;
+			AconaServiceType expectedType = AconaServiceType.READ;
 			String input = "Teststring";
 			//Datapoint dp = Datapoint.toDatapoint(input);
 			Message testObject = Message.newMessage().setReceiver(expectedreceiver).setService(expectedType).setContent(input);
@@ -123,7 +123,7 @@ public class MessageDatapointTester {
 			
 			String actualreceiver = testObject.getReceivers()[0];
 			//String actualMessage = testObject.getContent().getAsString();
-			AconaService actualType = testObject.getService();
+			AconaServiceType actualType = testObject.getService();
 			
 			//Now, the message would be sent and received. Convert back to datapoint
 			String dpback = messageout.getContentAsString();

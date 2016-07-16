@@ -1,9 +1,10 @@
 package at.tuwien.ict.acona.cell.datastructures.types;
 
-public enum AconaService {
+public enum AconaServiceType {
 	NONE,
 	READ,
 	WRITE,
 	SUBSCRIBE,
-	UNSUBSCRIBE;
+	UNSUBSCRIBE,
+	DEBUG;
 }

@@ -39,26 +39,41 @@ public class JadeContainerUtil {
 	 * @return
 	 * @throws StaleProxyException
 	 */
-	public AgentController createAgent(String name, Class<?> clzz, Object[] args, ContainerController containerController) throws StaleProxyException {
+	public AgentController createAgent(String name, Class<?> clzz, Object[] args, ContainerController containerController, boolean starAgent) throws StaleProxyException {
 		AgentController agentController = null;
 		String className = clzz.getName();
 		
 		agentController = containerController.createNewAgent(name, className, args);
-		agentController.start();
-		
-		//Wait until the agent has been initialized
-		//FIXME: This is a unsaubere solution. Listener would be better
-		while (agentController.getState().getCode()!=3) {
-			synchronized (this) {
-				try {
-					this.wait(10);
-				} catch (InterruptedException e) {
-					
+		if(starAgent) {
+			agentController.start();
+			
+			//Wait until the agent has been initialized
+			//FIXME: This is a unsaubere solution. Listener would be better
+			while (agentController.getState().getCode()!=3) {
+				synchronized (this) {
+					try {
+						this.wait(10);
+					} catch (InterruptedException e) {
+						
+					}
 				}
 			}
 		}
 		
 		return agentController;
+	}
+	
+	/**
+	 * Create an agent within a container
+	 * 
+	 * @param name
+	 * @param clzz
+	 * @param containerController
+	 * @return
+	 * @throws StaleProxyException
+	 */
+	public AgentController createAgent(String name, Class<?> clzz, Object[] args, ContainerController containerController) throws StaleProxyException {
+		return createAgent(name, clzz, args, containerController, true);
 	}
 	
 	public void createRMAInContainer(ContainerController container) throws StaleProxyException {

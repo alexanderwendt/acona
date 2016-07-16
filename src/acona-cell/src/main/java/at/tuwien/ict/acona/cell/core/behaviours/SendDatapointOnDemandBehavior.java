@@ -2,7 +2,7 @@ package at.tuwien.ict.acona.cell.core.behaviours;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
@@ -17,11 +17,11 @@ public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
 	
 	private final AID receiver;
 	private final Datapoint datapoint;
-	private final AconaService service;
+	private final AconaServiceType service;
 
 	
 	
-	public SendDatapointOnDemandBehavior(AID receiver, Datapoint datapoint, AconaService serviceToUse) {
+	public SendDatapointOnDemandBehavior(AID receiver, Datapoint datapoint, AconaServiceType serviceToUse) {
 		this.receiver = receiver;
 		this.datapoint = datapoint;
 		this.service = serviceToUse;

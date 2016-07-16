@@ -5,7 +5,7 @@ import java.util.Map;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviourImpl;
 import at.tuwien.ict.acona.cell.core.behaviours.SendDatapointOnDemandBehavior;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import jade.core.AID;
 
 public class SendBehaviour extends CellFunctionBehaviourImpl {

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
 import jade.core.Runtime;
@@ -80,7 +80,7 @@ public class AclConverterTester {
 		try {
 			String expectedreceiver = "receiver";
 			String expectedMessage = "testmessage";
-			AconaService expectedType = AconaService.READ;
+			AconaServiceType expectedType = AconaServiceType.READ;
 			Message testObject = Message.newMessage().setReceiver(expectedreceiver).setService(expectedType).setContent(expectedMessage);
 			
 			//Convert to ACL and back again
@@ -89,7 +89,7 @@ public class AclConverterTester {
 			
 			String actualreceiver = result.getReceivers()[0];
 			String actualMessage = result.getContent().getAsJsonPrimitive().getAsString();
-			AconaService actualType = result.getService();
+			AconaServiceType actualType = result.getService();
 			
 			log.debug("Got receiver={}, type={}, message={}", actualreceiver, actualType, actualMessage);
 			

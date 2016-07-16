@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -36,7 +36,7 @@ public class ReadDataServiceBehavior extends CyclicBehaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
-		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaService.READ.toString()));
+		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaServiceType.READ.toString()));
 		ACLMessage msg = this.callerCell.receive(mt);
 		if (msg != null) {
 			Datapoint datapoint=null;

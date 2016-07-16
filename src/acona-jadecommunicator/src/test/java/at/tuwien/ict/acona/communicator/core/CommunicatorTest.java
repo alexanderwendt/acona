@@ -13,7 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.core.demoagents.InitiatorAgent;
@@ -142,7 +142,7 @@ public class CommunicatorTest {
 			//create message
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String receiver = "PongAgent";
-			AconaService type = AconaService.READ;
+			AconaServiceType type = AconaServiceType.READ;
 			String sendContent = "ping";
 			Message message = Message.newMessage().setReceiver(receiver).setService(type).setContent(sendContent);
 //			String sourceString = "{\"RECEIVER\": [\""+ receiver + "\"], "

@@ -18,7 +18,7 @@ import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
@@ -162,10 +162,10 @@ public class CellActivatorTester {
 			log.debug("State={}", agentController.getState());
 			
 			this.comm.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(cell.getName())
-					.setService(AconaService.WRITE)
+					.setService(AconaServiceType.WRITE)
 					.setContent(Datapoint.newDatapoint("data.op1").setValue(String.valueOf(op1))));
 			this.comm.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(cell.getName())
-					.setService(AconaService.WRITE)
+					.setService(AconaServiceType.WRITE)
 					.setContent(Datapoint.newDatapoint("data.op2").setValue(String.valueOf(op2))));
 			
 			//externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("data.op1").setValue(String.valueOf(op1)), externalController.getCell().getName());

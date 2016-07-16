@@ -10,7 +10,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
 import jade.core.behaviours.CyclicBehaviour;
@@ -36,7 +36,7 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
-		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaService.SUBSCRIBE.toString()));
+		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology(AconaServiceType.SUBSCRIBE.toString()));
 		ACLMessage msg = this.callerCell.receive(mt);
 		if (msg != null) {
 			try {
@@ -70,7 +70,7 @@ public class SubscribeDataServiceBehavior extends CyclicBehaviour {
 					log.debug("Reply sent");
 				}
 				
-				this.myAgent.addBehaviour(new SendDatapointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress()), AconaService.WRITE));
+				this.myAgent.addBehaviour(new SendDatapointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress()), AconaServiceType.WRITE));
 				log.debug("Initial value sent to {}", msg.getSender().getLocalName());
 				
 			} catch (Exception e) {

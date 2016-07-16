@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 
 public class MessageTester {
 	
@@ -18,12 +18,12 @@ public class MessageTester {
 		try {
 			String expectedreceiver = "receiver";
 			String expectedMessage = "testmessage";
-			AconaService expectedType = AconaService.READ;
+			AconaServiceType expectedType = AconaServiceType.READ;
 			Message testObject = Message.newMessage().setReceiver(expectedreceiver).setService(expectedType).setContent(expectedMessage);
 			
 			String actualreceiver = testObject.getReceivers()[0];
 			String actualMessage = testObject.getContent().getAsString();
-			AconaService actualType = testObject.getService();
+			AconaServiceType actualType = testObject.getService();
 			
 			log.debug("Got receiver={}, type={}, message={}", actualreceiver, actualType, actualMessage);
 			
@@ -43,7 +43,7 @@ public class MessageTester {
 		try {
 			String expectedreceiver = "receiver";
 			String expectedMessage = "testmessage";
-			AconaService expectedType = AconaService.READ;
+			AconaServiceType expectedType = AconaServiceType.READ;
 			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"MuHaahAhaAaahAAHA\"}";
 			Datapoint dp = Datapoint.toDatapoint(input);
 			
@@ -51,7 +51,7 @@ public class MessageTester {
 			
 			String actualreceiver = testObject.getReceivers()[0];
 			//String actualMessage = testObject.getContent().getAsString();
-			AconaService actualType = testObject.getService();
+			AconaServiceType actualType = testObject.getService();
 			testObject.setContent(dp);
 			
 			//Now, the message would be sent and received. Convert back to datapoint

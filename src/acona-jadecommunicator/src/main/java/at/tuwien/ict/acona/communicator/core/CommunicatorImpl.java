@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.communicator.datastructurecontainer.BlackboardBean;
 import at.tuwien.ict.acona.communicator.datastructurecontainer.CommunicationMode;
@@ -62,7 +62,7 @@ public class CommunicatorImpl extends Thread implements Communicator {
 			JadeGateway.init("at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent", args, p);
 			
 			//Init the agents and the gateway
-			this.sendAsynchronousMessageToAgent(Message.newMessage().setReceiver("DF").setContent("init").setService(AconaService.WRITE));
+			this.sendAsynchronousMessageToAgent(Message.newMessage().setReceiver("DF").setContent("init").setService(AconaServiceType.WRITE));
 		
 			log.info("Gateway active={}", JadeGateway.isGatewayActive());
 			
@@ -162,14 +162,14 @@ public class CommunicatorImpl extends Thread implements Communicator {
 	@Override
 	public void subscribeDatapoint(String agentName, String datapointName) throws Exception {
 		this.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(agentName)
-				.setService(AconaService.SUBSCRIBE)
+				.setService(AconaServiceType.SUBSCRIBE)
 				.setContent(Datapoint.newDatapoint(datapointName)));
 	}
 
 	@Override
 	public void unsubscribeDatapoint(String agentName, String datapointName) throws Exception {
 		this.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(agentName)
-				.setService(AconaService.UNSUBSCRIBE)
+				.setService(AconaServiceType.UNSUBSCRIBE)
 				.setContent(Datapoint.newDatapoint(datapointName)));
 		
 	}

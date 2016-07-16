@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.cell.core;
 
 import java.rmi.server.UID;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import at.tuwien.ict.acona.cell.activator.ActivationHandler;
 import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
+import at.tuwien.ict.acona.cell.core.behaviours.AconaServiceResponseBehaviour;
 import at.tuwien.ict.acona.cell.core.behaviours.NotifyBehaviour;
 import at.tuwien.ict.acona.cell.core.behaviours.ReadDataServiceBehavior;
 import at.tuwien.ict.acona.cell.core.behaviours.SubscribeDataServiceBehavior;
@@ -133,20 +135,10 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			this.createBasicBehaviors();
 			
 			
-			//Get passed arguments to start the system, in this case the system configuration
-			Object[] args = this.getArguments();
-			if (args!=null) {
-				if (args[0] instanceof JsonObject) {
-					JsonObject config = (JsonObject)args[0];
-					this.setupCellFunctionBehaviours(config);
-				}
-				
-				//controller = ((CellInspectorController)args[0]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
-				
-				log.debug("agent will use an inspector as controller");
-			} else {
-				throw new NullPointerException("No arguments found although necessary. Add a cell configuration. An empty cell configuration will also work");
-			} 
+			JsonObject config = getArgument(0, JsonObject.class);
+			this.setupCellFunctionBehaviours(config);
+			//controller = ((CellInspectorController)args[0]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
+			log.debug("agent will use an inspector as controller");
 			 
 			//Init internally with local variables
 			this.internalInit();
@@ -163,7 +155,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 
 	}
 	
-	private void createBasicBehaviors() {
+	protected void createBasicBehaviors() {
 		//Create readbehavior
 		ReadDataServiceBehavior readDataService = new ReadDataServiceBehavior(this);
 		this.addBehaviour(readDataService);
@@ -174,17 +166,16 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		this.addBehaviour(subscribeDataServiceBehavior);
 		UnsubscribeDataServiceBehavior unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
 		this.addBehaviour(unsubscribeDataServiceBehavior);
-		
-		
 	}
 	
 	/**
-	 * Helper method that provides unique ids (using {@link UID#toString()} of a newly created {@link UID}) to the {@link ACLMessage#setReplyWith(String)} and {@link ACLMessage#setConversationId(String)} methods
+	 * Helper method sets the interaction protocol to FIPA_REQUEST and provides unique ids (using {@link UID#toString()} of a newly created {@link UID}) to the {@link ACLMessage#setReplyWith(String)} and {@link ACLMessage#setConversationId(String)} methods
 	 * of the given {@code message}. Unique ids on these fields are neccessary for the message to be processable by the JADE implementations of FIPA complient protocol handlers.
 	 * 
 	 * @param message
 	 */
 	protected void prepareSyncMessage(ACLMessage message) {
+		message.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		message.setReplyWith(new UID().toString());
 		message.setConversationId(new UID().toString());
 		log.debug("ACL message after perpareSyncMessage:\n" + message.toString());
@@ -298,4 +289,70 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		return builder.toString();
 	}
 	
+	/**
+	 * Convenience function to access the arguments provided to the agent via {@link Agent#getArguments()} in a typesafe manner.
+	 * Note: the argument is cast from the Object stored in the object array provided on agent generation
+	 * 
+	 * @param index The index of the request argument in the arguments list
+	 * @param type The type of the requested argument
+	 * @return The argument at the given {@code index}, cast to the given {@code type}
+	 */
+	protected <TYPE> TYPE getArgument(int index, Class<TYPE> type) {
+		if(getArguments() == null) {
+			throw new IndexOutOfBoundsException("Agent " + this.getName() + " has not been provided with an argument list. Argument at index " + index + " of type " + type.getName() + " is therefore out of bounds");
+		}
+		if(getArguments().length <= index) {
+			throw new IndexOutOfBoundsException("Argument list index " + index + " is out of bounds (" + getArguments().length + " arguments are available)");
+		}
+		if(type.isInstance(getArguments()[index])) {
+			return type.cast(getArguments()[index]);
+		} else {
+			throw new ClassCastException("Argument " + index + " in argument list " + getArguments() + " can not be cast to " + type.getName());
+		}
+	}
+	
+	/**
+	 * Convenience function to access a List provided to the agent via {@link Agent#getArguments()} in a typesafe manner. The provided type is the type of the objects contained in the list.
+	 * For example: if argument #1 is of type {@code List<ACLMessage>} then the call would look like this: {@code List<ACLMessage> result = getArgumentList(1, ACLMessage.class);}
+	 * Note: each argument is cast from Object to the type stored in the list
+	 * Also Note: this method can not provide additional type checking for further containers within the list and does not support other container types than list
+	 * 
+	 * @param index The index of the request argument in the arguments list
+	 * @param type The content type of the requested list
+	 * @return The argument at the given {@code index}, cast to a list of the given {@code type}
+	 */
+	protected <TYPE> List<TYPE> getArgumentList(int index, Class<TYPE> type) {
+		List<TYPE> result = new ArrayList<>();
+		
+		for(Object obj : getArgument(index, List.class)) {
+			if(!type.isInstance(obj)) {
+				throw new ClassCastException("Argument " + index + " in argument list " + getArguments() + " can not be cast to " + type.getName());
+			} else {
+				result.add(type.cast(obj));
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Shortcut method used to access the argument at the given {@code index} as string
+	 * This method calls: {@code getArgument(index, String.class)}
+	 * 
+	 * @param index
+	 * @return
+	 */
+	protected String getArgument(int index) {
+		return getArgument(index, String.class);
+	}
+	
+	/**
+	 * Shortcut method used to access the argument list at the given {@code index} as list of strings
+	 * This method calls: {@code getArgumentList(index, String.class)}
+	 * 
+	 * @param index
+	 * @return
+	 */
+	protected List<String> getArgumentList(int index) {
+		return getArgumentList(index, String.class);
+	}
 }

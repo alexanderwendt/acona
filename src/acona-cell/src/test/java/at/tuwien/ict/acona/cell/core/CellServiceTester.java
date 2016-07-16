@@ -19,7 +19,7 @@ import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.communicator.core.Communicator;
 import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
 import at.tuwien.ict.acona.communicator.util.ACLUtils;
@@ -101,7 +101,7 @@ public class CellServiceTester {
 			Message writeMessage = Message.newMessage()
 					.addReceiver(receiver)
 					.setContent(Datapoint.newDatapoint(datapointaddress).setValue(value).toJsonObject())
-					.setService(AconaService.WRITE);
+					.setService(AconaServiceType.WRITE);
 			
 			
 			//Create message body
@@ -114,7 +114,7 @@ public class CellServiceTester {
 			
 			Message readMessage = Message.newMessage()
 					.setReceiver(receiver)
-					.setService(AconaService.READ)
+					.setService(AconaServiceType.READ)
 					.setContent(Datapoint.newDatapoint(datapointaddress));
 			
 			Message result = this.comm.sendSynchronousMessageToAgent(readMessage, 100000);
@@ -190,7 +190,7 @@ public class CellServiceTester {
 			//Create Message
 			Message message = Message.newMessage()
 					.addReceiver(publisherAgentName)
-					.setService(AconaService.SUBSCRIBE)
+					.setService(AconaServiceType.SUBSCRIBE)
 					.setContent(Datapoint.newDatapoint(datapointaddress));
 			//JsonObject message = JsonMessage.createMessage(JsonMessage.toJsonObjectString(JsonMessage.DATAPOINTADDRESS, datapointaddress), publisherAgentName, JsonMessage.SERVICESUBSCRIBE);
 			ACLMessage msg = ACLUtils.convertToACL(message);
@@ -287,7 +287,7 @@ public class CellServiceTester {
 			//Create Message
 			Message message = Message.newMessage()
 					.addReceiver(publisherAgentName)
-					.setService(AconaService.SUBSCRIBE)
+					.setService(AconaServiceType.SUBSCRIBE)
 					.setContent(Datapoint.newDatapoint(datapointaddress));
 			//JsonObject message = JsonMessage.createMessage(JsonMessage.toJsonObjectString(JsonMessage.DATAPOINTADDRESS, datapointaddress), publisherAgentName, JsonMessage.SERVICESUBSCRIBE);
 			ACLMessage msg = ACLUtils.convertToACL(message);
@@ -313,7 +313,7 @@ public class CellServiceTester {
 			//Create Message
 			Message message2 = Message.newMessage()
 					.addReceiver(publisherAgentName)
-					.setService(AconaService.UNSUBSCRIBE)
+					.setService(AconaServiceType.UNSUBSCRIBE)
 					.setContent(Datapoint.newDatapoint(datapointaddress));
 			//JsonObject message = JsonMessage.createMessage(JsonMessage.toJsonObjectString(JsonMessage.DATAPOINTADDRESS, datapointaddress), publisherAgentName, JsonMessage.SERVICESUBSCRIBE);
 			ACLMessage msg2 = ACLUtils.convertToACL(message2);
@@ -412,7 +412,7 @@ public class CellServiceTester {
 				//Create Message
 				Message message = Message.newMessage()
 						.addReceiver(previousController.getCell().getLocalName())
-						.setService(AconaService.SUBSCRIBE)
+						.setService(AconaServiceType.SUBSCRIBE)
 						.setContent(Datapoint.newDatapoint(datapointaddress));
 				//JsonObject message = JsonMessage.createMessage(JsonMessage.toJsonObjectString(JsonMessage.DATAPOINTADDRESS, datapointaddress), publisherAgentName, JsonMessage.SERVICESUBSCRIBE);
 				ACLMessage msg = ACLUtils.convertToACL(message);

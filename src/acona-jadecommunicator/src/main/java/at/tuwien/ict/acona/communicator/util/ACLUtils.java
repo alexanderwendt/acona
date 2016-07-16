@@ -5,7 +5,7 @@ import java.util.List;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaService;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import jade.core.AID;
@@ -17,7 +17,7 @@ public class ACLUtils {
 		
 		String content = message.getContent(); //as String
 		//AconaService type = AconaService.valueOf(message.getUserDefinedParameter(Keys.SERVICE.toString())); //for type
-		AconaService type = AconaService.valueOf(message.getOntology()); //for type
+		AconaServiceType type = AconaServiceType.valueOf(message.getOntology()); //for type
 		//AconaSync mode = AconaSync.valueOf(message.getUserDefinedParameter(Keys.MODE.toString())); //for type
 		AconaSync mode = AconaSync.valueOf(message.getEncoding()); //for type
 		//Get all receivers in a list
