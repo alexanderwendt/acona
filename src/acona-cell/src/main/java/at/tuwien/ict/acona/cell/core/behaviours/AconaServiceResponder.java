@@ -40,6 +40,7 @@ public class AconaServiceResponder extends AchieveREResponder {
 		ACLMessage response = request.createReply();
 		
 		response.setContent(aconaResponse.toString());
+		response.setEncoding(request.getEncoding());
 		
 		if(service.getError() != 0) {
 			response.setPerformative(ACLMessage.INFORM);

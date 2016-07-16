@@ -77,7 +77,7 @@ public class SyncCommunicationTest extends BaseCellTester {
 		public String matches(GlobalLogEntry entry) {
 			String error = "";
 			
-			if(entry.getAgent() != agent) {
+			if(!entry.getAgent().equals(agent)) {
 				error = "Message was logged by wrong agent!\nExpected: " + message.toString() + "\nLogged: " + entry.getMessage().toString();
 			}
 			
@@ -109,7 +109,7 @@ public class SyncCommunicationTest extends BaseCellTester {
 		MessageTemplate cond3 = MessageTemplate.MatchProtocol(message.getProtocol());
 		MessageTemplate cond4 = MessageTemplate.MatchConversationId(message.getConversationId());
 		MessageTemplate cond5 = MessageTemplate.MatchInReplyTo(message.getReplyWith());
-		MessageTemplate cond6 = MessageTemplate.MatchPerformative(message.getPerformative());
+		//MessageTemplate cond6 = MessageTemplate.MatchPerformative(message.getPerformative());
 		MessageTemplate cond7 = MessageTemplate.MatchEncoding(message.getEncoding());
 		
 		return MessageTemplate.and(
@@ -117,8 +117,7 @@ public class SyncCommunicationTest extends BaseCellTester {
 				cond2, MessageTemplate.and(
 				cond3, MessageTemplate.and(
 				cond4, MessageTemplate.and(
-				cond5, MessageTemplate.and(
-				cond6, cond7))))));
+				cond5, cond7)))));
 	}
 	
 	protected MessageTemplate getReceiverRequestTemplate(AID receiver, ACLMessage message) {
@@ -127,7 +126,7 @@ public class SyncCommunicationTest extends BaseCellTester {
 		MessageTemplate cond3 = MessageTemplate.MatchProtocol(message.getProtocol());
 		MessageTemplate cond4 = MessageTemplate.MatchConversationId(message.getConversationId());
 		MessageTemplate cond5 = MessageTemplate.MatchReplyWith(message.getReplyWith());
-		MessageTemplate cond6 = MessageTemplate.MatchPerformative(getNextSuccessfullPerformative(message.getPerformative()));
+		//MessageTemplate cond6 = MessageTemplate.MatchPerformative(getNextSuccessfullPerformative(message.getPerformative()));
 		MessageTemplate cond7 = MessageTemplate.MatchEncoding(message.getEncoding());
 		
 		return MessageTemplate.and(
@@ -135,8 +134,7 @@ public class SyncCommunicationTest extends BaseCellTester {
 				cond2, MessageTemplate.and(
 				cond3, MessageTemplate.and(
 				cond4, MessageTemplate.and(
-				cond5, MessageTemplate.and(
-				cond6, cond7))))));
+				cond5, cond7)))));
 	}
 	
 	protected AID getOnlyReceiver(ACLMessage message) {
