@@ -5,12 +5,13 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviourImpl;
+import at.tuwien.ict.acona.cell.core.CellUtil;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class SynchronizedReadBehaviour extends CellFunctionBehaviourImpl {
 
 	private static final String TIMEOUTNAME = "timeout";
-	private int timeout = this.conf.get(TIMEOUTNAME).getAsInt();
+	//private int timeout = 1000;
 	
 	private final SynchronousQueue<Datapoint> queue = new SynchronousQueue<Datapoint>();
 	
@@ -20,7 +21,9 @@ public class SynchronizedReadBehaviour extends CellFunctionBehaviourImpl {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void function(Map<String, Datapoint> data) {
+	public void function(Map<String, Datapoint> data) {		
+		log.debug("Start synchronized read behaviour");
+		
 		//Get the datapoint
 		if (data.isEmpty()==false) {
 			Datapoint dp = data.entrySet().iterator().next().getValue();
@@ -30,6 +33,8 @@ public class SynchronizedReadBehaviour extends CellFunctionBehaviourImpl {
 			} catch (InterruptedException e) {
 				
 			}
+			
+			log.debug("Behaviour finished. Value={} put in queue", dp);
 		} else {
 			try {
 				throw new Exception ("No datapoint, although there should be one");
@@ -50,21 +55,25 @@ public class SynchronizedReadBehaviour extends CellFunctionBehaviourImpl {
 		//Execute the sendondemandbehaviour
 		//this.caller.addBehaviour(new SendDatapointOnDemandBehavior(AID.), value, AconaService.WRITE));
 		
+		
 	}
 	
-	public Datapoint poll() throws InterruptedException {
+	public Datapoint poll() {
 		Datapoint result = null;
 		
 		try {
-			result = queue.poll(timeout, TimeUnit.MILLISECONDS);
+			//timeout = this.conf.get(TIMEOUTNAME).getAsInt();	//Get the timeout from the config
+			
+			//Poll the result
+			result = queue.poll(this.conf.get(TIMEOUTNAME).getAsInt(), TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
-			log.warn("Timeout");
-			throw new InterruptedException(e.getMessage());
+			
 		}
 		
 		return result;
 		
 	}
+
 
 
 }

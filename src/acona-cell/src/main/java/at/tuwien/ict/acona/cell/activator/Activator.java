@@ -40,5 +40,13 @@ public interface Activator {
 	 */
 	public List<String> getLinkedDatapoints();
 	
+	/**
+	 * Get the condition mapping
+	 * 
+	 * @return
+	 */
 	public Map<String, List<ActivatorConditionManager>> getConditionMapping();
+	
+	public void closeActivator();
+	
 }

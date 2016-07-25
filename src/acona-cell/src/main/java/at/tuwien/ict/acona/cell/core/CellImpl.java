@@ -28,6 +28,7 @@ import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.cell.storage.DataStorageSubscriberNotificator;
 import jade.core.Agent;
+import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -41,6 +42,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 
 	private final DataStorage dataStorage = new DataStorageImpl();
 	private final ActivationHandler activationHandler = new ActivationHandlerImpl();
+	private final CellUtil util = new CellUtil(this);
 	
 	//Genotype configuration
 	protected JsonObject conf;
@@ -156,15 +158,21 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	}
 	
 	protected void createBasicBehaviors() {
+		//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+		
 		//Create readbehavior
 		ReadDataServiceBehavior readDataService = new ReadDataServiceBehavior(this);
 		this.addBehaviour(readDataService);
+		//this.addBehaviour(tbf.wrap(readDataService));
 		//Create writebehavior
 		WriteDataServiceBehavior writeDataService = new WriteDataServiceBehavior(this);
+		//this.addBehaviour(tbf.wrap(writeDataService));
 		this.addBehaviour(writeDataService);
 		SubscribeDataServiceBehavior subscribeDataServiceBehavior = new SubscribeDataServiceBehavior(this);
+		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
 		this.addBehaviour(subscribeDataServiceBehavior);
 		UnsubscribeDataServiceBehavior unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
+		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
 		this.addBehaviour(unsubscribeDataServiceBehavior);
 	}
 	
@@ -257,6 +265,10 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		return activationHandler;
 	}
 
+	public CellUtil getCellUtil() {
+		return util;
+	}
+	
 	@Override
 	public void notifySubscribers(List<String> subscribers, String caller, Datapoint subscribedData) {
 		//Check inputs
@@ -275,9 +287,8 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		if (subscribers.isEmpty()==false) {
 			this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
 		}
-		
-
 	}
+
 
 	@Override
 	public String toString() {

@@ -1,13 +1,10 @@
 package at.tuwien.ict.acona.cell.testing;
 
-import java.rmi.server.UID;
-
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.behaviours.AconaServiceResponder;
+import at.tuwien.ict.acona.cell.core.behaviours.AconaLoggingServiceResponder;
 import at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import jade.core.AID;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.lang.acl.MessageTemplate;
 
@@ -16,7 +13,7 @@ public class AconaSyncSequenceReceiver extends CellImpl {
 	
 	@Override
 	protected void createBasicBehaviors() {
-		AconaServiceResponder queryResponder = new AconaServiceResponder(this, new AconaServiceInterface<CellImpl>() {
+		AconaLoggingServiceResponder queryResponder = new AconaLoggingServiceResponder(this, new AconaServiceInterface<CellImpl>() {
 			private int error = 0;
 
 			@Override

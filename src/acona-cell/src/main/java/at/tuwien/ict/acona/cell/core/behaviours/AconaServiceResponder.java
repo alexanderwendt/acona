@@ -3,7 +3,7 @@ package at.tuwien.ict.acona.cell.core.behaviours;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
 import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.testing.GlobalLogger;
+//import at.tuwien.ict.acona.cell.testing.GlobalLogger;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
@@ -31,7 +31,7 @@ public class AconaServiceResponder extends AchieveREResponder {
 	
 	@Override
 	protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
-		GlobalLogger.log(getAgent(), request);
+		//GlobalLogger.log(getAgent(), request);
 		
 		Message aconaMessage = Message.toMessage(request.getContent());
 		
