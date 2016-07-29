@@ -69,7 +69,7 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 	@Override
 	public void action() {
 		//The behavior is always launched at the start. Block only pauses the behavior for the next time.
-		log.trace("Behavior {}>run allowed={}", this.name, this.isAllowedToRun());
+		log.trace("Behaviour {}>run allowed={}", this.name, this.isAllowedToRun());
 		if (this.isAllowedToRun()==true) {
 			log.trace("Behavior {}> Execute with data={}", this.name, this.data);
 			this.function(data);

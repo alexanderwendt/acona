@@ -21,6 +21,7 @@ import at.tuwien.ict.acona.cell.config.ConditionConfig;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
 import at.tuwien.ict.acona.cell.core.InspectorCellClient;
+import at.tuwien.ict.acona.cell.core.helpers.CellWithFSMBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
@@ -97,56 +98,28 @@ public class CellFSMBehaviourTester {
 	@Test
 	public void fsmBehaviourTest() {
 		try {
-			String readAddress = "storageagent.data.value";
-			String triggerAddress = "readeragent.data.command";
-			String resultAddress = "data.result";
-			int databaseValue = 12345;
-			int expectedValue = 12345;
-			
-			//Create config JSON for reader agent
-			CellConfig cellreader = CellConfig.newConfig("ReaderAgent", "at.tuwien.ict.acona.cell.core.cellImpl");
-			cellreader.setClass(CellImpl.class);
-			cellreader.addCondition(ConditionConfig.newConfig("startreadcondition", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
-			cellreader.addBehaviour(BehaviourConfig.newConfig("readBehaviour", "at.tuwien.ict.acona.cell.core.helpers.TestReadAndWriteBehaviour")
-					.setProperty("agentname", "StorageAgent")
-					.setProperty("timeout", "2000")
-					.setProperty("result", resultAddress)
-					.setProperty("readaddress", readAddress));
-			cellreader.addActivator(ActivatorConfig.newConfig("ReadActivator").setBehaviour("readBehaviour").setActivatorLogic("")
-					.addMapping(triggerAddress, "startreadcondition"));
-			
 			//Create agent in the system
 			//String[] args = {"1", "pong"};
-			Object[] args = new Object[1];
-			args[0] = cellreader.toJsonObject();
-			AgentController readerAgent = this.util.createAgent(cellreader.getName(), cellreader.getClassToInvoke(), args, agentContainer);
+			InspectorCellClient externalController = new InspectorCellClient();
+			Object[] args = new Object[2];
+			args[0] = new JsonObject();
+			args[1] = externalController;
+			AgentController readerAgent = this.util.createAgent("FSMAgent", CellWithFSMBehaviour.class, args, agentContainer);
+			double expectedValue = 1.2;
 			
 			log.debug("State={}", readerAgent.getState());
-			
-			//Create config JSON for storage agent
-			CellConfig cellstorage = CellConfig.newConfig("StorageAgent", "at.tuwien.ict.acona.cell.core.cellInspector");
-			cellstorage.setClass(InspectorCell.class);
-			
-			//Create cell inspector controller for the subscriber
-			InspectorCellClient externalController = new InspectorCellClient();
-			Object[] argsPublisher = new Object[2];
-			argsPublisher[0] = cellstorage.toJsonObject();
-			argsPublisher[1] = externalController;
-			//Create agent in the system
-			AgentController agentController = this.util.createAgent(cellstorage.getName(), cellstorage.getClassToInvoke(), argsPublisher, agentContainer);
-			
-			log.debug("State={}", agentController.getState());		
+				
 			
 			//Write databasevalue directly into the storage
-			externalController.getCell().getDataStorage().write(Datapoint.newDatapoint(readAddress).setValue(new JsonPrimitive(databaseValue)), null);
+			externalController.getCell().getDataStorage().write(Datapoint.newDatapoint("Test").setValue(new JsonPrimitive(1.2)), null);
 			
 			//=== Start the system ===//
-			this.comm.subscribeDatapoint("ReaderAgent", readAddress);
+			this.comm.subscribeDatapoint("ReaderAgent", "none");
 			
 			//Send Write command
 			Message writeMessage = Message.newMessage()
 					.addReceiver("ReaderAgent")
-					.setContent(Datapoint.newDatapoint(triggerAddress).setValue("START").toJsonObject())
+					.setContent(Datapoint.newDatapoint("anything").setValue("START").toJsonObject())
 					.setService(AconaService.WRITE);
 			
 			Message ack = this.comm.sendSynchronousMessageToAgent(writeMessage, 10000);
