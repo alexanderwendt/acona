@@ -10,14 +10,12 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.ThreadedBehaviourFactory;
 
 public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implements CellFunctionBehaviour {
 
 	protected static Logger log = LoggerFactory.getLogger(CellFunctionBehaviourImpl.class);
 	protected String name;
 	protected JsonObject conf;
-	//protected final Activator activator;
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -41,15 +39,17 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 		this.isAllowedToRun = false;
 		this.caller = caller;
 		
-		//this.subInit();
+		this.subInit();
 		
 		return this;
 	}
 	
-//	/**
-//	 * Init of the children of this behaviour
-//	 */
-//	protected abstract void subInit();
+	/**
+	 * Init of the children of this behaviour
+	 */
+	protected void subInit() {
+		//Override this
+	}
 	
 	@Override
 	public void setData(Map<String, Datapoint> data) {
@@ -71,12 +71,17 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 		//The behavior is always launched at the start. Block only pauses the behavior for the next time.
 		log.trace("Behaviour {}>run allowed={}", this.name, this.isAllowedToRun());
 		if (this.isAllowedToRun()==true) {
-			log.trace("Behavior {}> Execute with data={}", this.name, this.data);
-			this.function(data);
+			//try {
+				log.trace("Behavior {}> Execute with data={}", this.name, this.data);
+				this.function(data);
+				
+				//Clean up behavior
+				this.setRunPermission(false);
+				this.data=null;
+//			} catch (Exception e) {
+//				log.error("Cannot run behaviour", e);
+//			}
 			
-			//Clean up behavior
-			this.setRunPermission(false);
-			this.data=null;
 		} else {
 			block();
 		}		
@@ -109,12 +114,12 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 		StringBuilder builder = new StringBuilder();
 		builder.append("name=");
 		builder.append(name);
-		builder.append(", settings=");
-		builder.append(conf);
-		builder.append(", data=");
-		builder.append(data);
+		//builder.append(", settings=");
+		//builder.append(conf);
+		//builder.append(", data=");
+		//builder.append(data);
 		builder.append(", caller=");
-		builder.append(caller);
+		builder.append(caller.getName());
 		return builder.toString();
 	}
 

@@ -151,7 +151,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		}
 	}
 	
-	protected void internalInit() {
+	protected void internalInit() throws Exception {
 		//Setup activations and behaviors
 		//Overwrite method with own init
 
@@ -233,7 +233,6 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
 		}
 	}
-
 
 	@Override
 	public String toString() {

@@ -26,6 +26,13 @@ public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
 
 	
 	
+	/**
+	 * Send a message to another agent with a oneshotbehaviour
+	 * 
+	 * @param receiver AID from receiver
+	 * @param datapoint set the datapoint
+	 * @param serviceToUse set which acona service to use
+	 */
 	public SendDatapointOnDemandBehavior(AID receiver, Datapoint datapoint, AconaService serviceToUse) {
 		this.receiver = receiver;
 		this.datapoint = datapoint;
@@ -34,6 +41,7 @@ public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
 	
 	@Override
 	public void action() {
+		log.trace("Start sendDatapointondemandbehaviour");
 		//Write value of datapoint to subscriber, in order to provide with initial value
 		//Create send message without target
 		ACLMessage notifyMessage = ACLUtils.convertToACL(Message.newMessage()
@@ -49,6 +57,6 @@ public class SendDatapointOnDemandBehavior extends OneShotBehaviour {
 		//notifyMessage.setContent(writeBody.toString());
 		notifyMessage.addReceiver(receiver);
 		this.myAgent.send(notifyMessage);
-		log.debug("Datapoint={} sent to agent={} with service={}", datapoint, receiver.getLocalName(), service);
+		log.debug("Datapoint={} sent to agent={} with service={}", datapoint, receiver, service);
 	}
 }

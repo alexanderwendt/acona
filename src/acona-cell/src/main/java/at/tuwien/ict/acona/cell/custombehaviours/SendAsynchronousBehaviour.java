@@ -10,30 +10,40 @@ import jade.core.AID;
 
 public class SendAsynchronousBehaviour extends CellFunctionBehaviourImpl {
 
-	private static final String RECEIVERDATAPOINTADDRESS = "receivername";
-	private static final String DATAPOINTADDRESS = "datapointaddress";
-	private static final String ACONASERVICEADDRESS = "aconaservice";
+	private static final String RECEIVERDATAPOINTADDRESS = "receivernameaddress";
+	private static final String DATAPOINTSOURCEADDRESS = "datapointsourceaddress";
+	private static final String DATAPOINTTARGETADDRESS = "datapointtargetaddress";
+	private static final String ACONASERVICEADDRESS = "aconaserviceaddress";
+	private static final String DEFAULTACONASERVICE = "defaultservice";
+	
+	private static final String STATEADDRESS = "stateaddress";
+	private static final String MYSTATEID = "mystateid";
+	private static final String SUCCESSID = "successstateid";
+	private static final String NOSUCCESSID = "nosuccessid";
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
+	public void subInit() {
+		//Write the default acona service, which is used until another service is found for that
+		this.writeToDataStorage(Datapoint.newDatapoint(conf.getAsJsonPrimitive(ACONASERVICEADDRESS).getAsString()).setValue(conf.get(DEFAULTACONASERVICE)));
+	}
+	
 	@Override
 	public void function(Map<String, Datapoint> data) {
-		String receiverID = data.get("receiver").getValue().getAsString();
-		Datapoint value = data.get("datapoint");
+		AID name = new AID(this.readFromDataStorage(conf.get(RECEIVERDATAPOINTADDRESS).getAsString()).getValue().getAsString(), AID.ISLOCALNAME);
+		Datapoint dp = this.readFromDataStorage(conf.get(DATAPOINTSOURCEADDRESS).getAsString());
+		String targetdatapoint = conf.get(DATAPOINTTARGETADDRESS).getAsString();
+		AconaService service = AconaService.valueOf(this.readFromDataStorage(conf.get(ACONASERVICEADDRESS).getAsString()).getValue().getAsString());
 		
-		//this.myAgent.addBehaviour(new SendDatapointOnDemandBehavior(msg.getSender(), this.callerCell.getDataStorage().read(dp.getAddress()), AconaService.WRITE));
-		// TODO Auto-generated method stub
+		//Create target datapoint
+		Datapoint targetdp = Datapoint.newDatapoint(targetdatapoint).setValue(dp.getValue());
 		
-		//Create an activator that listens to two predefined datapoints. Any data, which is put there is sent to that
-		//agent name. One datapoint is for the receiver of the message and one datapoint contains the datapoint that shall be sent
-		
-		//Execute the sendondemandbehaviour
-		//this.caller.addBehaviour(new SendDatapointOnDemandBehavior(AID.), value, AconaService.WRITE));
+		this.myAgent.addBehaviour(new SendDatapointOnDemandBehavior(name, dp, service));
+		log.debug("Send to agent={}, datapoint={}, service={}", name, targetdp, service);
 		
 	}
-
 
 }

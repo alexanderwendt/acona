@@ -26,9 +26,9 @@ private final JsonObject configObject = new JsonObject();
 		return this;
 	}
 	
-	public ActivatorConfig addMapping(String datapoint, String conditionName) {
+	public ActivatorConfig addMapping(String datapointaddress, String conditionName) {
 		JsonObject object = new JsonObject();
-		object.addProperty(datapoint, conditionName);
+		object.addProperty(datapointaddress, conditionName);
 		this.configObject.getAsJsonArray(ACTIVATORMAP).add(object);
 		return this;
 	}

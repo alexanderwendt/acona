@@ -33,8 +33,18 @@ public interface Communicator {
 	 */
 	public Message sendSynchronousMessageToAgent(Message message, int timeout) throws Exception;
 	
+	/**
+	 * @param agentName
+	 * @param datapointName
+	 * @throws Exception
+	 */
 	public void subscribeDatapoint(String agentName, String datapointName) throws Exception;
 	
+	/**
+	 * @param agentName
+	 * @param datapointName
+	 * @throws Exception
+	 */
 	public void unsubscribeDatapoint(String agentName, String datapointName) throws Exception;
 	
 	/**
@@ -54,9 +64,24 @@ public interface Communicator {
 	 */
 	public void addListener(ListenerModule listener);
 	
+	/**
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public Message getMessageFromAgent() throws InterruptedException;
 	
+	/**
+	 * @param timeout
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public Message getMessageFromAgent(long timeout) throws InterruptedException;
 	
+	/**
+	 * @param timeout in ms
+	 * @param ignoreEmptyValues if the result is empty strings, do nothing
+	 * @return Datapoint
+	 * @throws InterruptedException
+	 */
 	public Datapoint getDatapointFromAgent(long timeout, boolean ignoreEmptyValues) throws InterruptedException;
 }

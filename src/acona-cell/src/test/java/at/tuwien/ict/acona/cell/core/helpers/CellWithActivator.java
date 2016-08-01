@@ -20,7 +20,7 @@ public class CellWithActivator extends InspectorCell {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	protected void internalInit() {
+	protected void internalInit() throws Exception {
 		//Address
 		//String datapointsource = "activator.test.address";
 		String activatorName = "testactivator";

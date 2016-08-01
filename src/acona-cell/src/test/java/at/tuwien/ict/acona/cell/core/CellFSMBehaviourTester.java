@@ -43,7 +43,7 @@ public class CellFSMBehaviourTester {
 	private Communicator comm;
 	
 	private ContainerController agentContainer;
-	ContainerController mainContainerController;
+	private ContainerController mainContainerController;
 
 	@Before
 	public void setUp() throws Exception {
@@ -95,7 +95,7 @@ public class CellFSMBehaviourTester {
 	 * In this test, one agent is created, which is the database. Another agent is created that shall read a value from the database with a blocking read function. The test is passed, if the read value is written to a subscribed datapoint
 	 * 
 	 */
-	@Test
+	//@Test
 	public void fsmBehaviourTest() {
 		try {
 			//Create agent in the system

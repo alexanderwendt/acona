@@ -9,8 +9,9 @@ public interface Condition {
 	/**
 	 * @param name
 	 * @param settings
+	 * @throws Exception 
 	 */
-	public Condition init(String name, final JsonObject settings);
+	public Condition init(String name, final JsonObject settings) throws Exception;
 	
 	/**
 	 * @return
