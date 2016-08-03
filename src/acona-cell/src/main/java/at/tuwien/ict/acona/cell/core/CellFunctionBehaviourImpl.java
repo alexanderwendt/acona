@@ -123,6 +123,4 @@ public abstract class CellFunctionBehaviourImpl extends CyclicBehaviour implemen
 		return builder.toString();
 	}
 
-
-
 }
