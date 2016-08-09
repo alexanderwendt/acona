@@ -223,7 +223,7 @@ public class CellBuilder {
 		String name = config.get(ACTIVATORNAME).getAsString();
 		String behaviourName = config.get(ACTIVATORBEHAVIOUR).getAsString();
 		JsonArray conditionMapping = config.get(ACTIVATORMAP).getAsJsonArray();	//"key : "[value, value, value]"
-		String activatorLogic = config.get(ACTIVATORLOGIC).getAsString();
+		String activatorLogic = (config.get(ACTIVATORLOGIC)!=null?config.get(ACTIVATORLOGIC).getAsString():"");
 		
 		try {
 			//Get behaviour

@@ -487,8 +487,8 @@ public class CellServiceTester {
 			int expectedValue = 12345;
 			
 			//Create config JSON for reader agent
-			CellConfig cellreader = CellConfig.newConfig("ReaderAgent", "at.tuwien.ict.acona.cell.core.cellImpl");
-			cellreader.setClass(CellImpl.class);
+			CellConfig cellreader = CellConfig.newConfig("ReaderAgent", "at.tuwien.ict.acona.cell.core.CellImpl");
+			//cellreader.setClass(CellImpl.class);
 			cellreader.addCondition(ConditionConfig.newConfig("startreadcondition", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
 			cellreader.addBehaviour(BehaviourConfig.newConfig("readBehaviour", "at.tuwien.ict.acona.cell.core.helpers.TestReadAndWriteBehaviour")
 					.setProperty("agentname", "StorageAgent")
@@ -502,13 +502,21 @@ public class CellServiceTester {
 			//String[] args = {"1", "pong"};
 			Object[] args = new Object[1];
 			args[0] = cellreader.toJsonObject();
-			AgentController readerAgent = this.util.createAgent(cellreader.getName(), cellreader.getClassToInvoke(), args, agentContainer);
+			
+			AgentController readerAgent = null;
+			try {
+				readerAgent = this.util.createAgent(cellreader.getName(), cellreader.getClassToInvoke(), args, agentContainer);
+			} catch (Exception e) {
+				log.error("error", e);
+			}
+			
+			
 			
 			log.debug("State={}", readerAgent.getState());
 			
 			//Create config JSON for storage agent
-			CellConfig cellstorage = CellConfig.newConfig("StorageAgent", "at.tuwien.ict.acona.cell.core.cellInspector");
-			cellstorage.setClass(InspectorCell.class);
+			CellConfig cellstorage = CellConfig.newConfig("StorageAgent", "at.tuwien.ict.acona.cell.core.InspectorCell");
+			//cellstorage.setClass(InspectorCell.class);
 			
 			//Create cell inspector controller for the subscriber
 			InspectorCellClient externalController = new InspectorCellClient();
@@ -516,7 +524,7 @@ public class CellServiceTester {
 			argsPublisher[0] = cellstorage.toJsonObject();
 			argsPublisher[1] = externalController;
 			//Create agent in the system
-			AgentController agentController = this.util.createAgent(cellstorage.getName(), cellstorage.getClassToInvoke(), argsPublisher, agentContainer);
+			AgentController agentController = this.util.createAgent(cellstorage.getName(), Class.forName(cellstorage.getClassName()), argsPublisher, agentContainer);
 			
 			log.debug("State={}", agentController.getState());		
 			

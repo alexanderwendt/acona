@@ -110,4 +110,10 @@ public class DummyCell implements CellInitialization {
 		return null;
 	}
 
+	@Override
+	public String getLocalName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

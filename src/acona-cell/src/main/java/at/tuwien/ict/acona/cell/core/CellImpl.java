@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.SynchronousQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +26,6 @@ import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.cell.storage.DataStorageSubscriberNotificator;
 import jade.core.Agent;
-import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -151,7 +148,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		}
 	}
 	
-	protected void internalInit() {
+	protected void internalInit() throws Exception {
 		//Setup activations and behaviors
 		//Overwrite method with own init
 
@@ -288,7 +285,6 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
 		}
 	}
-
 
 	@Override
 	public String toString() {

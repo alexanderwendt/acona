@@ -12,7 +12,7 @@ public class InspectorCell extends CellImpl {
 		super.setup();
 		
 		Object[] args = this.getArguments();
-		if (args!=null) {
+		if (args!=null && args.length>1) {
 			controller = ((InspectorCellClient)args[1]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
 			
 			log.debug("agent will use an inspector as controller");

@@ -30,6 +30,13 @@ public interface Cell {
 	public String getName();
 	
 	/**
+	 * Get local name without IP number
+	 * 
+	 * @return
+	 */
+	public String getLocalName();
+	
+	/**
 	 * Get a copy of the current cell configuration
 	 * 
 	 * @return

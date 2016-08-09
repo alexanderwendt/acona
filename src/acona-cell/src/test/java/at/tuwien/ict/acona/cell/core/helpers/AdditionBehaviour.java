@@ -45,7 +45,7 @@ public class AdditionBehaviour extends CellFunctionBehaviourImpl {
 		double result = operand1 + operand2;
 		
 		//Write result in memory
-		this.caller.getDataStorage().write(Datapoint.newDatapoint(conf.get(RESULTADDRESS).getAsString()).setValue(String.valueOf(result)), caller.getName());
+		this.writeToDataStorage(Datapoint.newDatapoint(conf.get(RESULTADDRESS).getAsString()).setValue(String.valueOf(result)));
 		log.info("{}> Add {} + {} = {}", this.name, operand1, operand2, result);
 		
 		

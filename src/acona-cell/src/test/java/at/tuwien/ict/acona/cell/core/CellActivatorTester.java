@@ -136,8 +136,8 @@ public class CellActivatorTester {
 	public void createConfigurableAdditionNetwork() {
 		try {
 			//Create config JSON
-			CellConfig cell = CellConfig.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.cellInspector");
-			cell.setClass(InspectorCell.class);
+			CellConfig cell = CellConfig.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.InspectorCell");
+			//cell.setClass(InspectorCell.class);
 			cell.addCondition(ConditionConfig.newConfig("operand1", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
 			cell.addCondition(ConditionConfig.newConfig("operand2", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
 			cell.addBehaviour(BehaviourConfig.newConfig("additionBehaviour", "at.tuwien.ict.acona.cell.core.helpers.AdditionBehaviour")
@@ -158,7 +158,7 @@ public class CellActivatorTester {
 			argsPublisher[0] = cell.toJsonObject();
 			argsPublisher[1] = externalController;
 			//Create agent in the system
-			AgentController agentController = this.util.createAgent(cell.getName(), cell.getClassToInvoke(), argsPublisher, agentContainer);
+			AgentController agentController = this.util.createAgent(cell.getName(), Class.forName(cell.getClassName()), argsPublisher, agentContainer);
 			log.debug("State={}", agentController.getState());
 			
 			this.comm.sendSynchronousMessageToAgent(Message.newMessage().addReceiver(cell.getName())

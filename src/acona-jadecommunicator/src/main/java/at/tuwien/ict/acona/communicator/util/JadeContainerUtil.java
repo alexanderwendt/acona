@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.communicator.util;
 
-import com.google.gson.JsonObject;
-
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;

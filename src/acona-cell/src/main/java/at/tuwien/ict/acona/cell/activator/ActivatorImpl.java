@@ -63,6 +63,7 @@ public class ActivatorImpl implements Activator {
 		
 		
 		//Read the initial value from the datapoint to trigger the conditions, especially the always true conditions
+		log.trace("{}>Initialize all conditions, by testing them with their subscribed data", this.name);
 		subscriptionCondition.entrySet().forEach((Entry<String, List<Condition>> e)->{
 			this.runActivation(this.caller.getDataStorage().read(e.getKey()));
 		});
@@ -156,9 +157,9 @@ public class ActivatorImpl implements Activator {
 		builder.append("name=");
 		builder.append(name);
 		builder.append(", behavior=");
-		builder.append(behavior);
+		builder.append(behavior.getName());
 		builder.append(", caller=");
-		builder.append(caller);
+		builder.append(caller.getLocalName());
 		builder.append(", conditions=");
 		builder.append(conditionMapping);
 		return builder.toString();

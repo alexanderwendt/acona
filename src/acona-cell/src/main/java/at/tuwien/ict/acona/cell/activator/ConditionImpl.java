@@ -15,7 +15,7 @@ public abstract class ConditionImpl implements Condition {
 	protected JsonObject conf = new JsonObject();
 	
 	@Override
-	public Condition init(String name, JsonObject conf) {
+	public Condition init(String name, JsonObject conf) throws Exception {
 		this.name = name;
 		this.conf = conf;
 		
@@ -25,7 +25,7 @@ public abstract class ConditionImpl implements Condition {
 		return this;
 	}
 	
-	protected abstract void subInit();
+	protected abstract void subInit() throws Exception;
 
 	@Override
 	public String getName() {

@@ -10,7 +10,8 @@ public class CellConfig {
 	private static final String CELLBEHAVIOURS = "cellbehaviours";
 	private static final String CELLACTIVATORS = "activators";
 	
-	private Class<?> clzz;
+	//private Class<?> clzz;
+	
 	private final JsonObject configObject = new JsonObject();
 	
 	public static CellConfig newConfig(String name, String className) {
@@ -35,12 +36,12 @@ public class CellConfig {
 	}
 	
 	public CellConfig setClass(Class<?> clzz) {
-		this.clzz = clzz;
+		this.setClassName(clzz.getName());
 		return this;
 	}
 	
-	public Class<?> getClassToInvoke() {
-		return this.clzz;
+	public Class<?> getClassToInvoke() throws Exception {
+		return Class.forName(this.getClassName());
 	}
 	
 	public CellConfig addProperty(String name, String value) {
