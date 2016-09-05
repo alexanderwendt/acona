@@ -2,8 +2,6 @@ package at.tuwien.ict.acona.cell.activator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -21,8 +19,10 @@ public interface Activator {
 	public Activator init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell caller);
 	
 	/**
+	 * run the activatior and test if the subscribed data can activate something
+	 * 
 	 * @param subscribedData
-	 * @return
+	 * @return true if the datapoint triggers activation. It returns false if the datapoint does not trigger any activation
 	 */
 	public boolean runActivation(Datapoint subscribedData);
 
@@ -31,7 +31,7 @@ public interface Activator {
 	 * 
 	 * @return
 	 */
-	public String getName();
+	public String getActivatorName();
 	
 	/**
 	 * Get all datapoints, which are subscribed (linked) to this activator
@@ -47,6 +47,9 @@ public interface Activator {
 	 */
 	public Map<String, List<ActivatorConditionManager>> getConditionMapping();
 	
+	/**
+	 * Close the activator
+	 */
 	public void closeActivator();
 	
 }

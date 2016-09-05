@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionHasValue;
@@ -17,8 +16,6 @@ import at.tuwien.ict.acona.cell.config.ActivatorConfig;
 import at.tuwien.ict.acona.cell.config.BehaviourConfig;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.ConditionConfig;
-import at.tuwien.ict.acona.cell.core.helpers.CellWithFSMBehaviour;
-import at.tuwien.ict.acona.cell.core.helpers.CustomTestCell;
 import at.tuwien.ict.acona.cell.core.helpers.ReadOperandBehaviour;
 import at.tuwien.ict.acona.cell.custombehaviours.SendAsynchronousBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -26,11 +23,7 @@ import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.util.CommUtil;
 import at.tuwien.ict.acona.communicator.core.Communicator;
-import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
-import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
 import jade.core.Runtime;
-import jade.wrapper.AgentController;
-import jade.wrapper.ContainerController;
 
 public class CellSendTester {
 

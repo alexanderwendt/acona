@@ -97,7 +97,7 @@ public class CellBuilder {
 						if (activator==null) {
 							throw new NullPointerException("activator does not exist");
 						}
-						this.activatorMap.put(activator.getName(), activator);
+						this.activatorMap.put(activator.getActivatorName(), activator);
 					} catch (Exception e) {
 						log.error("Cannot create activator from {}", activatorConfig, e);
 					}	

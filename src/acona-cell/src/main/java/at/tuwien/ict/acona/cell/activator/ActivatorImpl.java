@@ -147,7 +147,7 @@ public class ActivatorImpl implements Activator {
 	}
 
 	@Override
-	public String getName() {
+	public String getActivatorName() {
 		return this.name;
 	}
 
