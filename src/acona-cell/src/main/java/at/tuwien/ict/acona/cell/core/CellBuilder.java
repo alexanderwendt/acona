@@ -2,6 +2,7 @@ package at.tuwien.ict.acona.cell.core;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,29 +19,33 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
 import at.tuwien.ict.acona.cell.activator.Condition;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
 
 public class CellBuilder {
 	private static final String CELLNAME = "cellname";
 	private static final String CELLCLASS = "cellclass";
+	
+	//Only for JADE behaviour functions
 	private static final String CELLCONDITIONS = "conditions";
 	private static final String CELLBEHAVIOURS = "cellbehaviours";
 	private static final String CELLACTIVATORS = "activators";
 	
 	private static final String CONDITIONNAME = "conditionname";
 	private static final String CONDITIONCLASS = "conditionclass";
-	//private static final String CONDITIONCONFIG = "conditionconfig";
-	
 	
 	private static final String BEHAVIOURNAME = "behaviourname";
 	private static final String BEHAVIOURCLASS = "behaviourclass";
-	//private static final String BEHAVIOURCONFIG = "behaviourconfig";
 	
 	private static final String ACTIVATORNAME = "activatorname";
 	private static final String ACTIVATORMAP = "activatormap";
 	private static final String ACTIVATORBEHAVIOUR = "activatorbehaviour";
 	private static final String ACTIVATORLOGIC = "activatorlogic";
+	
+	//Only for cell functions
+	private static final String CELLFUNCTIONNAME = "cellfunctionname";
+	private static final String CELLFUNCTIONMAP = "cellfunctionmap";	//id to datapoint to subscribe
 	
 	private static Logger log = LoggerFactory.getLogger(CellBuilder.class);
 	
@@ -49,6 +54,96 @@ public class CellBuilder {
 	private final Map<String, Activator> activatorMap = new ConcurrentHashMap<String, Activator>();
 	
 	public void initializeCellConfig(JsonObject config, CellInitialization caller) throws Exception {
+		//Check, which type of config
+		//FIXME: Integrate both configs into one
+		if (config.get(CELLFUNCTIONMAP)==null) {
+			//Standard JADE config
+			log.info("Init cell builder for JADE behaviours");
+			initializeCellConfigJADEBehaviour(config, caller);
+			
+		} else {
+			//Cell function config
+			log.info("Init cell builder for cell functions");
+			initializeCellConfigCellFunctions(config, caller);
+		}
+		
+		
+	}
+	
+	private void initializeCellConfigCellFunctions(JsonObject config, CellInitialization caller) throws Exception {
+		try {
+			//=== Instantiate the conditions ===
+			//Get all condition configs
+			JsonArray cellActivators = config.getAsJsonArray(CELLFUNCTIONMAP);
+				
+			//Instantiate the activators
+			cellActivators.forEach(activatorConfig->{
+				try {
+					Activator activator = this.createCellFunctionFromConfig(activatorConfig.getAsJsonObject(), caller);
+					if (activator==null) {
+						throw new NullPointerException("activator does not exist");
+					}
+					this.activatorMap.put(activator.getActivatorName(), activator);
+				} catch (Exception e) {
+					log.error("Cannot create activator from {}", activatorConfig, e);
+				}	
+					
+			});
+				
+			//Set all activators
+			caller.setActivatorMap(activatorMap);
+				
+			//Register activators
+			caller.getActivatorMap().entrySet().forEach(a->{
+				caller.getActivationHandler().registerActivatorInstance(a.getValue());
+			});
+			
+		} catch (Exception e) {
+			log.error("Cannot create cell", e);
+			throw new Exception(e.getMessage());
+		}
+		
+	}
+	
+	private Activator createCellFunctionFromConfig(JsonObject config, Cell caller) throws Exception {
+		Activator result = null;
+		
+		//Get all values
+		String name = config.get(CELLFUNCTIONNAME).getAsString();
+		JsonArray conditionMapping = config.get(CELLFUNCTIONMAP).getAsJsonArray();	//"key : "[value, value, value]"
+		
+		try {	
+			//Create condition address map
+			final Map<String, List<Condition>> datapointConditionMap = new ConcurrentHashMap<String, List<Condition>>();
+			conditionMapping.forEach(mapping->{
+				final Set<Entry<String, JsonElement>> set = mapping.getAsJsonObject().entrySet();
+				set.forEach(e->{
+					//Get id
+					String id = e.getKey();
+					
+					//Get condition name
+					String conditionName = e.getValue().getAsString();
+					String datapoint = e.getValue().getAsString();
+					
+					
+					
+					//Set in table as new list or if it exists just add to list
+					datapointConditionMap.put(datapoint, new ArrayList<Condition>());
+					//FIXME: Add the ids also to the system
+				});
+			});
+			
+			result = new ActivatorJADEBehaviourImpl().init(name, datapointConditionMap, "", null, caller);
+		
+		} catch (Exception e) {
+			log.error("Cannot create activation", e);
+			throw new Exception(e.getMessage());
+		}
+		
+		return result;
+	}
+	
+	private void initializeCellConfigJADEBehaviour(JsonObject config, CellInitialization caller) throws Exception {
 		//Instantiate the cell itself
 		
 		try {
@@ -119,7 +214,6 @@ public class CellBuilder {
 			log.error("Cannot create cell", e);
 			throw new Exception(e.getMessage());
 		}
-		
 	}
 	
 	private Condition createConditionFromConfig(JsonObject config) throws Exception {
@@ -258,7 +352,7 @@ public class CellBuilder {
 				throw new Exception("No conditions available");
 			}
 			
-			result = new ActivatorImpl().init(name, datapointConditionMap, activatorLogic, cellFunctionBehaviour, caller);
+			result = new ActivatorJADEBehaviourImpl().init(name, datapointConditionMap, activatorLogic, cellFunctionBehaviour, caller);
 		
 		} catch (Exception e) {
 			log.error("Cannot create activation", e);

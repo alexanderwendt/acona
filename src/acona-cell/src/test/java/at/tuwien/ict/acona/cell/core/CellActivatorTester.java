@@ -10,18 +10,18 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.config.ActivatorConfig;
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.BehaviourConfig;
+import at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
+import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
+import at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.config.ConditionConfig;
 import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.communicator.core.Communicator;
-import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
-import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
+import at.tuwien.ict.acona.jadelauncher.core.Gateway;
+import at.tuwien.ict.acona.jadelauncher.core.GatewayImpl;
+import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
@@ -30,7 +30,7 @@ public class CellActivatorTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellActivatorTester.class);
 	private final JadeContainerUtil util = new JadeContainerUtil();
-	private Communicator comm;
+	private Gateway comm;
 	
 	private ContainerController agentContainer;
 	
@@ -49,7 +49,7 @@ public class CellActivatorTester {
 			
 			//Create gateway
 			log.debug("Create gateway");
-			comm = new CommunicatorImpl();
+			comm = new GatewayImpl();
 			comm.init();
 			
 		} catch (Exception e) {
@@ -136,15 +136,15 @@ public class CellActivatorTester {
 	public void createConfigurableAdditionNetwork() {
 		try {
 			//Create config JSON
-			CellConfig cell = CellConfig.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.InspectorCell");
+			CellConfigJadeBehaviour cell = CellConfigJadeBehaviour.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.InspectorCell");
 			//cell.setClass(InspectorCell.class);
 			cell.addCondition(ConditionConfig.newConfig("operand1", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
 			cell.addCondition(ConditionConfig.newConfig("operand2", "at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty"));
-			cell.addBehaviour(BehaviourConfig.newConfig("additionBehaviour", "at.tuwien.ict.acona.cell.core.helpers.AdditionBehaviour")
+			cell.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("additionBehaviour", "at.tuwien.ict.acona.cell.core.helpers.AdditionBehaviour")
 					.setProperty("operand1", "data.op1")
 					.setProperty("operand2", "data.op2")
 					.setProperty("result", "data.result"));
-			cell.addActivator(ActivatorConfig.newConfig("AdditionActivator").setBehaviour("additionBehaviour").setActivatorLogic("")
+			cell.addActivator(ActivatorConfigJadeBehaviour.newConfig("AdditionActivator").setBehaviour("additionBehaviour").setActivatorLogic("")
 					.addMapping("data.op1", "operand1")
 					.addMapping("data.op2", "operand2"));
 

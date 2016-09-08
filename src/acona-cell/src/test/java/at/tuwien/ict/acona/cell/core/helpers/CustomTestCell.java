@@ -4,7 +4,7 @@ import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.communicator.util.ACLUtils;
+import at.tuwien.ict.acona.jadelauncher.util.ACLUtils;
 import jade.core.behaviours.TickerBehaviour;
 
 public class CustomTestCell extends CellImpl {

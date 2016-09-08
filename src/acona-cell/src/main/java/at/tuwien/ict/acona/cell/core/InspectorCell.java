@@ -22,4 +22,8 @@ public class InspectorCell extends CellImpl {
 		
 		controller.setCellInspector(this);
 	}
+	
+	protected void internalInit() throws Exception {
+		
+	}
 }

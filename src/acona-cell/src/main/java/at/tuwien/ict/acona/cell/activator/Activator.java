@@ -2,8 +2,9 @@ package at.tuwien.ict.acona.cell.activator;
 
 import java.util.List;
 import java.util.Map;
+
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.Cell;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public interface Activator {

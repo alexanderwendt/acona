@@ -42,7 +42,7 @@ public class DatapointTester {
 			//Convert back to datapoint
 			Datapoint resultDp = Datapoint.toDatapoint(dpString);
 			
-			assertEquals(value, resultDp.getValue().getAsString());
+			assertEquals(value, resultDp.getValue().getAsJsonPrimitive().getAsString());
 			log.info("Test passed. Result={}", resultDp);
 		} catch (Exception e) {
 			log.error("Cannot init system", e);
@@ -60,7 +60,7 @@ public class DatapointTester {
 			
 			Datapoint dp = Datapoint.toDatapoint(input);
 			
-			assertEquals("Wrong value", dp.getValue().getAsString());
+			assertEquals("Wrong value", dp.getValue().getAsJsonPrimitive().getAsString());
 			log.info("Test passed. Input={}", input);
 		} catch (Exception e) {
 			log.error("Cannot init system", e);

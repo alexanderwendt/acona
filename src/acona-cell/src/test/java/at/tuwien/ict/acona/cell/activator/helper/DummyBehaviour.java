@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.Cell;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class DummyBehaviour implements CellFunctionBehaviour {
@@ -32,7 +32,7 @@ public class DummyBehaviour implements CellFunctionBehaviour {
 	}
 
 	@Override
-	public void setData(Map<String, Datapoint> data) {
+	public void updateData(Map<String, Datapoint> data) {
 		log.debug("Data arrived={}", data);
 		
 	}

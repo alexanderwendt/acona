@@ -1,0 +1,149 @@
+package at.tuwien.ict.acona.cell.communicator;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import at.tuwien.ict.acona.cell.core.CellImpl;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
+import jade.core.AID;
+import jade.domain.FIPANames;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.proto.SimpleAchieveREResponder;
+
+public class AconaServiceBehaviour extends SimpleAchieveREResponder {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private static Logger log = LoggerFactory.getLogger(AconaServiceBehaviour.class);
+	private final static Gson gson = new Gson();
+	private final CellImpl cell; 
+	
+	private List<Datapoint> datapointList;
+	private String sender;
+	private final AconaServiceType serviceType;
+	
+	public AconaServiceBehaviour(CellImpl caller, AconaServiceType serviceType) {
+		//In the super class, it shall use the message template here
+		super(caller, MessageTemplate.and(
+				MessageTemplate.MatchProtocol((AconaServiceType.SUBSCRIBE==serviceType?
+						FIPANames.InteractionProtocol.FIPA_SUBSCRIBE:FIPANames.InteractionProtocol.FIPA_REQUEST)), 
+				MessageTemplate.MatchOntology(serviceType.toString())));
+		//FIPANames.InteractionProtocol.FIPA_REQUEST)
+		this.serviceType = serviceType;
+		this.cell = caller;
+		log.debug("Responder ready. Waiting for incoming {} request", serviceType);
+	}
+	
+	public ACLMessage prepareResponse(ACLMessage request) {
+		log.debug("Received message={}", request);
+		ACLMessage temp = request.createReply();
+		//temp.setOntology(AconaServiceType.NONE.toString());
+		temp.setOntology(AconaServiceType.NONE.toString());
+		
+		try { 
+			//Extract datapoints
+			String content = request.getContent();
+			//Type listOfTestObject = new TypeToken<List<Datapoint>>(){}.getType();
+			//String serializedDatapoints = gson.toJson(datapoints, listOfTestObject);
+			JsonArray object = gson.fromJson(content, JsonArray.class);
+			this.datapointList = new ArrayList<Datapoint>();
+			object.forEach(e->{this.datapointList.add(Datapoint.toDatapoint((JsonObject)e));});
+			//datapointList = gson.fromJson(content, listOfTestObject);
+			//List<TestObject> list2 = gson.fromJson(s, listOfTestObject);
+			sender = request.getSender().getLocalName();
+			
+			
+			temp.setPerformative(ACLMessage.AGREE);
+			log.info("OK to execute service {}", serviceType);
+		
+		} catch (Exception fe){
+			log.error("Error handling the {} action.", serviceType, fe);
+			temp.setPerformative(ACLMessage.REFUSE);
+		}
+		
+		return temp;
+	}
+	
+	public ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+		ACLMessage msg = request.createReply();
+		msg.setOntology(AconaServiceType.NONE.toString());
+
+		try {
+			//Execute the service action
+			this.executeServiceAction(this.serviceType, msg);
+			
+			//Set performative that all is ok
+			msg.setPerformative(ACLMessage.INFORM);
+				
+		} catch (Exception e) {
+			log.error("Cannot process request", e);
+			msg.setPerformative(ACLMessage.FAILURE);
+		}
+		
+		log.info("Message={}", msg);
+		return msg;
+	}
+	
+	protected void executeServiceAction(AconaServiceType serviceType, ACLMessage msg) throws Exception {
+		List<Datapoint> readDatapoints;
+		String serializedDatapoints="";
+		switch (serviceType) {
+			case WRITE:
+				//For each datapoint, write it to the database
+				this.datapointList.forEach(dp->{this.cell.getDataStorage().write(dp, sender);});
+				break;
+			case READ:
+				//For each datapoint, write it to the database
+				readDatapoints = new ArrayList<Datapoint>();
+				this.datapointList.forEach(dp->{
+					readDatapoints.add(this.cell.getDataStorage().read(dp.getAddress()));
+				});
+				
+				//serialize datapoints
+				JsonArray jsonarray = new JsonArray();
+				readDatapoints.forEach(dp->{
+					jsonarray.add(dp.toJsonObject());
+				});
+				serializedDatapoints = jsonarray.toString();
+				msg.setContent(serializedDatapoints);
+				break;
+			case SUBSCRIBE:
+				readDatapoints = new ArrayList<Datapoint>();
+				
+				//For each datapoint, write it to the database
+				this.datapointList.forEach(dp->{
+					log.info("Sender={}", new AID(msg.getReplyWith(), AID.ISGUID).getLocalName());
+					this.cell.getDataStorage().subscribeDatapoint(dp.getAddress(), sender);
+					readDatapoints.add(this.cell.getDataStorage().read(dp.getAddress()));
+				});
+					
+				//serialize datapoints
+				serializedDatapoints = gson.toJson(readDatapoints);
+				msg.setContent(serializedDatapoints);
+				break;
+			case UNSUBSCRIBE:
+				//For each datapoint, write it to the database
+				this.datapointList.forEach(dp->{
+					this.cell.getDataStorage().unsubscribeDatapoint(dp.getAddress(), sender);
+				});
+				break;
+			
+		default:
+			throw new Exception("Serive type not supported");
+				
+		}
+		
+		
+	}
+}

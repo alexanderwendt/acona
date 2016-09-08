@@ -15,12 +15,9 @@ import at.tuwien.ict.acona.cell.activator.ActivationHandler;
 import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.core.behaviours.AconaServiceResponseBehaviour;
-import at.tuwien.ict.acona.cell.core.behaviours.NotifyBehaviour;
-import at.tuwien.ict.acona.cell.core.behaviours.ReadDataServiceBehavior;
-import at.tuwien.ict.acona.cell.core.behaviours.SubscribeDataServiceBehavior;
-import at.tuwien.ict.acona.cell.core.behaviours.UnsubscribeDataServiceBehavior;
-import at.tuwien.ict.acona.cell.core.behaviours.WriteDataServiceBehavior;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
+import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
+import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
@@ -33,13 +30,13 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.AchieveREInitiator;
 
 public class CellImpl extends Agent implements CellInitialization, DataStorageSubscriberNotificator {
 
 	private final DataStorage dataStorage = new DataStorageImpl();
 	private final ActivationHandler activationHandler = new ActivationHandlerImpl();
 	private final CellUtil util = new CellUtil(this);
+	private final CommunicatorImpl comm = new CommunicatorImpl(this, this.dataStorage);
 	
 	//Genotype configuration
 	protected JsonObject conf;
@@ -131,7 +128,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			this.dataStorage.init(this);
 			 
 			//Create behaviors
-			this.createBasicBehaviors();
+			//this.createBasicBehaviors();
 			
 			
 			JsonObject config = getArgument(0, JsonObject.class);
@@ -151,27 +148,28 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	protected void internalInit() throws Exception {
 		//Setup activations and behaviors
 		//Overwrite method with own init
+		
 
 	}
 	
-	protected void createBasicBehaviors() {
-		//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
-		
-		//Create readbehavior
-		ReadDataServiceBehavior readDataService = new ReadDataServiceBehavior(this);
-		this.addBehaviour(readDataService);
-		//this.addBehaviour(tbf.wrap(readDataService));
-		//Create writebehavior
-		WriteDataServiceBehavior writeDataService = new WriteDataServiceBehavior(this);
-		//this.addBehaviour(tbf.wrap(writeDataService));
-		this.addBehaviour(writeDataService);
-		SubscribeDataServiceBehavior subscribeDataServiceBehavior = new SubscribeDataServiceBehavior(this);
-		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
-		this.addBehaviour(subscribeDataServiceBehavior);
-		UnsubscribeDataServiceBehavior unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
-		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
-		this.addBehaviour(unsubscribeDataServiceBehavior);
-	}
+//	protected void createBasicBehaviors() {
+//		//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+//		
+//		//Create readbehavior
+//		ReadDataServiceBehavior readDataService = new ReadDataServiceBehavior(this);
+//		this.addBehaviour(readDataService);
+//		//this.addBehaviour(tbf.wrap(readDataService));
+//		//Create writebehavior
+//		WriteDataServiceBehavior writeDataService = new WriteDataServiceBehavior(this);
+//		//this.addBehaviour(tbf.wrap(writeDataService));
+//		this.addBehaviour(writeDataService);
+//		SubscribeDataServiceBehavior subscribeDataServiceBehavior = new SubscribeDataServiceBehavior(this);
+//		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
+//		this.addBehaviour(subscribeDataServiceBehavior);
+//		UnsubscribeDataServiceBehavior unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
+//		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
+//		this.addBehaviour(unsubscribeDataServiceBehavior);
+//	}
 	
 	/**
 	 * Helper method sets the interaction protocol to FIPA_REQUEST and provides unique ids (using {@link UID#toString()} of a newly created {@link UID}) to the {@link ACLMessage#setReplyWith(String)} and {@link ACLMessage#setConversationId(String)} methods
@@ -282,7 +280,14 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		
 		//Notify external agents that subscribe a value from this data storage
 		if (subscribers.isEmpty()==false) {
-			this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
+			subscribers.forEach(s->{
+			try {
+				this.comm.write(subscribedData, s);
+			} catch (Exception e) {
+				log.error("Cannot notify datapoint={} to subscriber={}", subscribedData, s, e);
+			}});
+			//this.comm.write(datapoints, agentName);
+			//this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
 		}
 	}
 
@@ -362,5 +367,10 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	 */
 	protected List<String> getArgumentList(int index) {
 		return getArgumentList(index, String.class);
+	}
+
+	@Override
+	public CommunicatorToCellFunction getCommunicator() {
+		return this.comm;
 	}
 }

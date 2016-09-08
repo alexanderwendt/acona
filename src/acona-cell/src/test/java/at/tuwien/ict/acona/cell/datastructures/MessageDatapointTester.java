@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.CellServiceTester;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.communicator.core.Communicator;
-import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
-import at.tuwien.ict.acona.communicator.util.ACLUtils;
-import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
+import at.tuwien.ict.acona.jadelauncher.core.Gateway;
+import at.tuwien.ict.acona.jadelauncher.core.GatewayImpl;
+import at.tuwien.ict.acona.jadelauncher.util.ACLUtils;
+import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
 import jade.core.Runtime;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
@@ -24,7 +24,7 @@ public class MessageDatapointTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellServiceTester.class);
 	private final JadeContainerUtil util = new JadeContainerUtil();
-	private Communicator comm;
+	private Gateway comm;
 	
 	private ContainerController agentContainer;
 	ContainerController mainContainerController;
@@ -44,7 +44,7 @@ public class MessageDatapointTester {
 			
 			//Create gateway
 			log.debug("Create gateway");
-			comm = new CommunicatorImpl();
+			comm = new GatewayImpl();
 			comm.init();
 			
 		} catch (Exception e) {

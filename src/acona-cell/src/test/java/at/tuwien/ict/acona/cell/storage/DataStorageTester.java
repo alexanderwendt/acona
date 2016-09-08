@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;

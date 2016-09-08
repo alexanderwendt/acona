@@ -10,11 +10,13 @@ import at.tuwien.ict.acona.cell.activator.ActivationHandler;
 import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
+import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
 import at.tuwien.ict.acona.cell.core.CellInitialization;
 import at.tuwien.ict.acona.cell.core.CellUtil;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
+import at.tuwien.ict.acona.cell.storage.helpers.DataStorageSubscriberNotificatorMock;
 import jade.core.behaviours.Behaviour;
 
 public class DummyCell implements CellInitialization {
@@ -27,7 +29,7 @@ public class DummyCell implements CellInitialization {
 	private final Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap = new HashMap<String, CellFunctionBehaviour>();
 	private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
 
-	private DataStorage data = new DataStorageImpl().init(null);
+	private DataStorage data = new DataStorageImpl().init(new DataStorageSubscriberNotificatorMock());
 	private ActivationHandler activationHandler = new ActivationHandlerImpl();
 	
 	@Override
@@ -112,6 +114,12 @@ public class DummyCell implements CellInitialization {
 
 	@Override
 	public String getLocalName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommunicatorToCellFunction getCommunicator() {
 		// TODO Auto-generated method stub
 		return null;
 	}

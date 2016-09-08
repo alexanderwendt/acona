@@ -4,6 +4,7 @@ import java.util.Map;
 
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.Condition;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
 
 public interface CellInitialization extends Cell {
 	public void setConditionMap(Map<String, Condition> conditionMap);

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviourImpl;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviourImpl;
 import at.tuwien.ict.acona.cell.core.CellUtil;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 

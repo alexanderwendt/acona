@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
-import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
-import at.tuwien.ict.acona.communicator.util.JadeException;
+import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
+import at.tuwien.ict.acona.jadelauncher.util.JadeException;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.AgentState;
@@ -63,10 +63,10 @@ public abstract class BaseCellTester {
 	}
 	
 	protected <AGENT_TYPE extends CellImpl> AgentController newAgent(String name, Class<AGENT_TYPE> type, Object... additionalArgs) throws StaleProxyException {
-		return newAgent(name, type, CellConfig.newConfig(name, type.getName()), additionalArgs);
+		return newAgent(name, type, CellConfigJadeBehaviour.newConfig(name, type.getName()), additionalArgs);
 	}
 	
-	protected <AGENT_TYPE extends CellImpl> AgentController newAgent(String name, Class<AGENT_TYPE> type, CellConfig cellConfig, Object... additionalArgs) throws StaleProxyException {
+	protected <AGENT_TYPE extends CellImpl> AgentController newAgent(String name, Class<AGENT_TYPE> type, CellConfigJadeBehaviour cellConfig, Object... additionalArgs) throws StaleProxyException {
 		//Create agent in the system
 		Object[] args = new Object[additionalArgs.length + 1];
 		args[0] = cellConfig.toJsonObject();

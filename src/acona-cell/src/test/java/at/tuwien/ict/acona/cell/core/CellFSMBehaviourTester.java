@@ -2,45 +2,31 @@ package at.tuwien.ict.acona.cell.core;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.config.ActivatorConfig;
-import at.tuwien.ict.acona.cell.config.BehaviourConfig;
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.ConditionConfig;
-import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.InspectorCell;
 import at.tuwien.ict.acona.cell.core.InspectorCellClient;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithFSMBehaviour;
-import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.communicator.core.Communicator;
-import at.tuwien.ict.acona.communicator.core.CommunicatorImpl;
-import at.tuwien.ict.acona.communicator.util.ACLUtils;
-import at.tuwien.ict.acona.communicator.util.JadeContainerUtil;
+import at.tuwien.ict.acona.jadelauncher.core.Gateway;
+import at.tuwien.ict.acona.jadelauncher.core.GatewayImpl;
+import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
 import jade.core.Runtime;
-import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
-import jade.wrapper.State;
 
 public class CellFSMBehaviourTester {
 	
 	private static Logger log = LoggerFactory.getLogger(CellFSMBehaviourTester.class);
 	private final JadeContainerUtil util = new JadeContainerUtil();
-	private Communicator comm;
+	private Gateway comm;
 	
 	private ContainerController agentContainer;
 	private ContainerController mainContainerController;
@@ -60,7 +46,7 @@ public class CellFSMBehaviourTester {
 			
 			//Create gateway
 			log.debug("Create gateway");
-			comm = new CommunicatorImpl();
+			comm = new GatewayImpl();
 			comm.init();
 			
 		} catch (Exception e) {

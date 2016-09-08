@@ -6,22 +6,28 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class Datapoint {
 	private final static String KEYADDRESS = "ADDRESS";
 	private final static String KEYTYPE = "TYPE";
 	private final static String KEYVALUE = "VALUE";
 	
+	private String ADDRESS="";
+	private String TYPE="";
+	private JsonElement VALUE = new JsonObject();
+	
 	private final static Gson gson = new Gson();
-	private final JsonObject jsondatapoint;
+	//private final JsonObject jsondatapoint;
 	
 	private static Logger log = LoggerFactory.getLogger(Datapoint.class);
 	
 	private Datapoint(String address) {
-		jsondatapoint = new JsonObject();
-		this.jsondatapoint.addProperty(KEYADDRESS, address);
-		this.jsondatapoint.addProperty(KEYTYPE, "");
-		this.jsondatapoint.addProperty(KEYVALUE, "");
+		//VALUE = new JsonObject();
+		this.ADDRESS = address;
+		//this.jsondatapoint.addProperty(KEYADDRESS, address);
+		//this.jsondatapoint.addProperty(KEYTYPE, "");
+		//this.jsondatapoint.addProperty(KEYVALUE, "");
 	}
 	
 	public static Datapoint newDatapoint(String address) {
@@ -62,42 +68,46 @@ public class Datapoint {
 	}
 	
 	public Datapoint setType(String type) {
-		this.jsondatapoint.addProperty(KEYTYPE, type);
+		this.TYPE = type;
 		
 		return this;
 	}
 	
 	public Datapoint setValue(String value) {
-		this.jsondatapoint.addProperty(KEYVALUE, value);
+		this.VALUE = new JsonPrimitive(value);
 		
 		return this;
 	}
 	
 	public Datapoint setValue(JsonElement value) {
-		this.jsondatapoint.add(KEYVALUE, value);
+		this.VALUE = value;
 		
 		return this;
 	}
 	
 	public JsonObject toJsonObject() {
-		return this.jsondatapoint;
+		return gson.fromJson(this.toString(), JsonObject.class);
 	}
 	
 	public String getAddress() {
-		return this.jsondatapoint.get(KEYADDRESS).getAsString();
+		return ADDRESS; 
 	}
 	
 	public String getType() {
-		return this.jsondatapoint.get(KEYTYPE).getAsString();
+		return TYPE;
 	}
 	
 	public JsonElement getValue() {
-		return this.jsondatapoint.get(KEYVALUE);
+		return VALUE;
+	}
+	
+	public String getValueAsString() {
+		return VALUE.getAsJsonPrimitive().getAsString();
 	}
 
 	@Override
 	public String toString() {
-		return this.jsondatapoint.toString();
+		return gson.toJson(this, Datapoint.class);
 	}
 	
 	

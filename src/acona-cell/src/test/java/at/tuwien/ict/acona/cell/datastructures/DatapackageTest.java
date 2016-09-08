@@ -6,10 +6,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.datastructures.Chunk;
-import at.tuwien.ict.acona.cell.datastructures.ChunkImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapackage;
-import at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
+import _OLD.at.tuwien.ict.acona.cell.datastructures.Chunk;
+import _OLD.at.tuwien.ict.acona.cell.datastructures.ChunkImpl;
+import _OLD.at.tuwien.ict.acona.cell.datastructures.Datapackage;
+import _OLD.at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 
 public class DatapackageTest {
 	

@@ -12,25 +12,26 @@ import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionHasValue;
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.config.ActivatorConfig;
-import at.tuwien.ict.acona.cell.config.BehaviourConfig;
-import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
+import at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
+import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.config.ConditionConfig;
 import at.tuwien.ict.acona.cell.core.helpers.ReadOperandBehaviour;
 import at.tuwien.ict.acona.cell.custombehaviours.SendAsynchronousBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.cell.util.CommUtil;
-import at.tuwien.ict.acona.communicator.core.Communicator;
+import at.tuwien.ict.acona.cell.util.JadelauncherUtil;
+import at.tuwien.ict.acona.jadelauncher.core.Gateway;
 import jade.core.Runtime;
+import jade.wrapper.AgentController;
 
 public class CellSendTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellSendTester.class);
 	//private final JadeContainerUtil util = new JadeContainerUtil();
-	private CommUtil commUtil = CommUtil.getUtil();
-	private Communicator comm = commUtil.getJadeGateway();
+	private JadelauncherUtil commUtil = JadelauncherUtil.getUtil();
+	private Gateway comm = commUtil.getJadeGateway();
 
 	@Before
 	public void setUp() throws Exception {
@@ -91,12 +92,12 @@ public class CellSendTester {
 			String resultAddress = "agent.result";
 			
 			//Create Database agents 1-2
-			CellConfig dbAgent1 = CellConfig.newConfig("dbagent1", CellImpl.class.getName());
+			CellConfigJadeBehaviour dbAgent1 = CellConfigJadeBehaviour.newConfig("dbagent1", CellImpl.class.getName());
 			this.commUtil.createAgent(dbAgent1);
 			
 			//Create the calculator agent
 			//Create the basic information for any agent
-			CellConfig additionAgent = CellConfig.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.CellImpl");
+			CellConfigJadeBehaviour additionAgent = CellConfigJadeBehaviour.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.CellImpl");
 			
 			//Create conditions that can be used in the agents, only the name of the condition and their classes
 			//Readerconditions
@@ -105,7 +106,7 @@ public class CellSendTester {
 			
 			//Create behaviours that will be used by the agents
 			//Add the reader
-			additionAgent.addBehaviour(BehaviourConfig.newConfig("S1", ReadOperandBehaviour.class.getName())
+			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S1", ReadOperandBehaviour.class.getName())
 					.setProperty("op1agent", "dbagent1")
 					.setProperty("op1address", operand1address)
 					.setProperty("op2agent", "dbagent2")
@@ -115,14 +116,14 @@ public class CellSendTester {
 			
 			//Add activators
 			//Add reader activator
-			additionAgent.addActivator(ActivatorConfig.newConfig("T0").setBehaviour("S1").setActivatorLogic("")
+			additionAgent.addActivator(ActivatorConfigJadeBehaviour.newConfig("T0").setBehaviour("S1").setActivatorLogic("")
 					.addMapping(triggeraddress, "starttrigger"));
 			
 			this.commUtil.createAgent(additionAgent);
 			
 			
 			//Create result receiver agent
-			CellConfig receiverAgent = CellConfig.newConfig("receiveragent", "at.tuwien.ict.acona.cell.core.CellImpl");
+			CellConfigJadeBehaviour receiverAgent = CellConfigJadeBehaviour.newConfig("receiveragent", "at.tuwien.ict.acona.cell.core.CellImpl");
 			this.commUtil.createAgent(receiverAgent);
 			
 			//subscribe the result without timeout
@@ -174,16 +175,16 @@ public class CellSendTester {
 			String resultAddress = "agent.result";
 			
 			//Create Database agents 1-2
-			CellConfig dbAgent1 = CellConfig.newConfig("dbagent1", CellImpl.class.getName());
+			CellConfigJadeBehaviour dbAgent1 = CellConfigJadeBehaviour.newConfig("dbagent1", CellImpl.class.getName());
 			this.commUtil.createAgent(dbAgent1);
-			CellConfig dbAgent2 = CellConfig.newConfig("dbagent2", "at.tuwien.ict.acona.cell.core.CellImpl");
+			CellConfigJadeBehaviour dbAgent2 = CellConfigJadeBehaviour.newConfig("dbagent2", "at.tuwien.ict.acona.cell.core.CellImpl");
 			this.commUtil.createAgent(dbAgent2);
 			
 			
 			
 			//Create the calculator agent
 			//Create the basic information for any agent
-			CellConfig additionAgent = CellConfig.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.CellImpl");
+			CellConfigJadeBehaviour additionAgent = CellConfigJadeBehaviour.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.CellImpl");
 			
 			//Create conditions that can be used in the agents, only the name of the condition and their classes
 			//Readerconditions
@@ -200,7 +201,7 @@ public class CellSendTester {
 			
 			//Create behaviours that will be used by the agents
 			//Add the reader
-			additionAgent.addBehaviour(BehaviourConfig.newConfig("S1", ReadOperandBehaviour.class.getName())
+			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S1", ReadOperandBehaviour.class.getName())
 					.setProperty("op1agent", "dbagent1")
 					.setProperty("op1address", operand1address)
 					.setProperty("op2agent", "dbagent2")
@@ -209,13 +210,13 @@ public class CellSendTester {
 					.setProperty("stateaddress", stateaddress));
 			
 			//Add the addition itself
-			additionAgent.addBehaviour(BehaviourConfig.newConfig("S2", "at.tuwien.ict.acona.cell.core.helpers.AdditionBehaviour")
+			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S2", "at.tuwien.ict.acona.cell.core.helpers.AdditionBehaviour")
 					.setProperty("operand1", operand1address)
 					.setProperty("operand2", operand2address)
 					.setProperty("result", resultAddress));
 			
 			//Add the sender
-			additionAgent.addBehaviour(BehaviourConfig.newConfig("S3", SendAsynchronousBehaviour.class.getName())
+			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S3", SendAsynchronousBehaviour.class.getName())
 					.setProperty("receivernameaddress", "s3.receiveragent")
 					.setProperty("datapointsourceaddress", resultAddress)
 					.setProperty("datapointtargetaddress", resultAddress)
@@ -224,16 +225,16 @@ public class CellSendTester {
 			
 			//Add activators
 			//Add reader activator
-			additionAgent.addActivator(ActivatorConfig.newConfig("T0").setBehaviour("S1").setActivatorLogic("")
+			additionAgent.addActivator(ActivatorConfigJadeBehaviour.newConfig("T0").setBehaviour("S1").setActivatorLogic("")
 					.addMapping(triggeraddress, "starttrigger"));
 			
 			//Add addition activator
-			additionAgent.addActivator(ActivatorConfig.newConfig("T1").setBehaviour("S2").setActivatorLogic("")
+			additionAgent.addActivator(ActivatorConfigJadeBehaviour.newConfig("T1").setBehaviour("S2").setActivatorLogic("")
 					.addMapping(operand1address, "operand1")
 					.addMapping(operand2address, "operand2"));
 			
 			//Add sender activator
-			additionAgent.addActivator(ActivatorConfig.newConfig("T2").setBehaviour("S3")
+			additionAgent.addActivator(ActivatorConfigJadeBehaviour.newConfig("T2").setBehaviour("S3")
 					.addMapping("s3.receiveragent", "receivername")
 					.addMapping(resultAddress, "datapointsource"));
 			
@@ -241,7 +242,7 @@ public class CellSendTester {
 			
 			
 			//Create result receiver agent
-			CellConfig receiverAgent = CellConfig.newConfig("receiveragent", "at.tuwien.ict.acona.cell.core.CellImpl");
+			CellConfigJadeBehaviour receiverAgent = CellConfigJadeBehaviour.newConfig("receiveragent", "at.tuwien.ict.acona.cell.core.CellImpl");
 			this.commUtil.createAgent(receiverAgent);
 			
 			//subscribe the result without timeout
@@ -345,5 +346,8 @@ public class CellSendTester {
 //			fail("Error");
 //		}
 //	}
+	
+	
+
 
 }

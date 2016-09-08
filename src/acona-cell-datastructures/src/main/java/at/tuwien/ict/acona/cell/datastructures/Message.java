@@ -14,6 +14,7 @@ import at.tuwien.ict.acona.cell.datastructures.types.AconaSync;
 import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import at.tuwien.ict.acona.cell.datastructures.util.JsonUtils;
 
+@Deprecated
 public class Message {
 	public final static String KEYRECEIVER = "RECEIVER";
 	public final static String KEYMODE = "MODE";

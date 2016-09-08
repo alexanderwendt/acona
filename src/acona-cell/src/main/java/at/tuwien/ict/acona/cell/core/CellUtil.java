@@ -1,27 +1,7 @@
 package at.tuwien.ict.acona.cell.core;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonObject;
-
-import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
-import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.config.BehaviourConfig;
-import at.tuwien.ict.acona.cell.core.behaviours.SendDatapointOnDemandBehavior;
-import at.tuwien.ict.acona.cell.custombehaviours.SynchronizedReadBehaviour;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import jade.core.AID;
-import jade.core.behaviours.ThreadedBehaviourFactory;
 
 public class CellUtil {
 	private final static String CONDITIONNAME = "temporaryactivatorcondition";

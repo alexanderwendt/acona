@@ -3,10 +3,14 @@ package at.tuwien.ict.acona.cell.core;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.activator.ActivationHandler;
+import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
+import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import jade.core.behaviours.Behaviour;
 
 public interface Cell {
+	
+	public CommunicatorToCellFunction getCommunicator();
 	
 	/**
 	 * Get data storage

@@ -2,13 +2,13 @@ package at.tuwien.ict.acona.cell.core.helpers;
 
 import java.util.Map;
 
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviourImpl;
+import _OLD_at.tuwien.ict.acona.cell.core.behaviours.SendDatapointOnDemandBehavior;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviourImpl;
 import at.tuwien.ict.acona.cell.core.CellUtil;
-import at.tuwien.ict.acona.cell.core.behaviours.SendDatapointOnDemandBehavior;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.communicator.util.ACLUtils;
+import at.tuwien.ict.acona.jadelauncher.util.ACLUtils;
 import jade.core.AID;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.lang.acl.ACLMessage;

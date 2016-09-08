@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.core.behaviours;
 
+import _OLD_at.tuwien.ict.acona.cell.core.behaviours.AconaServiceResponder;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
 import at.tuwien.ict.acona.cell.testing.GlobalLogger;

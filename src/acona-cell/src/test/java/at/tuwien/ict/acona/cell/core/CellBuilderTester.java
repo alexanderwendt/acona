@@ -21,12 +21,12 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
 import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysFalse;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysTrue;
 import at.tuwien.ict.acona.cell.activator.helper.DummyBehaviour;
 import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellBuilderTester {

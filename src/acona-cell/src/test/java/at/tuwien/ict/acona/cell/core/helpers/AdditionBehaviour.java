@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviourImpl;
 import at.tuwien.ict.acona.cell.core.Cell;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviourImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.communicator.util.ACLUtils;
+import at.tuwien.ict.acona.jadelauncher.util.ACLUtils;
 
 public class AdditionBehaviour extends CellFunctionBehaviourImpl {
 	

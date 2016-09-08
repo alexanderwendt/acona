@@ -18,8 +18,9 @@ import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysTrue;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionIsOne;
 import at.tuwien.ict.acona.cell.activator.helper.DummyBehaviour;
 import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.Cell;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellActivatorOnlyTester {
@@ -66,7 +67,7 @@ public class CellActivatorOnlyTester {
 			int data = 0;
 			
 			//Create activator
-			Activator activator = new ActivatorImpl();
+			Activator activator = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
 			DummyBehaviour activateBehaviour = new DummyBehaviour();
@@ -133,7 +134,7 @@ public class CellActivatorOnlyTester {
 			int data = 0;
 			
 			//Create activator
-			Activator activator = new ActivatorImpl();
+			Activator activator = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
 			DummyBehaviour activateBehaviour = new DummyBehaviour();
@@ -204,7 +205,7 @@ public class CellActivatorOnlyTester {
 			int variableData = 0;
 			
 			//Create activator
-			Activator activator = new ActivatorImpl();
+			Activator activator = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
 			DummyBehaviour activateBehaviour = new DummyBehaviour();
@@ -262,8 +263,8 @@ public class CellActivatorOnlyTester {
 			String conditionNameIsOne = "isOne";
 			
 			//Create activator
-			Activator activator1 = new ActivatorImpl();
-			Activator activator2 = new ActivatorImpl();
+			Activator activator1 = new ActivatorJADEBehaviourImpl();
+			Activator activator2 = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
 			DummyBehaviour activateBehaviour1 = new DummyBehaviour();

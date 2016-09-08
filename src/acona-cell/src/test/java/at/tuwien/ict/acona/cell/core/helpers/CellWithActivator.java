@@ -7,10 +7,10 @@ import java.util.Map;
 
 import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.ActivatorImpl;
 import at.tuwien.ict.acona.cell.activator.Condition;
 import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.core.CellFunctionBehaviour;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
+import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
 
 public class CellWithActivator extends InspectorCell {
@@ -30,7 +30,7 @@ public class CellWithActivator extends InspectorCell {
 		additionBehaviourConf.addProperty("operand2", "data.op2");
 		additionBehaviourConf.addProperty("result", "data.result");
 		
-		Activator activator = new ActivatorImpl();
+		Activator activator = new ActivatorJADEBehaviourImpl();
 		CellFunctionBehaviour activateBehaviour = new AdditionBehaviour().init("AdditionBehaviour", additionBehaviourConf, this);
 		
 		//Create condition
