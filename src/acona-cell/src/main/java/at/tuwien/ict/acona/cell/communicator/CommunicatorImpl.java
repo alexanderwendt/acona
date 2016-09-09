@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
@@ -23,6 +24,7 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
@@ -32,39 +34,57 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 	
 	protected static Logger log = LoggerFactory.getLogger(CommunicatorImpl.class);
 
-	private final static int DEFAULTTIMEOUT = 10000;
+	private int defaultTimeout = 10000;
 	
 	private final CellImpl cell;
 	private final DataStorage datastorage;
 	private final static Gson gson = new Gson();
 	
-	public CommunicatorImpl(CellImpl cell, DataStorage dataStorage) {
+	public CommunicatorImpl(CellImpl cell, DataStorage dataStorage, boolean useThreadedBehaviours) {
 		this.cell = cell;
 		this.datastorage = dataStorage;
 		
 		//Add responders to the agent
-		this.createBasicBehaviors();
+		this.createBasicServiceBehaviors(this.cell, useThreadedBehaviours);
 	}
 	
-	private void createBasicBehaviors() {
-		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+	/**
+	 * Create the basic services of the cell
+	 * 
+	 * @param useThreadedBehaviours
+	 */
+	private void createBasicServiceBehaviors(CellImpl cell, boolean useThreadedBehaviours) {
+		List<Behaviour> behaviours = new ArrayList<Behaviour>();
+		behaviours.add(new AconaServiceBehaviour(cell, AconaServiceType.READ));
+		behaviours.add(new AconaServiceBehaviour(cell, AconaServiceType.WRITE));
+		behaviours.add(new AconaServiceBehaviour(this.cell, AconaServiceType.SUBSCRIBE));
+		behaviours.add(new AconaServiceBehaviour(this.cell, AconaServiceType.UNSUBSCRIBE));
 		
-		//Create readbehavior
-		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.READ)));
-		//this.addBehaviour(tbf.wrap(readDataService));
-		//Create writebehavior
-		//this.addBehaviour(tbf.wrap(writeDataService));
-		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.WRITE)));
-		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
-		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.SUBSCRIBE)));
-		//UnsubscribeDataServiceBehavr unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
-		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
-		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.UNSUBSCRIBE)));
+		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+		behaviours.forEach(b->{
+			if (useThreadedBehaviours==true) {
+				cell.addBehaviour(tbf.wrap(b));
+			} else {
+				cell.addBehaviour(b);
+			}
+		});
+		
+//		//Create readbehavior
+//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.READ)));
+//		//this.addBehaviour(tbf.wrap(readDataService));
+//		//Create writebehavior
+//		//this.addBehaviour(tbf.wrap(writeDataService));
+//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.WRITE)));
+//		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
+//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.SUBSCRIBE)));
+//		//UnsubscribeDataServiceBehavr unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
+//		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
+//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.UNSUBSCRIBE)));
 	}
 
 	@Override
 	public List<Datapoint> read(List<Datapoint> datapoints) throws Exception {
-		return read(datapoints, this.cell.getLocalName(), DEFAULTTIMEOUT);
+		return read(datapoints, this.cell.getLocalName(), defaultTimeout);
 	}
 
 	@Override
@@ -118,7 +138,7 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 	
 	@Override
 	public Datapoint read(Datapoint datapoint, String agentName) throws Exception {
-		return read(datapoint, agentName, DEFAULTTIMEOUT);
+		return read(datapoint, agentName, defaultTimeout);
 	}
 
 	@Override
@@ -137,12 +157,12 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {
-		this.write(datapoints, this.cell.getLocalName(), DEFAULTTIMEOUT);
+		this.write(datapoints, this.cell.getLocalName(), defaultTimeout, true);
 		
 	}
 
 	@Override
-	public void write(List<Datapoint> datapoints, String agentName, int timeout) throws Exception {
+	public void write(List<Datapoint> datapoints, String agentName, int timeout, boolean blocking) throws Exception {
 		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
 		if (agentName.equals(this.cell.getLocalName())==true) {
 			datapoints.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
@@ -166,27 +186,30 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			//Blocking read and write
 			SynchronousQueue<Boolean> queue = new SynchronousQueue<Boolean>();
 			this.cell.addBehaviour(new WriteDatapointBehaviour(this.cell, requestMsg, queue));
-			try {
-				boolean writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
-				if (writeBehaviourFinished==false) {
-					throw new Exception("Operation timed out after " + timeout + "ms.");
+			if (blocking==true) {
+				try {
+					boolean writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
+					if (writeBehaviourFinished==false) {
+						throw new Exception("Operation timed out after " + timeout + "ms.");
+					}
+				} catch (InterruptedException e) {
+					log.warn("Queue interrupted");
 				}
-			} catch (InterruptedException e) {
-				log.warn("Queue interrupted");
 			}
+			
 		}
 		
 	}
 
 	@Override
 	public void write(Datapoint datapoint) throws Exception {
-		this.write(Arrays.asList(datapoint), this.cell.getLocalName(), DEFAULTTIMEOUT);
+		this.write(Arrays.asList(datapoint), this.cell.getLocalName(), defaultTimeout, true);
 		
 	}
 
 	@Override
 	public void write(Datapoint datapoints, String agentName) throws Exception {
-		this.write(Arrays.asList(datapoints), agentName, DEFAULTTIMEOUT);
+		this.write(Arrays.asList(datapoints), agentName, defaultTimeout, true);
 		
 	}
 
@@ -227,7 +250,7 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			try {
 				result.addAll(queue.poll(10000, TimeUnit.MILLISECONDS));
 				if (result.isEmpty()) {
-					throw new Exception("Operation timed out after " + DEFAULTTIMEOUT + "ms.");
+					throw new Exception("Operation timed out after " + defaultTimeout + "ms.");
 				}
 			} catch (InterruptedException e) {
 				log.warn("Queue interrupted");
@@ -263,9 +286,9 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			SynchronousQueue<Boolean> queue = new SynchronousQueue<Boolean>();
 			this.cell.addBehaviour(new UnsubscribeDatapointBehaviour(this.cell, requestMsg, queue));
 			try {
-				boolean writeBehaviourFinished = queue.poll(DEFAULTTIMEOUT, TimeUnit.MILLISECONDS);
+				boolean writeBehaviourFinished = queue.poll(defaultTimeout, TimeUnit.MILLISECONDS);
 				if (writeBehaviourFinished==false) {
-					throw new Exception("Operation timed out after " + DEFAULTTIMEOUT + "ms.");
+					throw new Exception("Operation timed out after " + defaultTimeout + "ms.");
 				}
 			} catch (InterruptedException e) {
 				log.warn("Queue interrupted");
@@ -575,6 +598,16 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 				log.error("Cannot relese queue", e);
 			}
 		}
+	}
+
+	@Override
+	public void setDefaultTimeout(int timeout) {
+		this.defaultTimeout = timeout;
+	}
+
+	@Override
+	public int getDefaultTimeout() {
+		return this.defaultTimeout;
 	}
 	
 }

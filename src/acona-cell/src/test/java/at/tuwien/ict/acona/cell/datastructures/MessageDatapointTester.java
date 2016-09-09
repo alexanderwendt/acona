@@ -20,6 +20,7 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
+@Deprecated
 public class MessageDatapointTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellServiceTester.class);
@@ -74,7 +75,7 @@ public class MessageDatapointTester {
 		this.comm.shutDown();
 	}
 
-	@Test
+	//@Test
 	public void MessageConversionTestDatapoints() {
 		try {
 			String expectedreceiver = "receiver";
@@ -107,7 +108,7 @@ public class MessageDatapointTester {
 	}
 	
 
-	@Test
+	//@Test
 	public void MessageConversionTestPlainStrings() {
 		try {
 			String expectedreceiver = "receiver";

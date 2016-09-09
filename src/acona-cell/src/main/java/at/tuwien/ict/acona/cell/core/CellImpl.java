@@ -36,7 +36,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	private final DataStorage dataStorage = new DataStorageImpl();
 	private final ActivationHandler activationHandler = new ActivationHandlerImpl();
 	private final CellUtil util = new CellUtil(this);
-	private final CommunicatorImpl comm = new CommunicatorImpl(this, this.dataStorage);
+	private CommunicatorImpl comm;
 	
 	//Genotype configuration
 	protected JsonObject conf;
@@ -128,7 +128,9 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			this.dataStorage.init(this);
 			 
 			//Create behaviors
-			//this.createBasicBehaviors();
+			this.comm = new CommunicatorImpl(this, this.dataStorage, true);	
+			//FIXME: nonthreaded behaviours an optional celloption. There is a problem with the blocking behaviours. They block each other 
+			//and then first end at timeout.
 			
 			
 			JsonObject config = getArgument(0, JsonObject.class);

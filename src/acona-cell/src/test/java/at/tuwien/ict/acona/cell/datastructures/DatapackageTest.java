@@ -11,6 +11,7 @@ import _OLD.at.tuwien.ict.acona.cell.datastructures.ChunkImpl;
 import _OLD.at.tuwien.ict.acona.cell.datastructures.Datapackage;
 import _OLD.at.tuwien.ict.acona.cell.datastructures.DatapackageImpl;
 
+@Deprecated
 public class DatapackageTest {
 	
 	private static Logger log = LoggerFactory.getLogger(DatapackageTest.class);

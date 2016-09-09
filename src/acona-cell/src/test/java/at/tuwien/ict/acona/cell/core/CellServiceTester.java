@@ -307,7 +307,9 @@ public class CellServiceTester {
 			//Create X=5 agents
 			List<InspectorCellClient> inspectors = new ArrayList<InspectorCellClient>();
 			for (int i=0; i<numberOfAgents; i++) {
-				inspectors.add(this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(agentNameTemplate + i, InspectorCell.class.getName())));
+				InspectorCellClient cell = (this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(agentNameTemplate + i, InspectorCell.class.getName())));
+				inspectors.add(cell);
+				cell.getCell().getCommunicator().setDefaultTimeout(10000);
 			}
 			
 			//Set subscriptions
