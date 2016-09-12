@@ -9,6 +9,8 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public interface Activator {
 	
+	public Activator initCellFunctions(String name, Map<String, String> subscriptionMapping, Cell caller) throws Exception;
+	
 	/**
 	 * @param name
 	 * @param subscriptionAddresses
@@ -17,15 +19,16 @@ public interface Activator {
 	 * @param behavior
 	 * @param caller
 	 */
-	public Activator init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell caller);
+	public Activator initWithConditions(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell caller);
 	
 	/**
 	 * run the activatior and test if the subscribed data can activate something
 	 * 
 	 * @param subscribedData
 	 * @return true if the datapoint triggers activation. It returns false if the datapoint does not trigger any activation
+	 * @throws Exception 
 	 */
-	public boolean runActivation(Datapoint subscribedData);
+	public boolean runActivation(Datapoint subscribedData) throws Exception;
 
 	/**
 	 * Get the name of the activator
@@ -39,7 +42,7 @@ public interface Activator {
 	 * 
 	 * @return
 	 */
-	public List<String> getLinkedDatapoints();
+	public List<String> getSubscribedDatapoints();
 	
 	/**
 	 * Get the condition mapping

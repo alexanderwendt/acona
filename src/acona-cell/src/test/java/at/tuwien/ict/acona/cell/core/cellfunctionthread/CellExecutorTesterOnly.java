@@ -56,7 +56,7 @@ public class CellExecutorTesterOnly {
 			subscriptions.put(queryDatapoint, new ArrayList<Condition>());
 			subscriptions.put(executeonceDatapoint, new ArrayList<Condition>());
 			DummyCell cell = new DummyCell();
-			executor.init("testexecutor", subscriptions, "", null, cell);
+			executor.initWithConditions("testexecutor", subscriptions, "", null, cell);
 			
 			//Start the executor with anything just to see
 			this.executor.runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()));

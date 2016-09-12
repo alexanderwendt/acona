@@ -54,16 +54,18 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 		try { 
 			//Extract datapoints
 			String content = request.getContent();
-			//Type listOfTestObject = new TypeToken<List<Datapoint>>(){}.getType();
-			//String serializedDatapoints = gson.toJson(datapoints, listOfTestObject);
 			JsonArray object = gson.fromJson(content, JsonArray.class);
 			this.datapointList = new ArrayList<Datapoint>();
 			object.forEach(e->{this.datapointList.add(Datapoint.toDatapoint((JsonObject)e));});
-			//datapointList = gson.fromJson(content, listOfTestObject);
-			//List<TestObject> list2 = gson.fromJson(s, listOfTestObject);
+
+			if (this.serviceType.equals(AconaServiceType.QUERY)==true) {
+				log.warn("Check if service is available");
+				//TODO: Implement this
+				throw new UnsupportedOperationException();
+				
+			}
+			
 			sender = request.getSender().getLocalName();
-			
-			
 			temp.setPerformative(ACLMessage.AGREE);
 			log.info("OK to execute service {}", serviceType);
 		
@@ -138,7 +140,9 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 					this.cell.getDataStorage().unsubscribeDatapoint(dp.getAddress(), sender);
 				});
 				break;
-			
+			case QUERY:
+				throw new UnsupportedOperationException();
+				//break;
 		default:
 			throw new Exception("Serive type not supported");
 				

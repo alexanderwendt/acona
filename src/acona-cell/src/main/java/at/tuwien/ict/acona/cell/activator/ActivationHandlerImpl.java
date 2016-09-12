@@ -26,13 +26,19 @@ public class ActivationHandlerImpl implements ActivationHandler {
 		
 		//run all activations of that datapoint in parallel
 		log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
-		instanceList.forEach((Activator a)->a.runActivation(subscribedData));
+		instanceList.forEach((Activator a)->{
+			try {
+				a.runActivation(subscribedData);
+			} catch (Exception e) {
+				log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
+			}
+		});
 	}
 
 	@Override
 	public void registerActivatorInstance(Activator activatorInstance) {
 		//Get all subscribed addresses
-		List<String> activatorAddresses = activatorInstance.getLinkedDatapoints();
+		List<String> activatorAddresses = activatorInstance.getSubscribedDatapoints();
 		
 		//Go through each address and add the activator to this address
 		activatorAddresses.forEach(address->{
@@ -59,7 +65,7 @@ public class ActivationHandlerImpl implements ActivationHandler {
 		activatorInstance.closeActivator();
 		
 		//Get all subscribed addresses
-		List<String> activatorAddresses = activatorInstance.getLinkedDatapoints();
+		List<String> activatorAddresses = activatorInstance.getSubscribedDatapoints();
 				
 		//Go through each address and remove the activator to this address
 		activatorAddresses.forEach(address->{

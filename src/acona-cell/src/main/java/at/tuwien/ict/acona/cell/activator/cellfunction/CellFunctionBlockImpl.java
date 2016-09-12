@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.cell.activator.cellfunction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -39,8 +40,7 @@ public abstract class CellFunctionBlockImpl implements Activator  {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final List<String> subscriptions = new ArrayList<String>();
-	
+	private final Map<String, String> subscriptions = new HashMap<String, String>();
 	
 	private boolean isActive = true;
 	private boolean executeOnce = true;
@@ -48,20 +48,27 @@ public abstract class CellFunctionBlockImpl implements Activator  {
 	private boolean isAllowedToRun = true;
 
 	@Override
-	public Activator init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell callerCell) {
+	public Activator initCellFunctions(String name, Map<String, String> subscriptionMapping, Cell caller) {
 		this.name = name;
-		this.cell = callerCell;
-		this.subscriptions.addAll(new ArrayList<String>(subscriptionCondition.keySet()));
+		this.cell = caller;
+		this.subscriptions.putAll(subscriptionMapping);
+		
+		//Execute internal init
+		cellFunctionInit();		//e.g. add subscriptions
 		
 		//Subscribe datapoints
-		this.subscriptions.forEach(s->{
+		this.subscriptions.values().forEach(s->{
 			this.cell.getDataStorage().subscribeDatapoint(s, cell.getName());
 		});
-		
 		
 		log.info("CellFunction {} initilized", this.getActivatorName());
 		
 		return this;
+	}
+	
+	@Override
+	public Activator initWithConditions(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell callerCell) {
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
@@ -71,6 +78,8 @@ public abstract class CellFunctionBlockImpl implements Activator  {
 		
 		return true;	//In the customized activator, the activation always triggers the notify function. Only one datapoint at the time can be triggered, no lists
 	}
+	
+	protected abstract void cellFunctionInit();
 	
 	protected abstract void updateDatapoint(Datapoint subscribedData);
 	
@@ -163,8 +172,8 @@ public abstract class CellFunctionBlockImpl implements Activator  {
 	}
 
 	@Override
-	public List<String> getLinkedDatapoints() {
-		return this.subscriptions;
+	public List<String> getSubscribedDatapoints() {
+		return new ArrayList<String>(this.subscriptions.values());
 	}
 
 	@Override
@@ -186,4 +195,9 @@ public abstract class CellFunctionBlockImpl implements Activator  {
 	public void setExecuteRate(int blockingTime) {
 		this.executeRate = blockingTime;
 	}
+
+	protected Map<String, String> getSubscriptions() {
+		return subscriptions;
+	}
+
 }

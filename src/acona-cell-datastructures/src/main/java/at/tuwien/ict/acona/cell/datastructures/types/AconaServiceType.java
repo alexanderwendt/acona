@@ -6,5 +6,6 @@ public enum AconaServiceType {
 	WRITE,
 	SUBSCRIBE,
 	UNSUBSCRIBE,
+	QUERY,
 	DEBUG;
 }

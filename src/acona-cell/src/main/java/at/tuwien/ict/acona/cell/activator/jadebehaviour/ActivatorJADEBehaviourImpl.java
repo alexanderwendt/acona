@@ -33,7 +33,7 @@ public class ActivatorJADEBehaviourImpl implements Activator {
 	private volatile int conditionCurrentCount = 0;
 
 	@Override
-	public Activator init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell caller) {
+	public Activator initWithConditions(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell caller) {
 		this.name = name;
 		this.behavior = behavior;
 		this.caller = caller;
@@ -168,13 +168,18 @@ public class ActivatorJADEBehaviourImpl implements Activator {
 	}
 
 	@Override
-	public List<String> getLinkedDatapoints() {
+	public List<String> getSubscribedDatapoints() {
 		return Collections.unmodifiableList(new ArrayList<String>(this.conditionMapping.keySet()));
 	}
 
 	@Override
 	public Map<String, List<ActivatorConditionManager>> getConditionMapping() {
 		return this.conditionMapping;
+	}
+
+	@Override
+	public Activator initCellFunctions(String name, Map<String, String> subscriptionMapping, Cell caller) {
+		throw new UnsupportedOperationException();
 	}
 
 }

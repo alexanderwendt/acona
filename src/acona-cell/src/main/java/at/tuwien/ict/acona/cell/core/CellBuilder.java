@@ -133,7 +133,7 @@ public class CellBuilder {
 				});
 			});
 			
-			result = new ActivatorJADEBehaviourImpl().init(name, datapointConditionMap, "", null, caller);
+			result = new ActivatorJADEBehaviourImpl().initWithConditions(name, datapointConditionMap, "", null, caller);
 		
 		} catch (Exception e) {
 			log.error("Cannot create activation", e);
@@ -352,7 +352,7 @@ public class CellBuilder {
 				throw new Exception("No conditions available");
 			}
 			
-			result = new ActivatorJADEBehaviourImpl().init(name, datapointConditionMap, activatorLogic, cellFunctionBehaviour, caller);
+			result = new ActivatorJADEBehaviourImpl().initWithConditions(name, datapointConditionMap, activatorLogic, cellFunctionBehaviour, caller);
 		
 		} catch (Exception e) {
 			log.error("Cannot create activation", e);

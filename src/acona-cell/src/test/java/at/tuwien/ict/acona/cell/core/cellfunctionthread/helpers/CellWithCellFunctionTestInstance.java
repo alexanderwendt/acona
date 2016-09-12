@@ -28,7 +28,7 @@ public class CellWithCellFunctionTestInstance extends CellImpl {
 		subscriptions.put(queryDatapoint, new ArrayList<Condition>());
 		subscriptions.put(executeonceDatapoint, new ArrayList<Condition>());
 		
-		threadActivator.init("testbehaviour", subscriptions, "", null, this);
+		threadActivator.initWithConditions("testbehaviour", subscriptions, "", null, this);
 		this.getActivationHandler().registerActivatorInstance(threadActivator);
 		
 		log.debug("Executor registered");

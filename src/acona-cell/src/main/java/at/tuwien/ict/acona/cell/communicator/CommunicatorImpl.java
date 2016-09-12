@@ -59,6 +59,7 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 		behaviours.add(new AconaServiceBehaviour(cell, AconaServiceType.WRITE));
 		behaviours.add(new AconaServiceBehaviour(this.cell, AconaServiceType.SUBSCRIBE));
 		behaviours.add(new AconaServiceBehaviour(this.cell, AconaServiceType.UNSUBSCRIBE));
+		behaviours.add(new AconaServiceBehaviour(cell, AconaServiceType.QUERY));
 		
 		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 		behaviours.forEach(b->{
@@ -68,18 +69,6 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 				cell.addBehaviour(b);
 			}
 		});
-		
-//		//Create readbehavior
-//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.READ)));
-//		//this.addBehaviour(tbf.wrap(readDataService));
-//		//Create writebehavior
-//		//this.addBehaviour(tbf.wrap(writeDataService));
-//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.WRITE)));
-//		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
-//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.SUBSCRIBE)));
-//		//UnsubscribeDataServiceBehavr unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
-//		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
-//		this.cell.addBehaviour(tbf.wrap(new AconaServiceBehaviour(this.cell, AconaServiceType.UNSUBSCRIBE)));
 	}
 
 	@Override
@@ -295,6 +284,14 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			}
 		}			
 	}
+	
+	@Override
+	public Datapoint query(Datapoint datapoint, String agentName, int timeout) throws Exception {
+		throw new UnsupportedOperationException();
+		//return null;
+	}
+	
+	//=== INNER CLASSES ====//
 	
 	private class WriteDatapointBehaviour extends SimpleAchieveREInitiator {
 		
@@ -609,5 +606,85 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 	public int getDefaultTimeout() {
 		return this.defaultTimeout;
 	}
+	
+	private class QueryDatapointBehaviour extends SimpleAchieveREInitiator {
+		
+		private final SynchronousQueue<List<Datapoint>> queue;
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public QueryDatapointBehaviour(Agent a, ACLMessage msg, SynchronousQueue<List<Datapoint>> queue) {
+			super(a, msg);
+			msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+			this.queue = queue;
+			log.trace("Ready to send query message.");
+		}
+		
+		protected void handleAgree(ACLMessage msg) {
+			log.info("Query operation agreed. Waiting for completion notification...");
+		}
+		protected void handleInform(ACLMessage msg) {
+			log.info("Query operation successfully completed");
+			
+			log.info("Received message={}", msg.getContent());
+			String datapointListAsString = msg.getContent();
+			
+			JsonArray object = gson.fromJson(datapointListAsString, JsonArray.class);
+			//log.info("Received acknowledge={}", object);
+			List<Datapoint> datapointList = new ArrayList<Datapoint>();
+			object.forEach(e->{datapointList.add(Datapoint.toDatapoint(e.getAsJsonObject()));});
+			
+			releseQueue(datapointList);
+		}
+		protected void handleNotUnderstood(ACLMessage msg) {
+			log.info("Query request not understood by engager agent");
+			releseQueue(new ArrayList<Datapoint>());
+		}
+		protected void handleFailure(ACLMessage msg) {
+			log.info("Qeury failed");
+			// Get the failure reason and communicate it to the user
+			try{
+				AbsPredicate absPred =(AbsPredicate)myAgent.getContentManager().extractContent(msg);
+				
+				log.warn("The reason is: " + absPred.getTypeName());
+			}
+			catch (Codec.CodecException fe){
+				log.error("FIPAException reading failure reason: " + fe.getMessage());
+			}
+			catch (OntologyException oe){
+				log.error("OntologyException reading failure reason: " + oe.getMessage());
+			}
+			
+			releseQueue(new ArrayList<Datapoint>());
+		}
+		protected void handleRefuse(ACLMessage msg) {
+			log.info("Query refused");
+			// Get the refusal reason and communicate it to the user
+			try{
+				AbsContentElementList list =(AbsContentElementList)myAgent.getContentManager().extractAbsContent(msg);
+				AbsPredicate absPred = (AbsPredicate)list.get(1);
+				log.warn("The reason is: " + absPred.getTypeName());
+			}
+			catch (Codec.CodecException fe){
+				log.error("FIPAException reading refusal reason: " + fe.getMessage());
+			}
+			catch (OntologyException oe){
+				log.error("OntologyException reading refusal reason: " + oe.getMessage());
+			}
+			
+			releseQueue(new ArrayList<Datapoint>());
+		}
+		
+		private void releseQueue(List<Datapoint> list) {
+			try {
+				queue.put(list);
+			} catch (InterruptedException e) {
+				log.error("Cannot relese queue", e);
+			}
+		}
+	}
+
 	
 }

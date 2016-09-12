@@ -94,7 +94,7 @@ public class CellActivatorOnlyTester {
 			
 			
 			//activateBehaviour
-			activator.init(activatorName, conditionMapping, "", activateBehaviour, cell);
+			activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, cell);
 			
 			this.handler.registerActivatorInstance(activator);
 			log.debug("Activator registered in handler. System initialized");
@@ -161,7 +161,7 @@ public class CellActivatorOnlyTester {
 			
 			
 			//activateBehaviour
-			activator.init(activatorName, conditionMapping, "", activateBehaviour, cell);
+			activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, cell);
 			
 			this.handler.registerActivatorInstance(activator);
 			log.debug("Activator registered in handler. System initialized");
@@ -221,7 +221,7 @@ public class CellActivatorOnlyTester {
 			conditionMapping.put(datapointsource2, Arrays.asList(condition2));
 			
 			//activateBehaviour
-			activator.init(activatorName, conditionMapping, "", activateBehaviour, cell);
+			activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, cell);
 			
 			this.handler.registerActivatorInstance(activator);
 			log.debug("Activator registered in handler. System initialized");
@@ -273,7 +273,7 @@ public class CellActivatorOnlyTester {
 			Map<String, List<Condition>> conditionMapping1 = new HashMap<String, List<Condition>>();
 			conditionMapping1.put(datapointsource1, Arrays.asList(condition1));
 			
-			activator1.init(activatorName1, conditionMapping1, "", activateBehaviour1, cell);
+			activator1.initWithConditions(activatorName1, conditionMapping1, "", activateBehaviour1, cell);
 			this.handler.registerActivatorInstance(activator1);
 			
 			DummyBehaviour activateBehaviour2 = new DummyBehaviour();
@@ -282,7 +282,7 @@ public class CellActivatorOnlyTester {
 			Map<String, List<Condition>> conditionMapping2 = new HashMap<String, List<Condition>>();
 			conditionMapping2.put(datapointsource2, Arrays.asList(condition2));
 
-			activator2.init(activatorName1, conditionMapping2, "", activateBehaviour2, cell);
+			activator2.initWithConditions(activatorName1, conditionMapping2, "", activateBehaviour2, cell);
 			this.handler.registerActivatorInstance(activator2);
 			log.debug("Activator registered in handler. System initialized with activators={}", this.handler.getActivatorMap());
 			

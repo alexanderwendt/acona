@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.cell.activator.cellfunction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -39,42 +40,54 @@ public abstract class CellFunctionThreadImpl extends Thread implements Activator
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final List<String> subscriptions = new ArrayList<String>();
+	private final Map<String, String> subscriptions = new HashMap<String, String>();
 	
 	
 	private boolean isActive = true;
 	private boolean executeOnce = true;
 	private ControlCommand command = ControlCommand.STOP;
 	private boolean isAllowedToRun = true;
-
+	
 	@Override
-	public Activator init(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell callerCell) {
+	public Activator initCellFunctions(String name, Map<String, String> subscriptionMapping, Cell caller) throws Exception {
 		this.name = name;
-		this.setName(name);
-		this.cell = callerCell;
-		this.subscriptions.addAll(new ArrayList<String>(subscriptionCondition.keySet()));
+		this.cell = caller;
+		this.subscriptions.putAll(subscriptionMapping);
 		
-		//Subscribe datapoints
-		this.subscriptions.forEach(s->{
-			this.cell.getDataStorage().subscribeDatapoint(s, cell.getName());
-		});
-		
-		super.start();
-		
-		log.info("CellFunction {} initilized", this.getActivatorName());
+		try {
+			//Execute internal init
+			cellFunctionInit();		//e.g. add subscriptions
+			
+			//Subscribe datapoints
+			this.subscriptions.values().forEach(s->{
+				this.cell.getDataStorage().subscribeDatapoint(s, cell.getName());
+			});
+			
+			log.info("CellFunction {} initilized", this.getActivatorName());
+		} catch (Exception e) {
+			log.error("CellFunction {} could not be initialized", this.getActivatorName());
+			throw new Exception(e.getMessage());
+		}
 		
 		return this;
 	}
 	
 	@Override
-	public boolean runActivation(Datapoint subscribedData) {
+	public Activator initWithConditions(String name, Map<String, List<Condition>> subscriptionCondition, String logic, CellFunctionBehaviour behavior, Cell callerCell) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public boolean runActivation(Datapoint subscribedData) throws Exception {
 		//This is the notify or update function of the executor
 		this.updateDatapoint(subscribedData);
 		
 		return true;	//In the customized activator, the activation always triggers the notify function. Only one datapoint at the time can be triggered, no lists
 	}
 	
-	protected abstract void updateDatapoint(Datapoint subscribedData);
+	protected abstract void cellFunctionInit() throws Exception;
+	
+	protected abstract void updateDatapoint(Datapoint subscribedData) throws Exception;
 	
 	protected abstract void executeFunction() throws Exception;
 	
@@ -165,8 +178,12 @@ public abstract class CellFunctionThreadImpl extends Thread implements Activator
 	}
 
 	@Override
-	public List<String> getLinkedDatapoints() {
-		return this.subscriptions;
+	public List<String> getSubscribedDatapoints() {
+		return new ArrayList<String>(this.subscriptions.values());
+	}
+	
+	protected Map<String, String> getSubscriptions() {
+		return subscriptions;
 	}
 
 	@Override
@@ -188,4 +205,13 @@ public abstract class CellFunctionThreadImpl extends Thread implements Activator
 	public void setExecuteRate(int blockingTime) {
 		this.executeRate = blockingTime;
 	}
+	
+	protected void writeLocal(Datapoint datapoint) throws Exception {
+		this.cell.getCommunicator().write(datapoint);
+	}
+	
+	protected Datapoint readLocal(String address) throws Exception {
+		return this.cell.getCommunicator().read(Datapoint.newDatapoint(address));
+	}
+
 }

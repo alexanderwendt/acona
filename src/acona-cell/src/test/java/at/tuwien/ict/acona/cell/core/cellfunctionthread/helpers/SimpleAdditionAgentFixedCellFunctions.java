@@ -27,7 +27,7 @@ public class SimpleAdditionAgentFixedCellFunctions extends CellImpl {
 		Map<String, List<Condition>> subscriptions = new HashMap<String, List<Condition>>();
 		subscriptions.put(COMMANDDATAPOINT, new ArrayList<Condition>());
 		
-		threadActivator.init("getdata", subscriptions, "", null, this);
+		threadActivator.initWithConditions("getdata", subscriptions, "", null, this);
 		this.getActivationHandler().registerActivatorInstance(threadActivator);
 		
 		//Add publisher function
