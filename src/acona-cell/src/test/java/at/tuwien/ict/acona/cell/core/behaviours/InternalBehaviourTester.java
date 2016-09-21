@@ -12,7 +12,7 @@ import at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.config.ConditionConfig;
-import at.tuwien.ict.acona.cell.core.InspectorCellClient;
+import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
@@ -74,7 +74,7 @@ public class InternalBehaviourTester {
 			//cellstorage.setClass(InspectorCell.class);
 			
 			//Create cell inspector controller for the subscriber
-			InspectorCellClient externalController = new InspectorCellClient();
+			CellGatewayImpl externalController = new CellGatewayImpl();
 			Object[] argsPublisher = new Object[2];
 			argsPublisher[0] = cellstorage.toJsonObject();
 			argsPublisher[1] = externalController;

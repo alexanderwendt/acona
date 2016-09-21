@@ -66,4 +66,10 @@ public class CellFunctionTestInstance extends CellFunctionThreadImpl {
 		
 	}
 
+	@Override
+	protected void cellFunctionInit() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

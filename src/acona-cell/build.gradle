@@ -56,8 +56,8 @@ dependencies {
     compile 'org.codehaus.janino:janino:2.7.8'	//For color
     compile 'org.codehaus.janino:commons-compiler:2.7.8'
     compile 'org.fusesource.jansi:jansi:1.11'
-	compile project(':acona-jadecommunicator')
-	compile project(':acona-cell-datastructures')
+	//compile project(':acona-jadecommunicator')
+	//compile project(':acona-cell-datastructures')
     
     //Jade library
 	compile group: 'com.tilab.jade', name: 'jade', version: '4.4.0'

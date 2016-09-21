@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
-import at.tuwien.ict.acona.cell.core.InspectorCellClient;
-import at.tuwien.ict.acona.jadelauncher.core.Gateway;
-import at.tuwien.ict.acona.jadelauncher.core.GatewayImpl;
+import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
 import at.tuwien.ict.acona.jadelauncher.util.JadeException;
 import jade.wrapper.AgentController;
@@ -31,7 +29,7 @@ public class JadelauncherUtil {
 	private Map<String, AgentController> agentControllerMap = new HashMap<String, AgentController>();
 	private String defaultContainer = "";
 	private boolean mainControllerExists = false;
-	private Gateway comm = new GatewayImpl();
+	//private Gateway comm = new GatewayImpl();
 	
 	//Make singleton
 	private static JadelauncherUtil instance = null;
@@ -95,17 +93,17 @@ public class JadelauncherUtil {
 		return this.agentContainerMap.get(defaultContainer);
 	}
 	
-	public void initJadeGateway() throws Exception {
-		this.comm.init();
-	}
-	
-	public Gateway getJadeGateway() {
-		return this.comm;
-	}
-	
-	public void shutDownJadeGateway() {
-		this.comm.shutDown();
-	}
+//	public void initJadeGateway() throws Exception {
+//		this.comm.init();
+//	}
+//	
+//	public Gateway getJadeGateway() {
+//		return this.comm;
+//	}
+//	
+//	public void shutDownJadeGateway() {
+//		this.comm.shutDown();
+//	}
 	
 	//=== Agent methods ===//
 	
@@ -124,8 +122,8 @@ public class JadelauncherUtil {
 		log.debug("Agent state={}", agentController.getState());	
 	}
 	
-	public InspectorCellClient createInspectorAgent(CellConfigJadeBehaviour cellConfig) throws Exception {
-		InspectorCellClient externalController = new InspectorCellClient();
+	public CellGatewayImpl createInspectorAgent(CellConfigJadeBehaviour cellConfig) throws Exception {
+		CellGatewayImpl externalController = new CellGatewayImpl();
 		
 		//Create the object
 		Object[] args = new Object[2];

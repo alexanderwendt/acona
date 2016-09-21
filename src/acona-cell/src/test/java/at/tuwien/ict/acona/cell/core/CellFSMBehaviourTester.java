@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.core.InspectorCellClient;
+import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithFSMBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
@@ -86,7 +86,7 @@ public class CellFSMBehaviourTester {
 		try {
 			//Create agent in the system
 			//String[] args = {"1", "pong"};
-			InspectorCellClient externalController = new InspectorCellClient();
+			CellGatewayImpl externalController = new CellGatewayImpl();
 			Object[] args = new Object[2];
 			args[0] = new JsonObject();
 			args[1] = externalController;

@@ -7,6 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
 import at.tuwien.ict.acona.cell.activator.Activator;
 import at.tuwien.ict.acona.cell.activator.ActivatorConditionManager;
 import at.tuwien.ict.acona.cell.activator.Condition;
@@ -98,7 +101,11 @@ public abstract class CellFunctionThreadImpl extends Thread implements Activator
 			
 			try {
 				if (this.isAllowedToRun==true) {
+					executePreProcessing();
+					
 					executeFunction();
+					
+					executePostProcessing();
 				}
 			} catch (Exception e1) {
 				log.error("Error in program execution", e1);
@@ -121,6 +128,14 @@ public abstract class CellFunctionThreadImpl extends Thread implements Activator
 		}
 		
 		log.debug("Stop executor {}", this.getActivatorName());
+	}
+	
+	protected void executePostProcessing() {
+		
+	}
+	
+	protected void executePreProcessing() {
+		
 	}
 	
 	/**
@@ -210,8 +225,23 @@ public abstract class CellFunctionThreadImpl extends Thread implements Activator
 		this.cell.getCommunicator().write(datapoint);
 	}
 	
+	protected <DATATYPE> void writeLocal(String address, DATATYPE datapoint) throws Exception {
+		
+		Gson gson = new Gson();
+		String value = gson.toJson(datapoint);
+		this.cell.getCommunicator().write(Datapoint.newDatapoint(address).setValue(value));
+	}
+	
 	protected Datapoint readLocal(String address) throws Exception {
 		return this.cell.getCommunicator().read(Datapoint.newDatapoint(address));
+	}
+	
+	protected JsonElement readLocalAsJson(String address) throws Exception {
+		return this.cell.getCommunicator().read(Datapoint.newDatapoint(address)).getValue();
+	}
+	
+	protected String getCustomSetting(String key) {
+		return this.cell.getConfiguration().get(key).getAsString();
 	}
 
 }

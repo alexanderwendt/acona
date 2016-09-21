@@ -12,23 +12,19 @@ import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.CellSendTester;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
-import at.tuwien.ict.acona.cell.core.InspectorCellClient;
+import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CellWithCellFunctionTestInstance;
 import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.SimpleAdditionAgentFixedCellFunctions;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Message;
-import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.util.JadelauncherUtil;
-import at.tuwien.ict.acona.jadelauncher.core.Gateway;
 import jade.core.Runtime;
 
 public class CellExecutorWithCellTester {
 	private static Logger log = LoggerFactory.getLogger(CellExecutorWithCellTester.class);
 	//private final JadeContainerUtil util = new JadeContainerUtil();
 	private JadelauncherUtil commUtil = JadelauncherUtil.getUtil();
-	private Gateway comm = commUtil.getJadeGateway();
+	//private Gateway comm = commUtil.getJadeGateway();
 
 	@Before
 	public void setUp() throws Exception {
@@ -92,7 +88,7 @@ public class CellExecutorWithCellTester {
 			this.commUtil.createAgent(testagent);
 			
 			//Create inspector or the new gateway
-			InspectorCellClient cellControlSubscriber = this.commUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig("subscriber", InspectorCell.class.getName()));
+			CellGatewayImpl cellControlSubscriber = this.commUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig("subscriber", InspectorCell.class.getName()));
 			
 			//Write the numbers in the database agents
 			//this.comm.subscribeDatapoint("testagent", "datapoint.result");
@@ -163,10 +159,10 @@ public class CellExecutorWithCellTester {
 			//Create Database agents 1-2
 			//INFO: By using an inspector agent, automatically, a gateway is created
 			CellConfigJadeBehaviour inputMemoryAgent = CellConfigJadeBehaviour.newConfig(inputMemoryAgentName, CellImpl.class.getName());
-			InspectorCellClient client1 = this.commUtil.createInspectorAgent(inputMemoryAgent);
+			CellGatewayImpl client1 = this.commUtil.createInspectorAgent(inputMemoryAgent);
 		
 			CellConfigJadeBehaviour outputMemoryAgent = CellConfigJadeBehaviour.newConfig(outputmemoryAgentName, CellImpl.class.getName());
-			InspectorCellClient client2 = this.commUtil.createInspectorAgent(outputMemoryAgent);
+			CellGatewayImpl client2 = this.commUtil.createInspectorAgent(outputMemoryAgent);
 			
 			//Create the drive track agent
 			CellConfigJadeBehaviour drivetrackAgent = CellConfigJadeBehaviour.newConfig(drivetrackAgentName, SimpleAdditionAgentFixedCellFunctions.class.getName());
@@ -180,7 +176,9 @@ public class CellExecutorWithCellTester {
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)), "nothing");
 			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)), "nothing");
-			this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
+			
+			client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START")), drivetrackAgentName);
+			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			
 			synchronized (this) {
 				try {
@@ -192,10 +190,12 @@ public class CellExecutorWithCellTester {
 			
 			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1+1)), "nothing");
 			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2+2)), "nothing");
-			this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
+			
+			client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START")), drivetrackAgentName);
+			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			
 			//Get the result from the result receiver agent
-			String result = this.comm.getDatapointFromAgent(100000, true).getValue().getAsString();
+			String result = client2.getCommunicator().read(Datapoint.newDatapoint(resultdatapoint)).getValueAsString();
 			
 			log.debug("correct value={}, actual value={}", "FINISHED", result);
 			

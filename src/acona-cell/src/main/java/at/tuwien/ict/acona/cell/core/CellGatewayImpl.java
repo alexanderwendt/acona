@@ -3,10 +3,11 @@ package at.tuwien.ict.acona.cell.core;
 import java.util.Arrays;
 import java.util.List;
 
+import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 
-public class InspectorCellClient {
+public class CellGatewayImpl {
 	private InspectorCell cell;
 	
 	public void setCellInspector(InspectorCell cell) {
@@ -45,5 +46,9 @@ public class InspectorCellClient {
 	
 	public DataStorage getDataStorage() {
 		return this.cell.getDataStorage();
+	}
+	
+	public CommunicatorToCellFunction getCommunicator() {
+		return this.getCell().getCommunicator();
 	}
 }

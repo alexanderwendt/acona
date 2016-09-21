@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.InspectorCellClient;
+import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
 import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
 import at.tuwien.ict.acona.jadelauncher.util.JadeException;

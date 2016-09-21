@@ -1,7 +1,7 @@
 package at.tuwien.ict.acona.cell.core;
 
 public class InspectorCell extends CellImpl {
-	private InspectorCellClient controller;
+	private CellGatewayImpl controller;
 	
 	/**
 	 * 
@@ -13,7 +13,7 @@ public class InspectorCell extends CellImpl {
 		
 		Object[] args = this.getArguments();
 		if (args!=null && args.length>1) {
-			controller = ((InspectorCellClient)args[1]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
+			controller = ((CellGatewayImpl)args[1]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
 			
 			log.debug("agent will use an inspector as controller");
 		} else {
