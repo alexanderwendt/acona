@@ -14,10 +14,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.activator.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.activator.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
 import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CellFunctionTestInstance;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -40,7 +42,7 @@ public class CellExecutorTesterOnly {
 
 	@After
 	public void tearDown() throws Exception {
-		executor.closeActivator();
+		executor.setExit();
 	}
 	
 	@Test
@@ -51,15 +53,28 @@ public class CellExecutorTesterOnly {
 			String queryDatapoint = "datapoint.query";
 			String executeonceDatapoint = "datapoint.executeonce";
 
-			Map<String, List<Condition>> subscriptions = new HashMap<String, List<Condition>>();
-			subscriptions.put(commandDatapoint, new ArrayList<Condition>());
-			subscriptions.put(queryDatapoint, new ArrayList<Condition>());
-			subscriptions.put(executeonceDatapoint, new ArrayList<Condition>());
+			CellFunctionConfig config = CellFunctionConfig.newConfig("testExecutor", CellFunctionTestInstance.class)
+					.addSubscription(SubscriptionConfig.newConfig("COMMAND", commandDatapoint))
+					.addSubscription(SubscriptionConfig.newConfig("QUERY", queryDatapoint))
+					.addSubscription(SubscriptionConfig.newConfig("EXECUTEONCE", executeonceDatapoint));
+			
+//			Map<String, List<Condition>> subscriptions = new HashMap<String, List<Condition>>();
+//			subscriptions.put(commandDatapoint, new ArrayList<Condition>());
+//			subscriptions.put(queryDatapoint, new ArrayList<Condition>());
+//			subscriptions.put(executeonceDatapoint, new ArrayList<Condition>());
+			
+			
+			
 			DummyCell cell = new DummyCell();
-			executor.initWithConditions("testexecutor", subscriptions, "", null, cell);
+			
+			this.executor.init(config, cell);
+			//executor.initWithConditions("testexecutor", subscriptions, "", null, cell);
 			
 			//Start the executor with anything just to see
-			this.executor.runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()));
+			//Create a datapoint to start the function
+			Map<String, Datapoint> map = new HashMap<String, Datapoint>();
+			map.put(commandDatapoint, Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()));		
+			this.executor.updateData(map);//.runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
 			
 			//Put a delay to mitigate thread troubles
 			synchronized (this) {
@@ -71,7 +86,10 @@ public class CellExecutorTesterOnly {
 			}
 			
 			//Now run something that is purposeful
-			this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
+			map.clear();
+			map.put(queryDatapoint, Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
+			this.executor.updateData(map);
+			//this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
 			
 			log.debug("wait for agent to answer");
 			synchronized (this) {
@@ -83,9 +101,9 @@ public class CellExecutorTesterOnly {
 			}
 			
 			String result = cell.getDataStorage().read("datapoint.result").getValue().getAsString();
-			log.info("Received result={}", result);
+			log.info("Shall match={}, Received result={}", "FINISHED", result);
 			assertEquals("FINISHED", result);
-			
+			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Cannot test system", e);
 			fail("Error");

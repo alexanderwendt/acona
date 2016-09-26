@@ -13,13 +13,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import _OLD.at.tuwien.ict.acona.cell.activator.Activator;
+import _OLD.at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysFalse;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysTrue;
 import at.tuwien.ict.acona.cell.activator.helper.ConditionIsOne;
-import at.tuwien.ict.acona.cell.activator.helper.DummyBehaviour;
+import at.tuwien.ict.acona.cell.activator.helper.DummyFunction;
 import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
-import at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
-import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
+import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -27,7 +30,7 @@ public class CellActivatorOnlyTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellActivatorOnlyTester.class);
 	
-	private ActivationHandlerImpl handler = null;
+	private CellFunctionHandlerImpl handler = null;
 	private Cell cell = new DummyCell();
 
 	@Before
@@ -35,7 +38,7 @@ public class CellActivatorOnlyTester {
 		log.info("Start cell activator tester");
 		try {
 			//Setup activationhandler
-			handler = new ActivationHandlerImpl();
+			handler = new CellFunctionHandlerImpl();
 			
 			
 		} catch (Exception e) {
@@ -70,7 +73,7 @@ public class CellActivatorOnlyTester {
 			Activator activator = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
-			DummyBehaviour activateBehaviour = new DummyBehaviour();
+			DummyFunction activateBehaviour = new DummyFunction();
 			activateBehaviour.init(activatorName, null, cell);
 			
 			//Create condition
@@ -137,7 +140,7 @@ public class CellActivatorOnlyTester {
 			Activator activator = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
-			DummyBehaviour activateBehaviour = new DummyBehaviour();
+			DummyFunction activateBehaviour = new DummyFunction();
 			activateBehaviour.init(activatorName, null, cell);
 			
 			//Create condition
@@ -208,7 +211,7 @@ public class CellActivatorOnlyTester {
 			Activator activator = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
-			DummyBehaviour activateBehaviour = new DummyBehaviour();
+			DummyFunction activateBehaviour = new DummyFunction();
 			activateBehaviour.init(activatorName, null, cell);
 			
 			//Create condition
@@ -267,7 +270,7 @@ public class CellActivatorOnlyTester {
 			Activator activator2 = new ActivatorJADEBehaviourImpl();
 			
 			//Create behaviour
-			DummyBehaviour activateBehaviour1 = new DummyBehaviour();
+			DummyFunction activateBehaviour1 = new DummyFunction();
 			activateBehaviour1.init(activatorName1, null, cell);
 			Condition condition1 = new ConditionAlwaysTrue().init(conditionNameIsTrue, null);
 			Map<String, List<Condition>> conditionMapping1 = new HashMap<String, List<Condition>>();
@@ -276,7 +279,7 @@ public class CellActivatorOnlyTester {
 			activator1.initWithConditions(activatorName1, conditionMapping1, "", activateBehaviour1, cell);
 			this.handler.registerActivatorInstance(activator1);
 			
-			DummyBehaviour activateBehaviour2 = new DummyBehaviour();
+			DummyFunction activateBehaviour2 = new DummyFunction();
 			activateBehaviour2.init(activatorName2, null, cell);
 			Condition condition2 = new ConditionIsOne().init(conditionNameIsOne, null);
 			Map<String, List<Condition>> conditionMapping2 = new HashMap<String, List<Condition>>();

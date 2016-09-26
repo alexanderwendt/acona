@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.Condition;
+import _OLD.at.tuwien.ict.acona.cell.activator.Activator;
+import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 
 public class CellWithCellFunctionTestInstance extends CellImpl {
@@ -29,7 +29,7 @@ public class CellWithCellFunctionTestInstance extends CellImpl {
 		subscriptions.put(executeonceDatapoint, new ArrayList<Condition>());
 		
 		threadActivator.initWithConditions("testbehaviour", subscriptions, "", null, this);
-		this.getActivationHandler().registerActivatorInstance(threadActivator);
+		this.getFunctionHandler().registerActivatorInstance(threadActivator);
 		
 		log.debug("Executor registered");
 	}

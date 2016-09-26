@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.Condition;
+import _OLD.at.tuwien.ict.acona.cell.activator.Activator;
+import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 
 public class SimpleAdditionAgentFixedCellFunctions extends CellImpl {
@@ -28,7 +28,7 @@ public class SimpleAdditionAgentFixedCellFunctions extends CellImpl {
 		subscriptions.put(COMMANDDATAPOINT, new ArrayList<Condition>());
 		
 		threadActivator.initWithConditions("getdata", subscriptions, "", null, this);
-		this.getActivationHandler().registerActivatorInstance(threadActivator);
+		this.getFunctionHandler().registerActivatorInstance(threadActivator);
 		
 		//Add publisher function
 		

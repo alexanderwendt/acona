@@ -27,7 +27,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SimpleAchieveREInitiator;
 
-public class CommunicatorImpl implements CommunicatorToCellFunction {
+public class CommunicatorImpl implements Communicator {
 	
 	protected static Logger log = LoggerFactory.getLogger(CommunicatorImpl.class);
 
@@ -69,21 +69,21 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 	}
 
 	@Override
-	public List<Datapoint> read(List<Datapoint> datapoints) throws Exception {
+	public List<Datapoint> read(List<String> datapoints) throws Exception {
 		return read(datapoints, this.cell.getLocalName(), defaultTimeout);
 	}
 
 	@Override
-	public List<Datapoint> read(List<Datapoint> datapoints, String agentName, int timeout) throws Exception {
+	public List<Datapoint> read(List<String> datapointaddress, String agentName, int timeout) throws Exception {
 		final List<Datapoint> result = new ArrayList<Datapoint>();
 		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
 		if (agentName.equals(this.cell.getLocalName())==true) {
 			//readDatapoints = new ArrayList<Datapoint>();
-			datapoints.forEach(dp->{
-				result.add(this.cell.getDataStorage().read(dp.getAddress()));
+			datapointaddress.forEach(dp->{
+				result.add(this.cell.getDataStorage().read(dp));
 			});
 			
-			datapoints.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
+			result.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
 		} else {
 			//Create a InitiatorBehaviour to write the datapoints to the target agent if that agent is external
 			ACLMessage requestMsg = new ACLMessage(ACLMessage.REQUEST);
@@ -95,7 +95,8 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			//Type listOfTestObject = new TypeToken<List<Datapoint>>(){}.getType();
 			//String serializedDatapoints = gson.toJson(datapoints, listOfTestObject);
 			JsonArray object = new JsonArray();
-			datapoints.forEach(dp->{object.add(dp.toJsonObject());});
+			
+			datapointaddress.forEach(dp->{object.add(Datapoint.newDatapoint(dp).toJsonObject());});
 			//String serializedDatapoints = gson.toJson(datapoints);
 			//List<TestObject> list2 = gson.fromJson(s, listOfTestObject);
 			
@@ -116,19 +117,14 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 		
 		return result;
 	}
-
-	@Override
-	public Datapoint read(Datapoint datapoint) throws Exception {	
-		return read(datapoint, this.cell.getLocalName()); 
-	}
 	
 	@Override
-	public Datapoint read(Datapoint datapoint, String agentName) throws Exception {
+	public Datapoint read(String datapoint, String agentName) throws Exception {
 		return read(datapoint, agentName, defaultTimeout);
 	}
 
 	@Override
-	public Datapoint read(Datapoint datapoint, String agentName, int timeout) throws Exception {
+	public Datapoint read(String datapoint, String agentName, int timeout) throws Exception {
 		List<Datapoint> list = read(Arrays.asList(datapoint), agentName, timeout);
 		
 		Datapoint result = null;
@@ -140,11 +136,20 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 		
 		return result; 
 	}
+	
+	@Override
+	public Datapoint read(String datapointName) throws Exception {
+		return this.read(datapointName, this.cell.getLocalName());
+	}
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {
 		this.write(datapoints, this.cell.getLocalName(), defaultTimeout, true);
-		
+	}
+	
+	@Override
+	public void writeNonblocking(Datapoint datapoint, String agentName) throws Exception {
+		this.write(Arrays.asList(datapoint), agentName, this.defaultTimeout, false);
 	}
 
 	@Override
@@ -181,7 +186,12 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 				} catch (InterruptedException e) {
 					log.warn("Queue interrupted");
 				}
+			} else {
+				//If nonblocking, then no queue is used
+				//queue.put(true);
 			}
+			
+			
 			
 		}
 		
@@ -194,25 +204,24 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 	}
 
 	@Override
-	public void write(Datapoint datapoints, String agentName) throws Exception {
-		this.write(Arrays.asList(datapoints), agentName, defaultTimeout, true);
-		
+	public void write(Datapoint datapoint, String agentName) throws Exception {
+		this.write(Arrays.asList(datapoint), agentName, defaultTimeout, true);
 	}
 
 	@Override
-	public List<Datapoint> subscribe(List<Datapoint> datapoints, String agentName) throws Exception {
+	public List<Datapoint> subscribe(List<String> datapoints, String agentName) throws Exception {
 		final List<Datapoint> result = new ArrayList<Datapoint>();
 		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
 		if (agentName.equals(this.cell.getLocalName())==true) {
 			//readDatapoints = new ArrayList<Datapoint>();
 			datapoints.forEach(dp->{
 				//Subscribe
-				this.cell.getDataStorage().subscribeDatapoint(dp.getAddress(), agentName);
+				this.cell.getDataStorage().subscribeDatapoint(dp, agentName);
 				//Read the value and add to result list
-				result.add(this.cell.getDataStorage().read(dp.getAddress()));
+				result.add(this.cell.getDataStorage().read(dp));
 			});
 			
-			datapoints.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
+			result.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
 		} else {
 			//Create a InitiatorBehaviour to write the datapoints to the target agent if that agent is external
 			ACLMessage requestMsg = new ACLMessage(ACLMessage.SUBSCRIBE);
@@ -224,7 +233,7 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			//Type listOfTestObject = new TypeToken<List<Datapoint>>(){}.getType();
 			//String serializedDatapoints = gson.toJson(datapoints, listOfTestObject);
 			JsonArray object = new JsonArray();
-			datapoints.forEach(dp->{object.add(dp.toJsonObject());});
+			datapoints.forEach(dp->{object.add(Datapoint.newDatapoint(dp).toJsonObject());});
 			//String serializedDatapoints = gson.toJson(datapoints);
 			//List<TestObject> list2 = gson.fromJson(s, listOfTestObject);
 			
@@ -247,10 +256,10 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 	}
 
 	@Override
-	public void unsubscribe(List<Datapoint> datapoints, String agentName) throws Exception {
+	public void unsubscribe(List<String> datapoints, String agentName) throws Exception {
 		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
 		if (agentName.equals(this.cell.getLocalName())==true) {
-			datapoints.forEach(dp->{this.datastorage.unsubscribeDatapoint(dp.getAddress(), this.cell.getLocalName());});
+			datapoints.forEach(dp->{this.datastorage.unsubscribeDatapoint(dp, this.cell.getLocalName());});
 		} else {
 			//Create a InitiatorBehaviour to write the datapoints to the target agent if that agent is external
 			ACLMessage requestMsg = new ACLMessage(ACLMessage.REQUEST);
@@ -262,7 +271,7 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 			//Type listOfTestObject = new TypeToken<List<Datapoint>>(){}.getType();
 			//String serializedDatapoints = gson.toJson(datapoints, listOfTestObject);
 			JsonArray object = new JsonArray();
-			datapoints.forEach(dp->{object.add(dp.toJsonObject());});
+			datapoints.forEach(dp->{object.add(Datapoint.newDatapoint(dp).toJsonObject());});
 			//String serializedDatapoints = gson.toJson(datapoints);
 			//List<TestObject> list2 = gson.fromJson(s, listOfTestObject);
 					
@@ -280,6 +289,12 @@ public class CommunicatorImpl implements CommunicatorToCellFunction {
 				log.warn("Queue interrupted");
 			}
 		}			
+	}
+	
+	@Override
+	public void unsubscribeDatapoint(String datapointName, String name) throws Exception {
+		this.unsubscribe(Arrays.asList(datapointName), name);
+		
 	}
 	
 	@Override

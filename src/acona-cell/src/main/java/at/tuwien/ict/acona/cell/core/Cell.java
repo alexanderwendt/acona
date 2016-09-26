@@ -2,15 +2,16 @@ package at.tuwien.ict.acona.cell.core;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.activator.ActivationHandler;
 import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
-import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
+import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
+import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import jade.core.behaviours.Behaviour;
 
 public interface Cell {
 	
-	public CommunicatorToCellFunction getCommunicator();
+	public Communicator getCommunicator();
 	
 	/**
 	 * Get data storage
@@ -24,7 +25,7 @@ public interface Cell {
 	 * 
 	 * @return activation handler
 	 */
-	public ActivationHandler getActivationHandler();
+	public CellFunctionHandler getFunctionHandler();
 	
 	/**
 	 * Get cell name (not the JADE local name)
@@ -60,13 +61,7 @@ public interface Cell {
 	 * @param conf: Valid JsonObject for cells
 	 * @throws Exception 
 	 */
-	public void setupCellFunctionBehaviours(JsonObject conf) throws Exception;
+	public void setupCellFunctions(CellConfig conf) throws Exception;
 	
 	
-	/**
-	 * Get cell utils with send methods
-	 * 
-	 * @return
-	 */
-	public CellUtil getCellUtil();
 }

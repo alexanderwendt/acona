@@ -16,6 +16,7 @@ import at.tuwien.ict.acona.cell.datastructures.types.Keys;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
+@Deprecated
 public class ACLUtils {
 	
 	public static Message convertToMessage(ACLMessage message) {

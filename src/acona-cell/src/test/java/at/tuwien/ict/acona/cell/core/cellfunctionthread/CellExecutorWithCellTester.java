@@ -10,20 +10,24 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
+import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
+import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CellFunctionTestInstance;
 import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CellWithCellFunctionTestInstance;
 import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.SimpleAdditionAgentFixedCellFunctions;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.util.JadelauncherUtil;
+import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
 public class CellExecutorWithCellTester {
 	private static Logger log = LoggerFactory.getLogger(CellExecutorWithCellTester.class);
 	//private final JadeContainerUtil util = new JadeContainerUtil();
-	private JadelauncherUtil commUtil = JadelauncherUtil.getUtil();
+	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
 	//private Gateway comm = commUtil.getJadeGateway();
 
 	@Before
@@ -31,10 +35,10 @@ public class CellExecutorWithCellTester {
 		try {
 			//Create container
 			log.debug("Create or get main container");
-			this.commUtil.createMainContainer("localhost", 1099, "MainContainer");
+			this.launcher.createMainContainer("localhost", 1099, "MainContainer");
 			
 			log.debug("Create subcontainer");
-			this.commUtil.createSubContainer("localhost", 1099, "Subcontainer");
+			this.launcher.createSubContainer("localhost", 1099, "Subcontainer");
 			
 			//log.debug("Create gui");
 			//this.commUtil.createDebugUserInterface();
@@ -84,18 +88,22 @@ public class CellExecutorWithCellTester {
 			String expectedResult = "FINISHED";
 			
 			//Create Database agents 1-2
-			CellConfigJadeBehaviour testagent = CellConfigJadeBehaviour.newConfig("testagent", CellWithCellFunctionTestInstance.class.getName());
-			this.commUtil.createAgent(testagent);
+			CellConfig testagent = CellConfig.newConfig("testagent", CellImpl.class)
+					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CellFunctionTestInstance.class)
+							.addSubscription(SubscriptionConfig.newConfig("COMMAND", commandDatapoint))
+							.addSubscription(SubscriptionConfig.newConfig("QUERY", queryDatapoint))
+							.addSubscription(SubscriptionConfig.newConfig("EXECUTEONCE", executeonceDatapoint)));
+			this.launcher.createAgent(testagent);
 			
 			//Create inspector or the new gateway
-			CellGatewayImpl cellControlSubscriber = this.commUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig("subscriber", InspectorCell.class.getName()));
+			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
 			
 			//Write the numbers in the database agents
 			//this.comm.subscribeDatapoint("testagent", "datapoint.result");
 			
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			cellControlSubscriber.subscribeForeignDatapoint("datapoint.result", "testagent");
-			cellControlSubscriber.getCell().getCommunicator().write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
+			cellControlSubscriber.getCommunicator().write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
 			
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(queryDatapoint).setValue(new JsonPrimitive("SELECT * FILESERVER"))).setService(AconaServiceType.WRITE));
 					
@@ -159,14 +167,14 @@ public class CellExecutorWithCellTester {
 			//Create Database agents 1-2
 			//INFO: By using an inspector agent, automatically, a gateway is created
 			CellConfigJadeBehaviour inputMemoryAgent = CellConfigJadeBehaviour.newConfig(inputMemoryAgentName, CellImpl.class.getName());
-			CellGatewayImpl client1 = this.commUtil.createInspectorAgent(inputMemoryAgent);
+			CellGatewayImpl client1 = this.launcher.createAgent(inputMemoryAgent);
 		
 			CellConfigJadeBehaviour outputMemoryAgent = CellConfigJadeBehaviour.newConfig(outputmemoryAgentName, CellImpl.class.getName());
-			CellGatewayImpl client2 = this.commUtil.createInspectorAgent(outputMemoryAgent);
+			CellGatewayImpl client2 = this.launcher.createAgent(outputMemoryAgent);
 			
 			//Create the drive track agent
 			CellConfigJadeBehaviour drivetrackAgent = CellConfigJadeBehaviour.newConfig(drivetrackAgentName, SimpleAdditionAgentFixedCellFunctions.class.getName());
-			this.commUtil.createAgent(drivetrackAgent);
+			this.launcher.createAgent(drivetrackAgent);
 			
 			
 			
@@ -195,7 +203,7 @@ public class CellExecutorWithCellTester {
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			
 			//Get the result from the result receiver agent
-			String result = client2.getCommunicator().read(Datapoint.newDatapoint(resultdatapoint)).getValueAsString();
+			String result = client2.getCommunicator().read(resultdatapoint).getValueAsString();
 			
 			log.debug("correct value={}, actual value={}", "FINISHED", result);
 			

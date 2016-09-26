@@ -47,32 +47,37 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	
 	public ACLMessage prepareResponse(ACLMessage request) {
 		log.debug("Received message={}", request);
-		ACLMessage temp = request.createReply();
-		//temp.setOntology(AconaServiceType.NONE.toString());
-		temp.setOntology(AconaServiceType.NONE.toString());
+		ACLMessage temp = null;
 		
-		try { 
-			//Extract datapoints
-			String content = request.getContent();
-			JsonArray object = gson.fromJson(content, JsonArray.class);
-			this.datapointList = new ArrayList<Datapoint>();
-			object.forEach(e->{this.datapointList.add(Datapoint.toDatapoint((JsonObject)e));});
-
-			if (this.serviceType.equals(AconaServiceType.QUERY)==true) {
-				log.warn("Check if service is available");
-				//TODO: Implement this
-				throw new UnsupportedOperationException();
-				
-			}
+		//if (this.serviceType.equals(AconaServiceType.WRITE)==false) {	//If write, no agree is necessary
+			temp = request.createReply();
+			//temp.setOntology(AconaServiceType.NONE.toString());
+			temp.setOntology(AconaServiceType.NONE.toString());
 			
-			sender = request.getSender().getLocalName();
-			temp.setPerformative(ACLMessage.AGREE);
-			log.info("OK to execute service {}", serviceType);
+			try { 
+				//Extract datapoints
+				String content = request.getContent();
+				JsonArray object = gson.fromJson(content, JsonArray.class);
+				this.datapointList = new ArrayList<Datapoint>();
+				object.forEach(e->{this.datapointList.add(Datapoint.toDatapoint((JsonObject)e));});
+
+				if (this.serviceType.equals(AconaServiceType.QUERY)==true) {
+					log.warn("Check if service is available");
+					//TODO: Implement this
+					throw new UnsupportedOperationException();
+					
+				}
+				
+				sender = request.getSender().getLocalName();
+				temp.setPerformative(ACLMessage.AGREE);
+				log.info("OK to execute service {}", serviceType);
+			
+			} catch (Exception fe){
+				log.error("Error handling the {} action.", serviceType, fe);
+				temp.setPerformative(ACLMessage.REFUSE);
+			}
+		//}
 		
-		} catch (Exception fe){
-			log.error("Error handling the {} action.", serviceType, fe);
-			temp.setPerformative(ACLMessage.REFUSE);
-		}
 		
 		return temp;
 	}

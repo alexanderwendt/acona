@@ -1,6 +1,6 @@
 package at.tuwien.ict.acona.framework.modules;
 
-import at.tuwien.ict.acona.cell.activator.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 
 public interface Controller {
 	public AgentState sendCommandToAgent(String agentName, ControlCommand command) throws Exception;

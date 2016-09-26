@@ -1,40 +1,18 @@
 package at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers;
 
-import at.tuwien.ict.acona.cell.activator.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.activator.cellfunction.ControlCommand;
+import java.util.Map;
+
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellFunctionTestInstance extends CellFunctionThreadImpl {
 	
-	private String commandDatapoint = "datapoint.command";
-	private String queryDatapoint = "datapoint.query";
-	private String executeonceDatapoint = "datapoint.executeonce";
+	private String commandDatapoint = "COMMAND";
+	private String queryDatapoint = "QUERY";
+	private String executeonceDatapoint = "EXECUTEONCE";
 	
 	private String query = "";
-
-	@Override
-	protected void updateDatapoint(Datapoint subscribedData) {
-		if (subscribedData.getAddress().equals(commandDatapoint)) {
-			//Set command
-			String command = subscribedData.getValue().getAsString();
-			try {
-				this.setCommand(command);
-				log.debug("Command {} set", command);
-			} catch (Exception e) {
-				log.error("Cannot execute command {}", command, e);
-			}
-		} else if (subscribedData.getAddress().equals(this.queryDatapoint)) {
-			//Extract query and execute system
-			this.query = subscribedData.getValue().getAsString();
-			log.debug("Query {} received", this.query);
-			this.setCommand(ControlCommand.START);
-		} else if (subscribedData.getAddress().equals(this.executeonceDatapoint)) {
-			//Set mode execute once or periodically
-			this.setExecuteOnce(subscribedData.getValue().getAsBoolean());
-			log.debug("ExecuteOnce={}", this.isExecuteOnceSet());
-		}
-		
-	}
 
 	@Override
 	protected void executeFunction() throws Exception {
@@ -56,7 +34,7 @@ public class CellFunctionTestInstance extends CellFunctionThreadImpl {
 				log.debug("waited {}ms", i*100);
 			}
 			
-			this.cell.getDataStorage().write(Datapoint.newDatapoint("datapoint.result").setValue("FINISHED"), this.cell.getLocalName());
+			this.writeLocal(Datapoint.newDatapoint("datapoint.result").setValue("FINISHED"));
 			log.info("Something was proceeded. Give back to tester");
 		
 			
@@ -66,8 +44,48 @@ public class CellFunctionTestInstance extends CellFunctionThreadImpl {
 		
 	}
 
+	
 	@Override
-	protected void cellFunctionInit() throws Exception {
+	protected void updateDatapointsById(Map<String, Datapoint> data) {
+		if (data.containsKey(commandDatapoint)) {
+			//Set command
+			String command = data.get(commandDatapoint).getValueAsString();
+			try {
+				this.setCommand(command);
+				log.debug("Command {} set", command);
+			} catch (Exception e) {
+				log.error("Cannot execute command {}", command, e);
+			}
+		} else if (data.containsKey(this.queryDatapoint)) {
+			//Extract query and execute system
+			this.query = data.get(queryDatapoint).getValueAsString();
+			log.debug("Query {} received", this.query);
+			this.setCommand(ControlCommand.START);
+		} else if (data.containsKey(executeonceDatapoint)) {
+			//Set mode execute once or periodically
+			this.setExecuteOnce(data.get(executeonceDatapoint).getValue().getAsBoolean());
+			log.debug("ExecuteOnce={}", this.isExecuteOnce());
+		}
+		
+	}
+
+
+	@Override
+	protected void cellFunctionInternalInit() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	protected void executePostProcessing() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	protected void executePreProcessing() {
 		// TODO Auto-generated method stub
 		
 	}

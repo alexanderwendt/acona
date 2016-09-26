@@ -2,22 +2,17 @@ package at.tuwien.ict.acona.cell.core;
 
 import java.rmi.server.UID;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.activator.ActivationHandler;
-import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
-import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
 import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
-import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
+import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
@@ -34,17 +29,17 @@ import jade.lang.acl.MessageTemplate;
 public class CellImpl extends Agent implements CellInitialization, DataStorageSubscriberNotificator {
 
 	private final DataStorage dataStorage = new DataStorageImpl();
-	private final ActivationHandler activationHandler = new ActivationHandlerImpl();
-	private final CellUtil util = new CellUtil(this);
+	private final CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
 	private CommunicatorImpl comm;
+	private CellGateway controller;
 	
 	//Genotype configuration
-	protected JsonObject conf;
+	protected CellConfig conf;
 	
 	//phenotype functions
-	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
-	private final Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap = new HashMap<String, CellFunctionBehaviour>();
-	private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
+	//private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
+	//private final Map<String, CellFunction> cellFunctionBehaviourMap = new HashMap<String, CellFunction>();
+	//private final Map<String, CellFunction> cellFunctionMap = new HashMap<String, CellFunction>();
 	
 	/**
 	 * Default serial version UID
@@ -54,43 +49,42 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	protected static Logger log = LoggerFactory.getLogger(CellImpl.class);
 
 	
-	@Override
-	public void setConditionMap(Map<String, Condition> conditionMap) {
-		this.conditionMap.putAll(conditionMap);
-	}
+//	@Override
+//	public void setConditionMap(Map<String, Condition> conditionMap) {
+//		this.conditionMap.putAll(conditionMap);
+//	}
+//	
+//	@Override
+//	public void setCellFunctionMap(Map<String, CellFunction> cellFunctionBehaviourMap) {
+//		this.cellFunctionMap.putAll(cellFunctionBehaviourMap);
+//		
+//	}
+
+//	@Override
+//	public void setActivatorMap(Map<String, Activator> activatorMap) {
+//		this.activatorMap.putAll(activatorMap);
+//	}
+	
+//	@Override
+//	public Map<String, Condition> getConditionMap() {
+//		return this.conditionMap;
+//	}
+//
+//	@Override
+//	public Map<String, CellFunction> getCellFunctionMap() {
+//		return this.cellFunctionMap;
+//	}
+
+//	@Override
+//	public Map<String, Activator> getActivatorMap() {
+//		return this.activatorMap;
+//	}
 	
 	@Override
-	public void setCellFunctionBehaviourMap(Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap) {
-		this.cellFunctionBehaviourMap.putAll(cellFunctionBehaviourMap);
-		
-	}
-
-	@Override
-	public void setActivatorMap(Map<String, Activator> activatorMap) {
-		this.activatorMap.putAll(activatorMap);
-	}
-	
-	@Override
-	public Map<String, Condition> getConditionMap() {
-		return this.conditionMap;
-	}
-
-	@Override
-	public Map<String, CellFunctionBehaviour> getCellFunctionBehaviourMap() {
-		return this.cellFunctionBehaviourMap;
-	}
-
-	@Override
-	public Map<String, Activator> getActivatorMap() {
-		return this.activatorMap;
-	}
-	
-	@Override
-	public void setupCellFunctionBehaviours(JsonObject conf) throws Exception {
+	public void setupCellFunctions(CellConfig conf) throws Exception {
 		//clear the current behaviour
-		conditionMap.clear();
-		cellFunctionBehaviourMap.clear();
-		activatorMap.clear();
+		//conditionMap.clear();
+		//cellFunctionMap.clear();
 		
 		//TODO: Delete all activators and all running behaviours by unsubscription of the activators and deletion of the behaviours.
 		
@@ -99,13 +93,13 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		
 		//Create the cellbuilder and apply activators
 		CellBuilder builder = new CellBuilder();
-		builder.initializeCellConfig(conf, this);
+		builder.initializeCellConfig(this.conf, this);
 	}
 	
 	@Override
 	public JsonObject getConfiguration() {
 		//Deepcopy through serialization
-		return new Gson().fromJson(conf, JsonObject.class);
+		return this.conf.toJsonObject();
 	}
 	
 	/* (non-Javadoc)
@@ -113,16 +107,16 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	 */
 	protected void setup() {
 		try {
-			// Register the basic cell service in the yellow pages
-			DFAgentDescription dfDescriptionAgent = new DFAgentDescription();
-			dfDescriptionAgent.setName(getAID());
-			ServiceDescription sericeDescription = createServiceDescription();
-			dfDescriptionAgent.addServices(sericeDescription);
-			try {
-				DFService.register(this, dfDescriptionAgent);
-			} catch (FIPAException fe) {
-				log.error("Cannot setup DFservice", fe);
+			//Start the controller for the cell that can be used outside of jade
+			Object[] args = this.getArguments();
+			if (args!=null && args.length>1) {
+				controller = this.getArgument(1, CellGatewayImpl.class);//((CellGatewayImpl)args[1]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
+				//log.debug("agent will use an inspector as controller");
+			} else {
+				throw new NullPointerException("No arguments found although necessary. Add controller to argument 1");
 			}
+			
+			controller.init(this);
 			 
 			//Init datastorage
 			this.dataStorage.init(this);
@@ -133,13 +127,24 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			//and then first end at timeout.
 			
 			
-			JsonObject config = getArgument(0, JsonObject.class);
-			this.setupCellFunctionBehaviours(config);
+			CellConfig config = getArgument(0, CellConfig.class);
+			this.setupCellFunctions(config);
 			//controller = ((CellInspectorController)args[0]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
 			log.debug("agent will use an inspector as controller");
 			 
 			//Init internally with local variables
 			this.internalInit();
+			
+			// Register the basic cell service in the yellow pages
+			DFAgentDescription dfDescriptionAgent = new DFAgentDescription();
+			dfDescriptionAgent.setName(getAID());
+			ServiceDescription sericeDescription = createServiceDescription();
+			dfDescriptionAgent.addServices(sericeDescription);
+			try {
+				DFService.register(this, dfDescriptionAgent);
+			} catch (FIPAException fe) {
+				log.error("Cannot setup DFservice", fe);
+			}
 			 
 			log.debug("Cell {}> initialized", this.getName());
 		} catch (Exception e) {
@@ -153,25 +158,6 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		
 
 	}
-	
-//	protected void createBasicBehaviors() {
-//		//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
-//		
-//		//Create readbehavior
-//		ReadDataServiceBehavior readDataService = new ReadDataServiceBehavior(this);
-//		this.addBehaviour(readDataService);
-//		//this.addBehaviour(tbf.wrap(readDataService));
-//		//Create writebehavior
-//		WriteDataServiceBehavior writeDataService = new WriteDataServiceBehavior(this);
-//		//this.addBehaviour(tbf.wrap(writeDataService));
-//		this.addBehaviour(writeDataService);
-//		SubscribeDataServiceBehavior subscribeDataServiceBehavior = new SubscribeDataServiceBehavior(this);
-//		//this.addBehaviour(tbf.wrap(subscribeDataServiceBehavior));
-//		this.addBehaviour(subscribeDataServiceBehavior);
-//		UnsubscribeDataServiceBehavior unsubscribeDataServiceBehavior = new UnsubscribeDataServiceBehavior(this);
-//		//this.addBehaviour(tbf.wrap(unsubscribeDataServiceBehavior));
-//		this.addBehaviour(unsubscribeDataServiceBehavior);
-//	}
 	
 	/**
 	 * Helper method sets the interaction protocol to FIPA_REQUEST and provides unique ids (using {@link UID#toString()} of a newly created {@link UID}) to the {@link ACLMessage#setReplyWith(String)} and {@link ACLMessage#setConversationId(String)} methods
@@ -258,13 +244,13 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	}
 	
 	@Override
-	public ActivationHandler getActivationHandler() {
+	public CellFunctionHandler getFunctionHandler() {
 		return activationHandler;
 	}
 
-	public CellUtil getCellUtil() {
-		return util;
-	}
+//	public CellUtil getCellUtil() {
+//		return util;
+//	}
 	
 	@Override
 	public void notifySubscribers(List<String> subscribers, String caller, Datapoint subscribedData) {
@@ -288,8 +274,6 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			} catch (Exception e) {
 				log.error("Cannot notify datapoint={} to subscriber={}", subscribedData, s, e);
 			}});
-			//this.comm.write(datapoints, agentName);
-			//this.addBehaviour(new NotifyBehaviour(subscribers, subscribedData));
 		}
 	}
 
@@ -372,7 +356,8 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	}
 
 	@Override
-	public CommunicatorToCellFunction getCommunicator() {
+	public Communicator getCommunicator() {
 		return this.comm;
 	}
+
 }

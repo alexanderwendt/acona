@@ -1,7 +1,7 @@
 package _OLD_at.tuwien.ict.acona.cell.core.behaviours;
 
+import _OLD.at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 //import at.tuwien.ict.acona.cell.testing.GlobalLogger;
 import jade.domain.FIPANames;

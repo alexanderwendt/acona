@@ -12,26 +12,23 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.InspectorCell;
+import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.util.JadelauncherUtil;
-import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
+import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
-import jade.wrapper.ContainerController;
 
 public class CellServiceTester {
 	
 	private static Logger log = LoggerFactory.getLogger(CellServiceTester.class);
-	private final JadeContainerUtil util = new JadeContainerUtil();
-	private JadelauncherUtil launchUtil = JadelauncherUtil.getUtil();
+	//private final JadeContainerUtil util = new JadeContainerUtil();
+	private KoreExternalControllerImpl launchUtil = KoreExternalControllerImpl.getLauncher();
 	//private Gateway comm = launchUtil.getJadeGateway();
 	
 	
-	private ContainerController agentContainer;
-	ContainerController mainContainerController;
+	//private ContainerController agentContainer;
+	//ContainerController mainContainerController;
 
 	/**
 	 * Setup the JADE communication. No Jade Gateway necessary
@@ -103,9 +100,9 @@ public class CellServiceTester {
 			String value = "testvalue";
 			
 			//Create inspectoragent
-			CellGatewayImpl client = this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig("inspectorgateway", InspectorCell.class.getName()));
+			CellGatewayImpl client = this.launchUtil.createAgent(CellConfig.newConfig("inspectorgateway", CellImpl.class.getName()));
 			//Create receiver agent
-			this.launchUtil.createAgent(CellConfigJadeBehaviour.newConfig(receiver, CellImpl.class.getName()));
+			this.launchUtil.createAgent(CellConfig.newConfig(receiver, CellImpl.class.getName()));
 			
 //			synchronized (this) {
 //				try {
@@ -116,7 +113,7 @@ public class CellServiceTester {
 //			}
 			
 			client.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value), receiver);
-			Datapoint resultdp = client.getCell().getCommunicator().read(Datapoint.newDatapoint(datapointaddress), receiver, 100000);
+			Datapoint resultdp = client.getCell().getCommunicator().read(datapointaddress, receiver, 100000);
 
 			String result = resultdp.getValue().getAsString();
 			log.info("Received result={}. Expected result={}", result, value);
@@ -156,15 +153,15 @@ public class CellServiceTester {
 			String value1 = "Wrong value";
 			String value2 = "MuHaahAhaAaahAAHA";
 			
-			CellGatewayImpl cellControlSubscriber = this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(subscriberAgentName, InspectorCell.class.getName()));
-			CellGatewayImpl cellControlPublisher = this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(publisherAgentName, InspectorCell.class.getName()));
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(subscriberAgentName, CellImpl.class.getName()));
+			CellGatewayImpl cellControlPublisher = this.launchUtil.createAgent(CellConfig.newConfig(publisherAgentName, CellImpl.class.getName()));
 			
 			//Set init value
 			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(datapointaddress).setValue(value1), cellControlPublisher.getCell().getName());
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 
 			
-			cellControlSubscriber.getCommunicator().subscribe(Arrays.asList(Datapoint.newDatapoint(datapointaddress)), publisherAgentName);
+			cellControlSubscriber.getCommunicator().subscribe(Arrays.asList(datapointaddress), publisherAgentName);
 			
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getCell().getDataStorage());
@@ -217,8 +214,8 @@ public class CellServiceTester {
 			String value1 = "Wrong value1";
 			String value2 = "MuHaahAhaAaahAAHA2";
 			
-			CellGatewayImpl cellControlSubscriber = this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(subscriberAgentName, InspectorCell.class.getName()));
-			CellGatewayImpl cellControlPublisher = this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(publisherAgentName, InspectorCell.class.getName()));
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(subscriberAgentName, CellImpl.class.getName()));
+			CellGatewayImpl cellControlPublisher = this.launchUtil.createAgent(CellConfig.newConfig(publisherAgentName, CellImpl.class.getName()));
 			
 			//Set init value
 			cellControlPublisher.writeLocalDatapoint(Datapoint.newDatapoint(datapointaddress).setValue(value1));
@@ -294,7 +291,7 @@ public class CellServiceTester {
 			//Create X=5 agents
 			List<CellGatewayImpl> inspectors = new ArrayList<CellGatewayImpl>();
 			for (int i=0; i<numberOfAgents; i++) {
-				CellGatewayImpl cell = (this.launchUtil.createInspectorAgent(CellConfigJadeBehaviour.newConfig(agentNameTemplate + i, InspectorCell.class.getName())));
+				CellGatewayImpl cell = (this.launchUtil.createAgent(CellConfig.newConfig(agentNameTemplate + i, CellImpl.class.getName())));
 				inspectors.add(cell);
 				cell.getCell().getCommunicator().setDefaultTimeout(10000);
 			}

@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonObject;
-import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
-import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
+
+import _OLD.at.tuwien.ict.acona.cell.activator.Activator;
+import _OLD.at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
+import at.tuwien.ict.acona.cell.cellfunction.special.conditions.ConditionIsNotEmpty;
 import at.tuwien.ict.acona.cell.core.InspectorCell;
 
 public class CellWithActivator extends InspectorCell {
@@ -31,7 +32,7 @@ public class CellWithActivator extends InspectorCell {
 		additionBehaviourConf.addProperty("result", "data.result");
 		
 		Activator activator = new ActivatorJADEBehaviourImpl();
-		CellFunctionBehaviour activateBehaviour = new AdditionBehaviour().init("AdditionBehaviour", additionBehaviourConf, this);
+		CellFunction activateBehaviour = new AdditionBehaviour().init("AdditionBehaviour", additionBehaviourConf, this);
 		
 		//Create condition
 		Condition condition1 = new ConditionIsNotEmpty().init(conditionName, new JsonObject());
@@ -47,7 +48,7 @@ public class CellWithActivator extends InspectorCell {
 		activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, this);
 		//activator.registerCondition(new ConditionIsNotEmpty());
 		
-		this.getActivationHandler().registerActivatorInstance(activator);
+		this.getFunctionHandler().registerActivatorInstance(activator);
 		
 		log.debug("Activator registered");
 	}

@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.core;
 
+@Deprecated
 public class InspectorCell extends CellImpl {
 	private CellGatewayImpl controller;
 	
@@ -20,7 +21,7 @@ public class InspectorCell extends CellImpl {
 			throw new NullPointerException("No arguments found although necessary. Add inspectorcontroller");
 		}
 		
-		controller.setCellInspector(this);
+		controller.init(this);
 	}
 	
 	protected void internalInit() throws Exception {

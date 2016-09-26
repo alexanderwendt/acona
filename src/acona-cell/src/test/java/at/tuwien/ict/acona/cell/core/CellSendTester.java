@@ -10,19 +10,19 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.activator.conditions.ConditionHasValue;
-import at.tuwien.ict.acona.cell.activator.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
-import at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
-import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
-import at.tuwien.ict.acona.cell.config.ConditionConfig;
+import _OLD.at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.ConditionConfig;
+import _OLD.at.tuwien.ict.acona.cell.custombehaviours.SendAsynchronousBehaviour;
+import at.tuwien.ict.acona.cell.cellfunction.special.conditions.ConditionHasValue;
+import at.tuwien.ict.acona.cell.cellfunction.special.conditions.ConditionIsNotEmpty;
 import at.tuwien.ict.acona.cell.core.helpers.ReadOperandBehaviour;
-import at.tuwien.ict.acona.cell.custombehaviours.SendAsynchronousBehaviour;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.cell.util.JadelauncherUtil;
 import at.tuwien.ict.acona.jadelauncher.core.Gateway;
+import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 
@@ -30,7 +30,7 @@ public class CellSendTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellSendTester.class);
 	//private final JadeContainerUtil util = new JadeContainerUtil();
-	private JadelauncherUtil commUtil = JadelauncherUtil.getUtil();
+	private KoreExternalControllerImpl commUtil = KoreExternalControllerImpl.getLauncher();
 	private Gateway comm = commUtil.getJadeGateway();
 
 	@Before

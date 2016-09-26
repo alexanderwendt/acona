@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
-import at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
-import at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
-import at.tuwien.ict.acona.cell.config.ConditionConfig;
+import _OLD.at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
+import _OLD.at.tuwien.ict.acona.cell.config.ConditionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.helpers.CellWithActivator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;

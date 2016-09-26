@@ -1,19 +1,12 @@
 package at.tuwien.ict.acona.cell.activator.helper;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.activator.ActivationHandler;
-import at.tuwien.ict.acona.cell.activator.ActivationHandlerImpl;
-import at.tuwien.ict.acona.cell.activator.Activator;
-import at.tuwien.ict.acona.cell.activator.Condition;
-import at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviour;
-import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
+import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.core.CellInitialization;
-import at.tuwien.ict.acona.cell.core.CellUtil;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.cell.storage.helpers.DataStorageSubscriberNotificatorMock;
@@ -22,15 +15,16 @@ import jade.core.behaviours.Behaviour;
 public class DummyCell implements CellInitialization {
 	
 	//Genotype configuration
-	protected JsonObject conf;
+	protected CellConfig conf;
 	
 	//phenotype functions
-	private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
-	private final Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap = new HashMap<String, CellFunctionBehaviour>();
-	private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
+	//private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
+	//private final Map<String, CellFunction> cellFunctionBehaviourMap = new HashMap<String, CellFunction>();
+	//private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
 
 	private DataStorage data = new DataStorageImpl().init(new DataStorageSubscriberNotificatorMock());
-	private ActivationHandler activationHandler = new ActivationHandlerImpl();
+	private Communicator comm = new CommunicatorMock(this);
+	private CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
 	
 	@Override
 	public DataStorage getDataStorage() {
@@ -38,7 +32,7 @@ public class DummyCell implements CellInitialization {
 	}
 
 	@Override
-	public ActivationHandler getActivationHandler() {
+	public CellFunctionHandler getFunctionHandler() {
 		return this.activationHandler;
 	}
 
@@ -63,53 +57,41 @@ public class DummyCell implements CellInitialization {
 		return builder.toString();
 	}
 
-	@Override
-	public void setConditionMap(Map<String, Condition> conditionMap) {
-		this.conditionMap.putAll(conditionMap);
-	}
-	
-	@Override
-	public void setCellFunctionBehaviourMap(Map<String, CellFunctionBehaviour> cellFunctionBehaviourMap) {
-		this.cellFunctionBehaviourMap.putAll(cellFunctionBehaviourMap);
-		
-	}
-
-	@Override
-	public void setActivatorMap(Map<String, Activator> activatorMap) {
-		this.activatorMap.putAll(activatorMap);
-	}
-	
-	@Override
-	public Map<String, Condition> getConditionMap() {
-		return this.conditionMap;
-	}
-
-	@Override
-	public Map<String, CellFunctionBehaviour> getCellFunctionBehaviourMap() {
-		return this.cellFunctionBehaviourMap;
-	}
-
-	@Override
-	public Map<String, Activator> getActivatorMap() {
-		return this.activatorMap;
-	}
+//	@Override
+//	public void setConditionMap(Map<String, Condition> conditionMap) {
+//		this.conditionMap.putAll(conditionMap);
+//	}
+//	
+//	@Override
+//	public void setCellFunctionMap(Map<String, CellFunction> cellFunctionBehaviourMap) {
+//		this.cellFunctionBehaviourMap.putAll(cellFunctionBehaviourMap);
+//		
+//	}
+//
+//	@Override
+//	public void setActivatorMap(Map<String, Activator> activatorMap) {
+//		this.activatorMap.putAll(activatorMap);
+//	}
+//	
+//	@Override
+//	public Map<String, Condition> getConditionMap() {
+//		return this.conditionMap;
+//	}
+//
+//	@Override
+//	public Map<String, CellFunction> getCellFunctionMap() {
+//		return this.cellFunctionBehaviourMap;
+//	}
+//
+//	@Override
+//	public Map<String, Activator> getActivatorMap() {
+//		return this.activatorMap;
+//	}
 	
 	@Override
 	public JsonObject getConfiguration() {
 		//Deepcopy through serialization
-		return new Gson().fromJson(conf, JsonObject.class);
-	}
-
-	@Override
-	public void setupCellFunctionBehaviours(JsonObject conf) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public CellUtil getCellUtil() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.conf.toJsonObject();
 	}
 
 	@Override
@@ -119,9 +101,14 @@ public class DummyCell implements CellInitialization {
 	}
 
 	@Override
-	public CommunicatorToCellFunction getCommunicator() {
-		// TODO Auto-generated method stub
-		return null;
+	public Communicator getCommunicator() {
+		return this.comm;
+	}
+
+	@Override
+	public void setupCellFunctions(CellConfig conf) throws Exception {
+		this.conf = conf;
+		
 	}
 
 }

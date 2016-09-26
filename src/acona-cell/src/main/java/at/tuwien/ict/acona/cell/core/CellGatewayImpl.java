@@ -3,18 +3,18 @@ package at.tuwien.ict.acona.cell.core;
 import java.util.Arrays;
 import java.util.List;
 
-import at.tuwien.ict.acona.cell.communicator.CommunicatorToCellFunction;
+import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 
-public class CellGatewayImpl {
-	private InspectorCell cell;
+public class CellGatewayImpl implements CellGateway {
+	private CellImpl cell;
 	
-	public void setCellInspector(InspectorCell cell) {
+	public void init(CellImpl cell) {
 		this.cell = cell;
 	}
 	
-	public InspectorCell getCell() {
+	public CellImpl getCell() {
 		return this.cell;
 	}
 	
@@ -23,11 +23,11 @@ public class CellGatewayImpl {
 	}
 	
 	public Datapoint readLocalDatapoint(String address) throws Exception {
-		return this.getCell().getCommunicator().read(Datapoint.newDatapoint(address));
+		return this.getCell().getCommunicator().read(address);
 	}
 	
 	public Datapoint subscribeForeignDatapoint(String address, String agentName) throws Exception {
-		List<Datapoint> list = this.getCell().getCommunicator().subscribe(Arrays.asList(Datapoint.newDatapoint(address)), agentName);
+		List<Datapoint> list = this.getCell().getCommunicator().subscribe(Arrays.asList(address), agentName);
 		
 		Datapoint result = null;
 		if (list.isEmpty()==false) {
@@ -41,14 +41,20 @@ public class CellGatewayImpl {
 	}
 	
 	public void unsubscribeLocalDatapoint(String address, String agentName) throws Exception {
-		this.getCell().getCommunicator().unsubscribe(Arrays.asList(Datapoint.newDatapoint(address)), agentName);
+		this.getCell().getCommunicator().unsubscribe(Arrays.asList(address), agentName);
 	}
 	
 	public DataStorage getDataStorage() {
 		return this.cell.getDataStorage();
 	}
 	
-	public CommunicatorToCellFunction getCommunicator() {
+	public Communicator getCommunicator() {
 		return this.getCell().getCommunicator();
+	}
+
+	@Override
+	public void setCustomAgentSetting(String key, String value) {
+		// TODO Auto-generated method stub
+		
 	}
 }
