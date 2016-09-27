@@ -212,5 +212,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return config;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CellFunctionImpl [name=");
+		builder.append(name);
+		builder.append(", subscriptions=");
+		builder.append(subscriptions);
+		builder.append("]");
+		return builder.toString();
+	}
+
 
 }

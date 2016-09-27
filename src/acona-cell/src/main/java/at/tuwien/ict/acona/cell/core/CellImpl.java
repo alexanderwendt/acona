@@ -117,6 +117,8 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			}
 			
 			controller.init(this);
+			
+			this.activationHandler.init(this);
 			 
 			//Init datastorage
 			this.dataStorage.init(this);
@@ -258,13 +260,13 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 
 		//Remove the caller from the subscibers to be notified. The system shall not notify itself, except internal data exchange has happened
 		//Notify local behaviours
-		if (subscribers.contains(this.getName())) {
+		if (subscribers.contains(this.getLocalName())) {
 			log.trace("activate local behaviors");
 			this.activationHandler.activateLocalBehaviours(subscribedData);
 		}
 		
 		//Revove it from the list before sending to external application because this agent does not subscribe through external subscriptions
-		subscribers.remove(this.getName());
+		subscribers.remove(this.getLocalName());
 		
 		//Notify external agents that subscribe a value from this data storage
 		if (subscribers.isEmpty()==false) {
