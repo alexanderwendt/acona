@@ -249,10 +249,6 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	public CellFunctionHandler getFunctionHandler() {
 		return activationHandler;
 	}
-
-//	public CellUtil getCellUtil() {
-//		return util;
-//	}
 	
 	@Override
 	public void notifySubscribers(List<String> subscribers, String caller, Datapoint subscribedData) {
@@ -261,12 +257,21 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 		//Remove the caller from the subscibers to be notified. The system shall not notify itself, except internal data exchange has happened
 		//Notify local behaviours
 		if (subscribers.contains(this.getLocalName())) {
-			log.trace("activate local behaviors");
-			this.activationHandler.activateLocalBehaviours(subscribedData);
+			log.trace("activate local behaviors for agent {}", this.getLocalName());
+			this.activationHandler.activateLocalFunctions(subscribedData);
+			
+			//Revove it from the list before sending to external application because this agent does not subscribe through external subscriptions
+			subscribers.remove(this.getLocalName());
 		}
 		
-		//Revove it from the list before sending to external application because this agent does not subscribe through external subscriptions
-		subscribers.remove(this.getLocalName());
+		//Remove the caller itself because the caller is writing this datapoint
+		if (subscribers.contains(caller)) {
+			log.debug("caller is writing a subscribed datapoint. Remove the caller. No subscription necessary");
+			subscribers.remove(caller);
+		}
+		
+		
+		
 		
 		//Notify external agents that subscribe a value from this data storage
 		if (subscribers.isEmpty()==false) {

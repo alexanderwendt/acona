@@ -3,6 +3,8 @@ package at.tuwien.ict.acona.cell.config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.core.CellImpl;
+
 public class CellConfig {
 	public static final String CELLNAME = "cellname";
 	public static final String CELLCLASS = "cellclass";
@@ -20,6 +22,10 @@ public class CellConfig {
 	
 	public static CellConfig newConfig(String name, Class<?> clzz) {
 		return new CellConfig(name, clzz.getName());
+	}
+	
+	public static CellConfig newConfig(String name) {
+		return new CellConfig(name, CellImpl.class.getName());
 	}
 	
 	private CellConfig(String name, String className) {

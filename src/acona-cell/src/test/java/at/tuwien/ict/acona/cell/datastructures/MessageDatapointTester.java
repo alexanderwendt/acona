@@ -9,12 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.CellServiceTester;
+import at.tuwien.ict.acona.cell.core.CellBasicServiceTester;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.jadelauncher.core.Gateway;
-import at.tuwien.ict.acona.jadelauncher.core.GatewayImpl;
 import at.tuwien.ict.acona.jadelauncher.util.ACLUtils;
 import at.tuwien.ict.acona.jadelauncher.util.JadeContainerUtil;
+import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
@@ -23,9 +22,8 @@ import jade.wrapper.ContainerController;
 @Deprecated
 public class MessageDatapointTester {
 
-	private static Logger log = LoggerFactory.getLogger(CellServiceTester.class);
-	private final JadeContainerUtil util = new JadeContainerUtil();
-	private Gateway comm;
+	private static Logger log = LoggerFactory.getLogger(CellBasicServiceTester.class);
+	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
 	
 	private ContainerController agentContainer;
 	ContainerController mainContainerController;
@@ -35,18 +33,16 @@ public class MessageDatapointTester {
 		try {
 			//Create container
 			log.debug("Create or get main container");
-			mainContainerController = this.util.createMainJADEContainer("localhost", 1099, "MainContainer");
-					
+			this.launcher.createMainContainer("localhost", 1099, "MainContainer");
+			
 			log.debug("Create subcontainer");
-			agentContainer = this.util.createAgentContainer("localhost", 1099, "Subcontainer"); 
+			this.launcher.createSubContainer("localhost", 1099, "Subcontainer");
 			
 			//log.debug("Create gui");
-			//this.util.createRMAInContainer(agentContainer);
+			//this.commUtil.createDebugUserInterface();
 			
 			//Create gateway
-			log.debug("Create gateway");
-			comm = new GatewayImpl();
-			comm.init();
+			//commUtil.initJadeGateway();
 			
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
@@ -72,7 +68,7 @@ public class MessageDatapointTester {
 				
 			}
 		}
-		this.comm.shutDown();
+		//this.commUtil.shutDownJadeGateway();
 	}
 
 	//@Test

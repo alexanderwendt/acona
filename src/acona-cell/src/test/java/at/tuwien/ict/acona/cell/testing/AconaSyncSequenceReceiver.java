@@ -8,10 +8,10 @@ import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.lang.acl.MessageTemplate;
 
+@Deprecated
 public class AconaSyncSequenceReceiver extends CellImpl {
 	private static final long serialVersionUID = -76073396839466397L;
 	
-	@Override
 	protected void createBasicBehaviors() {
 		AconaLoggingServiceResponder queryResponder = new AconaLoggingServiceResponder(this, new AconaServiceInterface<CellImpl>() {
 			private int error = 0;

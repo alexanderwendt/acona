@@ -2,7 +2,7 @@ package at.tuwien.ict.acona.cell.config;
 
 import com.google.gson.JsonObject;
 
-public class SubscriptionConfig {
+public class DatapointConfig {
 	public final static String LOCALAGENTNAME = "";
 	
 	public static final String ID = "id";
@@ -14,19 +14,19 @@ public class SubscriptionConfig {
 	
 	private final JsonObject configObject;	
 	
-	public static SubscriptionConfig newConfig(String name, String address) {
-		return new SubscriptionConfig(name, address);
+	public static DatapointConfig newConfig(String name, String address) {
+		return new DatapointConfig(name, address);
 	}
 	
-	public static SubscriptionConfig newConfig(String name, String address, String agentid) {
-		return new SubscriptionConfig(name, address, agentid);
+	public static DatapointConfig newConfig(String name, String address, String agentid) {
+		return new DatapointConfig(name, address, agentid);
 	}
 	
-	public static SubscriptionConfig newConfig(JsonObject config) throws Exception {
-		return new SubscriptionConfig(config);
+	public static DatapointConfig newConfig(JsonObject config) throws Exception {
+		return new DatapointConfig(config);
 	}
 	
-	private SubscriptionConfig(String id, String address, String agentid) {
+	private DatapointConfig(String id, String address, String agentid) {
 		super();
 		this.configObject = new JsonObject();
 		this.setId(id);
@@ -34,7 +34,7 @@ public class SubscriptionConfig {
 		this.setAgentId(agentid);
 	}
 	
-	private SubscriptionConfig(String id, String address) {
+	private DatapointConfig(String id, String address) {
 		super();
 		this.configObject = new JsonObject();
 		this.setId(id);
@@ -42,7 +42,7 @@ public class SubscriptionConfig {
 		this.setAgentId(LOCALAGENTNAME);
 	}
 	
-	private SubscriptionConfig(JsonObject config) throws Exception {
+	private DatapointConfig(JsonObject config) throws Exception {
 		super();
 		if (this.isSubscriptionConfig(config)==true) {
 			this.configObject = config;

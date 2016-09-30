@@ -1,16 +1,11 @@
 package at.tuwien.ict.acona.cell.config;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
-
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 
 public class CellFunctionConfig {
 	public static final String CELLFUNCTIONNAME = "functionname";
@@ -28,6 +23,17 @@ public class CellFunctionConfig {
 	public static CellFunctionConfig newConfig(String name, Class<?> clzz) {
 		String className = clzz.getName();
 		return new CellFunctionConfig(name, className);
+	}
+	
+	/**
+	 * Config, where the function name is the class name for a simple class + hashcode
+	 * 
+	 * @param clzz
+	 * @return
+	 */
+	public static CellFunctionConfig newConfig(Class<?> clzz) {
+		String className = clzz.getName();
+		return new CellFunctionConfig(clzz.getSimpleName() + className.hashCode(), className);
 	}
 	
 	public static CellFunctionConfig newConfig(JsonObject config) {
@@ -64,7 +70,7 @@ public class CellFunctionConfig {
 		return this;
 	}
 	
-	public CellFunctionConfig addSubscription(SubscriptionConfig config) {
+	public CellFunctionConfig addSubscription(DatapointConfig config) {
 		this.configObject.getAsJsonArray(CELLSUBSCRIPTIONS).add(config.toJsonObject());
 		return this;
 	}
@@ -95,16 +101,16 @@ public class CellFunctionConfig {
 		return this.configObject.getAsJsonPrimitive(CELLEXECUTERATE);
 	}
 	
-	public List<SubscriptionConfig> getSubscriptionConfig() {
+	public List<DatapointConfig> getSubscriptionConfig() {
 		JsonArray array = this.configObject.getAsJsonArray(CELLSUBSCRIPTIONS);
 		//Gson gson = new Gson();
 		//Type type = new TypeToken<List<SubscriptionConfig>>(){}.getType();
 		//List<SubscriptionConfig> configList = gson.fromJson(array, type);
-		List<SubscriptionConfig> result = new ArrayList<SubscriptionConfig>();
+		List<DatapointConfig> result = new ArrayList<DatapointConfig>();
 		array.forEach(a->{
 			
 			try {
-				result.add(SubscriptionConfig.newConfig(a.getAsJsonObject()));
+				result.add(DatapointConfig.newConfig(a.getAsJsonObject()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -116,6 +122,10 @@ public class CellFunctionConfig {
 	
 	public String getProperty(String key) {
 		return this.configObject.getAsJsonPrimitive(key).getAsString();
+	}
+	
+	public JsonObject getPropertyAsJsonObject(String key) {
+		return this.configObject.getAsJsonObject(key);
 	}
 	
 	public JsonObject toJsonObject() {

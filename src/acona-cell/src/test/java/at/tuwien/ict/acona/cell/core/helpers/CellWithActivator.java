@@ -48,7 +48,7 @@ public class CellWithActivator extends InspectorCell {
 		activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, this);
 		//activator.registerCondition(new ConditionIsNotEmpty());
 		
-		this.getFunctionHandler().registerActivatorInstance(activator);
+		this.getFunctionHandler().registerCellFunctionInstance(activator);
 		
 		log.debug("Activator registered");
 	}

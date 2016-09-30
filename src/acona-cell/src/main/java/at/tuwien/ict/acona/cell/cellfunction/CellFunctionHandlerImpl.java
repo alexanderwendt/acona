@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -23,45 +23,48 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	private Cell caller;
 	
 	@Override
-	public void activateLocalBehaviours(Datapoint subscribedData) {
-		//Get all instances, which subscribe the datapoint
-		List<CellFunction> instanceList = cellFunctionMap.get(subscribedData.getAddress());
-		//Add datapoint to map
-		Map<String, Datapoint> subscribedDatapointMap = new HashMap<String, Datapoint>();
-		subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
-		
-		//FIXME: Sometimes, the instancelist is empty, after keys have been deleted. Consider that
-		
-		//run all activations of that datapoint in parallel
-		log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
-		instanceList.forEach((CellFunction a)->{
-			try {
-				a.updateData(subscribedDatapointMap);
-			} catch (Exception e) {
-				log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
-			}
-		});
+	public void activateLocalFunctions(Datapoint subscribedData) {
+		//If there are any functions, then they should be activated
+		if (cellFunctionMap.containsKey(subscribedData.getAddress())) {
+			//Get all instances, which subscribe the datapoint
+			List<CellFunction> instanceList = cellFunctionMap.get(subscribedData.getAddress());
+			//Add datapoint to map
+			Map<String, Datapoint> subscribedDatapointMap = new HashMap<String, Datapoint>();
+			subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
+			
+			//FIXME: Sometimes, the instancelist is empty, after keys have been deleted. Consider that
+			
+			//run all activations of that datapoint in parallel
+			log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
+			instanceList.forEach((CellFunction a)->{
+				try {
+					a.updateData(subscribedDatapointMap);
+				} catch (Exception e) {
+					log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
+				}
+			});
+		}
 	}
 
 	@Override
-	public void registerActivatorInstance(CellFunction activatorInstance) {
+	public void registerCellFunctionInstance(CellFunction cellFunctionInstance) {
 		//Get all subscribed addresses
-		List<SubscriptionConfig> activatorAddresses = new ArrayList<SubscriptionConfig>(activatorInstance.getSubscribedDatapoints().values());
+		List<DatapointConfig> activatorAddresses = new ArrayList<DatapointConfig>(cellFunctionInstance.getSubscribedDatapoints().values());
 		
 		//Go through each address and add the activator to this address
 		activatorAddresses.forEach(subscriptionConfig->{
-			if (this.cellFunctionMap.containsKey(subscriptionConfig)==false) {
+			if (this.cellFunctionMap.containsKey(subscriptionConfig.getAddress())==false) {
 				//Add new entry
 				List<CellFunction> activators = new LinkedList<CellFunction>();
-				activators.add(activatorInstance);
+				activators.add(cellFunctionInstance);
 				this.cellFunctionMap.put(subscriptionConfig.getAddress(), activators);
 				
-				log.info("Address={}, registered activator={}", subscriptionConfig.getAddress(), activatorInstance);
-			} else if (this.cellFunctionMap.get(subscriptionConfig.getAddress()).contains(activatorInstance)==false) {
-				this.cellFunctionMap.get(subscriptionConfig.getAddress()).add(activatorInstance);
-				log.info("Address={}, added activator={}", subscriptionConfig.getAddress(), activatorInstance);
+				log.info("Address={}, registered activator={} in agent{}", subscriptionConfig.getAddress(), cellFunctionInstance, this.caller.getLocalName());
+			} else if (this.cellFunctionMap.get(subscriptionConfig.getAddress()).contains(cellFunctionInstance)==false) {
+				this.cellFunctionMap.get(subscriptionConfig.getAddress()).add(cellFunctionInstance);
+				log.info("Address={}, added activator={}", subscriptionConfig.getAddress(), cellFunctionInstance);
 			} else {
-				log.warn("Address={}: Cannot register activator={}. Instance already exists", subscriptionConfig, activatorInstance);
+				log.warn("Address={}: Cannot register activator={}. Instance already exists", subscriptionConfig, cellFunctionInstance);
 			}
 			
 			try {
@@ -80,10 +83,10 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	@Override
 	public void deregisterActivatorInstance(CellFunction activatorInstance) {
 		//Deregister activator -> deregister all datapoints in the datastorage itself
-		activatorInstance.setExit();
+		//activatorInstance.setExit();
 		
 		//Get all subscribed addresses
-		List<SubscriptionConfig> activatorAddresses = new ArrayList<SubscriptionConfig>(activatorInstance.getSubscribedDatapoints().values());
+		List<DatapointConfig> activatorAddresses = new ArrayList<DatapointConfig>(activatorInstance.getSubscribedDatapoints().values());
 				
 		//Go through each address and remove the activator to this address
 		activatorAddresses.forEach(subscriptionsConfig->{

@@ -155,6 +155,18 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public ControllerCellGateway getAgent(String localName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ControllerCellGateway getTopController() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

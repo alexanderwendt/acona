@@ -15,6 +15,7 @@ import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
+import at.tuwien.ict.acona.cell.temporarysubscriptions.TemporarySubscription;
 import jade.content.abs.AbsContentElementList;
 import jade.content.abs.AbsPredicate;
 import jade.content.lang.Codec;
@@ -211,18 +212,30 @@ public class CommunicatorImpl implements Communicator {
 	@Override
 	public List<Datapoint> subscribe(List<String> datapoints, String agentName) throws Exception {
 		final List<Datapoint> result = new ArrayList<Datapoint>();
-		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
-		if (agentName.equals(this.cell.getLocalName())==true) {
-			//readDatapoints = new ArrayList<Datapoint>();
-			datapoints.forEach(dp->{
-				//Subscribe
-				this.cell.getDataStorage().subscribeDatapoint(dp, agentName);
-				//Read the value and add to result list
-				result.add(this.cell.getDataStorage().read(dp));
-			});
-			
-			result.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
-		} else {
+		
+		//In any matter, for a subscribed datapoint, the local storage must be subscribed, else the datapoint is updated from 
+		//another agent, but the internal function is not notified. The subscriber uses the writefunction to write to the local
+		//database. Therefore, the local database has to be subscribed too.
+		datapoints.forEach(dp->{
+			//Subscribe
+			this.cell.getDataStorage().subscribeDatapoint(dp, this.cell.getLocalName());
+			//Read the value and add to result list
+			result.add(this.cell.getDataStorage().read(dp));
+		});
+		
+//		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
+//		if (agentName.equals(this.cell.getLocalName())==true) {
+//			//readDatapoints = new ArrayList<Datapoint>();
+//			datapoints.forEach(dp->{
+//				//Subscribe
+//				this.cell.getDataStorage().subscribeDatapoint(dp, agentName);
+//				//Read the value and add to result list
+//				result.add(this.cell.getDataStorage().read(dp));
+//			});
+//			
+//			result.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
+//		} else {
+		if	(agentName.equals(this.cell.getLocalName())==false) {
 			//Create a InitiatorBehaviour to write the datapoints to the target agent if that agent is external
 			ACLMessage requestMsg = new ACLMessage(ACLMessage.SUBSCRIBE);
 			requestMsg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
@@ -243,7 +256,7 @@ public class CommunicatorImpl implements Communicator {
 			SynchronousQueue<List<Datapoint>> queue = new SynchronousQueue<List<Datapoint>>();
 			this.cell.addBehaviour(new SubscribeDatapointBehaviour(this.cell, requestMsg, queue));
 			try {
-				result.addAll(queue.poll(10000, TimeUnit.MILLISECONDS));
+				result.addAll(queue.poll(this.defaultTimeout, TimeUnit.MILLISECONDS));
 				if (result.isEmpty()) {
 					throw new Exception("Operation timed out after " + defaultTimeout + "ms.");
 				}
@@ -258,9 +271,14 @@ public class CommunicatorImpl implements Communicator {
 	@Override
 	public void unsubscribe(List<String> datapoints, String agentName) throws Exception {
 		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
-		if (agentName.equals(this.cell.getLocalName())==true) {
-			datapoints.forEach(dp->{this.datastorage.unsubscribeDatapoint(dp, this.cell.getLocalName());});
-		} else {
+		
+		//All local datapoints have to be unsubscribed too, just as they have been subscribed
+		datapoints.forEach(dp->{this.datastorage.unsubscribeDatapoint(dp, this.cell.getLocalName());});
+		
+//		if (agentName.equals(this.cell.getLocalName())==true) {
+//			datapoints.forEach(dp->{this.datastorage.unsubscribeDatapoint(dp, this.cell.getLocalName());});
+//		} else {
+		if (agentName.equals(this.cell.getLocalName())==false) {
 			//Create a InitiatorBehaviour to write the datapoints to the target agent if that agent is external
 			ACLMessage requestMsg = new ACLMessage(ACLMessage.REQUEST);
 			requestMsg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
@@ -298,9 +316,25 @@ public class CommunicatorImpl implements Communicator {
 	}
 	
 	@Override
-	public Datapoint query(Datapoint datapoint, String agentName, int timeout) throws Exception {
-		throw new UnsupportedOperationException();
-		//return null;
+	public Datapoint query(Datapoint datapointtowrite, String agentNameToWrite, Datapoint datapointwithresult, String agentNameResult, int timeout) throws Exception {
+		TemporarySubscription subscription = null; 	
+		Datapoint result = null;
+		
+		try {
+			SynchronousQueue<Datapoint> queue = new SynchronousQueue<Datapoint>();
+			//Subscribe the result and init queue
+			subscription = new TemporarySubscription(this.cell, datapointwithresult.getAddress(), agentNameResult, timeout, queue);
+			
+			//Write the datapoint
+			this.write(datapointtowrite, agentNameToWrite);
+			
+			//Wait for result
+			result = queue.poll(timeout, TimeUnit.MILLISECONDS);
+		} catch (Exception e) {
+			log.error("Cannot execute query", e);
+		}
+
+		return result;
 	}
 	
 	//=== INNER CLASSES ====//

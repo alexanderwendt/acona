@@ -11,6 +11,7 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
+@Deprecated
 public class AconaSyncSequenceSender extends CellImpl {
 	private static final long serialVersionUID = -3396424145035230755L;
 	List<ACLMessage> messages = null;

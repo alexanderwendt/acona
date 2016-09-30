@@ -2,15 +2,18 @@ package at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers;
 
 import java.util.Map;
 
+import com.google.gson.JsonElement;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class CellFunctionTestInstance extends CellFunctionThreadImpl {
+public class CFDurationTester extends CellFunctionThreadImpl {
 	
-	private String commandDatapoint = "COMMAND";
-	private String queryDatapoint = "QUERY";
-	private String executeonceDatapoint = "EXECUTEONCE";
+	private String commandDatapoint = "command";	//agtne1.servicehalloworld.command, description
+	private String queryDatapoint = "query";
+	private String executeonceDatapoint = "executeonce";
+	private String result = "result";
 	
 	private String query = "";
 
@@ -47,7 +50,8 @@ public class CellFunctionTestInstance extends CellFunctionThreadImpl {
 	
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		if (data.containsKey(commandDatapoint)) {
+		//data.get(this.commandDatapoint).getValue().
+		if (data.containsKey(commandDatapoint) && data.get(this.commandDatapoint).getValue().toString().equals("{}")==false) {
 			//Set command
 			String command = data.get(commandDatapoint).getValueAsString();
 			try {
@@ -56,12 +60,14 @@ public class CellFunctionTestInstance extends CellFunctionThreadImpl {
 			} catch (Exception e) {
 				log.error("Cannot execute command {}", command, e);
 			}
-		} else if (data.containsKey(this.queryDatapoint)) {
+		} else if (data.containsKey(this.queryDatapoint) && data.get(this.queryDatapoint).getValue().toString().equals("{}")==false) {
 			//Extract query and execute system
+			//JsonElement x= data.get(this.queryDatapoint).getValue().getAsJsonObject();
+			//boolean tester = x.isJsonNull();
 			this.query = data.get(queryDatapoint).getValueAsString();
 			log.debug("Query {} received", this.query);
 			this.setCommand(ControlCommand.START);
-		} else if (data.containsKey(executeonceDatapoint)) {
+		} else if (data.containsKey(executeonceDatapoint) && data.get(executeonceDatapoint).getValue().toString().equals("{}")==false) {
 			//Set mode execute once or periodically
 			this.setExecuteOnce(data.get(executeonceDatapoint).getValue().getAsBoolean());
 			log.debug("ExecuteOnce={}", this.isExecuteOnce());

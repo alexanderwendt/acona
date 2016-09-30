@@ -12,16 +12,17 @@ import com.google.gson.JsonPrimitive;
 
 import _OLD.at.tuwien.ict.acona.cell.config.ActivatorConfigJadeBehaviour;
 import _OLD.at.tuwien.ict.acona.cell.config.BehaviourConfigJadeBehaviour;
-import _OLD.at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import _OLD.at.tuwien.ict.acona.cell.config.ConditionConfig;
 import _OLD.at.tuwien.ict.acona.cell.custombehaviours.SendAsynchronousBehaviour;
 import at.tuwien.ict.acona.cell.cellfunction.special.conditions.ConditionHasValue;
 import at.tuwien.ict.acona.cell.cellfunction.special.conditions.ConditionIsNotEmpty;
-import at.tuwien.ict.acona.cell.core.helpers.ReadOperandBehaviour;
+import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CFDurationTester;
+import at.tuwien.ict.acona.cell.core.helpers.AdditionFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.jadelauncher.core.Gateway;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
@@ -30,30 +31,35 @@ public class CellSendTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellSendTester.class);
 	//private final JadeContainerUtil util = new JadeContainerUtil();
-	private KoreExternalControllerImpl commUtil = KoreExternalControllerImpl.getLauncher();
-	private Gateway comm = commUtil.getJadeGateway();
+	private KoreExternalControllerImpl launchUtil = KoreExternalControllerImpl.getLauncher();
 
+	/**
+	 * Setup the JADE communication. No Jade Gateway necessary
+	 * 
+	 * @throws Exception
+	 */
 	@Before
 	public void setUp() throws Exception {
 		try {
+			
 			//Create container
 			log.debug("Create or get main container");
-			this.commUtil.createMainContainer("localhost", 1099, "MainContainer");
-			
+			this.launchUtil.createMainContainer("localhost", 1099, "MainContainer");
+			//mainContainerController = this.util.createMainJADEContainer("localhost", 1099, "MainContainer");
+					
 			log.debug("Create subcontainer");
-			this.commUtil.createSubContainer("localhost", 1099, "Subcontainer");
-			
-			//log.debug("Create gui");
-			//this.commUtil.createDebugUserInterface();
-			
-			//Create gateway
-			commUtil.initJadeGateway();
+			this.launchUtil.createSubContainer("localhost", 1099, "Subcontainer"); 
 			
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
 		}
 	}
 
+	/**
+	 * Tear down the JADE container
+	 * 
+	 * @throws Exception
+	 */
 	@After
 	public void tearDown() throws Exception {
 		synchronized (this) {
@@ -73,7 +79,51 @@ public class CellSendTester {
 				
 			}
 		}
-		this.commUtil.shutDownJadeGateway();
+	}
+	
+	/**
+	 * Test the high level method query. Query works like a combination of write and subscribe. Start a controller agent and a service agent. Send a command or query to the controller agent. It operates for 2s, then there is a result,
+	 * which is written to a certain datapoint. This datapoint is subscribed by the query and if any calue is written to the subscribed datapoint within a timeout, the query is executed. The value read is the testvalue
+	 * 
+	 * 
+	 */
+	@Test
+	public void queryControllerTest() {
+		try {
+			String commandDatapoint = "datapoint.command";
+			String queryDatapoint = "datapoint.query";
+			String executeonceDatapoint = "datapoint.executeonce";
+			String resultDatapoint = "datapoint.result";
+			String controllerAgentName = "controllerAgent";
+			String serviceAgentName = "serviceAgent";
+			
+			String expectedResult = "FINISHED";
+			
+			//Create service agent
+			CellConfig testagent = CellConfig.newConfig(serviceAgentName, CellImpl.class)
+					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationTester.class)
+							.addSubscription(DatapointConfig.newConfig("command", commandDatapoint))
+							.addSubscription(DatapointConfig.newConfig("query", queryDatapoint))
+							.addSubscription(DatapointConfig.newConfig("executeonce", executeonceDatapoint))
+							.setProperty("result", resultDatapoint));
+			this.launchUtil.createAgent(testagent);
+			
+			//Create inspector or the new gateway
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class));
+			
+			String result = cellControlSubscriber.getCommunicator().query(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), serviceAgentName, Datapoint.newDatapoint(resultDatapoint), serviceAgentName, 100000).getValueAsString();
+			log.debug("Received back from query={}", result);
+			
+			//String result = cellControlSubscriber.readLocalDatapoint(resultDatapoint).getValueAsString();
+			
+			log.debug("correct value={}, actual value={}", "FINISHED", result);
+			
+			assertEquals(result, expectedResult);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
 	}
 	
 	/**
@@ -92,12 +142,20 @@ public class CellSendTester {
 			String resultAddress = "agent.result";
 			
 			//Create Database agents 1-2
-			CellConfigJadeBehaviour dbAgent1 = CellConfigJadeBehaviour.newConfig("dbagent1", CellImpl.class.getName());
-			this.commUtil.createAgent(dbAgent1);
+			CellConfig dbAgent1 = CellConfig.newConfig("dbagent1");
+			this.launchUtil.createAgent(dbAgent1);
+			CellConfig dbAgent2 = CellConfig.newConfig("dbagent2");
+			this.launchUtil.createAgent(dbAgent2);
+			CellConfig resultAgent = CellConfig.newConfig("resultagent");
+			this.launchUtil.createAgent(resultAgent);
 			
 			//Create the calculator agent
 			//Create the basic information for any agent
-			CellConfigJadeBehaviour additionAgent = CellConfigJadeBehaviour.newConfig("AdditionAgent", "at.tuwien.ict.acona.cell.core.CellImpl");
+			CellConfig additionAgent = CellConfig.newConfig("AdditionAgent");
+			
+			
+			
+			
 			
 			//Create conditions that can be used in the agents, only the name of the condition and their classes
 			//Readerconditions
@@ -106,7 +164,7 @@ public class CellSendTester {
 			
 			//Create behaviours that will be used by the agents
 			//Add the reader
-			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S1", ReadOperandBehaviour.class.getName())
+			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S1", AdditionFunction.class.getName())
 					.setProperty("op1agent", "dbagent1")
 					.setProperty("op1address", operand1address)
 					.setProperty("op2agent", "dbagent2")
@@ -201,7 +259,7 @@ public class CellSendTester {
 			
 			//Create behaviours that will be used by the agents
 			//Add the reader
-			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S1", ReadOperandBehaviour.class.getName())
+			additionAgent.addBehaviour(BehaviourConfigJadeBehaviour.newConfig("S1", AdditionFunction.class.getName())
 					.setProperty("op1agent", "dbagent1")
 					.setProperty("op1address", operand1address)
 					.setProperty("op2agent", "dbagent2")

@@ -19,6 +19,7 @@ import jade.wrapper.AgentState;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
+
 public abstract class BaseCellTester {
 	private static Logger log = LoggerFactory.getLogger(BaseCellTester.class);
 	protected final JadeContainerUtil util = new JadeContainerUtil();

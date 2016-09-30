@@ -16,14 +16,14 @@ public interface CellFunctionHandler {
 	 * @param address
 	 * @param subscribedData
 	 */
-	public void activateLocalBehaviours(Datapoint subscribedData);
+	public void activateLocalFunctions(Datapoint subscribedData);
 	
 	/**
 	 * Register an activator that is linked to datapoints through its activations
 	 * 
 	 * @param activatorInstance
 	 */
-	public void registerActivatorInstance(CellFunction activatorInstance);
+	public void registerCellFunctionInstance(CellFunction activatorInstance);
 	
 	/**
 	 * Deregister an activator instance that is linked to datapoints through its activations

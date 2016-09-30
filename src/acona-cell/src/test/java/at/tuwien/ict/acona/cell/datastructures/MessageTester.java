@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 
+@Deprecated
 public class MessageTester {
 	
 	private static Logger log = LoggerFactory.getLogger(MessageTester.class);

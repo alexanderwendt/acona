@@ -29,7 +29,7 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
 import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellBuilderTester {
@@ -76,7 +76,7 @@ public class CellBuilderTester {
 			CellConfig cellConfig = CellConfig.newConfig("testcell", DummyCell.class);
 			cellConfig.addProperty("testproperty1", "10000");
 			cellConfig.addCellfunction(CellFunctionConfig.newConfig("function1", DummyFunction.class)
-					.addSubscription(SubscriptionConfig.newConfig("ID1", "agent1.dp1.value"))
+					.addSubscription(DatapointConfig.newConfig("ID1", "agent1.dp1.value"))
 					.setExecuteOnce(true)
 					.setExecuterate(500)
 					.setProperty("TESTPROPERTY1", "valuesuccess"));

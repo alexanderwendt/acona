@@ -13,8 +13,8 @@ public class ControllerFunction extends CellFunctionThreadImpl implements Contro
 	private int state = 0;
 
 	@Override
-	public AgentState sendCommandToAgent(String agentName, ControlCommand command) throws Exception {
-		AgentState state  = AgentState.valueOf(this.getCommunicator().query(Datapoint.newDatapoint(COMMANDDATAPOINT).setValue(command.toString()), command.toString(), defaultTimeout).getValueAsString());
+	public ServiceState sendCommandToAgent(String agentName, ControlCommand command) throws Exception {
+		ServiceState state  = ServiceState.valueOf(this.getCommunicator().query(Datapoint.newDatapoint(COMMANDDATAPOINT).setValue(command.toString()), command.toString(), defaultTimeout).getValueAsString());
 		
 		return state;
 		//Command is blocking
@@ -22,19 +22,6 @@ public class ControllerFunction extends CellFunctionThreadImpl implements Contro
 
 	@Override
 	protected void cellFunctionInternalInit() throws Exception {
-		
-	}
-
-	@Override
-	protected void updateDatapoint(Datapoint subscribedData) throws Exception {
-		//React on the start trigger
-		if (subscribedData.getAddress().equals(this.getSubscribedDatapoints().get(COMMANDDATAPOINT).getAddress())) {
-			try {
-				this.setCommand(subscribedData.getValue().getAsString());
-			} catch (Exception e) {
-				log.error("Cannot read command", e);
-			}
-		}
 		
 	}
 
@@ -47,10 +34,10 @@ public class ControllerFunction extends CellFunctionThreadImpl implements Contro
 	}
 
 	@Override
-	public AgentState sendNonBlockingCommandToAgent(String agentName, ControlCommand command) throws Exception {
+	public ServiceState sendNonBlockingCommandToAgent(String agentName, ControlCommand command) throws Exception {
 		this.getCommunicator().write(Datapoint.newDatapoint(COMMANDDATAPOINT).setValue(command.toString()), agentName);
 		
-		return AgentState.FINISHED;
+		return ServiceState.STOPPED;
 	}
 
 	@Override
@@ -68,6 +55,19 @@ public class ControllerFunction extends CellFunctionThreadImpl implements Contro
 	@Override
 	public void updateData(Map<String, Datapoint> data) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateDatapointsById(Map<String, Datapoint> data) {
+		//React on the start trigger
+		if (data.containsKey(this.getSubscribedDatapoints().get(COMMANDDATAPOINT).getAddress())) {
+			try {
+				this.setCommand(data.get(this.getSubscribedDatapoints().get(COMMANDDATAPOINT).getAddress()).getValue().getAsString());
+			} catch (Exception e) {
+				log.error("Cannot read command", e);
+			}
+		}
 		
 	}
 

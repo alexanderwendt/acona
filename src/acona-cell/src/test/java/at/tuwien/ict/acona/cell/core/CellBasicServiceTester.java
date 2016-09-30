@@ -19,9 +19,9 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
-public class CellServiceTester {
+public class CellBasicServiceTester {
 	
-	private static Logger log = LoggerFactory.getLogger(CellServiceTester.class);
+	private static Logger log = LoggerFactory.getLogger(CellBasicServiceTester.class);
 	//private final JadeContainerUtil util = new JadeContainerUtil();
 	private KoreExternalControllerImpl launchUtil = KoreExternalControllerImpl.getLauncher();
 	//private Gateway comm = launchUtil.getJadeGateway();
@@ -153,11 +153,11 @@ public class CellServiceTester {
 			String value1 = "Wrong value";
 			String value2 = "MuHaahAhaAaahAAHA";
 			
-			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(subscriberAgentName, CellImpl.class.getName()));
-			CellGatewayImpl cellControlPublisher = this.launchUtil.createAgent(CellConfig.newConfig(publisherAgentName, CellImpl.class.getName()));
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(subscriberAgentName));
+			CellGatewayImpl cellControlPublisher = this.launchUtil.createAgent(CellConfig.newConfig(publisherAgentName));
 			
 			//Set init value
-			cellControlPublisher.getCell().getDataStorage().write(Datapoint.newDatapoint(datapointaddress).setValue(value1), cellControlPublisher.getCell().getName());
+			cellControlPublisher.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value1));
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 
 			
@@ -176,7 +176,7 @@ public class CellServiceTester {
 			}
 			
 			//Update Datapoint in publisher. It is expected that the subscriber cell is updated too
-			cellControlPublisher.getCell().getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value2), publisherAgentName);
+			cellControlPublisher.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value2));
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 			
 			//Check if value was updated in subscribercell
@@ -329,6 +329,8 @@ public class CellServiceTester {
 			fail("Error");
 		}
 	}
+	
+	
 
 
 }

@@ -10,16 +10,14 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-import _OLD.at.tuwien.ict.acona.cell.config.CellConfigJadeBehaviour;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.InspectorCell;
+import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CellFunctionTestInstance;
-import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CellWithCellFunctionTestInstance;
-import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.SimpleAdditionAgentFixedCellFunctions;
+import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CFAdditionServiceSimple;
+import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CFDurationTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
@@ -84,31 +82,31 @@ public class CellExecutorWithCellTester {
 			String commandDatapoint = "datapoint.command";
 			String queryDatapoint = "datapoint.query";
 			String executeonceDatapoint = "datapoint.executeonce";
+			String resultDatapoint = "datapoint.result";
 			
 			String expectedResult = "FINISHED";
 			
 			//Create Database agents 1-2
 			CellConfig testagent = CellConfig.newConfig("testagent", CellImpl.class)
-					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CellFunctionTestInstance.class)
-							.addSubscription(SubscriptionConfig.newConfig("COMMAND", commandDatapoint))
-							.addSubscription(SubscriptionConfig.newConfig("QUERY", queryDatapoint))
-							.addSubscription(SubscriptionConfig.newConfig("EXECUTEONCE", executeonceDatapoint)));
-			this.launcher.createAgent(testagent);
+					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationTester.class)
+							.addSubscription(DatapointConfig.newConfig("command", commandDatapoint))
+							.addSubscription(DatapointConfig.newConfig("query", queryDatapoint))
+							.addSubscription(DatapointConfig.newConfig("executeonce", executeonceDatapoint))
+							.setProperty("result", resultDatapoint));
+			CellGatewayImpl testAgent = this.launcher.createAgent(testagent);
+			
+			testAgent.getCommunicator().setDefaultTimeout(100000);
 			
 			//Create inspector or the new gateway
 			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
+			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
 			
 			//Write the numbers in the database agents
-			//this.comm.subscribeDatapoint("testagent", "datapoint.result");
 			
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			cellControlSubscriber.subscribeForeignDatapoint("datapoint.result", "testagent");
 			cellControlSubscriber.getCommunicator().write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
 			
-			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(queryDatapoint).setValue(new JsonPrimitive("SELECT * FILESERVER"))).setService(AconaServiceType.WRITE));
-					
-			//Get the result from the result receiver agent
-			//String result = this.comm.getDatapointFromAgent(100000, true).getValue().getAsString();
 			
 			synchronized (this) {
 				try {
@@ -118,7 +116,8 @@ public class CellExecutorWithCellTester {
 				}
 			}
 			
-			String result = cellControlSubscriber.readLocalDatapoint("datapoint.result").getValueAsString();
+			
+			String result = cellControlSubscriber.readLocalDatapoint(resultDatapoint).getValueAsString();
 			
 			log.debug("correct value={}, actual value={}", "FINISHED", result);
 			
@@ -139,15 +138,22 @@ public class CellExecutorWithCellTester {
 	 * 
 	 */
 	@Test
-	public void complexCellTester() {
+	public void externalControllerWithDatabaseCellsAndAdditionCellTest() {
 		try {
+			String COMMANDDATAPOINTNAME = "command";
+			String STATUSDATAPOINTNAME = "status";
+			String OPERAND1 = "operand1";
+			String OPERAND2 = "operand2";
+			String RESULT = "result";
+			
+			
 			//define all datapoints that shall be used
 			String memorydatapoint1 = "inputmemory.variable1";	//put into memory mock agent
 			String memorydatapoint2 = "inputmemory.variable2";	//put into memory mock agent
 			
 			//drivetrack data
 			String commandDatapoint = "drivetrack.controller.command";
-			String modedatapoint = "drivetrack.controller.mode";
+			String statedatapoint = "drivetrack.controller.mode";
 			String executeinterval = "drivetrack.controller.executioninterval";
 			
 			
@@ -160,54 +166,67 @@ public class CellExecutorWithCellTester {
 			int expectedResult = 25;
 			
 			//Define agent names and info
-			String inputMemoryAgentName = "InputBufferAgent";
+			String inputMemoryAgentName1 = "InputBufferAgent1";
+			String inputMemoryAgentName2 = "InputBufferAgent2";
 			String outputmemoryAgentName = "OutputBufferAgent";
-			String drivetrackAgentName = "DriveTrackAgent";
+			String additionAgentName = "AdditionAgent";
+			String controllerAgentName = "controller";
 			
-			//Create Database agents 1-2
-			//INFO: By using an inspector agent, automatically, a gateway is created
-			CellConfigJadeBehaviour inputMemoryAgent = CellConfigJadeBehaviour.newConfig(inputMemoryAgentName, CellImpl.class.getName());
-			CellGatewayImpl client1 = this.launcher.createAgent(inputMemoryAgent);
-		
-			CellConfigJadeBehaviour outputMemoryAgent = CellConfigJadeBehaviour.newConfig(outputmemoryAgentName, CellImpl.class.getName());
-			CellGatewayImpl client2 = this.launcher.createAgent(outputMemoryAgent);
+			//Create Database agents 1 and 2
+			CellConfig inputMemoryAgent1 = CellConfig.newConfig(inputMemoryAgentName1);
+			CellGatewayImpl client1 = this.launcher.createAgent(inputMemoryAgent1);
+			CellConfig inputMemoryAgent2 = CellConfig.newConfig(inputMemoryAgentName2);
+			CellGatewayImpl client2 = this.launcher.createAgent(inputMemoryAgent2);
 			
-			//Create the drive track agent
-			CellConfigJadeBehaviour drivetrackAgent = CellConfigJadeBehaviour.newConfig(drivetrackAgentName, SimpleAdditionAgentFixedCellFunctions.class.getName());
-			this.launcher.createAgent(drivetrackAgent);
+			//Create resultagent
+			CellConfig outputMemoryAgent = CellConfig.newConfig(outputmemoryAgentName);
+			CellGatewayImpl outputagent = this.launcher.createAgent(outputMemoryAgent);
 			
+			//Create the addition agent with the addition function that reads from 2 different datapoints at 2 agents, calculates and then puts the values in a 3rd output agent
+			CellConfig additionAgent = CellConfig.newConfig(additionAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(CFAdditionServiceSimple.class)
+							.addSubscription(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint))
+							.setProperty(STATUSDATAPOINTNAME, statedatapoint)
+							.setProperty(OPERAND1, DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1).toJsonObject())
+							.setProperty(OPERAND2, DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2).toJsonObject())
+							.setProperty(RESULT, DatapointConfig.newConfig(RESULT, resultdatapoint, outputmemoryAgentName).toJsonObject()));
+			this.launcher.createAgent(additionAgent);
 			
+			//Control agent
+			CellConfig controller = CellConfig.newConfig(controllerAgentName);
+			CellGatewayImpl controlAgent = this.launcher.createAgent(controller);
 			
+			log.info("=== All agents initialized ===");
 			//Write the numbers in the database agents
-			//this.comm.subscribeDatapoint(drivetrackAgentName, "datapoint.result");
+			client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
+			client2.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
 			
-			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
-			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)), "nothing");
-			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)), "nothing");
+			//Query the service with start and then get the status
+			//Set default timeout to a high number to be able to debug
+			controlAgent.getCommunicator().setDefaultTimeout(100000);
+			log.debug("Execute query");
+			Datapoint resultState = controlAgent.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName, Datapoint.newDatapoint(statedatapoint), additionAgentName, 100000);
+			log.debug("Query executed with result={}", resultState);
 			
-			client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START")), drivetrackAgentName);
+			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue().getAsJsonPrimitive().getAsDouble();
+			//client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START")), drivetrackAgentName);
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			
-			synchronized (this) {
-				try {
-					this.wait(2000);
-				} catch (InterruptedException e) {
-					
-				}
-			}
 			
-			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1+1)), "nothing");
-			client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2+2)), "nothing");
 			
-			client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START")), drivetrackAgentName);
+			
+			//client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1+1)), "nothing");
+			//client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2+2)), "nothing");
+			
+			//client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START")), drivetrackAgentName);
 			//this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			
 			//Get the result from the result receiver agent
-			String result = client2.getCommunicator().read(resultdatapoint).getValueAsString();
+			//String result = client2.getCommunicator().read(resultdatapoint).getValueAsString();
 			
-			log.debug("correct value={}, actual value={}", "FINISHED", result);
+			log.debug("correct value={}, actual value={}", expectedResult, sum);
 			
-			assertEquals(result, expectedResult);
+			assertEquals(sum, expectedResult, 0.0);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

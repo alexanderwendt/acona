@@ -120,9 +120,9 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		log.debug("Stop executor {}", this.getFunctionName());
 	}
 	
-	protected abstract void executePostProcessing();
+	protected abstract void executePostProcessing() throws Exception;
 	
-	protected abstract void executePreProcessing();
+	protected abstract void executePreProcessing() throws Exception;
 	
 	//=== Internal functions for the control of the tread ===//
 	

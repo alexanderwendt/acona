@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -34,7 +34,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final Map<String, SubscriptionConfig> subscriptions = new HashMap<String, SubscriptionConfig>();	//Variable, datapoint
+	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>();	//Variable, datapoint
 	
 	protected ControlCommand currentCommand = ControlCommand.STOP;
 	protected boolean runAllowed = false;
@@ -96,9 +96,9 @@ public abstract class CellFunctionImpl implements CellFunction {
 	
 	protected abstract void executeFunction() throws Exception;
 	
-	protected abstract void executePostProcessing();
+	protected abstract void executePostProcessing() throws Exception;
 	
-	protected abstract void executePreProcessing();
+	protected abstract void executePreProcessing() throws Exception;
 
 	public abstract void setCommand(ControlCommand command);
 
@@ -129,11 +129,12 @@ public abstract class CellFunctionImpl implements CellFunction {
 		//this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
 		
 		//Execute specific functions
+		this.cell.getFunctionHandler().deregisterActivatorInstance(this);
 		this.setCommand(ControlCommand.EXIT);
 	}
 	
 	@Override
-	public Map<String, SubscriptionConfig> getSubscribedDatapoints() {	//ID config
+	public Map<String, DatapointConfig> getSubscribedDatapoints() {	//ID config
 		return subscriptions;
 	}
 	
@@ -210,6 +211,17 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected CellFunctionConfig getConfig() {
 		return config;
+	}
+	
+	/**
+	 * Return the subscribed datapoint based on its ID in the function
+	 * 
+	 * @param data: inputmap from subscribed data
+	 * @param id: datapoint id defined in the config or in the code 
+	 * @return
+	 */
+	protected Datapoint getDatapointFromId(Map<String, Datapoint> data, String id) {
+		return data.get(this.getSubscribedDatapoints().get(id).getAddress());
 	}
 
 	@Override

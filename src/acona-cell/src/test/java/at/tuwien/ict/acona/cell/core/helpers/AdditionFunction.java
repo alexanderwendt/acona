@@ -7,14 +7,15 @@ import org.slf4j.LoggerFactory;
 
 import _OLD.at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviourImpl;
 import _OLD_at.tuwien.ict.acona.cell.core.behaviours.SendDatapointOnDemandBehavior;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 
-public class ReadOperandBehaviour extends CellFunctionBehaviourImpl {
+public class AdditionFunction extends CellFunctionThreadImpl {
 	
-	protected static Logger log = LoggerFactory.getLogger(ReadOperandBehaviour.class);
+	protected static Logger log = LoggerFactory.getLogger(AdditionFunction.class);
 	
 	private static final String OPERAND1AGENTNAME = "op1agent";
 	private static final String OPERAND1ADDRESS  ="op1address";
@@ -30,7 +31,7 @@ public class ReadOperandBehaviour extends CellFunctionBehaviourImpl {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public ReadOperandBehaviour() {
+	public AdditionFunction() {
 		super();
 	}
 

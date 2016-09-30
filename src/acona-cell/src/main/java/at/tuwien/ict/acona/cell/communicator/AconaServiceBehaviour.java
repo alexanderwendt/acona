@@ -59,7 +59,9 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 				String content = request.getContent();
 				JsonArray object = gson.fromJson(content, JsonArray.class);
 				this.datapointList = new ArrayList<Datapoint>();
-				object.forEach(e->{this.datapointList.add(Datapoint.toDatapoint((JsonObject)e));});
+				object.forEach(e->{
+					this.datapointList.add(Datapoint.toDatapoint((JsonObject)e));
+				});
 
 				if (this.serviceType.equals(AconaServiceType.QUERY)==true) {
 					log.warn("Check if service is available");

@@ -3,7 +3,7 @@ package at.tuwien.ict.acona.cell.cellfunction;
 import java.util.Map;
 
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.config.SubscriptionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -21,8 +21,9 @@ public interface CellFunction {
 	/**
 	 * Update subscribed data
 	 * @param datapoints, which are subscribe
+	 * @throws Exception 
 	 */
-	public void updateData(Map<String, Datapoint> data);
+	public void updateData(Map<String, Datapoint> data) throws Exception;
 	/**
 	 * Return the name of the function, which has been specified in the config file
 	 * @return Name of the function
@@ -32,7 +33,7 @@ public interface CellFunction {
 	 * Use these datapoints for the activatorhandler
 	 * @return Subscriptions
 	 */
-	public Map<String, SubscriptionConfig> getSubscribedDatapoints();	
+	public Map<String, DatapointConfig> getSubscribedDatapoints();	
 	
 	/**
 	 * Handle functions: START, STOP, PAUSE, EXIT

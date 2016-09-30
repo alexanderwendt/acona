@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -15,7 +16,7 @@ public class Datapoint {
 	
 	private String ADDRESS="";
 	private String TYPE="";
-	private JsonElement VALUE = new JsonObject();
+	private JsonElement VALUE = new JsonObject(); //new JsonObject();
 	
 	private final static Gson gson = new Gson();
 	//private final JsonObject jsondatapoint;
@@ -41,7 +42,7 @@ public class Datapoint {
 			if (Datapoint.isDatapoint(data)==true) {
 				result = Datapoint.newDatapoint(data.get(KEYADDRESS).getAsString()).setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
 			} else {
-				throw new IllegalArgumentException("Cannot cast json data to datapoint");
+				throw new IllegalArgumentException("Cannot cast json data to datapoint " + data);
 			}
 			
 		} catch (IllegalArgumentException e) {

@@ -26,6 +26,7 @@ import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
+@Deprecated
 public class CellActivatorTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellActivatorTester.class);

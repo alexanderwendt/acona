@@ -99,17 +99,17 @@ public class CellActivatorOnlyTester {
 			//activateBehaviour
 			activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, cell);
 			
-			this.handler.registerActivatorInstance(activator);
+			this.handler.registerCellFunctionInstance(activator);
 			log.debug("Activator registered in handler. System initialized");
 			
 			//Test actual behaviour
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
 			
 			assertEquals(false, activateBehaviour.hasRun());
 			
@@ -166,17 +166,17 @@ public class CellActivatorOnlyTester {
 			//activateBehaviour
 			activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, cell);
 			
-			this.handler.registerActivatorInstance(activator);
+			this.handler.registerCellFunctionInstance(activator);
 			log.debug("Activator registered in handler. System initialized");
 			
 			//Test actual behaviour
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource3).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource4).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource5).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource6).setValue(String.valueOf(data)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource7).setValue(String.valueOf(data)));
 			
 			assertEquals(true, activateBehaviour.hasRun());
 			log.info("Test passed");
@@ -226,18 +226,18 @@ public class CellActivatorOnlyTester {
 			//activateBehaviour
 			activator.initWithConditions(activatorName, conditionMapping, "", activateBehaviour, cell);
 			
-			this.handler.registerActivatorInstance(activator);
+			this.handler.registerCellFunctionInstance(activator);
 			log.debug("Activator registered in handler. System initialized");
 			
 			//Run the first run and init the constant condition of the constant data
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(constanceData)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource1).setValue(String.valueOf(constanceData)));
 			
 			//Run the variable data
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));
 			
 			//Increment variable data and run again. Now it shall activate the behaviour
 			variableData++;
-			this.handler.activateLocalBehaviours(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));			
+			this.handler.activateLocalFunctions(Datapoint.newDatapoint(datapointsource2).setValue(String.valueOf(variableData)));			
 			
 			assertEquals(true, activateBehaviour.hasRun());
 			log.info("Test passed");
@@ -277,7 +277,7 @@ public class CellActivatorOnlyTester {
 			conditionMapping1.put(datapointsource1, Arrays.asList(condition1));
 			
 			activator1.initWithConditions(activatorName1, conditionMapping1, "", activateBehaviour1, cell);
-			this.handler.registerActivatorInstance(activator1);
+			this.handler.registerCellFunctionInstance(activator1);
 			
 			DummyFunction activateBehaviour2 = new DummyFunction();
 			activateBehaviour2.init(activatorName2, null, cell);
@@ -286,7 +286,7 @@ public class CellActivatorOnlyTester {
 			conditionMapping2.put(datapointsource2, Arrays.asList(condition2));
 
 			activator2.initWithConditions(activatorName1, conditionMapping2, "", activateBehaviour2, cell);
-			this.handler.registerActivatorInstance(activator2);
+			this.handler.registerCellFunctionInstance(activator2);
 			log.debug("Activator registered in handler. System initialized with activators={}", this.handler.getActivatorMap());
 			
 			//Remove both activations
