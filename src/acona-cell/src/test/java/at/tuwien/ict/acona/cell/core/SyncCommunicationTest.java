@@ -202,50 +202,50 @@ public class SyncCommunicationTest extends BaseCellTester {
 		return errors;
 	}
 	
-	/**
-	 * Tests sync sending base functionality by sending a single message to a loopback agent that will return an empty INFORM message
-	 */
-	@Test
-	public void syncSend1() {
-		log.info("Starting test syncSend1");
-		try {
-			
-			List<ACLMessage> messageSequence = getMessageSequence1();
-			
-			sender = newAgent("Sender", AconaSyncSequenceSender.class, messageSequence, 3000, false);
-			receiver = newAgent("Receiver", AconaSyncSequenceReceiver.class);
-			
-			startAgent(receiver);
-			startAgent(sender);
-			
-			System.out.println("Waiting for the sender to finish");
-			try {
-				synchronized (this) {
-					wait(5000);					
-					System.out.println("Waiting finished");
-				}
-
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			log.debug(GlobalLogger.getLog().toString());
-			
-			List<String> errors = checkMessageSequence(messageSequence, GlobalLogger.getLog());
-			
-			if(!errors.isEmpty()) {
-				log.error("Errors: ");
-				for(String error : errors) {
-					log.error(error);
-				}
-			}
-			
-			assertTrue(errors.isEmpty());
-		} catch (StaleProxyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		log.info("Finished test syncSend1");
-	}
+//	/**
+//	 * Tests sync sending base functionality by sending a single message to a loopback agent that will return an empty INFORM message
+//	 */
+//	@Test
+//	public void syncSend1() {
+//		log.info("Starting test syncSend1");
+//		try {
+//			
+//			List<ACLMessage> messageSequence = getMessageSequence1();
+//			
+//			sender = newAgent("Sender", AconaSyncSequenceSender.class, messageSequence, 3000, false);
+//			receiver = newAgent("Receiver", AconaSyncSequenceReceiver.class);
+//			
+//			startAgent(receiver);
+//			startAgent(sender);
+//			
+//			System.out.println("Waiting for the sender to finish");
+//			try {
+//				synchronized (this) {
+//					wait(5000);					
+//					System.out.println("Waiting finished");
+//				}
+//
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			log.debug(GlobalLogger.getLog().toString());
+//			
+//			List<String> errors = checkMessageSequence(messageSequence, GlobalLogger.getLog());
+//			
+//			if(!errors.isEmpty()) {
+//				log.error("Errors: ");
+//				for(String error : errors) {
+//					log.error(error);
+//				}
+//			}
+//			
+//			assertTrue(errors.isEmpty());
+//		} catch (StaleProxyException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		log.info("Finished test syncSend1");
+//	}
 }

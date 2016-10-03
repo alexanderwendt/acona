@@ -63,5 +63,12 @@ public interface Cell {
 	 */
 	public void setupCellFunctions(CellConfig conf) throws Exception;
 	
+	/**
+	 * Register a service
+	 * 
+	 * @param name
+	 */
+	public void registerService(String name);
+	
 	
 }

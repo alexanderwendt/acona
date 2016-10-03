@@ -18,6 +18,8 @@ import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.cell.storage.DataStorageSubscriberNotificator;
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -32,6 +34,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	private final CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
 	private CommunicatorImpl comm;
 	private CellGateway controller;
+	private DFAgentDescription dfDescriptionAgentDescription;
 	
 	//Genotype configuration
 	protected CellConfig conf;
@@ -106,6 +109,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 	 * @see jade.core.Agent#setup()
 	 */
 	protected void setup() {
+		//Behaviours start first after setup
 		try {
 			//Start the controller for the cell that can be used outside of jade
 			Object[] args = this.getArguments();
@@ -122,36 +126,61 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			 
 			//Init datastorage
 			this.dataStorage.init(this);
-			 
-			//Create behaviors
-			this.comm = new CommunicatorImpl(this, this.dataStorage, true);	
-			//FIXME: nonthreaded behaviours an optional celloption. There is a problem with the blocking behaviours. They block each other 
-			//and then first end at timeout.
-			
-			
-			CellConfig config = getArgument(0, CellConfig.class);
-			this.setupCellFunctions(config);
-			//controller = ((CellInspectorController)args[0]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
-			log.debug("agent will use an inspector as controller");
-			 
-			//Init internally with local variables
-			this.internalInit();
 			
 			// Register the basic cell service in the yellow pages
-			DFAgentDescription dfDescriptionAgent = new DFAgentDescription();
-			dfDescriptionAgent.setName(getAID());
-			ServiceDescription sericeDescription = createServiceDescription();
-			dfDescriptionAgent.addServices(sericeDescription);
+			dfDescriptionAgentDescription = new DFAgentDescription();
+			dfDescriptionAgentDescription.setName(getAID());
 			try {
-				DFService.register(this, dfDescriptionAgent);
+				DFService.register(this, dfDescriptionAgentDescription);
 			} catch (FIPAException fe) {
 				log.error("Cannot setup DFservice", fe);
 			}
 			 
-			log.debug("Cell {}> initialized", this.getName());
+			//Create behaviors
+			this.comm = new CommunicatorImpl(this, this.dataStorage, true);	
+			
+			ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+			this.addBehaviour(tbf.wrap(new initAsBehaviour()));
+			//FIXME: nonthreaded behaviours an optional celloption. There is a problem with the blocking behaviours. They block each other 
+			//and then first end at timeout.
+			
+			
 		} catch (Exception e) {
 			log.error("Cannot setup cell agent", e);
 		}
+	}
+	
+	private class initAsBehaviour extends OneShotBehaviour {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void action() {
+			CellConfig config = getArgument(0, CellConfig.class);
+			try {
+				setupCellFunctions(config);
+				//controller = ((CellInspectorController)args[0]);	//Mode=0: return message in return message, Mode=1: append returnmessage, mode=2: return incoming message 
+				log.debug("agent will use an inspector as controller");
+				 
+				//Init internally with local variables
+				internalInit();
+				 
+				log.debug("Cell {}> initialized", getName());
+			} catch (Exception e) {
+				log.error("Cannot init cell", e);
+			}
+			
+		}
+		
+	}
+	
+	public void registerService(String name) {
+		ServiceDescription sericeDescription = createServiceDescription();
+		sericeDescription.setName(name);
+		dfDescriptionAgentDescription.addServices(sericeDescription);
 	}
 	
 	protected void internalInit() throws Exception {

@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.core.cellfunctionthread;
+package at.tuwien.ict.acona.cell.core.cellfunction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -20,7 +20,7 @@ import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
-import at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers.CFDurationTester;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellExecutorTesterOnly {
@@ -32,7 +32,7 @@ public class CellExecutorTesterOnly {
 		log.info("Start cell activator tester");
 		try {
 			//Setup activationhandler
-			executor = new CFDurationTester();
+			executor = new CFDurationThreadTester();
 			
 			
 		} catch (Exception e) {
@@ -53,7 +53,7 @@ public class CellExecutorTesterOnly {
 			String queryDatapoint = "datapoint.query";
 			String executeonceDatapoint = "datapoint.executeonce";
 
-			CellFunctionConfig config = CellFunctionConfig.newConfig("testExecutor", CFDurationTester.class)
+			CellFunctionConfig config = CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
 					.addSubscription(DatapointConfig.newConfig("command", commandDatapoint))
 					.addSubscription(DatapointConfig.newConfig("query", queryDatapoint))
 					.addSubscription(DatapointConfig.newConfig("executeonce", executeonceDatapoint));

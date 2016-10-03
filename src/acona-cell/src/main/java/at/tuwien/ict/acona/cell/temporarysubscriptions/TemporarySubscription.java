@@ -19,7 +19,7 @@ public class TemporarySubscription implements CellFunction {
 	protected static Logger log = LoggerFactory.getLogger(TemporarySubscription.class);
 	
 	private final Cell cell;
-	private final SynchronousQueue<Datapoint> queue;// = new SynchronousQueue<Datapoint>();
+	private final SynchronousQueue<Datapoint> queue = new SynchronousQueue<Datapoint>();
 	private final String subscriptionAddress;
 	//private static final String ID = "S";
 	//private final String agentName;
@@ -27,10 +27,10 @@ public class TemporarySubscription implements CellFunction {
 	private final String functionName;
 	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>();
 	
-	public TemporarySubscription(Cell cell, String subscriptionAddress, String agentName, int timeout, SynchronousQueue<Datapoint> queue) {
+	public TemporarySubscription(Cell cell, String subscriptionAddress, String agentName, int timeout) {
 		this.functionName = "TempSubscription-" + subscriptionAddress; 
 		
-		this.queue = queue;
+		//this.queue = queue;
 		//Get variables
 		this.cell = cell;
 		this.subscriptionAddress =  subscriptionAddress;
@@ -44,26 +44,26 @@ public class TemporarySubscription implements CellFunction {
 		
 	}
 	
-//	public Datapoint getDatapoint() throws Exception {
-//		Datapoint result = null;
-//		
-//		try {
-//			log.trace("Poll temp queue");
-//			result = this.queue.poll(timeout, TimeUnit.MILLISECONDS);
-//			log.trace("Result recieved={}", result);
-//			if (result==null) {
-//				log.error("Timeouterror");
-//				throw new Exception("Timeout");
-//			}
-//		} catch (InterruptedException e) {
-//			log.error("Message received", result);
-//			throw new Exception(e.getMessage());
-//		} finally {
-//			this.cell.getFunctionHandler().deregisterActivatorInstance(this);
-//		}
-//		
-//		return result;
-//	}
+	public Datapoint getDatapoint() throws Exception {
+		Datapoint result = null;
+		
+		try {
+			log.trace("Poll temp queue");
+			result = this.queue.poll(timeout, TimeUnit.MILLISECONDS);
+			log.trace("Result recieved={}", result);
+			if (result==null) {
+				log.error("Timeouterror");
+				throw new Exception("Timeout");
+			}
+		} catch (InterruptedException e) {
+			log.error("Message received", result);
+			throw new Exception(e.getMessage());
+		} finally {
+			this.cell.getFunctionHandler().deregisterActivatorInstance(this);
+		}
+		
+		return result;
+	}
 
 	@Override
 	public CellFunction init(CellFunctionConfig config, Cell cell) throws Exception {

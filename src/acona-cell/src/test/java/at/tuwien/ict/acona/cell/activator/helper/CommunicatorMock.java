@@ -56,11 +56,7 @@ public class CommunicatorMock implements Communicator {
 		return null;
 	}
 
-	@Override
-	public Datapoint query(Datapoint datapoint, String agentName, int timeout) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {
@@ -108,6 +104,13 @@ public class CommunicatorMock implements Communicator {
 	public void unsubscribeDatapoint(String datapointName, String name) throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Datapoint query(Datapoint datapointtowrite, String agentNameToWrite, Datapoint result,
+			String agentNameResult, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

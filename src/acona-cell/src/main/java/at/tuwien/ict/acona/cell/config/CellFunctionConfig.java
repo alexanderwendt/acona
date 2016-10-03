@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.cell.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -130,6 +131,17 @@ public class CellFunctionConfig {
 	
 	public JsonObject toJsonObject() {
 		return this.configObject;
+	}
+	
+	public <DATA_TYPE> DATA_TYPE getProperty(String key, Class<DATA_TYPE> type) {
+        Gson gson = new Gson();
+        
+        return gson.fromJson(this.configObject.get(key), type);
+	}
+	
+	public void setProperty(String key, Object value) {
+		//TODO: Method not tested yet
+		this.configObject.add(key, new Gson().toJsonTree(value));
 	}
 
 	@Override

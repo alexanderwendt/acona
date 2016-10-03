@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.config;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -83,6 +84,18 @@ public class CellConfig {
 		return this.configObject.getAsJsonPrimitive(key).getAsString();
 	}
 	
+	public <DATA_TYPE> DATA_TYPE getProperty(String key, Class<DATA_TYPE> type) {
+        Gson gson = new Gson();
+        
+        return gson.fromJson(this.configObject.get(key), type);
+	}
+	
+	public CellConfig addProperty(String key, Object value) {
+		//TODO: Method not tested yet
+		this.configObject.add(key, new Gson().toJsonTree(value));
+		return this;
+	}
+
 	public JsonObject toJsonObject() {
 		return this.configObject;
 	}

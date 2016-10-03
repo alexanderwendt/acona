@@ -1,14 +1,15 @@
-package at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers;
+package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
 import java.util.Map;
 
 import com.google.gson.JsonElement;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBlockImpl;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class CFDurationTester extends CellFunctionThreadImpl {
+public class CFDurationBlockingTester extends CellFunctionBlockImpl {
 	
 	private String commandDatapoint = "command";	//agtne1.servicehalloworld.command, description
 	private String queryDatapoint = "query";

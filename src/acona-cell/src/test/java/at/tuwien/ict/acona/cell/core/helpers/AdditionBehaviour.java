@@ -9,6 +9,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import _OLD.at.tuwien.ict.acona.cell.activator.jadebehaviour.CellFunctionBehaviourImpl;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Message;
@@ -49,6 +52,54 @@ public class AdditionBehaviour extends CellFunctionBehaviourImpl {
 		log.info("{}> Add {} + {} = {}", this.name, operand1, operand2, result);
 		
 		
+	}
+
+	@Override
+	public CellFunction init(CellFunctionConfig config, Cell cell) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getFunctionName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, DatapointConfig> getSubscribedDatapoints() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setStart() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setStop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setExit() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public CellFunctionConfig getFunctionConfig() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

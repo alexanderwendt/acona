@@ -177,7 +177,8 @@ public class CommunicatorImpl implements Communicator {
 			
 			//Blocking read and write
 			SynchronousQueue<Boolean> queue = new SynchronousQueue<Boolean>();
-			this.cell.addBehaviour(new WriteDatapointBehaviour(this.cell, requestMsg, queue));
+			ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+			this.cell.addBehaviour(tbf.wrap(new WriteDatapointBehaviour(this.cell, requestMsg, queue)));
 			if (blocking==true) {
 				try {
 					boolean writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
@@ -321,15 +322,15 @@ public class CommunicatorImpl implements Communicator {
 		Datapoint result = null;
 		
 		try {
-			SynchronousQueue<Datapoint> queue = new SynchronousQueue<Datapoint>();
+			//SynchronousQueue<Datapoint> queue = new SynchronousQueue<Datapoint>();
 			//Subscribe the result and init queue
-			subscription = new TemporarySubscription(this.cell, datapointwithresult.getAddress(), agentNameResult, timeout, queue);
+			subscription = new TemporarySubscription(this.cell, datapointwithresult.getAddress(), agentNameResult, timeout);
 			
 			//Write the datapoint
 			this.write(datapointtowrite, agentNameToWrite);
 			
 			//Wait for result
-			result = queue.poll(timeout, TimeUnit.MILLISECONDS);
+			result = subscription.getDatapoint();   //queue.poll(timeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 		}
@@ -406,7 +407,7 @@ public class CommunicatorImpl implements Communicator {
 			try {
 				queue.put(true);
 			} catch (InterruptedException e) {
-				log.error("Cannot relese queue", e);
+				log.error("Cannot release queue", e);
 			}
 		}
 	}

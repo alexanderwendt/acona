@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.core.cellfunctionthread.helpers;
+package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
 import java.util.HashMap;
 import java.util.Map;
