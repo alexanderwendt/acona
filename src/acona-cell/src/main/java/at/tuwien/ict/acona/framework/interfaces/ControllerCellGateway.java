@@ -1,10 +1,7 @@
-package at.tuwien.ict.acona.jadelauncher.util;
-
-import java.util.Map;
+package at.tuwien.ict.acona.framework.interfaces;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 public interface ControllerCellGateway {	//extends cellgateway

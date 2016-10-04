@@ -10,6 +10,8 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
+import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
+import at.tuwien.ict.acona.framework.interfaces.KoreExternalController;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
@@ -151,7 +153,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	}
 
 	@Override
-	public void sendCommands() {
+	public void sendUserCommands() {
 		// TODO Auto-generated method stub
 		
 	}

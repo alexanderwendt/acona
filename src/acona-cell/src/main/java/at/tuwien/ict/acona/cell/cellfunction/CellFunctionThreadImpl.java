@@ -58,7 +58,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			cellFunctionInternalInit();
 			
 			//Create a thread from this class
-			t = new Thread(this, this.getFunctionName());
+			t = new Thread(this, this.getCell().getLocalName() + "#" + this.getFunctionName());
 			t.start();
 			
 			log.info("CellFunction {} initilized", this.getFunctionName());

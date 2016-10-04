@@ -17,6 +17,9 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 public abstract class CellFunctionImpl implements CellFunction {
 	
 	protected static Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
+	protected static final String SYNCMODEPUSH = "push";
+	protected static final String SYNCMODEPULL = "pull";
+	
 	/**
 	 * Cell, which executes this function
 	 */
@@ -35,6 +38,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * List of datapoints that shall be subscribed
 	 */
 	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>();	//Variable, datapoint
+	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<String, DatapointConfig>();
 	
 	protected ControlCommand currentCommand = ControlCommand.STOP;
 	protected boolean runAllowed = false;
@@ -62,12 +66,22 @@ public abstract class CellFunctionImpl implements CellFunction {
 			cellFunctionInit();
 			
 			//Get subscriptions from config and add to subscription list
-			this.config.getSubscriptionConfig().forEach(s->{
-				this.subscriptions.put(s.getId(), s);
+			this.config.getSyncDatapoints().forEach(s->{
+				if (s.getSyncMode().equals(SYNCMODEPUSH)) {
+					this.subscriptions.put(s.getId(), s);
+				} else if (s.getSyncMode().equals(SYNCMODEPULL)) {
+					this.syncDatapoints.put(s.getId(), s);
+				} else {
+					try {
+						throw new Exception("No syncmode=" + s.getSyncMode() + ". only pull and push available");
+					} catch (Exception e) {
+						log.error("Cannot set sync mode", e);
+					}
+				}
 			});
 			
-			//Get custom configs
-			
+			//Register in cell
+			this.cell.getFunctionHandler().registerCellFunctionInstance(this);
 		} catch (Exception e) {
 			log.error("Cannot init function with config={}", config);
 			throw new Exception(e.getMessage());
@@ -185,8 +199,23 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return this.getCommunicator().read(address).getValue();
 	}
 	
-	protected String getCustomSetting(String key) {
-		return this.getCell().getConfiguration().get(key).getAsString();
+	protected <T> T readLocalSyncDatapointById(String id, Class<T> type) throws Exception {
+		Gson gson = new Gson();
+	    JsonElement value = this.readLocal(this.getConfig().getSyncDatapointsAsMap().get(id).getAddress()).getValue();
+	    T convertedValue = gson.fromJson(value, type);
+	    
+	    return convertedValue;
+	}
+	
+	protected <T> void writeLocalSyncDatapointById(String id, T value) throws Exception {
+		//Gson gson = new Gson();
+		
+		JsonElement writeValue = new Gson().toJsonTree(value);
+		this.writeLocal(Datapoint.newDatapoint(this.getConfig().getSyncDatapointsAsMap().get(id).getAddress()).setValue(writeValue));
+	}
+	
+	protected <T> T getCustomSetting(String key, Class<T> type) {
+		return this.getConfig().getProperty(name, type);
 	}
 
 	protected Cell getCell() {
@@ -233,6 +262,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 		builder.append(subscriptions);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	protected Map<String, DatapointConfig> getSyncDatapoints() {
+		return syncDatapoints;
 	}
 
 

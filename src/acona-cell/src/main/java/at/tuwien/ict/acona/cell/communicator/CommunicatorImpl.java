@@ -37,6 +37,7 @@ public class CommunicatorImpl implements Communicator {
 	private final CellImpl cell;
 	private final DataStorage datastorage;
 	private final static Gson gson = new Gson();
+	private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 	
 	public CommunicatorImpl(CellImpl cell, DataStorage dataStorage, boolean useThreadedBehaviours) {
 		this.cell = cell;
@@ -105,7 +106,7 @@ public class CommunicatorImpl implements Communicator {
 			
 			//Blocking read and write
 			SynchronousQueue<List<Datapoint>> queue = new SynchronousQueue<List<Datapoint>>();
-			this.cell.addBehaviour(new ReadDatapointBehaviour(this.cell, requestMsg, queue));
+			this.cell.addBehaviour(tbf.wrap(new ReadDatapointBehaviour(this.cell, requestMsg, queue)));
 			try {
 				result.addAll(queue.poll(timeout, TimeUnit.MILLISECONDS));
 				if (result.isEmpty()) {
@@ -154,8 +155,13 @@ public class CommunicatorImpl implements Communicator {
 	}
 
 	@Override
-	public void write(List<Datapoint> datapoints, String agentName, int timeout, boolean blocking) throws Exception {
+	public void write(List<Datapoint> datapoints, String agentComplementedName, int timeout, boolean blocking) throws Exception {
 		//If a local data storage is meant, then write it there, else a foreign data storage is meant.
+		String agentName = agentComplementedName;
+		if (agentComplementedName==null || agentComplementedName.isEmpty() || agentComplementedName.equals("")) {
+			agentName = this.cell.getLocalName();
+		}
+		
 		if (agentName.equals(this.cell.getLocalName())==true) {
 			datapoints.forEach(dp->{this.datastorage.write(dp, this.cell.getLocalName());});
 		} else {
@@ -177,7 +183,7 @@ public class CommunicatorImpl implements Communicator {
 			
 			//Blocking read and write
 			SynchronousQueue<Boolean> queue = new SynchronousQueue<Boolean>();
-			ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+			
 			this.cell.addBehaviour(tbf.wrap(new WriteDatapointBehaviour(this.cell, requestMsg, queue)));
 			if (blocking==true) {
 				try {
@@ -255,12 +261,13 @@ public class CommunicatorImpl implements Communicator {
 			
 			//Blocking read and write
 			SynchronousQueue<List<Datapoint>> queue = new SynchronousQueue<List<Datapoint>>();
-			this.cell.addBehaviour(new SubscribeDatapointBehaviour(this.cell, requestMsg, queue));
+			this.cell.addBehaviour(this.tbf.wrap(new SubscribeDatapointBehaviour(this.cell, requestMsg, queue)));
 			try {
-				result.addAll(queue.poll(this.defaultTimeout, TimeUnit.MILLISECONDS));
-				if (result.isEmpty()) {
+				List<Datapoint> list = queue.poll(this.defaultTimeout, TimeUnit.MILLISECONDS);
+				if (list==null) {
 					throw new Exception("Operation timed out after " + defaultTimeout + "ms.");
 				}
+				result.addAll(list);
 			} catch (InterruptedException e) {
 				log.warn("Queue interrupted");
 			}
@@ -298,7 +305,7 @@ public class CommunicatorImpl implements Communicator {
 					
 			//Blocking read and write
 			SynchronousQueue<Boolean> queue = new SynchronousQueue<Boolean>();
-			this.cell.addBehaviour(new UnsubscribeDatapointBehaviour(this.cell, requestMsg, queue));
+			this.cell.addBehaviour(this.tbf.wrap(new UnsubscribeDatapointBehaviour(this.cell, requestMsg, queue)));
 			try {
 				boolean writeBehaviourFinished = queue.poll(defaultTimeout, TimeUnit.MILLISECONDS);
 				if (writeBehaviourFinished==false) {
@@ -352,7 +359,7 @@ public class CommunicatorImpl implements Communicator {
 			super(a, msg);
 			msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 			this.queue = queue;
-			log.trace("Ready to send write message.");
+			log.trace("Ready to send write to agent={}, message={}", msg.getAllReceiver(), msg.getContent());
 		}
 		
 		protected void handleAgree(ACLMessage msg) {

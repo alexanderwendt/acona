@@ -5,9 +5,12 @@ import com.google.gson.JsonObject;
 public class DatapointConfig {
 	public final static String LOCALAGENTNAME = "";
 	
+	public final static String DEFAULTSYNCMODE = "pull";
+	
 	public static final String ID = "id";
 	public static final String ADDRESS = "address";
 	public static final String AGENTID = "agentid";
+	public static final String SYNCMODE = "syncmode";	//pull, push, "" oder null
 	
 	//Keep the jsonobject in order to be able to add more settings. If only a class is used, flexibility is lost for creating
 	//new json
@@ -15,32 +18,38 @@ public class DatapointConfig {
 	private final JsonObject configObject;	
 	
 	public static DatapointConfig newConfig(String name, String address) {
-		return new DatapointConfig(name, address);
+		return new DatapointConfig(name, address, LOCALAGENTNAME, DEFAULTSYNCMODE);
 	}
 	
-	public static DatapointConfig newConfig(String name, String address, String agentid) {
-		return new DatapointConfig(name, address, agentid);
+	public static DatapointConfig newConfig(String name, String address, String agentid, String syncmode) {
+		return new DatapointConfig(name, address, agentid, syncmode);
+	}
+	
+	public static DatapointConfig newConfig(String name, String address, String syncmode) {
+		return new DatapointConfig(name, address, LOCALAGENTNAME, syncmode);
 	}
 	
 	public static DatapointConfig newConfig(JsonObject config) throws Exception {
 		return new DatapointConfig(config);
 	}
 	
-	private DatapointConfig(String id, String address, String agentid) {
+	private DatapointConfig(String id, String address, String agentid, String syncmode) {
 		super();
 		this.configObject = new JsonObject();
 		this.setId(id);
 		this.setAddress(address);
 		this.setAgentId(agentid);
+		this.setSyncMode(syncmode);
 	}
 	
-	private DatapointConfig(String id, String address) {
-		super();
-		this.configObject = new JsonObject();
-		this.setId(id);
-		this.setAddress(address);
-		this.setAgentId(LOCALAGENTNAME);
-	}
+//	private DatapointConfig(String id, String address) {
+//		super();
+//		this.configObject = new JsonObject();
+//		this.setId(id);
+//		this.setAddress(address);
+//		this.setAgentId(LOCALAGENTNAME);
+//		this.setSyncMode(DEFAULTSYNCMODE);
+//	}
 	
 	private DatapointConfig(JsonObject config) throws Exception {
 		super();
@@ -67,6 +76,10 @@ public class DatapointConfig {
 	private void setAgentId(String id) {
 		this.configObject.addProperty(AGENTID, id);
 	}
+	
+	private void setSyncMode(String mode) {
+		this.configObject.addProperty(SYNCMODE, mode);
+	}
 
 	public String getId() {
 		return this.configObject.get(ID).getAsString();
@@ -78,6 +91,10 @@ public class DatapointConfig {
 
 	public String getAgentid() {
 		return this.configObject.get(AGENTID).getAsString();
+	}
+	
+	public String getSyncMode() {
+		return this.configObject.get(SYNCMODE).getAsString();
 	}
 	
 	public JsonObject toJsonObject() {

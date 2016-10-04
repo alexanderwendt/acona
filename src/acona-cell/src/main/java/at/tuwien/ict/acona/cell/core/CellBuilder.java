@@ -60,8 +60,6 @@ public class CellBuilder {
 						throw new NullPointerException("activator does not exist");
 					}
 					
-					caller.getFunctionHandler().registerCellFunctionInstance(cellfunction);
-					
 				} catch (Exception e) {
 					log.error("Cannot create activator from {}", activatorConfig, e);
 				}	

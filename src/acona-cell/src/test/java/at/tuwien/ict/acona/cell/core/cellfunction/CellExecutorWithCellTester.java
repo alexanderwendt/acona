@@ -91,9 +91,9 @@ public class CellExecutorWithCellTester {
 			//Create Database agents 1-2
 			CellConfig testagent = CellConfig.newConfig("testagent", CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-							.addSubscription(DatapointConfig.newConfig("command", commandDatapoint))
-							.addSubscription(DatapointConfig.newConfig("query", queryDatapoint))
-							.addSubscription(DatapointConfig.newConfig("executeonce", executeonceDatapoint))
+							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, "push"))
+							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, "push"))
+							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, "push"))
 							.setProperty("result", resultDatapoint));
 			CellGatewayImpl testAgent = this.launcher.createAgent(testagent);
 			
@@ -150,9 +150,9 @@ public class CellExecutorWithCellTester {
 			//Create Database agents 1-2
 			CellConfig testagent = CellConfig.newConfig("testagent", CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationBlockingTester.class)
-							.addSubscription(DatapointConfig.newConfig("command", commandDatapoint))
-							.addSubscription(DatapointConfig.newConfig("query", queryDatapoint))
-							.addSubscription(DatapointConfig.newConfig("executeonce", executeonceDatapoint))
+							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, "push"))
+							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, "push"))
+							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, "push"))
 							.setProperty("result", resultDatapoint));
 			CellGatewayImpl testAgent = this.launcher.createAgent(testagent);
 			
@@ -248,7 +248,7 @@ public class CellExecutorWithCellTester {
 			//Create the addition agent with the addition function that reads from 2 different datapoints at 2 agents, calculates and then puts the values in a 3rd output agent
 			CellConfig additionAgent = CellConfig.newConfig(additionAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(CFAdditionServiceSimple.class)
-							.addSubscription(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint))
+							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint, "push"))
 							.setProperty(STATUSDATAPOINTNAME, statedatapoint)
 							.setProperty(OPERAND1, DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1).toJsonObject())
 							.setProperty(OPERAND2, DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2).toJsonObject())
@@ -346,7 +346,7 @@ public class CellExecutorWithCellTester {
 			//Create the addition agent with the addition function that reads from 2 different datapoints at 2 agents, calculates and then puts the values in a 3rd output agent
 			CellConfig additionAgent = CellConfig.newConfig(additionAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(CFAdditionServiceBlockingSimple.class)
-							.addSubscription(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint))
+							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint, "push"))
 							.setProperty(STATUSDATAPOINTNAME, statedatapoint)
 							.setProperty(OPERAND1, DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1).toJsonObject())
 							.setProperty(OPERAND2, DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2).toJsonObject())

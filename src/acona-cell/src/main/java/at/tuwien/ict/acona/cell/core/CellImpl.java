@@ -139,6 +139,7 @@ public class CellImpl extends Agent implements CellInitialization, DataStorageSu
 			//Create behaviors
 			this.comm = new CommunicatorImpl(this, this.dataStorage, true);	
 			
+			//FIXME: In the function init, subscriptions shall be performed. However, as long as initAsBehaviour is running no new behaviours can be added
 			ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 			this.addBehaviour(tbf.wrap(new initAsBehaviour()));
 			//FIXME: nonthreaded behaviours an optional celloption. There is a problem with the blocking behaviours. They block each other 

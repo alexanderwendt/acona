@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
@@ -37,7 +36,7 @@ public class TemporarySubscription implements CellFunction {
 		//this.agentName = agentName;
 		this.timeout = timeout;
 		//Register datapoint
-		this.subscriptions.put(this.subscriptionAddress, DatapointConfig.newConfig(this.subscriptionAddress, this.subscriptionAddress, agentName));
+		this.subscriptions.put(this.subscriptionAddress, DatapointConfig.newConfig(this.subscriptionAddress, this.subscriptionAddress, agentName, "push"));
 		
 		//Register in cell activator
 		this.cell.getFunctionHandler().registerCellFunctionInstance(this);
@@ -67,8 +66,7 @@ public class TemporarySubscription implements CellFunction {
 
 	@Override
 	public CellFunction init(CellFunctionConfig config, Cell cell) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -117,7 +115,6 @@ public class TemporarySubscription implements CellFunction {
 	@Override
 	public CellFunctionConfig getFunctionConfig() {
 		throw new UnsupportedOperationException();
-		//return null;
 	}	
 	
 	

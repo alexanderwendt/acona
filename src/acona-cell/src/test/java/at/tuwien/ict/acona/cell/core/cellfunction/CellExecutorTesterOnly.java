@@ -54,9 +54,9 @@ public class CellExecutorTesterOnly {
 			String executeonceDatapoint = "datapoint.executeonce";
 
 			CellFunctionConfig config = CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-					.addSubscription(DatapointConfig.newConfig("command", commandDatapoint))
-					.addSubscription(DatapointConfig.newConfig("query", queryDatapoint))
-					.addSubscription(DatapointConfig.newConfig("executeonce", executeonceDatapoint));
+					.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, "push"))
+					.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, "push"))
+					.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, "push"));
 			
 //			Map<String, List<Condition>> subscriptions = new HashMap<String, List<Condition>>();
 //			subscriptions.put(commandDatapoint, new ArrayList<Condition>());

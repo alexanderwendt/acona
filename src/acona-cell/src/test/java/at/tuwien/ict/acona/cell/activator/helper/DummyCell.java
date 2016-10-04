@@ -26,6 +26,10 @@ public class DummyCell implements CellInitialization {
 	private Communicator comm = new CommunicatorMock(this);
 	private CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
 	
+	public DummyCell() {
+		activationHandler.init(this);
+	}
+	
 	@Override
 	public DataStorage getDataStorage() {
 		return data;
@@ -108,6 +112,12 @@ public class DummyCell implements CellInitialization {
 	@Override
 	public void setupCellFunctions(CellConfig conf) throws Exception {
 		this.conf = conf;
+		
+	}
+
+	@Override
+	public void registerService(String name) {
+		// TODO Auto-generated method stub
 		
 	}
 

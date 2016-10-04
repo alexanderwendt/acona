@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.jadelauncher.util;
+package at.tuwien.ict.acona.framework.interfaces;
 
 import com.google.gson.JsonObject;
 
@@ -16,5 +16,5 @@ public interface KoreExternalController {
 	public ControllerCellGateway getTopController();
 	
 	
-	public void sendCommands();
+	public void sendUserCommands();
 }

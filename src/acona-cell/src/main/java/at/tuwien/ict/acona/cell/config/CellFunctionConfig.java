@@ -1,7 +1,9 @@
 package at.tuwien.ict.acona.cell.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -11,11 +13,11 @@ import com.google.gson.JsonPrimitive;
 public class CellFunctionConfig {
 	public static final String CELLFUNCTIONNAME = "functionname";
 	public static final String CELLFUNCTIONCLASS = "functionclass";
-	public static final String CELLSUBSCRIPTIONS = "subscriptions";
+	public static final String CELLSYNCDATAPOINTS = "syncdatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
 	
-	private final JsonObject configObject;
+	protected final JsonObject configObject;
 	
 	public static CellFunctionConfig newConfig(String name, String className) {
 		return new CellFunctionConfig(name, className);
@@ -43,7 +45,7 @@ public class CellFunctionConfig {
 	
 	private CellFunctionConfig(String name, String className) {
 		this.configObject= new JsonObject();
-		this.configObject.add(CELLSUBSCRIPTIONS, new JsonArray());
+		this.configObject.add(CELLSYNCDATAPOINTS, new JsonArray());
 		this.setName(name).setClassName(className);
 	}
 	
@@ -71,9 +73,13 @@ public class CellFunctionConfig {
 		return this;
 	}
 	
-	public CellFunctionConfig addSubscription(DatapointConfig config) {
-		this.configObject.getAsJsonArray(CELLSUBSCRIPTIONS).add(config.toJsonObject());
+	public CellFunctionConfig addSyncDatapoint(DatapointConfig config) {
+		this.configObject.getAsJsonArray(CELLSYNCDATAPOINTS).add(config.toJsonObject());
 		return this;
+	}
+	
+	public CellFunctionConfig addSyncDatapoint(String address) {
+		return this.addSyncDatapoint(DatapointConfig.newConfig(address, address));
 	}
 	
 	public CellFunctionConfig setProperty(String name, String value) {
@@ -102,8 +108,18 @@ public class CellFunctionConfig {
 		return this.configObject.getAsJsonPrimitive(CELLEXECUTERATE);
 	}
 	
-	public List<DatapointConfig> getSubscriptionConfig() {
-		JsonArray array = this.configObject.getAsJsonArray(CELLSUBSCRIPTIONS);
+	public Map<String, DatapointConfig> getSyncDatapointsAsMap() {
+		Map<String, DatapointConfig> result = new HashMap<String, DatapointConfig>();
+		
+		this.getSyncDatapoints().forEach(s->{
+			result.put(s.getId(), s);
+		});
+		
+		return result;
+	}
+	
+	public List<DatapointConfig> getSyncDatapoints() {
+		JsonArray array = this.configObject.getAsJsonArray(CELLSYNCDATAPOINTS);
 		//Gson gson = new Gson();
 		//Type type = new TypeToken<List<SubscriptionConfig>>(){}.getType();
 		//List<SubscriptionConfig> configList = gson.fromJson(array, type);
