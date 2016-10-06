@@ -1,8 +1,6 @@
 package at.tuwien.ict.acona.framework.modules;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
@@ -19,11 +17,22 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  * 5. At command, start function
  * 6. At end, write subscribed datapoints to remote datapoints from local datapoints
  * 
+ * Methods for custom settings access:
+ * Get custom property: this.getConfig().getProperty(key, classtype)
+ * Get custom property: String configvalue = this.getCustomSetting("test", String.class);
+ * Set custom propery: this.getConfig().setProperty(key, value);
+ *  
+ * Methods for data access:
+ * JsonElement value = this.readLocalSyncDatapointById([STRING ID FROM CONFIG], [ClassType]);
+ * this.writeLocalSyncDatapointById([STRING ID FROM CONFIG, [value of Gson-convertable type]);
+ * 
+ * Implementing custom services
+ * implement abstract class AconaService
  * 
  * @author wendt
  *
  */
-public abstract class AconaServiceWithSubscribers extends CellFunctionThreadImpl {
+public abstract class AconaService extends CellFunctionThreadImpl {
 
 	private static String COMMANDDATAPOINTNAME = "command";
 	private static String STATEDATAPOINTNAME = "state";
@@ -40,7 +49,14 @@ public abstract class AconaServiceWithSubscribers extends CellFunctionThreadImpl
 		initServiceDatapoints(this.getFunctionName());
 		//3. Subscribe custom datapoints for this function
 		//This should be done in the config file
+		//Init the table for read datapoints
+//		this.getConfig().getSyncDatapoints().forEach(dpconfig->{
+//			this.getSubscribedDatapoints().put(dpconfig.getId(), dpconfig);
+//		});
+		
 		serviceInit();
+		
+		
 		
 	}
 	
@@ -72,7 +88,7 @@ public abstract class AconaServiceWithSubscribers extends CellFunctionThreadImpl
 	@Override
 	protected void executePostProcessing() throws Exception {
 		 // 6. At end, write subscribed datapoints to remote datapoints from local datapoints
-		this.getSubscribedDatapoints().values().forEach(config->{
+		this.getSyncDatapoints().values().forEach(config->{
 			try {
 				Datapoint dp = this.readLocal(config.getAddress());
 				String agentName=config.getAgentid();
@@ -89,7 +105,21 @@ public abstract class AconaServiceWithSubscribers extends CellFunctionThreadImpl
 
 	@Override
 	protected void executePreProcessing() throws Exception {
-		log.debug("Preprocessing");
+		//Read all values from the store or other agent
+		log.trace("Start preprocessing by reading function variables={}", this.getSyncDatapoints());
+		this.getReadDatapoints().forEach((k, v)->{
+			try {
+				//Read the remote datapoint
+				if (v.getAgentid().equals(this.getCell().getLocalName())==false) {
+					Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid());
+					//Write local value to synchronize the datapoints
+					this.writeLocal(temp);
+					log.debug("Read datapoint={}", temp);
+				}
+			} catch (Exception e) {
+				log.error("Cannot read datapoint={}", v);
+			}
+		});
 		
 	}
 
@@ -102,11 +132,10 @@ public abstract class AconaServiceWithSubscribers extends CellFunctionThreadImpl
 			} catch (Exception e) {
 				log.error("Cannot execute command={}", data.get(COMMANDDATAPOINTNAME).getValueAsString(), e);
 			}
+		} else {
+			log.info("Datapoint {} was received", data);
 		}
-		//5. At command, start function
-		
-		
-		
+
 		
 	}
 

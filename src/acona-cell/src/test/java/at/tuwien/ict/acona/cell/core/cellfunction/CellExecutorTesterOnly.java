@@ -3,9 +3,7 @@ package at.tuwien.ict.acona.cell.core.cellfunction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
@@ -14,27 +12,25 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.activator.helper.DummyCell;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
-import at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
+import at.tuwien.ict.acona.cell.core.helpers.DummyCell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellExecutorTesterOnly {
 	private static Logger log = LoggerFactory.getLogger(CellExecutorTesterOnly.class);
 	private CellFunctionThreadImpl executor;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		log.info("Start cell activator tester");
 		try {
-			//Setup activationhandler
+			// Setup activationhandler
 			executor = new CFDurationThreadTester();
-			
-			
+
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
 		}
@@ -44,7 +40,7 @@ public class CellExecutorTesterOnly {
 	public void tearDown() throws Exception {
 		executor.setExit();
 	}
-	
+
 	@Test
 	public void executorExecuteOnceTest() {
 		log.debug("Start executorExecuteOnceTest");
@@ -57,49 +53,53 @@ public class CellExecutorTesterOnly {
 					.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, "push"))
 					.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, "push"))
 					.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, "push"));
-			
-//			Map<String, List<Condition>> subscriptions = new HashMap<String, List<Condition>>();
-//			subscriptions.put(commandDatapoint, new ArrayList<Condition>());
-//			subscriptions.put(queryDatapoint, new ArrayList<Condition>());
-//			subscriptions.put(executeonceDatapoint, new ArrayList<Condition>());
-			
-			
-			
+
+			// Map<String, List<Condition>> subscriptions = new HashMap<String,
+			// List<Condition>>();
+			// subscriptions.put(commandDatapoint, new ArrayList<Condition>());
+			// subscriptions.put(queryDatapoint, new ArrayList<Condition>());
+			// subscriptions.put(executeonceDatapoint, new
+			// ArrayList<Condition>());
+
 			DummyCell cell = new DummyCell();
-			
+
 			this.executor.init(config, cell);
-			//executor.initWithConditions("testexecutor", subscriptions, "", null, cell);
-			
-			//Start the executor with anything just to see
-			//Create a datapoint to start the function
+			// executor.initWithConditions("testexecutor", subscriptions, "",
+			// null, cell);
+
+			// Start the executor with anything just to see
+			// Create a datapoint to start the function
 			Map<String, Datapoint> map = new HashMap<String, Datapoint>();
-			map.put(commandDatapoint, Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()));		
-			this.executor.updateData(map);//.runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
-			
-			//Put a delay to mitigate thread troubles
+			map.put(commandDatapoint,
+					Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()));
+			this.executor.updateData(map);// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
+
+			// Put a delay to mitigate thread troubles
 			synchronized (this) {
 				try {
 					this.wait(10);
 				} catch (InterruptedException e) {
-					
+
 				}
 			}
-			
-			//Now run something that is purposeful
+
+			// Now run something that is purposeful
 			map.clear();
-			map.put(queryDatapoint, Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
+			map.put(queryDatapoint, Datapoint.newDatapoint(queryDatapoint)
+					.setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
 			this.executor.updateData(map);
-			//this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
-			
+			// this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT
+			// * FROM ICT DATABASE AND DELETE FILESERVER"));
+
 			log.debug("wait for agent to answer");
 			synchronized (this) {
 				try {
 					this.wait(2000);
 				} catch (InterruptedException e) {
-					
+
 				}
 			}
-			
+
 			String result = cell.getDataStorage().read("datapoint.result").getValue().getAsString();
 			log.info("Shall match={}, Received result={}", "FINISHED", result);
 			assertEquals("FINISHED", result);

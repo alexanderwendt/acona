@@ -82,6 +82,10 @@ public class CellFunctionConfig {
 		return this.addSyncDatapoint(DatapointConfig.newConfig(address, address));
 	}
 	
+	public CellFunctionConfig addSyncDatapoint(String id, String address, String agentId, String syncMode) {
+		return this.addSyncDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
+	}
+	
 	public CellFunctionConfig setProperty(String name, String value) {
 		this.configObject.addProperty(name, value);
 		return this;
@@ -139,6 +143,16 @@ public class CellFunctionConfig {
 	
 	public String getProperty(String key) {
 		return this.configObject.getAsJsonPrimitive(key).getAsString();
+	}
+	
+	public String getProperty(String key, String defaultValue) {
+		String result = defaultValue;
+		
+		if (configObject.has(key)) {
+			result = this.configObject.getAsJsonPrimitive(key).getAsString();
+		}
+		
+		return result;
 	}
 	
 	public JsonObject getPropertyAsJsonObject(String key) {

@@ -38,6 +38,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * List of datapoints that shall be subscribed
 	 */
 	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>();	//Variable, datapoint
+	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>();	//Variable, datapoint
 	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<String, DatapointConfig>();
 	
 	protected ControlCommand currentCommand = ControlCommand.STOP;
@@ -70,7 +71,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 				if (s.getSyncMode().equals(SYNCMODEPUSH)) {
 					this.subscriptions.put(s.getId(), s);
 				} else if (s.getSyncMode().equals(SYNCMODEPULL)) {
-					this.syncDatapoints.put(s.getId(), s);
+					this.readDatapoints.put(s.getId(), s);
 				} else {
 					try {
 						throw new Exception("No syncmode=" + s.getSyncMode() + ". only pull and push available");
@@ -78,6 +79,9 @@ public abstract class CellFunctionImpl implements CellFunction {
 						log.error("Cannot set sync mode", e);
 					}
 				}
+				
+				syncDatapoints.put(s.getId(), s);
+				
 			});
 			
 			//Register in cell
@@ -266,6 +270,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected Map<String, DatapointConfig> getSyncDatapoints() {
 		return syncDatapoints;
+	}
+
+	protected Map<String, DatapointConfig> getReadDatapoints() {
+		return readDatapoints;
 	}
 
 

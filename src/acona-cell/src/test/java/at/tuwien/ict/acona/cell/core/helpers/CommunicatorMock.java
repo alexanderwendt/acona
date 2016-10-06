@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.activator.helper;
+package at.tuwien.ict.acona.cell.core.helpers;
 
 import java.util.List;
 
