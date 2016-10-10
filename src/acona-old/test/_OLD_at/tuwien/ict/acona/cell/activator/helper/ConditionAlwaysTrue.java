@@ -1,4 +1,4 @@
-package OLD_at.tuwien.ict.acona.cell.activator.helper;
+package _OLD_at.tuwien.ict.acona.cell.activator.helper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import _OLD_at.tuwien.ict.acona.cell.cellfunction.special.ConditionImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class ConditionIsOne extends ConditionImpl {
-	private static Logger log = LoggerFactory.getLogger(ConditionIsOne.class);
+public class ConditionAlwaysTrue extends ConditionImpl {
+	private static Logger log = LoggerFactory.getLogger(ConditionAlwaysTrue.class);
 
 	@Override
 	protected void subInit() {
@@ -19,24 +19,13 @@ public class ConditionIsOne extends ConditionImpl {
 	}
 
 	@Override
-	public boolean testCondition(Datapoint data) throws Exception {
-		boolean result = false;
-		
-		try {
-			if (data.getValue().getAsString().isEmpty()==false && data.getValue().getAsDouble()==1) {
-				result = true;
-			}
-		} catch (Exception e) {
-			log.error("Cannot execute condition. It should be programmed not to throw exceptions", e);
-		}
-
-		
-		return result;
+	public boolean testCondition(Datapoint data) {
+		return true;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Condition to return true if number is 1.0";
+		return "Dummy condition";
 	}
 
 }

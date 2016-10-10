@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
@@ -57,9 +58,13 @@ public class CellBuilderTester {
 			// Create the cell
 			CellConfig cellConfig = CellConfig.newConfig("testcell", DummyCell.class);
 			cellConfig.addProperty("testproperty1", "10000");
-			cellConfig.addCellfunction(CellFunctionConfig.newConfig("function1", DummyFunction.class)
-					.addSyncDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value", )).setExecuteOnce(true)
-					.setExecuterate(500).setProperty("TESTPROPERTY1", "valuesuccess"));
+			cellConfig
+					.addCellfunction(
+							CellFunctionConfig.newConfig("function1", DummyFunction.class)
+									.addSyncDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value",
+											SyncMode.push))
+									.setExecuteOnce(true).setExecuterate(500)
+									.setProperty("TESTPROPERTY1", "valuesuccess"));
 
 			log.info("Config={}", cellConfig);
 

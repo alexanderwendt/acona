@@ -1,8 +1,8 @@
-package at.tuwien.ict.acona.cell.testing;
+package _OLD_at.tuwien.ict.acona.cell.testing;
 
 import _OLD.at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
+import _OLD_at.tuwien.ict.acona.cell.core.behaviours.AconaLoggingServiceResponder;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.behaviours.AconaLoggingServiceResponder;
 import at.tuwien.ict.acona.cell.datastructures.Message;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import jade.core.behaviours.ThreadedBehaviourFactory;

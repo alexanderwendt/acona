@@ -4,9 +4,9 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.framework.modules.AconaService;
+import at.tuwien.ict.acona.framework.modules.AconaFunctionService;
 
-public class CFIncrementService extends AconaService {
+public class CFIncrementService extends AconaFunctionService {
 
 	private static final String INCREMENTATIONDATAPOINTNAME = "increment";
 	private static final String R = "rawdata";

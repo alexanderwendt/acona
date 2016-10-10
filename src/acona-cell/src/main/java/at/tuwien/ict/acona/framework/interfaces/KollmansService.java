@@ -1,8 +1,8 @@
 package at.tuwien.ict.acona.framework.interfaces;
 
-import at.tuwien.ict.acona.framework.modules.AconaService;
+import at.tuwien.ict.acona.framework.modules.AconaFunctionService;
 
-public class KollmansService extends AconaService {
+public class KollmansService extends AconaFunctionService {
 
 	
 	private final static String COUNTER = "counter";	//=kollmannsservice.variables.counter.value

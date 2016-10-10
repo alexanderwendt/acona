@@ -1,4 +1,4 @@
-package OLD_at.tuwien.ict.acona.cell.activator;
+package _OLD_at.tuwien.ict.acona.cell.activator;
 
 import static org.junit.Assert.*;
 
@@ -13,11 +13,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import OLD_at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysFalse;
-import OLD_at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysTrue;
-import OLD_at.tuwien.ict.acona.cell.activator.helper.ConditionIsOne;
 import _OLD.at.tuwien.ict.acona.cell.activator.Activator;
 import _OLD.at.tuwien.ict.acona.cell.activator.jadebehaviour.ActivatorJADEBehaviourImpl;
+import _OLD_at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysFalse;
+import _OLD_at.tuwien.ict.acona.cell.activator.helper.ConditionAlwaysTrue;
+import _OLD_at.tuwien.ict.acona.cell.activator.helper.ConditionIsOne;
 import _OLD_at.tuwien.ict.acona.cell.cellfunction.special.Condition;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;

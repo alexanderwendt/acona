@@ -1,9 +1,7 @@
-package at.tuwien.ict.acona.cell.core.behaviours;
+package _OLD_at.tuwien.ict.acona.cell.core.behaviours;
 
-import _OLD.at.tuwien.ict.acona.cell.core.service.AconaServiceInterface;
-import _OLD_at.tuwien.ict.acona.cell.core.behaviours.AconaServiceResponder;
+import _OLD_at.tuwien.ict.acona.cell.testing.GlobalLogger;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.testing.GlobalLogger;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
@@ -18,7 +16,7 @@ public class AconaLoggingServiceResponder extends AconaServiceResponder {
 	@Override
 	protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
 		GlobalLogger.log(getAgent(), request);
-		
+
 		return super.handleRequest(request);
-	}	
+	}
 }
