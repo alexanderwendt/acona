@@ -2,8 +2,8 @@ package at.tuwien.ict.acona.jadelauncher.util;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,18 +37,18 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	/**
 	 * Map with container name and ContainerController
 	 */
-	private final Map<String, ContainerController> agentContainerMap = new HashMap<String, ContainerController>();
+	private final Map<String, ContainerController> agentContainerMap = new ConcurrentHashMap<String, ContainerController>();
 	/**
 	 * Map with all agent controllers from JADE
 	 */
-	private final Map<String, AgentController> agentControllerMap = new HashMap<String, AgentController>();
-	private final Map<String, CellGatewayImpl> externalAgentControllerMap = new HashMap<String, CellGatewayImpl>();
+	private final Map<String, AgentController> agentControllerMap = new ConcurrentHashMap<String, AgentController>();
+	private final Map<String, CellGatewayImpl> externalAgentControllerMap = new ConcurrentHashMap<String, CellGatewayImpl>();
 
 	private String topController = "";
 
-	private final Map<String, CellGateway> controllerAgents = new HashMap<String, CellGateway>();
-	private final Map<String, CellGateway> serviceAgents = new HashMap<String, CellGateway>();
-	private final Map<String, CellGateway> memoryAgents = new HashMap<String, CellGateway>();
+	private final Map<String, CellGateway> controllerAgents = new ConcurrentHashMap<String, CellGateway>();
+	private final Map<String, CellGateway> serviceAgents = new ConcurrentHashMap<String, CellGateway>();
+	private final Map<String, CellGateway> memoryAgents = new ConcurrentHashMap<String, CellGateway>();
 
 	private String defaultContainer = "";
 
@@ -117,7 +117,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 
 	// === Agent methods ===//
 
-	public CellGatewayImpl createAgent(CellConfig cellConfig) throws Exception {
+	public synchronized CellGatewayImpl createAgent(CellConfig cellConfig) throws Exception {
 		// Create the object
 		CellGatewayImpl externalController = new CellGatewayImpl();
 
@@ -137,7 +137,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	}
 
 	@Override
-	public void executeUserInput(String command, String parameter) {
+	public synchronized void executeUserInput(String command, String parameter) {
 		throw new UnsupportedOperationException();
 
 	}
@@ -148,7 +148,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	}
 
 	@Override
-	public KoreExternalController init(String absolutefilePath) {
+	public synchronized KoreExternalController init(String absolutefilePath) {
 		JsonReader reader;
 		try {
 			reader = new JsonReader(new FileReader(absolutefilePath));
@@ -165,7 +165,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	}
 
 	@Override
-	public CellGateway getAgent(String localName) {
+	public synchronized CellGateway getAgent(String localName) {
 		return externalAgentControllerMap.get(localName);
 	}
 
@@ -175,7 +175,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	}
 
 	@Override
-	public KoreExternalController init(SystemConfig config) {
+	public synchronized KoreExternalController init(SystemConfig config) {
 
 		// Set top controller
 		this.setTopController(config.getTopController());

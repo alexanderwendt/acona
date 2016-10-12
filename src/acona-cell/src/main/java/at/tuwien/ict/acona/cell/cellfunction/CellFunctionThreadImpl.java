@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author wendt
  * 
@@ -10,6 +13,8 @@ package at.tuwien.ict.acona.cell.cellfunction;
  *
  */
 public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements Runnable {
+
+	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 
 	private Thread t;
 

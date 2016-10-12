@@ -3,8 +3,12 @@ package at.tuwien.ict.acona.framework.modules;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -32,14 +36,17 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  */
 public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 
-	private static String COMMANDDATAPOINTNAME = "command";
-	private static String STATEDATAPOINTNAME = "state";
-	private static String DESCRIPTIONDATAPOINTNAME = "description";
-	private static String PARAMETERDATAPOINTNAME = "parameter";
-	private static String CONFIGDATAPOINTNAME = "config";
+	private static Logger log = LoggerFactory.getLogger(AconaFunctionService.class);
+
+	private String COMMANDDATAPOINTNAME = "command";
+	private String STATEDATAPOINTNAME = "state";
+	private String DESCRIPTIONDATAPOINTNAME = "description";
+	private String PARAMETERDATAPOINTNAME = "parameter";
+	private String CONFIGDATAPOINTNAME = "config";
 
 	@Override
 	protected void cellFunctionInternalInit() throws Exception {
+		log.debug("{}> Init service", this.getFunctionName());
 		// 1. Register DF service from function name
 		// this.getCell().registerService(this.getFunctionName());
 		// 2. Initialize=subscribe datapoints to offer with start values
@@ -53,6 +60,8 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 
 		serviceInit();
 
+		log.debug("{}> Service initialized", this.getFunctionName());
+
 	}
 
 	protected abstract void serviceInit();
@@ -62,25 +71,22 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 		STATEDATAPOINTNAME = serviceName + "." + "state";
 		DESCRIPTIONDATAPOINTNAME = serviceName + "." + "description";
 		PARAMETERDATAPOINTNAME = serviceName + "." + "parameter";
-		CONFIGDATAPOINTNAME = serviceName + "." + "parameter";
+		CONFIGDATAPOINTNAME = serviceName + "." + "config";
 
 		Datapoint command = Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
 		Datapoint state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.STOPPED.toString());
-		Datapoint description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME)
-				.setValue("Service " + this.getFunctionName());
+		Datapoint description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
 		Datapoint parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
 		Datapoint config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
 
-		this.getSubscribedDatapoints().put(command.getAddress(),
-				DatapointConfig.newConfig(command.getAddress(), command.getAddress()));
-		this.getSubscribedDatapoints().put(state.getAddress(),
-				DatapointConfig.newConfig(state.getAddress(), state.getAddress()));
-		this.getSubscribedDatapoints().put(description.getAddress(),
-				DatapointConfig.newConfig(description.getAddress(), description.getAddress()));
-		this.getSubscribedDatapoints().put(parameter.getAddress(),
-				DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress()));
-		this.getSubscribedDatapoints().put(config.getAddress(),
-				DatapointConfig.newConfig(config.getAddress(), config.getAddress()));
+		log.trace("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}", command.getAddress(), state.getAddress(), description.getAddress(),
+				parameter.getAddress(), config.getAddress());
+
+		this.getSubscribedDatapoints().put(command.getAddress(), DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(state.getAddress(), DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(description.getAddress(), DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(parameter.getAddress(), DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(config.getAddress(), DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.push));
 
 		this.getCommunicator().write(Arrays.asList(command, state, description, parameter, config));
 
@@ -89,7 +95,7 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 	@Override
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
-		log.trace("Start preprocessing by reading function variables={}", this.getSyncDatapoints());
+		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
 		this.getReadDatapoints().forEach((k, v) -> {
 			try {
 				// Read the remote datapoint
@@ -97,10 +103,10 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 					Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid());
 					// Write local value to synchronize the datapoints
 					this.writeLocal(temp);
-					log.debug("Read datapoint={}", temp);
+					log.trace("{}> Preprocessing phase: Read datapoint and write local={}", temp);
 				}
 			} catch (Exception e) {
-				log.error("Cannot read datapoint={}", v);
+				log.error("{}>Cannot read datapoint={}", this.getFunctionName(), v, e);
 			}
 		});
 
@@ -108,16 +114,17 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executePostProcessing() throws Exception {
+		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getReadDatapoints());
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
-		this.getSyncDatapoints().values().forEach(config -> {
+		this.getReadDatapoints().values().forEach(config -> {
 			try {
 				Datapoint dp = this.readLocal(config.getAddress());
 				String agentName = config.getAgentid();
 				this.getCommunicator().write(dp, agentName);
-				log.trace("Written datapoint={} to agent={}", dp, agentName);
+				log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 			} catch (Exception e) {
-				log.error("Cannot write datapoint {} to remote memory module", config, e);
+				log.error("{}>Cannot write datapoint {} to remote memory module", this.getFunctionName(), config, e);
 			}
 		});
 
@@ -125,20 +132,22 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 				.setValue(ControlCommand.PAUSE.toString()));
 		this.writeLocal(Datapoint.newDatapoint(this.getSubscribedDatapoints().get(STATEDATAPOINTNAME).getAddress())
 				.setValue(ServiceState.STOPPED.toString()));
+
+		log.info("{}>Service execution finished", this.getFunctionName());
 	}
 
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
+		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, COMMANDDATAPOINTNAME);
 		// 4. If update datapoints is executed, do start command or other update
-		if (data.containsKey(COMMANDDATAPOINTNAME)
-				&& data.get(COMMANDDATAPOINTNAME).getValue().toString().equals("{}") == false) {
+		if (data.containsKey(COMMANDDATAPOINTNAME) && data.get(COMMANDDATAPOINTNAME).getValue().toString().equals("{}") == false) {
 			try {
 				this.setCommand(data.get(COMMANDDATAPOINTNAME).getValueAsString());
 			} catch (Exception e) {
-				log.error("Cannot execute command={}", data.get(COMMANDDATAPOINTNAME).getValueAsString(), e);
+				log.error("{}>Cannot execute command={}", this.getFunctionName(), data.get(COMMANDDATAPOINTNAME).getValueAsString(), e);
 			}
 		} else {
-			log.info("Datapoint {} was received", data);
+			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(), this.getSubscribedDatapoints().values());
 		}
 
 	}

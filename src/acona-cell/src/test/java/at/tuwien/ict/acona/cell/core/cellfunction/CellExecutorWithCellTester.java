@@ -19,7 +19,7 @@ import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionServiceBlockingSimple;
-import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionServiceSimple;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionCustomServiceSimple;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationBlockingTester;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -252,7 +252,7 @@ public class CellExecutorWithCellTester {
 			// from 2 different datapoints at 2 agents, calculates and then puts
 			// the values in a 3rd output agent
 			CellConfig additionAgent = CellConfig.newConfig(additionAgentName).addCellfunction(
-					CellFunctionConfig.newConfig(CFAdditionServiceSimple.class)
+					CellFunctionConfig.newConfig(CFAdditionCustomServiceSimple.class)
 							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint, SyncMode.push))
 							.setProperty(STATUSDATAPOINTNAME, statedatapoint)
 							.setProperty(OPERAND1, DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1, SyncMode.pull).toJsonObject())

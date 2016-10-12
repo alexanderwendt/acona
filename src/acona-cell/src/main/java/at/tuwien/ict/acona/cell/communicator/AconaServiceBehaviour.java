@@ -76,7 +76,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			log.info("OK to execute service {}", serviceType);
 
 		} catch (Exception fe) {
-			log.error("Received message {}", request);
+			log.error("Received message with sender: {}, receiver={}, service={},\n content={}", request.getSender(), request.getAllIntendedReceiver(), request.getOntology(), request.getContent());
 			log.error("Error handling the {} action.", serviceType, fe);
 			temp.setPerformative(ACLMessage.REFUSE);
 		}

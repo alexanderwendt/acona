@@ -26,9 +26,10 @@ public class TemporarySubscription implements CellFunction {
 	private int timeout = 10000;
 	private final String functionName;
 	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>();
+	private boolean isExitSet = false;
 
 	public TemporarySubscription(Cell cell, String subscriptionAddress, String agentName, int timeout) {
-		this.functionName = "TempSubscription-" + subscriptionAddress;
+		this.functionName = "TempSubscription" + this.hashCode() + "-" + subscriptionAddress;
 
 		// this.queue = queue;
 		// Get variables
@@ -59,7 +60,13 @@ public class TemporarySubscription implements CellFunction {
 			log.error("Message received", result);
 			throw new Exception(e.getMessage());
 		} finally {
-			this.cell.getFunctionHandler().deregisterActivatorInstance(this);
+			//If deregister has not been executed yet, do it
+			if (isExitSet == false) {
+				this.setExit();
+				//this.cell.getFunctionHandler().deregisterActivatorInstance(this);
+				this.isExitSet = true;
+			}
+
 		}
 
 		return result;
@@ -76,7 +83,11 @@ public class TemporarySubscription implements CellFunction {
 		Datapoint dp = data.get(subscriptionAddress);
 		this.queue.put(dp);
 		// After data was put in the queue, deregister subscription
-		this.setExit();
+		//Check if deregister has been executed before
+		if (isExitSet == false) {
+			this.setExit();
+			this.isExitSet = true;
+		}
 
 	}
 
@@ -116,6 +127,16 @@ public class TemporarySubscription implements CellFunction {
 	@Override
 	public CellFunctionConfig getFunctionConfig() {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TempSubscription: cell=");
+		builder.append(cell);
+		builder.append(", subscriptionAddress=");
+		builder.append(subscriptionAddress);
+		return builder.toString();
 	}
 
 }

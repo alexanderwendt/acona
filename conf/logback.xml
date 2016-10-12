@@ -19,7 +19,7 @@
     </filter>
 	
     <encoder>
-      <pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%highlight(%-5level)) %-25(%cyan(%logger{0})) - %msg%n%throwable</pattern>
+      <pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%highlight(%-5level)) %-25(%cyan(%logger{0}))(%F:%L\) - %msg%n%throwable</pattern>
 	  <!--<pattern>%-40(%date{HH:mm:ss.SSS} [%thread]) %-40(%-5level %logger{5}) - %msg%n%throwable</pattern>-->
 	  <!--<pattern>%-20(%d{HH:mm:ss.SSS} [%thread]) %-20(%-5level %logger{32} -) %msg%n</pattern>-->
 	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->

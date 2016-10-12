@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.core.CellGateway;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.framework.modules.ServiceState;
@@ -19,12 +20,16 @@ public class ControllerWrapper implements ControllerCellGateway {
 
 	private final static int DEFAULTTIMEOUT = 10000;
 
-	private final CellGateway gateway;
+	private final Communicator communicator;
 
 	private static Logger log = LoggerFactory.getLogger(ControllerWrapper.class);
 
 	public ControllerWrapper(CellGateway gateway) {
-		this.gateway = gateway;
+		this.communicator = gateway.getCommunicator();
+	}
+
+	public ControllerWrapper(Communicator communicator) {
+		this.communicator = communicator;
 	}
 
 	@Override
@@ -49,7 +54,7 @@ public class ControllerWrapper implements ControllerCellGateway {
 
 		ServiceState result = ServiceState.ERROR;
 		try {
-			Datapoint dp = this.gateway.getCommunicator().query(Datapoint.newDatapoint(servicecommand).setValue(ControlCommand.START.toString()), agentName, Datapoint.newDatapoint(serviceresult),
+			Datapoint dp = this.communicator.query(Datapoint.newDatapoint(servicecommand).setValue(ControlCommand.START.toString()), agentName, Datapoint.newDatapoint(serviceresult),
 					agentName, timeout);
 			result = ServiceState.valueOf(dp.getValueAsString());
 		} catch (Exception e) {

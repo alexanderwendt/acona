@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -18,6 +21,8 @@ public class CellFunctionConfig {
 	public static final String CELLSYNCDATAPOINTS = "syncdatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
+
+	private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
 
 	protected final JsonObject configObject;
 
@@ -144,8 +149,15 @@ public class CellFunctionConfig {
 		return result;
 	}
 
-	public String getProperty(String key) {
-		return this.configObject.getAsJsonPrimitive(key).getAsString();
+	public String getProperty(String key) throws Exception {
+		String result = "";
+		try {
+			result = this.configObject.getAsJsonPrimitive(key).getAsString();
+		} catch (Exception e) {
+			throw new Exception("Cannot read key " + key + ", " + e);
+		}
+
+		return result;
 	}
 
 	public String getProperty(String key, String defaultValue) {

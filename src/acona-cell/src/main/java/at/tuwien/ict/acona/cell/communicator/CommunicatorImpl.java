@@ -29,7 +29,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SimpleAchieveREInitiator;
 
-public class CommunicatorImpl implements Communicator {
+public class CommunicatorImpl extends Thread implements Communicator {
 
 	protected static Logger log = LoggerFactory.getLogger(CommunicatorImpl.class);
 

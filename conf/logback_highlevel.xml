@@ -50,9 +50,25 @@
       <OnMatch>DENY</OnMatch>
     </filter>
 	
+	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+      <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <expression>return logger.contains("CellFunctionThreadImpl");</expression>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>DENY</OnMatch>
+    </filter>
+	
+	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+      <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <expression>return logger.contains("AconaFunctionService");</expression>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>DENY</OnMatch>
+    </filter>
+	
 	<!--<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
       <evaluator>
-        <expression>return logger.contains("CellFunctionImpl");</expression>
+        <expression>return logger.contains("AconaFunctionService");</expression>
       </evaluator>
       <OnMismatch>DENY</OnMismatch>
       <OnMatch>ACCEPT</OnMatch>

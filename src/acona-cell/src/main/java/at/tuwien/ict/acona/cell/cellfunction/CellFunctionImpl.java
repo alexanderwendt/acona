@@ -17,7 +17,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public abstract class CellFunctionImpl implements CellFunction {
 
-	protected static Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
+	private static Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
 	protected static final String SYNCMODEPUSH = "push";
 	protected static final String SYNCMODEPULL = "pull";
 

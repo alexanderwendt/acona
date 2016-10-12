@@ -3,6 +3,9 @@ package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
@@ -11,7 +14,9 @@ import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.framework.modules.ServiceState;
 
-public class CFAdditionServiceSimple extends CellFunctionThreadImpl {
+public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
+
+	private static Logger log = LoggerFactory.getLogger(CFAdditionCustomServiceSimple.class);
 
 	private final String COMMANDDATAPOINTNAME = "command";
 	private final String STATUSDATAPOINTNAME = "status";
@@ -30,7 +35,7 @@ public class CFAdditionServiceSimple extends CellFunctionThreadImpl {
 	// private final String memorydatapoint2 = "inputmemory.variable2"; //put
 	// into memory mock agent
 
-	public CFAdditionServiceSimple() {
+	public CFAdditionCustomServiceSimple() {
 		this.setExecuteOnce(true); // Run only on demand from controller
 	}
 
