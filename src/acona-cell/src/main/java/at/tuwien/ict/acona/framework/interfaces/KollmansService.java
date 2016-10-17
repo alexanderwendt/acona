@@ -1,6 +1,6 @@
 package at.tuwien.ict.acona.framework.interfaces;
 
-import at.tuwien.ict.acona.framework.modules.AconaFunctionService;
+import at.tuwien.ict.acona.cell.cellfunction.AconaFunctionService;
 
 public class KollmansService extends AconaFunctionService {
 

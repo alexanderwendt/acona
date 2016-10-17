@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.temporarysubscriptions;
+package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
 import java.util.HashMap;
 import java.util.Map;

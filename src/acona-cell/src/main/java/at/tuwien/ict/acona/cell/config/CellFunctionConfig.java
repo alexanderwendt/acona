@@ -19,6 +19,7 @@ public class CellFunctionConfig {
 	public static final String CELLFUNCTIONNAME = "functionname";
 	public static final String CELLFUNCTIONCLASS = "functionclass";
 	public static final String CELLSYNCDATAPOINTS = "syncdatapoints";
+	public static final String CELLWRITEDATAPOINTS = "writedatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
 
@@ -54,6 +55,7 @@ public class CellFunctionConfig {
 	private CellFunctionConfig(String name, String className) {
 		this.configObject = new JsonObject();
 		this.configObject.add(CELLSYNCDATAPOINTS, new JsonArray());
+		this.configObject.add(CELLWRITEDATAPOINTS, new JsonArray());
 		this.setName(name).setClassName(className);
 	}
 
@@ -81,6 +83,8 @@ public class CellFunctionConfig {
 		return this;
 	}
 
+	//=== Syncdatapoints ===//
+
 	public CellFunctionConfig addSyncDatapoint(DatapointConfig config) {
 		this.configObject.getAsJsonArray(CELLSYNCDATAPOINTS).add(config.toJsonObject());
 		return this;
@@ -94,15 +98,52 @@ public class CellFunctionConfig {
 		return this.addSyncDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
 	}
 
-	public CellFunctionConfig setProperty(String name, String value) {
-		this.configObject.addProperty(name, value);
+	public List<DatapointConfig> getSyncDatapoints() {
+		return this.getDatapointConfig(CELLSYNCDATAPOINTS);
+	}
+
+	public Map<String, DatapointConfig> getSyncDatapointsAsMap() {
+		Map<String, DatapointConfig> result = new HashMap<String, DatapointConfig>();
+
+		this.getSyncDatapoints().forEach(s -> {
+			result.put(s.getId(), s);
+		});
+
+		return result;
+	}
+
+	//=======================//
+
+	//=== Write datapoints ===//
+
+	public CellFunctionConfig addWriteDatapoint(DatapointConfig config) {
+		this.configObject.getAsJsonArray(CELLWRITEDATAPOINTS).add(config.toJsonObject());
 		return this;
 	}
 
-	public CellFunctionConfig setProperty(String name, JsonObject value) {
-		this.configObject.add(name, value);
-		return this;
+	public CellFunctionConfig addWriteDatapoint(String address) {
+		return this.addWriteDatapoint(DatapointConfig.newConfig(address, address));
 	}
+
+	public CellFunctionConfig addWriteDatapoint(String id, String address, String agentId, SyncMode syncMode) {
+		return this.addWriteDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
+	}
+
+	public Map<String, DatapointConfig> getWriteDatapointsAsMap() {
+		Map<String, DatapointConfig> result = new HashMap<String, DatapointConfig>();
+
+		this.getWriteDatapoints().forEach(s -> {
+			result.put(s.getId(), s);
+		});
+
+		return result;
+	}
+
+	public List<DatapointConfig> getWriteDatapoints() {
+		return this.getDatapointConfig(CELLWRITEDATAPOINTS);
+	}
+
+	//======================//
 
 	public String getName() {
 		return this.configObject.getAsJsonPrimitive(CELLFUNCTIONNAME).getAsString();
@@ -120,18 +161,8 @@ public class CellFunctionConfig {
 		return this.configObject.getAsJsonPrimitive(CELLEXECUTERATE);
 	}
 
-	public Map<String, DatapointConfig> getSyncDatapointsAsMap() {
-		Map<String, DatapointConfig> result = new HashMap<String, DatapointConfig>();
-
-		this.getSyncDatapoints().forEach(s -> {
-			result.put(s.getId(), s);
-		});
-
-		return result;
-	}
-
-	public List<DatapointConfig> getSyncDatapoints() {
-		JsonArray array = this.configObject.getAsJsonArray(CELLSYNCDATAPOINTS);
+	private List<DatapointConfig> getDatapointConfig(String type) {
+		JsonArray array = this.configObject.getAsJsonArray(type);
 		// Gson gson = new Gson();
 		// Type type = new TypeToken<List<SubscriptionConfig>>(){}.getType();
 		// List<SubscriptionConfig> configList = gson.fromJson(array, type);
@@ -168,6 +199,16 @@ public class CellFunctionConfig {
 		}
 
 		return result;
+	}
+
+	public CellFunctionConfig setProperty(String name, String value) {
+		this.configObject.addProperty(name, value);
+		return this;
+	}
+
+	public CellFunctionConfig setProperty(String name, JsonObject value) {
+		this.configObject.add(name, value);
+		return this;
 	}
 
 	public JsonObject getPropertyAsJsonObject(String key) {

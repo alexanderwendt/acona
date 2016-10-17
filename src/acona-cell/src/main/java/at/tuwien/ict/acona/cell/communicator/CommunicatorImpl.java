@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.TemporarySubscription;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
-import at.tuwien.ict.acona.cell.temporarysubscriptions.TemporarySubscription;
 import jade.content.abs.AbsContentElementList;
 import jade.content.abs.AbsPredicate;
 import jade.content.lang.Codec;

@@ -3,8 +3,8 @@ package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.cellfunction.AconaFunctionService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.framework.modules.AconaFunctionService;
 
 public class CFIncrementService extends AconaFunctionService {
 

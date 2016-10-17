@@ -96,8 +96,8 @@ public class DatapointConfig {
 		return this.configObject.get(AGENTID).getAsString();
 	}
 
-	public String getSyncMode() {
-		return this.configObject.get(SYNCMODE).getAsString();
+	public SyncMode getSyncMode() {
+		return SyncMode.valueOf(this.configObject.get(SYNCMODE).getAsString());
 	}
 
 	public JsonObject toJsonObject() {

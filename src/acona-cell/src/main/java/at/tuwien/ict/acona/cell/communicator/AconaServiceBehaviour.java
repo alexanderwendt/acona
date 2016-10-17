@@ -15,6 +15,8 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
 import jade.core.AID;
 import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.SimpleAchieveREResponder;
@@ -45,7 +47,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	}
 
 	@Override
-	public ACLMessage prepareResponse(ACLMessage request) {
+	public ACLMessage prepareResponse(ACLMessage request) throws RefuseException {
 		log.debug("Received message={}", request);
 		ACLMessage temp = null;
 
@@ -67,6 +69,9 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			if (this.serviceType.equals(AconaServiceType.QUERY) == true) {
 				log.warn("Check if service is available");
 				// TODO: Implement this
+				//Todo: Check if input matches the description
+				//Todo: Check if service is running. If yes, create queue to wait until the run has finished and then set new data, optional
+
 				throw new UnsupportedOperationException();
 
 			}
@@ -79,6 +84,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			log.error("Received message with sender: {}, receiver={}, service={},\n content={}", request.getSender(), request.getAllIntendedReceiver(), request.getOntology(), request.getContent());
 			log.error("Error handling the {} action.", serviceType, fe);
 			temp.setPerformative(ACLMessage.REFUSE);
+			throw new RefuseException("check-failed");
 		}
 		// }
 
@@ -86,7 +92,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	}
 
 	@Override
-	public ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+	public ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException {
 		ACLMessage msg = request.createReply();
 		msg.setOntology(AconaServiceType.NONE.toString());
 
@@ -100,6 +106,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 		} catch (Exception e) {
 			log.error("Cannot process request", e);
 			msg.setPerformative(ACLMessage.FAILURE);
+			throw new FailureException("unexpected-error");
 		}
 
 		log.info("Message={}", msg);
@@ -152,6 +159,8 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			});
 			break;
 		case QUERY:
+			//Execute the service and create a temporary subscription queue function to wait for answer
+
 			throw new UnsupportedOperationException();
 			// break;
 		default:

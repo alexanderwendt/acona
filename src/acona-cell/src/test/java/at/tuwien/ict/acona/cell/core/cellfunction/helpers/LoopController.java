@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.cellfunction.AconaFunctionService;
 import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
 import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
-import at.tuwien.ict.acona.framework.modules.AconaFunctionService;
 import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 public class LoopController extends AconaFunctionService {

@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.framework.modules;
+package at.tuwien.ict.acona.cell.cellfunction;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -6,11 +6,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 /**
  * Service function 1. Register DF service from function name 2.
@@ -44,6 +42,8 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 	private String PARAMETERDATAPOINTNAME = "parameter";
 	private String CONFIGDATAPOINTNAME = "config";
 
+	private Datapoint command, state, description, parameter, config;
+
 	@Override
 	protected void cellFunctionInternalInit() throws Exception {
 		log.debug("{}> Init service", this.getFunctionName());
@@ -73,11 +73,11 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 		PARAMETERDATAPOINTNAME = serviceName + "." + "parameter";
 		CONFIGDATAPOINTNAME = serviceName + "." + "config";
 
-		Datapoint command = Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
-		Datapoint state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.STOPPED.toString());
-		Datapoint description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
-		Datapoint parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
-		Datapoint config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
+		command = Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
+		state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.STOPPED.toString());
+		description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
+		parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
+		config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
 
 		log.trace("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}", command.getAddress(), state.getAddress(), description.getAddress(),
 				parameter.getAddress(), config.getAddress());
@@ -114,10 +114,11 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executePostProcessing() throws Exception {
-		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getReadDatapoints());
+		//FIXME: The update here is not working well
+		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
-		this.getReadDatapoints().values().forEach(config -> {
+		this.getWriteDatapoints().values().forEach(config -> {
 			try {
 				Datapoint dp = this.readLocal(config.getAddress());
 				String agentName = config.getAgentid();
@@ -128,23 +129,21 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 			}
 		});
 
-		this.writeLocal(Datapoint.newDatapoint(this.getSubscribedDatapoints().get(COMMANDDATAPOINTNAME).getAddress())
-				.setValue(ControlCommand.PAUSE.toString()));
-		this.writeLocal(Datapoint.newDatapoint(this.getSubscribedDatapoints().get(STATEDATAPOINTNAME).getAddress())
-				.setValue(ServiceState.STOPPED.toString()));
+		this.writeLocal(this.command.setValue(ControlCommand.PAUSE.toString()));
+		this.writeLocal(this.state.setValue(ServiceState.STOPPED.toString()));
 
 		log.info("{}>Service execution finished", this.getFunctionName());
 	}
 
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, COMMANDDATAPOINTNAME);
+		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, command.getAddress());
 		// 4. If update datapoints is executed, do start command or other update
-		if (data.containsKey(COMMANDDATAPOINTNAME) && data.get(COMMANDDATAPOINTNAME).getValue().toString().equals("{}") == false) {
+		if (data.containsKey(command.getAddress()) && data.get(command.getAddress()).getValue().toString().equals("{}") == false) {
 			try {
-				this.setCommand(data.get(COMMANDDATAPOINTNAME).getValueAsString());
+				this.setCommand(data.get(command.getAddress()).getValueAsString());
 			} catch (Exception e) {
-				log.error("{}>Cannot execute command={}", this.getFunctionName(), data.get(COMMANDDATAPOINTNAME).getValueAsString(), e);
+				log.error("{}>Cannot execute command={}", this.getFunctionName(), data.get(command.getAddress()).getValueAsString(), e);
 			}
 		} else {
 			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(), this.getSubscribedDatapoints().values());

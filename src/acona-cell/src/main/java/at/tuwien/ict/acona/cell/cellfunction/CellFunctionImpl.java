@@ -38,11 +38,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>(); // Variable,
-																										// datapoint
-	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>(); // Variable,
-																										// datapoint
+	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>(); // Variable, datapoint
+	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>(); // Variable, datapoint
 	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<String, DatapointConfig>();
+	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<String, DatapointConfig>();
 
 	protected ControlCommand currentCommand = ControlCommand.STOP;
 	protected boolean runAllowed = false;
@@ -71,10 +70,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 			// Get subscriptions from config and add to subscription list
 			this.config.getSyncDatapoints().forEach(s -> {
-				if (s.getSyncMode().equals(SyncMode.push.toString())) {
+				if (s.getSyncMode().equals(SyncMode.push)) {
 					this.subscriptions.put(s.getId(), s);
-				} else if (s.getSyncMode().equals(SyncMode.pull.toString())) {
+				} else if (s.getSyncMode().equals(SyncMode.pushreturn)) {
+					this.subscriptions.put(s.getId(), s);
+					this.writeDatapoints.put(s.getId(), s);
+				} else if (s.getSyncMode().equals(SyncMode.pull)) {
 					this.readDatapoints.put(s.getId(), s);
+				} else if (s.getSyncMode().equals(SyncMode.pullreturn)) {
+					this.readDatapoints.put(s.getId(), s);
+					this.writeDatapoints.put(s.getId(), s);
 				} else {
 					try {
 						throw new Exception("No syncmode=" + s.getSyncMode() + ". only pull and push available");
@@ -279,6 +284,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected Map<String, DatapointConfig> getReadDatapoints() {
 		return readDatapoints;
+	}
+
+	protected Map<String, DatapointConfig> getWriteDatapoints() {
+		return writeDatapoints;
 	}
 
 }
