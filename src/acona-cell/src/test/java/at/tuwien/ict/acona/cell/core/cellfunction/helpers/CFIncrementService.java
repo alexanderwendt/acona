@@ -3,10 +3,10 @@ package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.AconaFunctionService;
+import at.tuwien.ict.acona.cell.cellfunction.AconaOndemandFunctionService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class CFIncrementService extends AconaFunctionService {
+public class CFIncrementService extends AconaOndemandFunctionService {
 
 	private static Logger log = LoggerFactory.getLogger(CFIncrementService.class);
 

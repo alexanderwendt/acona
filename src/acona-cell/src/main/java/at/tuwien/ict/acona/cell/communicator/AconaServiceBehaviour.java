@@ -38,7 +38,8 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	public AconaServiceBehaviour(CellImpl caller, AconaServiceType serviceType) {
 		// In the super class, it shall use the message template here
 		super(caller, MessageTemplate.and(
-				MessageTemplate.MatchProtocol((AconaServiceType.SUBSCRIBE == serviceType ? FIPANames.InteractionProtocol.FIPA_SUBSCRIBE : FIPANames.InteractionProtocol.FIPA_REQUEST)),
+				MessageTemplate.MatchProtocol((AconaServiceType.SUBSCRIBE == serviceType
+						? FIPANames.InteractionProtocol.FIPA_SUBSCRIBE : FIPANames.InteractionProtocol.FIPA_REQUEST)),
 				MessageTemplate.MatchOntology(serviceType.toString())));
 		// FIPANames.InteractionProtocol.FIPA_REQUEST)
 		this.serviceType = serviceType;
@@ -48,7 +49,9 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 
 	@Override
 	public ACLMessage prepareResponse(ACLMessage request) throws RefuseException {
-		log.debug("Received message={}", request);
+		log.debug("Received message service={}, sender={}, receiver={}, content={}", request.getOntology(),
+				request.getSender().getLocalName(), ((AID) request.getAllReceiver().next()).getLocalName(),
+				request.getContent().substring(0, 1000));
 		ACLMessage temp = null;
 
 		// if (this.serviceType.equals(AconaServiceType.WRITE)==false) { //If
@@ -69,8 +72,10 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			if (this.serviceType.equals(AconaServiceType.QUERY) == true) {
 				log.warn("Check if service is available");
 				// TODO: Implement this
-				//Todo: Check if input matches the description
-				//Todo: Check if service is running. If yes, create queue to wait until the run has finished and then set new data, optional
+				// Todo: Check if input matches the description
+				// Todo: Check if service is running. If yes, create queue to
+				// wait until the run has finished and then set new data,
+				// optional
 
 				throw new UnsupportedOperationException();
 
@@ -81,7 +86,8 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			log.info("OK to execute service {}", serviceType);
 
 		} catch (Exception fe) {
-			log.error("Received message with sender: {}, receiver={}, service={},\n content={}", request.getSender(), request.getAllIntendedReceiver(), request.getOntology(), request.getContent());
+			log.error("Received message with sender: {}, receiver={}, service={},\n content={}", request.getSender(),
+					request.getAllIntendedReceiver(), request.getOntology(), request.getContent());
 			log.error("Error handling the {} action.", serviceType, fe);
 			temp.setPerformative(ACLMessage.REFUSE);
 			throw new RefuseException("check-failed");
@@ -159,7 +165,8 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 			});
 			break;
 		case QUERY:
-			//Execute the service and create a temporary subscription queue function to wait for answer
+			// Execute the service and create a temporary subscription queue
+			// function to wait for answer
 
 			throw new UnsupportedOperationException();
 			// break;

@@ -32,15 +32,15 @@ import at.tuwien.ict.acona.framework.modules.ServiceState;
  * @author wendt
  *
  */
-public abstract class AconaFunctionService extends CellFunctionThreadImpl {
+public abstract class AconaOndemandFunctionService extends CellFunctionThreadImpl {
 
-	private static Logger log = LoggerFactory.getLogger(AconaFunctionService.class);
+	private static Logger log = LoggerFactory.getLogger(AconaOndemandFunctionService.class);
 
-	private String COMMANDDATAPOINTNAME = "command";
-	private String STATEDATAPOINTNAME = "state";
-	private String DESCRIPTIONDATAPOINTNAME = "description";
-	private String PARAMETERDATAPOINTNAME = "parameter";
-	private String CONFIGDATAPOINTNAME = "config";
+	protected String COMMANDDATAPOINTNAME = "command";
+	protected String STATEDATAPOINTNAME = "state";
+	protected String DESCRIPTIONDATAPOINTNAME = "description";
+	protected String PARAMETERDATAPOINTNAME = "parameter";
+	protected String CONFIGDATAPOINTNAME = "config";
 
 	private Datapoint command, state, description, parameter, config;
 
@@ -79,14 +79,21 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 		parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
 		config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
 
-		log.trace("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}", command.getAddress(), state.getAddress(), description.getAddress(),
-				parameter.getAddress(), config.getAddress());
+		log.trace(
+				"Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
+				command.getAddress(), state.getAddress(), description.getAddress(), parameter.getAddress(),
+				config.getAddress());
 
-		this.getSubscribedDatapoints().put(command.getAddress(), DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(state.getAddress(), DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(description.getAddress(), DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(parameter.getAddress(), DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(config.getAddress(), DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(command.getAddress(),
+				DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(state.getAddress(),
+				DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(description.getAddress(),
+				DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(parameter.getAddress(),
+				DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(config.getAddress(),
+				DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.push));
 
 		this.getCommunicator().write(Arrays.asList(command, state, description, parameter, config));
 
@@ -95,7 +102,8 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 	@Override
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
-		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(),
+				this.getReadDatapoints());
 		this.getReadDatapoints().forEach((k, v) -> {
 			try {
 				// Read the remote datapoint
@@ -114,8 +122,9 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executePostProcessing() throws Exception {
-		//FIXME: The update here is not working well
-		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
+		// FIXME: The update here is not working well
+		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(),
+				this.getWriteDatapoints());
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
 		this.getWriteDatapoints().values().forEach(config -> {
@@ -139,14 +148,27 @@ public abstract class AconaFunctionService extends CellFunctionThreadImpl {
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
 		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, command.getAddress());
 		// 4. If update datapoints is executed, do start command or other update
-		if (data.containsKey(command.getAddress()) && data.get(command.getAddress()).getValue().toString().equals("{}") == false) {
+		if (data.containsKey(command.getAddress())
+				&& data.get(command.getAddress()).getValue().toString().equals("{}") == false) {
 			try {
 				this.setCommand(data.get(command.getAddress()).getValueAsString());
 			} catch (Exception e) {
-				log.error("{}>Cannot execute command={}", this.getFunctionName(), data.get(command.getAddress()).getValueAsString(), e);
+				log.error("{}>Cannot execute command={}", this.getFunctionName(),
+						data.get(command.getAddress()).getValueAsString(), e);
 			}
-		} else {
-			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(), this.getSubscribedDatapoints().values());
+		}
+
+		if (data.containsKey(parameter.getAddress())) {
+			log.info("New parameter set={}", data.get(parameter).getValue());
+
+			data.keySet().forEach(key -> {
+				this.getConfig().setProperty(key, data.get(key).getValue());
+			});
+		}
+
+		if (data.containsKey(command.getAddress()) == false && data.containsKey(parameter.getAddress()) == false) {
+			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(),
+					this.getSubscribedDatapoints().values());
 		}
 
 	}

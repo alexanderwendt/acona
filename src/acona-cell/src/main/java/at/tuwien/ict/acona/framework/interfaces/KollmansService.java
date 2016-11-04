@@ -1,8 +1,8 @@
 package at.tuwien.ict.acona.framework.interfaces;
 
-import at.tuwien.ict.acona.cell.cellfunction.AconaFunctionService;
+import at.tuwien.ict.acona.cell.cellfunction.AconaOndemandFunctionService;
 
-public class KollmansService extends AconaFunctionService {
+public class KollmansService extends AconaOndemandFunctionService {
 
 	
 	private final static String COUNTER = "counter";	//=kollmannsservice.variables.counter.value

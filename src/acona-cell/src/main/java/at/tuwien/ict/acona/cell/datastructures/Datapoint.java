@@ -87,7 +87,11 @@ public class Datapoint {
 	}
 
 	public JsonObject toJsonObject() {
-		return gson.fromJson(this.toString(), JsonObject.class);
+		return gson.fromJson(this.toJsonString(), JsonObject.class);
+	}
+
+	public String toJsonString() {
+		return gson.toJson(this, Datapoint.class);
 	}
 
 	public String getAddress() {
@@ -108,7 +112,25 @@ public class Datapoint {
 
 	@Override
 	public String toString() {
-		return gson.toJson(this, Datapoint.class);
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.ADDRESS);
+		builder.append(":");
+		if (this.getType().equals("") == false) {
+			builder.append(this.TYPE);
+			builder.append(":");
+		}
+
+		// Check size of object
+		if (this.VALUE.toString().length() > 1000) {
+			builder.append(this.VALUE.toString().substring(0, 1000));
+			builder.append("...");
+		} else {
+			builder.append(this.VALUE);
+		}
+
+		// gson.toJson(this, Datapoint.class);
+
+		return builder.toString();
 	}
 
 }
