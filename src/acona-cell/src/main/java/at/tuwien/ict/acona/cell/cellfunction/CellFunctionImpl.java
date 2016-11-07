@@ -38,8 +38,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>(); // Variable, datapoint
-	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>(); // Variable, datapoint
+	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>(); // Variable,
+																										// datapoint
+	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>(); // Variable,
+																										// datapoint
 	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<String, DatapointConfig>();
 	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<String, DatapointConfig>();
 
@@ -210,12 +212,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return this.getCommunicator().read(address).getValue();
 	}
 
-	protected <T> T readLocalSyncDatapointById(String id, Class<T> type) throws Exception {
+	protected <T> T readLocalById(String id, Class<T> type) throws Exception {
 		Gson gson = new Gson();
 		JsonElement value = this.readLocal(this.getConfig().getSyncDatapointsAsMap().get(id).getAddress()).getValue();
 		T convertedValue = gson.fromJson(value, type);
 
 		return convertedValue;
+	}
+
+	protected Datapoint readLocalId(String id) throws Exception {
+		return this.readLocal(this.getSyncDatapoints().get(id).getAddress());
 	}
 
 	protected <T> void writeLocalSyncDatapointById(String id, T value) throws Exception {
@@ -264,7 +270,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * @return
 	 */
 	protected Datapoint getDatapointFromId(Map<String, Datapoint> data, String id) {
-		return data.get(this.getSubscribedDatapoints().get(id).getAddress());
+		return data.get(this.getSyncDatapoints().get(id).getAddress());
 	}
 
 	@Override

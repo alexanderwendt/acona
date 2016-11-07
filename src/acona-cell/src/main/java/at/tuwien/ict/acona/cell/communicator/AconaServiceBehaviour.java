@@ -51,7 +51,8 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	public ACLMessage prepareResponse(ACLMessage request) throws RefuseException {
 		log.debug("Received message service={}, sender={}, receiver={}, content={}", request.getOntology(),
 				request.getSender().getLocalName(), ((AID) request.getAllReceiver().next()).getLocalName(),
-				request.getContent().substring(0, 1000));
+				(request.getContent().length() > 1000 ? request.getContent().substring(0, 1000)
+						: request.getContent()));
 		ACLMessage temp = null;
 
 		// if (this.serviceType.equals(AconaServiceType.WRITE)==false) { //If
@@ -167,6 +168,8 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 		case QUERY:
 			// Execute the service and create a temporary subscription queue
 			// function to wait for answer
+			// put the input in a datapoint command
+			// wait for an answer on the return datapoint
 
 			throw new UnsupportedOperationException();
 			// break;

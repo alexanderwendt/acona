@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 
 public class Metadata extends KoreDatastructure {
 	public final static String PREDICATEREWARD = "hasReward";
+	public final static String PREDICATEDRIVE = "hasDrive";
 	public final static String DATATYPE = "metadata";
 
 	public static Metadata newMetadata(Concept c) throws Exception {
@@ -58,6 +59,42 @@ public class Metadata extends KoreDatastructure {
 		});
 
 		return convertedResult;
+	}
+
+	public Metadata addDrive(Drive reward) {
+		this.getChunk().setAssociatedContent(PREDICATEDRIVE, reward.getChunk());
+		return this;
+	}
+
+	public List<Drive> getDrive() {
+		JsonArray result = this.getChunk().getAssociatedContentAsArray(PREDICATEDRIVE);
+
+		List<Drive> convertedResult = new ArrayList<Drive>();
+
+		result.forEach(e -> {
+			try {
+				convertedResult.add(Drive.newDrive(e.getAsJsonObject()));
+			} catch (Exception e1) {
+				log.error("Cannot get as reward " + e);
+			}
+		});
+
+		return convertedResult;
+	}
+
+	public Drive getDrive(String driveName) {
+		List<Drive> drives = this.getDrive();
+
+		Drive result = null;
+
+		for (Drive drive : drives) {
+			if (drive.getName().equals(driveName)) {
+				result = drive;
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	public Metadata setValue(String key, String value) {

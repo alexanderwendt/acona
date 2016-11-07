@@ -13,7 +13,8 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 
 	private static Logger log = LoggerFactory.getLogger(CFDurationThreadTester.class);
 
-	private String commandDatapoint = "command"; //agtne1.servicehalloworld.command, description
+	private String commandDatapoint = "command"; // agtne1.servicehalloworld.command,
+													// description
 	private String queryDatapoint = "query";
 	private String executeonceDatapoint = "executeonce";
 	private String result = "result";
@@ -22,13 +23,13 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		//Execute some sort of query that takes a lot of time
+		// Execute some sort of query that takes a lot of time
 		log.info("The query={} was received. Execute it", query);
 
 		if (this.query.equals("") == false) {
 			for (int i = 1; i <= 10; i++) {
 				try {
-					//Block profile controller
+					// Block profile controller
 					synchronized (this) {
 						this.wait(100);
 					}
@@ -50,10 +51,11 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		//data.get(this.commandDatapoint).getValue().
-		if (data.containsKey(commandDatapoint) && data.get(this.commandDatapoint).getValue().toString().equals("{}") == false) {
-			//Set command
+	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+		// data.get(this.commandDatapoint).getValue().
+		if (data.containsKey(commandDatapoint)
+				&& data.get(this.commandDatapoint).getValue().toString().equals("{}") == false) {
+			// Set command
 			String command = data.get(commandDatapoint).getValueAsString();
 			try {
 				this.setCommand(command);
@@ -61,15 +63,18 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 			} catch (Exception e) {
 				log.error("Cannot execute command {}", command, e);
 			}
-		} else if (data.containsKey(this.queryDatapoint) && data.get(this.queryDatapoint).getValue().toString().equals("{}") == false) {
-			//Extract query and execute system
-			//JsonElement x= data.get(this.queryDatapoint).getValue().getAsJsonObject();
-			//boolean tester = x.isJsonNull();
+		} else if (data.containsKey(this.queryDatapoint)
+				&& data.get(this.queryDatapoint).getValue().toString().equals("{}") == false) {
+			// Extract query and execute system
+			// JsonElement x=
+			// data.get(this.queryDatapoint).getValue().getAsJsonObject();
+			// boolean tester = x.isJsonNull();
 			this.query = data.get(queryDatapoint).getValueAsString();
 			log.debug("Query {} received", this.query);
 			this.setCommand(ControlCommand.START);
-		} else if (data.containsKey(executeonceDatapoint) && data.get(executeonceDatapoint).getValue().toString().equals("{}") == false) {
-			//Set mode execute once or periodically
+		} else if (data.containsKey(executeonceDatapoint)
+				&& data.get(executeonceDatapoint).getValue().toString().equals("{}") == false) {
+			// Set mode execute once or periodically
 			this.setExecuteOnce(data.get(executeonceDatapoint).getValue().getAsBoolean());
 			log.debug("ExecuteOnce={}", this.isExecuteOnce());
 		}

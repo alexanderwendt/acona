@@ -18,8 +18,8 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionServiceBlockingSimple;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionCustomServiceSimple;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionServiceBlockingSimple;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationBlockingTester;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -95,13 +95,16 @@ public class CellExecutorWithCellTester {
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
 							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, SyncMode.push))
 							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push)).setProperty("result", resultDatapoint));
+							.addSyncDatapoint(
+									DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push))
+							.setProperty("result", resultDatapoint));
 			CellGatewayImpl testAgent = this.launcher.createAgent(testagent);
 
 			testAgent.getCommunicator().setDefaultTimeout(100000);
 
 			// Create inspector or the new gateway
-			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
+			CellGatewayImpl cellControlSubscriber = this.launcher
+					.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
 
 			// Write the numbers in the database agents
@@ -109,7 +112,8 @@ public class CellExecutorWithCellTester {
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			cellControlSubscriber.subscribeForeignDatapoint("datapoint.result", "testagent");
-			cellControlSubscriber.getCommunicator().write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
+			cellControlSubscriber.getCommunicator()
+					.write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
 
 			synchronized (this) {
 				try {
@@ -153,13 +157,16 @@ public class CellExecutorWithCellTester {
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationBlockingTester.class)
 							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, SyncMode.push))
 							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push)).setProperty("result", resultDatapoint));
+							.addSyncDatapoint(
+									DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push))
+							.setProperty("result", resultDatapoint));
 			CellGatewayImpl testAgent = this.launcher.createAgent(testagent);
 
 			testAgent.getCommunicator().setDefaultTimeout(100000);
 
 			// Create inspector or the new gateway
-			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
+			CellGatewayImpl cellControlSubscriber = this.launcher
+					.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
 
 			// Write the numbers in the database agents
@@ -167,8 +174,16 @@ public class CellExecutorWithCellTester {
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			cellControlSubscriber.subscribeForeignDatapoint("datapoint.result", "testagent");
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
 			// Write is blocking the communicator until an answer is received
-			cellControlSubscriber.getCommunicator().write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
+			cellControlSubscriber.getCommunicator()
+					.write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
 
 			// synchronized (this) {
 			// try {
@@ -177,6 +192,13 @@ public class CellExecutorWithCellTester {
 			//
 			// }
 			// }
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			String result = cellControlSubscriber.readLocalDatapoint(resultDatapoint).getValueAsString();
 
@@ -251,13 +273,21 @@ public class CellExecutorWithCellTester {
 			// Create the addition agent with the addition function that reads
 			// from 2 different datapoints at 2 agents, calculates and then puts
 			// the values in a 3rd output agent
-			CellConfig additionAgent = CellConfig.newConfig(additionAgentName).addCellfunction(
-					CellFunctionConfig.newConfig(CFAdditionCustomServiceSimple.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint, SyncMode.push))
-							.setProperty(STATUSDATAPOINTNAME, statedatapoint)
-							.setProperty(OPERAND1, DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1, SyncMode.pull).toJsonObject())
-							.setProperty(OPERAND2, DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2, SyncMode.pull).toJsonObject())
-							.setProperty(RESULT, DatapointConfig.newConfig(RESULT, resultdatapoint, outputmemoryAgentName, SyncMode.pull).toJsonObject()));
+			CellConfig additionAgent = CellConfig.newConfig(additionAgentName)
+					.addCellfunction(
+							CellFunctionConfig.newConfig(CFAdditionCustomServiceSimple.class)
+									.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint,
+											SyncMode.push))
+									.setProperty(STATUSDATAPOINTNAME, statedatapoint)
+									.setProperty(OPERAND1,
+											DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1,
+													SyncMode.pull).toJsonObject())
+									.setProperty(OPERAND2,
+											DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2,
+													SyncMode.pull).toJsonObject())
+									.setProperty(RESULT, DatapointConfig
+											.newConfig(RESULT, resultdatapoint, outputmemoryAgentName, SyncMode.pull)
+											.toJsonObject()));
 			this.launcher.createAgent(additionAgent);
 
 			// Control agent
@@ -273,13 +303,16 @@ public class CellExecutorWithCellTester {
 			// Set default timeout to a high number to be able to debug
 			controlAgent.getCommunicator().setDefaultTimeout(100000);
 			log.debug("Execute query");
-			Datapoint resultState = controlAgent.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
-					Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 100000);
+			Datapoint resultState = controlAgent.getCommunicator()
+					.query(Datapoint.newDatapoint(commandDatapoint)
+							.setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
+							Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 100000);
 			log.debug("Query executed with result={}", resultState);
 
 			Datapoint dpsum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName);
 			log.debug("Result={}", dpsum);
-			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue().getAsJsonPrimitive().getAsDouble();
+			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue()
+					.getAsJsonPrimitive().getAsDouble();
 			// client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START")), drivetrackAgentName);
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
@@ -361,11 +394,20 @@ public class CellExecutorWithCellTester {
 			// from 2 different datapoints at 2 agents, calculates and then puts
 			// the values in a 3rd output agent
 			CellConfig additionAgent = CellConfig.newConfig(additionAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(CFAdditionServiceBlockingSimple.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint, SyncMode.push)).setProperty(STATUSDATAPOINTNAME, statedatapoint)
-							.setProperty(OPERAND1, DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1, SyncMode.pull).toJsonObject())
-							.setProperty(OPERAND2, DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2, SyncMode.pull).toJsonObject())
-							.setProperty(RESULT, DatapointConfig.newConfig(RESULT, resultdatapoint, outputmemoryAgentName, SyncMode.pull).toJsonObject()));
+					.addCellfunction(
+							CellFunctionConfig.newConfig(CFAdditionServiceBlockingSimple.class)
+									.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, commandDatapoint,
+											SyncMode.push))
+									.setProperty(STATUSDATAPOINTNAME, statedatapoint)
+									.setProperty(OPERAND1,
+											DatapointConfig.newConfig(OPERAND1, memorydatapoint1, inputMemoryAgentName1,
+													SyncMode.pull).toJsonObject())
+									.setProperty(OPERAND2,
+											DatapointConfig.newConfig(OPERAND2, memorydatapoint2, inputMemoryAgentName2,
+													SyncMode.pull).toJsonObject())
+									.setProperty(RESULT, DatapointConfig
+											.newConfig(RESULT, resultdatapoint, outputmemoryAgentName, SyncMode.pull)
+											.toJsonObject()));
 			this.launcher.createAgent(additionAgent);
 
 			// Control agent
@@ -381,11 +423,14 @@ public class CellExecutorWithCellTester {
 			// Set default timeout to a high number to be able to debug
 			controlAgent.getCommunicator().setDefaultTimeout(100000);
 			log.debug("Execute query");
-			Datapoint resultState = controlAgent.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
-					Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 100000);
+			Datapoint resultState = controlAgent.getCommunicator()
+					.query(Datapoint.newDatapoint(commandDatapoint)
+							.setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
+							Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 100000);
 			log.debug("Query executed with result={}", resultState);
 
-			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue().getAsJsonPrimitive().getAsDouble();
+			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue()
+					.getAsJsonPrimitive().getAsDouble();
 			// client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START")), drivetrackAgentName);
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new

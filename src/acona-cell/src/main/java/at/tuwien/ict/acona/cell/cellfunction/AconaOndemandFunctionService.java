@@ -42,7 +42,7 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 	protected String PARAMETERDATAPOINTNAME = "parameter";
 	protected String CONFIGDATAPOINTNAME = "config";
 
-	private Datapoint command, state, description, parameter, config;
+	protected Datapoint command, state, description, parameter, config;
 
 	@Override
 	protected void cellFunctionInternalInit() throws Exception {
@@ -64,7 +64,7 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 
 	}
 
-	protected abstract void serviceInit();
+	protected abstract void serviceInit() throws Exception;
 
 	private void initServiceDatapoints(String serviceName) throws Exception {
 		COMMANDDATAPOINTNAME = serviceName + "." + "command";
@@ -145,9 +145,10 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 	}
 
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
+	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, command.getAddress());
 		// 4. If update datapoints is executed, do start command or other update
+		// Update command
 		if (data.containsKey(command.getAddress())
 				&& data.get(command.getAddress()).getValue().toString().equals("{}") == false) {
 			try {
@@ -158,14 +159,23 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 			}
 		}
 
-		if (data.containsKey(parameter.getAddress())) {
-			log.info("New parameter set={}", data.get(parameter).getValue());
+		// Update config
+		if (data.containsKey(this.config.getAddress())) {
+			log.info("New config set={}", data.get(parameter).getValue());
 
 			data.keySet().forEach(key -> {
 				this.getConfig().setProperty(key, data.get(key).getValue());
 			});
 		}
 
+		// Update parameters
+		if (data.containsKey(this.parameter.getAddress())) {
+			log.info("New parameter set={}", data.get(parameter).getValue());
+
+			this.parameter.setValue(data.get(this.parameter.getAddress()).getValue());
+		}
+
+		// Else
 		if (data.containsKey(command.getAddress()) == false && data.containsKey(parameter.getAddress()) == false) {
 			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(),
 					this.getSubscribedDatapoints().values());

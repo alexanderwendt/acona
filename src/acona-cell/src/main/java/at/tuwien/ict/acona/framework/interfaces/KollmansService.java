@@ -19,7 +19,7 @@ public class KollmansService extends AconaOndemandFunctionService {
 		String configvalue = this.getCustomSetting("test", String.class);
 		
 		//Daten zugreifen
-		double value = this.readLocalSyncDatapointById(COUNTER, Double.class);
+		double value = this.readLocalById(COUNTER, Double.class);
 		
 		//Operation execute
 		value++;

@@ -91,7 +91,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
+	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		if (data.containsKey(COMMANDDATAPOINTNAME)
 				&& data.get(COMMANDDATAPOINTNAME).getValueAsString().equals("{}") == false) {
 			try {

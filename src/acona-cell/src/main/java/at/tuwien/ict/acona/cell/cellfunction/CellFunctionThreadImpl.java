@@ -1,7 +1,12 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
+import java.lang.Thread.State;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 /**
  * @author wendt
@@ -104,6 +109,18 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	@Override
 	protected abstract void executePreProcessing() throws Exception;
+
+	@Override
+	protected void updateDatapointsById(Map<String, Datapoint> data) {
+		// If the thread is running, the method shall wait or produce timeout
+		while (!t.getState().equals(State.WAITING)) {
+
+		}
+
+		this.updateDatapointsByIdOnThread(data);
+	}
+
+	protected abstract void updateDatapointsByIdOnThread(Map<String, Datapoint> data);
 
 	// === Internal functions for the control of the tread ===//
 

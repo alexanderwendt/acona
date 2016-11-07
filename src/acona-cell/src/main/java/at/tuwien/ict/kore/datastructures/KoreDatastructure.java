@@ -46,6 +46,10 @@ public abstract class KoreDatastructure {
 
 	}
 
+	public String getName() {
+		return this.getName();
+	}
+
 	public KoreDatastructure setID(String id) {
 		this.chunk.setId(id);
 		return this;
