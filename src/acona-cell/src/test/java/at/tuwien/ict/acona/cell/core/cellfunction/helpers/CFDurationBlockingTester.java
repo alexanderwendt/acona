@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -90,6 +91,24 @@ public class CFDurationBlockingTester extends CellFunctionBlockImpl {
 
 	@Override
 	protected void executePreProcessing() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void cellFunctionExecutorInit() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void shutDownImplementation() {
 		// TODO Auto-generated method stub
 
 	}

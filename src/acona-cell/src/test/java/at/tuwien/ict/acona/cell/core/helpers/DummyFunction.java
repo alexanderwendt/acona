@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.core.helpers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -18,8 +19,8 @@ public class DummyFunction extends CellFunctionImpl {
 	@Override
 	public void cellFunctionInit() {
 		try {
-			if (this.getConfig().getProperty("TESTPROPERTY1") != null) {
-				log.info("Got info from config: option1={}", this.getConfig().getProperty("TESTPROPERTY1"));
+			if (this.getFunctionConfig().getProperty("TESTPROPERTY1") != null) {
+				log.info("Got info from config: option1={}", this.getFunctionConfig().getProperty("TESTPROPERTY1"));
 			} else {
 				log.info("No configuration was passed");
 			}
@@ -53,24 +54,20 @@ public class DummyFunction extends CellFunctionImpl {
 		return builder.toString();
 	}
 
-	@Override
 	protected void executeFunction() throws Exception {
 		log.info("Execute cell function");
 	}
 
-	@Override
 	protected void executePostProcessing() {
 		log.info("Postprocessing");
 
 	}
 
-	@Override
 	protected void executePreProcessing() {
 		log.info("Preprocessing");
 
 	}
 
-	@Override
 	public void setCommand(ControlCommand command) {
 		log.info("Command={} was set", command);
 
@@ -85,6 +82,18 @@ public class DummyFunction extends CellFunctionImpl {
 		} catch (Exception e) {
 			log.error("Cannot execute function", e);
 		}
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void shutDownImplementation() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

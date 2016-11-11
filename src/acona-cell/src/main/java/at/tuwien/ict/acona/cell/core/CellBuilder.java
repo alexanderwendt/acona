@@ -59,7 +59,8 @@ public class CellBuilder {
 			config.getCellfunctions().forEach(activatorConfig -> {
 				try {
 					// Instantiate and init function
-					CellFunction cellfunction = this.createCellFunctionFromConfig(activatorConfig.getAsJsonObject(), caller);
+					CellFunction cellfunction = this.createCellFunctionFromConfig(activatorConfig.getAsJsonObject(),
+							caller);
 					if (cellfunction == null) {
 						throw new NullPointerException("activator does not exist");
 					}
@@ -136,7 +137,7 @@ public class CellBuilder {
 	//
 	// }
 
-	private synchronized CellFunction createCellFunctionFromConfig(JsonObject config, Cell caller) throws Exception {
+	protected synchronized CellFunction createCellFunctionFromConfig(JsonObject config, Cell caller) throws Exception {
 		CellFunction result = null;
 
 		// Get all values

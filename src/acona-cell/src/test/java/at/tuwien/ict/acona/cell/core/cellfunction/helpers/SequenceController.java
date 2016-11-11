@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -20,14 +21,14 @@ public class SequenceController extends CellFunctionThreadImpl {
 	// execute service 1
 
 	private ServiceState executeServiceById(String serviceNameId, String agentNameId, int timeout) throws Exception {
-		return executeService(this.getConfig().getProperty(serviceNameId), this.getConfig().getProperty(agentNameId),
+		return executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId),
 				timeout);
 	}
 
 	private ServiceState executeService(String serviceName, String agentName, int timeout) throws Exception {
 		String commandDatapoint = serviceName + ".command";
 		String resultDatapoint = serviceName + ".state";
-		Datapoint result1 = this.getCommunicator().query(
+		Datapoint result1 = this.getCommunicator().queryDatapoints(
 				Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()), agentName,
 				Datapoint.newDatapoint(resultDatapoint), agentName, timeout);
 
@@ -104,7 +105,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void cellFunctionInternalInit() throws Exception {
-		this.delay = Integer.valueOf(this.getConfig().getProperty("delay", String.valueOf(this.delay)));
+		this.delay = Integer.valueOf(this.getFunctionConfig().getProperty("delay", String.valueOf(this.delay)));
 
 	}
 
@@ -118,6 +119,12 @@ public class SequenceController extends CellFunctionThreadImpl {
 	protected void executePreProcessing() throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

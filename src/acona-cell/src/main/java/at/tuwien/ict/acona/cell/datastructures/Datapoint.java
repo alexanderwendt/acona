@@ -10,11 +10,11 @@ import com.google.gson.JsonPrimitive;
 
 public class Datapoint {
 	private final static String KEYADDRESS = "ADDRESS";
-	private final static String KEYTYPE = "TYPE";
+	//private final static String KEYTYPE = "TYPE";
 	private final static String KEYVALUE = "VALUE";
 
 	private String ADDRESS = "";
-	private String TYPE = "";
+	//private String TYPE = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
 
 	private final static Gson gson = new Gson();
@@ -39,8 +39,8 @@ public class Datapoint {
 
 		try {
 			if (Datapoint.isDatapoint(data) == true) {
-				result = Datapoint.newDatapoint(data.get(KEYADDRESS).getAsString())
-						.setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
+				result = Datapoint.newDatapoint(data.get(KEYADDRESS).getAsString()).setValue(data.get(KEYVALUE));
+				//.setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
 			} else {
 				throw new IllegalArgumentException("Cannot cast json data to datapoint " + data);
 			}
@@ -61,18 +61,18 @@ public class Datapoint {
 	public static boolean isDatapoint(JsonObject data) {
 		boolean result = false;
 
-		if (data.has(KEYADDRESS) && data.has(KEYTYPE) && data.has(KEYVALUE)) {
+		if (data.has(KEYADDRESS) && data.has(KEYVALUE)) {
 			result = true;
 		}
 
 		return result;
 	}
 
-	public Datapoint setType(String type) {
-		this.TYPE = type;
-
-		return this;
-	}
+	//	public Datapoint setType(String type) {
+	//		this.TYPE = type;
+	//
+	//		return this;
+	//	}
 
 	public Datapoint setValue(String value) {
 		this.VALUE = new JsonPrimitive(value);
@@ -98,16 +98,22 @@ public class Datapoint {
 		return ADDRESS;
 	}
 
-	public String getType() {
-		return TYPE;
-	}
+	//	public String getType() {
+	//		return TYPE;
+	//	}
 
 	public JsonElement getValue() {
 		return VALUE;
 	}
 
 	public String getValueAsString() {
-		return VALUE.getAsJsonPrimitive().getAsString();
+		String result = "";
+		if (VALUE.toString().equals("{}") == true) {
+			result = "";
+		} else {
+			result = VALUE.getAsJsonPrimitive().getAsString();
+		}
+		return result;
 	}
 
 	@Override
@@ -115,10 +121,10 @@ public class Datapoint {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.ADDRESS);
 		builder.append(":");
-		if (this.getType().equals("") == false) {
-			builder.append(this.TYPE);
-			builder.append(":");
-		}
+		//		if (this.getType().equals("") == false) {
+		//			builder.append(this.TYPE);
+		//			builder.append(":");
+		//		}
 
 		// Check size of object
 		if (this.VALUE.toString().length() > 1000) {

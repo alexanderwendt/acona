@@ -127,8 +127,7 @@ public class CellBuilderTester {
 
 			builder.initializeCellConfig(cellConfig, cell);// .initializeCellConfig(cellConfig,
 															// cell);
-			String actualResult = cell.getFunctionHandler().getCellFunctionMapping().get("agent1.dp1.value").get(0)
-					.getFunctionConfig().getProperty("TESTPROPERTY1");
+			String actualResult = cell.getFunctionHandler().getCellFunctionDatapointMapping().get("agent1.dp1.value").get(0).getFunctionConfig().getProperty("TESTPROPERTY1");
 
 			// Get the name of one of the activators
 

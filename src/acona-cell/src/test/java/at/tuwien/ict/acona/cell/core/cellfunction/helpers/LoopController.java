@@ -1,11 +1,15 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.AconaOndemandFunctionService;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
 import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
 import at.tuwien.ict.acona.framework.modules.ServiceState;
@@ -20,7 +24,7 @@ public class LoopController extends AconaOndemandFunctionService {
 
 	private ServiceState executeServiceById(String serviceNameId, String agentNameId, int number, int timeout) throws Exception {
 		ControllerCellGateway controllerMethods = new ControllerWrapper(this.getCommunicator());
-		ServiceState result = controllerMethods.executeService(this.getConfig().getProperty(agentNameId) + number, this.getConfig().getProperty(serviceNameId), new JsonObject(), timeout);
+		ServiceState result = controllerMethods.executeService(this.getFunctionConfig().getProperty(agentNameId) + number, this.getFunctionConfig().getProperty(serviceNameId), new JsonObject(), timeout);
 
 		return result;
 	}
@@ -41,7 +45,7 @@ public class LoopController extends AconaOndemandFunctionService {
 	@Override
 	protected void executeFunction() throws Exception {
 		log.info("Execute increment service");
-		int numberOfAgents = this.getConfig().getProperty("numberofagents", Integer.class);
+		int numberOfAgents = this.getFunctionConfig().getProperty("numberofagents", Integer.class);
 
 		for (int i = 1; i <= numberOfAgents; i++) {
 			ServiceState result = this.executeServiceById("servicename", "agentnameprefix", i, 1000);
@@ -64,6 +68,12 @@ public class LoopController extends AconaOndemandFunctionService {
 	protected void serviceInit() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -12,34 +12,36 @@ import org.slf4j.LoggerFactory;
  *         be executed if a subscribed datapoint is received
  *
  */
-public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
+public abstract class CellFunctionBlockImpl extends CellFunctionExecutorImpl {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionBlockImpl.class);
 
-	//protected static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
-	//private Thread t;
+	// protected static Logger log =
+	// LoggerFactory.getLogger(CellFunctionThreadImpl.class);
+	// private Thread t;
 
-	//private int executeRate = 1000;
+	// private int executeRate = 1000;
 
 	/**
 	 * Name of the activator
 	 */
-	//private String name;
+	// private String name;
 
 	/**
 	 * Cell, which executes this function
 	 */
-	//protected Cell cell;
+	// protected Cell cell;
 
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	//private final Map<String, String> subscriptions = new HashMap<String, String>();	//Variable, datapoint
+	// private final Map<String, String> subscriptions = new HashMap<String,
+	// String>(); //Variable, datapoint
 
 	private boolean isActive = true;
-	//private boolean executeOnce = true;
-	//private ControlCommand command = ControlCommand.STOP;
-	//private boolean isAllowedToRun = true;
+	// private boolean executeOnce = true;
+	// private ControlCommand command = ControlCommand.STOP;
+	// private boolean isAllowedToRun = true;
 
 	public CellFunctionBlockImpl() {
 
@@ -48,25 +50,26 @@ public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
 	@Override
 	public void cellFunctionInit() throws Exception {
 		this.setExecuteOnce(true);
-		//this.name = name;
-		//this.cell = caller;
-		//this.subscriptions.putAll(subscriptionMapping);
+		// this.name = name;
+		// this.cell = caller;
+		// this.subscriptions.putAll(subscriptionMapping);
 
 		try {
-			//Execute internal init
-			//cellFunctionInit();		//e.g. add subscriptions
+			// Execute internal init
+			// cellFunctionInit(); //e.g. add subscriptions
 
-			//Subscribe datapoints
-			//this.getCommunicator().subscribe(this.getSubscribedDatapoints(), cell.getName());
-			//this.subscriptions.values().forEach(s->{
-			//	this.getCommunicator().subscribeDatapoint(s, cell.getName());
-			//});
+			// Subscribe datapoints
+			// this.getCommunicator().subscribe(this.getSubscribedDatapoints(),
+			// cell.getName());
+			// this.subscriptions.values().forEach(s->{
+			// this.getCommunicator().subscribeDatapoint(s, cell.getName());
+			// });
 
 			cellFunctionInternalInit();
 
-			//Create a thread from this class
-			//t = new Thread(this, this.getFunctionName());
-			//t.start();
+			// Create a thread from this class
+			// t = new Thread(this, this.getFunctionName());
+			// t.start();
 
 			log.info("CellFunction {} initilized", this.getFunctionName());
 		} catch (Exception e) {
@@ -75,17 +78,20 @@ public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
 		}
 	}
 
-	//	@Override
-	//	public boolean runActivation(Datapoint subscribedData) throws Exception {
-	//		//This is the notify or update function of the executor
-	//		this.updateDatapoint(subscribedData);
-	//		
-	//		return true;	//In the customized activator, the activation always triggers the notify function. Only one datapoint at the time can be triggered, no lists
-	//	}
+	// @Override
+	// public boolean runActivation(Datapoint subscribedData) throws Exception {
+	// //This is the notify or update function of the executor
+	// this.updateDatapoint(subscribedData);
+	//
+	// return true; //In the customized activator, the activation always
+	// triggers the notify function. Only one datapoint at the time can be
+	// triggered, no lists
+	// }
 
 	protected abstract void cellFunctionInternalInit() throws Exception;
 
-	//protected abstract void updateDatapoint(Datapoint subscribedData) throws Exception;
+	// protected abstract void updateDatapoint(Datapoint subscribedData) throws
+	// Exception;
 
 	@Override
 	protected abstract void executeFunction() throws Exception;
@@ -93,9 +99,10 @@ public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
 	public void executeRun() {
 		log.debug("Start cell function {}", this.getFunctionName());
 
-		//while(isActive==true) {
-		//Stop the system at the end of the turn, if STOP command has been given
-		//executeWait();
+		// while(isActive==true) {
+		// Stop the system at the end of the turn, if STOP command has been
+		// given
+		// executeWait();
 
 		try {
 			if (this.isAllowedToRun() == true) {
@@ -114,21 +121,21 @@ public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
 		} catch (Exception e) {
 			log.error("Error setting pause", e);
 		}
-		//			if (this.isExecuteOnce()==false) {
-		//				try {
-		//					Thread.sleep(this.getExecuteRate());
-		//				} catch (InterruptedException e) {
-		//					log.warn("Sleep was interrupted", e);
-		//				}
-		//			} else {
-		//				//Set datapoint as pause and set pause command here
-		//				try {
-		//					this.setCommand(ControlCommand.PAUSE.toString());
-		//				} catch (Exception e) {
-		//					log.error("Error setting pause", e);
-		//				}
-		//			}
-		//		}
+		// if (this.isExecuteOnce()==false) {
+		// try {
+		// Thread.sleep(this.getExecuteRate());
+		// } catch (InterruptedException e) {
+		// log.warn("Sleep was interrupted", e);
+		// }
+		// } else {
+		// //Set datapoint as pause and set pause command here
+		// try {
+		// this.setCommand(ControlCommand.PAUSE.toString());
+		// } catch (Exception e) {
+		// log.error("Error setting pause", e);
+		// }
+		// }
+		// }
 
 		log.debug("Stop executor {}", this.getFunctionName());
 	}
@@ -139,22 +146,23 @@ public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
 	@Override
 	protected abstract void executePreProcessing() throws Exception;
 
-	//=== Internal functions for the control of the tread ===//
+	// === Internal functions for the control of the tread ===//
 
-	//	/**
-	//	 * Check, which command is valid and block until finished
-	//	 */
-	//	private synchronized void executeWait() {
-	//		while(this.getCurrentCommand().equals(ControlCommand.STOP) || getCurrentCommand().equals(ControlCommand.PAUSE)) {
-	//			try {
-	//				//Block profile controller
-	//				this.setAllowedToRun(false);
-	//				this.wait();
-	//			} catch (InterruptedException e) {
-	//				log.trace("Wait interrupted client");
-	//			}
-	//		}
-	//	}
+	// /**
+	// * Check, which command is valid and block until finished
+	// */
+	// private synchronized void executeWait() {
+	// while(this.getCurrentCommand().equals(ControlCommand.STOP) ||
+	// getCurrentCommand().equals(ControlCommand.PAUSE)) {
+	// try {
+	// //Block profile controller
+	// this.setAllowedToRun(false);
+	// this.wait();
+	// } catch (InterruptedException e) {
+	// log.trace("Wait interrupted client");
+	// }
+	// }
+	// }
 
 	protected synchronized void setCommand(String commandString) throws Exception {
 		if (ControlCommand.isCommand(commandString)) {
@@ -172,7 +180,7 @@ public abstract class CellFunctionBlockImpl extends CellFunctionImpl {
 		if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
 			this.setAllowedToRun(true);
 			this.executeRun();
-			//this.notify();			
+			// this.notify();
 		} else if (this.getCurrentCommand().equals(ControlCommand.EXIT) == true) {
 			this.setActive(false);
 		}

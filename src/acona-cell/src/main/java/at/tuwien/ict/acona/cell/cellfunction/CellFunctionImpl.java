@@ -8,12 +8,14 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import jade.domain.FIPANames;
 
 public abstract class CellFunctionImpl implements CellFunction {
 
@@ -27,9 +29,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 	private Cell cell;
 	private CellFunctionConfig config;
 
-	private int executeRate = 1000;
-	private boolean executeOnce = true;
-
 	/**
 	 * Name of the activator
 	 */
@@ -41,6 +40,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>(); // Variable,
 																										// datapoint
 	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>(); // Variable,
+																										// //
 																										// datapoint
 	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<String, DatapointConfig>();
 	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<String, DatapointConfig>();
@@ -51,24 +51,33 @@ public abstract class CellFunctionImpl implements CellFunction {
 	@Override
 	public CellFunction init(CellFunctionConfig config, Cell caller) throws Exception {
 		try {
+			// === Extract fundamental settings ===//
 			// Extract settings
 			this.config = config;
 			this.cell = caller;
 
+			// Get the settings but set also default values
+
 			// Get name
-			this.name = config.getName();
-			// Get execute once as optional
-			if (config.isExecuteOnce() != null) {
-				this.setExecuteOnce(config.isExecuteOnce().getAsBoolean());
-			}
+			this.name = this.config.getName();
 
-			// Get executerate as optional
-			if (config.getExecuteRate() != null) {
-				this.setExecuteRate(config.getExecuteRate().getAsInt());
-			}
+			// === Internal init ===//
 
-			// Possibility to add more subscriptions
+			// Possibility to add more subscriptions and to overwrite default
+			// settings
 			cellFunctionInit();
+
+			// === Extract execution settings ===//
+
+			// Get responder if it exists
+			if (this.getFunctionConfig().getGenerateReponder() == null) {
+				this.config.setGenerateReponder(false);
+			}
+
+			if (this.getFunctionConfig().getResponderProtocol().equals("") == true) {
+				// Set default responderprotocol
+				this.getFunctionConfig().setResponderProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+			}
 
 			// Get subscriptions from config and add to subscription list
 			this.config.getSyncDatapoints().forEach(s -> {
@@ -94,7 +103,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 			});
 
-			// Register in cell
+			// === Register in the function handler ===//
 			this.cell.getFunctionHandler().registerCellFunctionInstance(this);
 		} catch (Exception e) {
 			log.error("Cannot init function with config={}", config);
@@ -106,10 +115,24 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected abstract void cellFunctionInit() throws Exception;
 
+	@Override
+	public void shutDown() {
+		// Unsubscribe all datapoints
+		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+
+		// Execute specific functions
+		this.shutDownImplementation();
+
+		//Execute general deregister
+		this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+	}
+
+	protected abstract void shutDownImplementation();
+
 	// protected abstract void updateDatapoint(Datapoint subscribedData) throws
 	// Exception;
 	@Override
-	public void updateData(Map<String, Datapoint> data) {
+	public void updateSubscribedData(Map<String, Datapoint> data) {
 		// Create datapointmapping ID to datapoint with new value
 		Map<String, Datapoint> subscriptions = new HashMap<String, Datapoint>();
 		this.getSubscribedDatapoints().forEach((k, v) -> {
@@ -123,43 +146,9 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected abstract void updateDatapointsById(Map<String, Datapoint> data);
 
-	protected abstract void executeFunction() throws Exception;
-
-	protected abstract void executePostProcessing() throws Exception;
-
-	protected abstract void executePreProcessing() throws Exception;
-
-	public abstract void setCommand(ControlCommand command);
-
 	@Override
 	public String getFunctionName() {
 		return this.name;
-	}
-
-	@Override
-	public void setStart() {
-		this.setCommand(ControlCommand.START);
-	}
-
-	@Override
-	public void setStop() {
-		this.setCommand(ControlCommand.STOP);
-	}
-
-	@Override
-	public void setPause() {
-		this.setCommand(ControlCommand.PAUSE);
-
-	}
-
-	@Override
-	public void setExit() {
-		// Unsubscribe all datapoints
-		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
-
-		// Execute specific functions
-		this.cell.getFunctionHandler().deregisterActivatorInstance(this);
-		this.setCommand(ControlCommand.EXIT);
 	}
 
 	@Override
@@ -172,20 +161,14 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return this.config;
 	}
 
-	public int getExecuteRate() {
-		return executeRate;
-	}
+	private void setFunctionConfig(JsonObject config) throws Exception {
+		// Set new config
+		this.config = CellFunctionConfig.newConfig(config);
 
-	public void setExecuteRate(int blockingTime) {
-		this.executeRate = blockingTime;
-	}
+		// Restart system
+		this.shutDown();
 
-	protected boolean isExecuteOnce() {
-		return executeOnce;
-	}
-
-	protected void setExecuteOnce(boolean executeOnce) {
-		this.executeOnce = executeOnce;
+		this.init(this.config, this.cell);
 	}
 
 	// === read and write shortcuts ===//
@@ -214,7 +197,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected <T> T readLocalById(String id, Class<T> type) throws Exception {
 		Gson gson = new Gson();
-		JsonElement value = this.readLocal(this.getConfig().getSyncDatapointsAsMap().get(id).getAddress()).getValue();
+		JsonElement value = this.readLocal(this.getFunctionConfig().getSyncDatapointsAsMap().get(id).getAddress())
+				.getValue();
 		T convertedValue = gson.fromJson(value, type);
 
 		return convertedValue;
@@ -228,12 +212,12 @@ public abstract class CellFunctionImpl implements CellFunction {
 		// Gson gson = new Gson();
 
 		JsonElement writeValue = new Gson().toJsonTree(value);
-		this.writeLocal(Datapoint.newDatapoint(this.getConfig().getSyncDatapointsAsMap().get(id).getAddress())
+		this.writeLocal(Datapoint.newDatapoint(this.getFunctionConfig().getSyncDatapointsAsMap().get(id).getAddress())
 				.setValue(writeValue));
 	}
 
 	protected <T> T getCustomSetting(String key, Class<T> type) {
-		return this.getConfig().getProperty(name, type);
+		return this.getFunctionConfig().getProperty(name, type);
 	}
 
 	protected Cell getCell() {
@@ -254,10 +238,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected void setAllowedToRun(boolean isAllowedToRun) {
 		this.runAllowed = isAllowedToRun;
-	}
-
-	protected CellFunctionConfig getConfig() {
-		return config;
 	}
 
 	/**

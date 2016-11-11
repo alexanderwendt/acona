@@ -1,12 +1,19 @@
-package at.tuwien.ict.acona.jadelauncher.util;
+package at.tuwien.ict.acona.cell.datastructures.util;
 
+import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class GsonUtils {
+
+	private static Gson gson = new Gson();
 
 	public static enum ConflictStrategy {
 		THROW_EXCEPTION, PREFER_FIRST_OBJ, PREFER_SECOND_OBJ, PREFER_NON_NULL;
@@ -96,5 +103,51 @@ public class GsonUtils {
 			throw new UnsupportedOperationException(
 					"The conflict strategy " + conflictStrategy + " is unknown and cannot be processed");
 		}
+	}
+
+	/**
+	 * Convert any jsonarray with convertable objects to a List
+	 * 
+	 * @param jsonArray
+	 * @param clzz
+	 * @return
+	 */
+	public static List<Datapoint> convertJsonArrayToDatapointList(JsonArray jsonArray) {
+		List<Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<List<Datapoint>>() {
+		}.getType());
+		return result;
+	}
+
+	/**
+	 * Convert any jsonarray with convertable objects to a List
+	 * 
+	 * @param jsonArray
+	 * @param clzz
+	 * @return
+	 */
+	public static <T> List<T> convertJsonArrayToList(JsonArray jsonArray, TypeToken<T> token) {
+		List<T> result = gson.fromJson(jsonArray.toString(), token.getType());
+		return result;
+	}
+
+	/**
+	 * Convert any list with jsonconvertable objects to jsonarray
+	 * 
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	public static JsonArray convertListToJsonArray(List<?> list) throws Exception {
+		Gson gson = new Gson();
+		JsonElement element = gson.toJsonTree(list, new TypeToken<List<?>>() {
+		}.getType());
+
+		if (!element.isJsonArray()) {
+			// fail appropriately
+			throw new Exception("Element is no JsonArray");
+		}
+
+		JsonArray jsonArray = element.getAsJsonArray();
+		return jsonArray;
 	}
 }

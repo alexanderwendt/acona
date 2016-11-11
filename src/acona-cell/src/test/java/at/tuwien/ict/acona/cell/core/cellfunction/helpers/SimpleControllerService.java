@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,12 +40,12 @@ public class SimpleControllerService extends AconaOndemandFunctionService {
 	@Override
 	protected void executeFunction() throws Exception {
 		try {
-			String serviceName = this.getConfig().getProperty("servicename");
-			String agentName = this.getConfig().getProperty("agentname");
+			String serviceName = this.getFunctionConfig().getProperty("servicename");
+			String agentName = this.getFunctionConfig().getProperty("agentname");
 
 			log.info("Start simple controller service to execute one service {} at agent {}", serviceName, agentName);
 
-			Datapoint result = this.getCommunicator().query(Datapoint.newDatapoint(serviceName + ".command").setValue(ControlCommand.START.toString()), agentName,
+			Datapoint result = this.getCommunicator().queryDatapoints(Datapoint.newDatapoint(serviceName + ".command").setValue(ControlCommand.START.toString()), agentName,
 					Datapoint.newDatapoint(serviceName + ".state"), agentName, 10000);
 			log.debug("Service executed with the result={}", result);
 		} catch (Exception e) {
@@ -54,8 +57,14 @@ public class SimpleControllerService extends AconaOndemandFunctionService {
 
 	@Override
 	protected void serviceInit() {
-		this.delay = Integer.valueOf(this.getConfig().getProperty("delay", String.valueOf(this.delay)));
+		this.delay = Integer.valueOf(this.getFunctionConfig().getProperty("delay", String.valueOf(this.delay)));
 
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

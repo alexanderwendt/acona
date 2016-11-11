@@ -83,37 +83,33 @@ public class CellExecutorWithCellTester {
 	@Test
 	public void threadExecutorInCellTester() {
 		try {
-			String commandDatapoint = "datapoint.command";
-			String queryDatapoint = "datapoint.query";
+			String queryDatapoint = CFDurationThreadTester.queryDatapointID;
 			String executeonceDatapoint = "datapoint.executeonce";
-			String resultDatapoint = "datapoint.result";
+			String resultDatapointAddress = "datapoint.result";
 
 			String expectedResult = "FINISHED";
 
 			// Create Database agents 1-2
 			CellConfig testagent = CellConfig.newConfig("testagent", CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, SyncMode.push))
-							.addSyncDatapoint(
-									DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push))
-							.setProperty("result", resultDatapoint));
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, CFDurationThreadTester.commandDatapointID, SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapoint, SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapoint, SyncMode.push))
+							.addWriteDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.pull)));
 			CellGatewayImpl testAgent = this.launcher.createAgent(testagent);
 
 			testAgent.getCommunicator().setDefaultTimeout(100000);
 
 			// Create inspector or the new gateway
-			CellGatewayImpl cellControlSubscriber = this.launcher
-					.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
+			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
 
 			// Write the numbers in the database agents
 
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
-			cellControlSubscriber.subscribeForeignDatapoint("datapoint.result", "testagent");
-			cellControlSubscriber.getCommunicator()
-					.write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
+			cellControlSubscriber.subscribeForeignDatapoint(resultDatapointAddress, "testagent");
+			cellControlSubscriber.getCommunicator().write(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
 
 			synchronized (this) {
 				try {
@@ -123,7 +119,7 @@ public class CellExecutorWithCellTester {
 				}
 			}
 
-			String result = cellControlSubscriber.readLocalDatapoint(resultDatapoint).getValueAsString();
+			String result = cellControlSubscriber.readLocalDatapoint(resultDatapointAddress).getValueAsString();
 
 			log.debug("correct value={}, actual value={}", "FINISHED", result);
 
@@ -304,9 +300,13 @@ public class CellExecutorWithCellTester {
 			controlAgent.getCommunicator().setDefaultTimeout(100000);
 			log.debug("Execute query");
 			Datapoint resultState = controlAgent.getCommunicator()
-					.query(Datapoint.newDatapoint(commandDatapoint)
-							.setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
-							Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 100000);
+					.queryDatapoints(commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, additionAgentName, 1000);
+			//Datapoint resultState = CFQuery.newQuery(additionAgentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, 10000, controlAgent.getCell());
+			//			Datapoint resultState = controlAgent.getCommunicator()
+			//					.query(Datapoint.newDatapoint(commandDatapoint)
+			//							.setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
+			//							Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 1000);
+
 			log.debug("Query executed with result={}", resultState);
 
 			Datapoint dpsum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName);
@@ -423,10 +423,7 @@ public class CellExecutorWithCellTester {
 			// Set default timeout to a high number to be able to debug
 			controlAgent.getCommunicator().setDefaultTimeout(100000);
 			log.debug("Execute query");
-			Datapoint resultState = controlAgent.getCommunicator()
-					.query(Datapoint.newDatapoint(commandDatapoint)
-							.setValue(new JsonPrimitive(ControlCommand.START.toString())), additionAgentName,
-							Datapoint.newDatapoint(STATUSDATAPOINTNAME), additionAgentName, 100000);
+			Datapoint resultState = controlAgent.getCommunicator().queryDatapoints(commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, additionAgentName, 100000);
 			log.debug("Query executed with result={}", resultState);
 
 			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue()

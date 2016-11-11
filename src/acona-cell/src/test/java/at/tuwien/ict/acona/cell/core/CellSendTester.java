@@ -9,12 +9,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
@@ -88,10 +89,10 @@ public class CellSendTester {
 	@Test
 	public void queryControllerTest() {
 		try {
-			String commandDatapoint = "datapoint.command";
-			String queryDatapoint = "datapoint.query";
-			String executeonceDatapoint = "datapoint.executeonce";
-			String resultDatapoint = "datapoint.result";
+			String commandDatapointAddress = "datapoint.command";
+			String queryDatapointAddress = "datapoint.query";
+			String executeonceDatapointAddress = "datapoint.executeonce";
+			String resultDatapointAddress = "datapoint.result";
 			String controllerAgentName = "controllerAgent";
 			String serviceAgentName = "serviceAgent";
 
@@ -100,26 +101,23 @@ public class CellSendTester {
 			// Create service agent
 			CellConfig testagent = CellConfig.newConfig(serviceAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push))
-							.setProperty("result", resultDatapoint));
-			this.launchUtil.createAgent(testagent);
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapointAddress, SyncMode.push))
+							.addWriteDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.pull)));
+			CellGatewayImpl cellService = this.launchUtil.createAgent(testagent);
+			cellService.getCommunicator().setDefaultTimeout(1000000);
 
 			// Create inspector or the new gateway
-			CellGatewayImpl cellControlSubscriber = this.launchUtil
-					.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class));
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class));
 
-			String result = cellControlSubscriber
-					.getCommunicator().query(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"),
-							serviceAgentName, Datapoint.newDatapoint(resultDatapoint), serviceAgentName, 100000)
-					.getValueAsString();
+			String result = cellControlSubscriber.getCommunicator().queryDatapoints(queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, serviceAgentName, 1000000).getValueAsString();
 			log.debug("Received back from query={}", result);
 
 			// String result =
 			// cellControlSubscriber.readLocalDatapoint(resultDatapoint).getValueAsString();
 
-			log.debug("correct value={}, actual value={}", "FINISHED", result);
+			log.debug("correct value={}, actual value={}", expectedResult, result);
 
 			assertEquals(result, expectedResult);
 			log.info("Test passed");
@@ -146,7 +144,7 @@ public class CellSendTester {
 			String commandDatapoint = "datapoint.command";
 			String queryDatapoint = "datapoint.query";
 			String executeonceDatapoint = "datapoint.executeonce";
-			String resultDatapoint = "datapoint.result";
+			String resultDatapoint = CFDurationThreadTester.resultDatapointID;
 			String controllerAgentName = "controllerAgent";
 			String serviceAgentName = "serviceAgent";
 
@@ -159,12 +157,9 @@ public class CellSendTester {
 			// Create service agent
 			CellConfig testagent = CellConfig.newConfig(serviceAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-							.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint,
-									"subscriptionagent", SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, "subscriptionagent",
-									SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint,
-									"subscriptionagent", SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapoint, "subscriptionagent", SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapoint, "subscriptionagent", SyncMode.push))
+							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, "subscriptionagent", SyncMode.push))
 							.setProperty("result", resultDatapoint));
 			this.launchUtil.createAgent(testagent);
 
@@ -172,10 +167,7 @@ public class CellSendTester {
 			CellGatewayImpl cellControlSubscriber = this.launchUtil
 					.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class));
 
-			String result = cellControlSubscriber
-					.getCommunicator().query(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"),
-							"subscriptionagent", Datapoint.newDatapoint(resultDatapoint), serviceAgentName, 100000)
-					.getValueAsString();
+			String result = cellControlSubscriber.getCommunicator().queryDatapoints(queryDatapoint, new JsonPrimitive("SELECT * FILESERVER"), "subscriptionagent", resultDatapoint, serviceAgentName, 1000).getValueAsString();
 			log.debug("Received back from query={}", result);
 
 			// String result =

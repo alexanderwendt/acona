@@ -160,7 +160,7 @@ public class AconaServiceTester {
 			memoryAgent.writeLocalDatapoint(
 					Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().query(
+			Datapoint state = controller.getCommunicator().queryDatapoints(
 					Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.START.toString()),
 					controller.getCell().getLocalName(), Datapoint.newDatapoint("state"),
 					controller.getCell().getLocalName(), 1000000);
@@ -351,7 +351,7 @@ public class AconaServiceTester {
 			// Test the wrapper for controllers too
 			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().query(
+			Datapoint state = controller.getCommunicator().queryDatapoints(
 					Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.START.toString()), Datapoint.newDatapoint("state"), 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
@@ -468,7 +468,7 @@ public class AconaServiceTester {
 			log.info("=== System initialized ===");
 			// === System operation ===//
 
-			Datapoint resultState = topController.getCommunicator().query(Datapoint.newDatapoint(controllerServiceName + ".command").setValue(ControlCommand.START.toString()),
+			Datapoint resultState = topController.getCommunicator().queryDatapoints(Datapoint.newDatapoint(controllerServiceName + ".command").setValue(ControlCommand.START.toString()),
 					Datapoint.newDatapoint(controllerServiceName + ".state"), 100000);
 
 			log.info("=== System operation finished. Extract results ===");

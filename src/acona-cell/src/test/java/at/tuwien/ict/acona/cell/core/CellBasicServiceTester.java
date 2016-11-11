@@ -13,7 +13,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
+import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFDataStorageUpdate;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
 import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
@@ -94,28 +101,98 @@ public class CellBasicServiceTester {
 	 * read value is equal to the original one.
 	 */
 	@Test
+	public void executeAsWriteTest() {
+		try {
+			String receiver = "Receiver";
+			String datapointaddress = "testaddress";
+			String value = "testvalue";
+
+			// Create inspectoragent
+			CellGatewayImpl client = this.launchUtil.createAgent(CellConfig.newConfig("client", CellImpl.class.getName()));
+			// Create receiver agent
+			CellGatewayImpl server = this.launchUtil.createAgent(CellConfig.newConfig(receiver, CellImpl.class.getName()));
+
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			List<Datapoint> parameter = new ArrayList<Datapoint>();
+			//parameter.add(Datapoint.newDatapoint("method").setValue("write"));
+
+			List<Datapoint> sendList = new ArrayList<Datapoint>();
+			sendList.add(Datapoint.newDatapoint(datapointaddress).setValue(value));
+			//JsonArray array = GsonUtils.convertListToJsonArray(sendList);
+			//parameter.add(Datapoint.newDatapoint("datapoints").setValue(array));
+
+			//Execute read method
+			client.getCommunicator().execute(receiver, "write", sendList, 100000);
+			client.getCommunicator().execute(receiver, "write", sendList, 100000);
+			client.getCommunicator().execute(receiver, "write", sendList, 100000);
+			client.getCommunicator().execute(receiver, "write", sendList, 100000);
+
+			List<Datapoint> parameter2 = new ArrayList<Datapoint>();
+			//parameter2.add(Datapoint.newDatapoint("method").setValue("read"));
+
+			List<Datapoint> sendList2 = new ArrayList<Datapoint>();
+			sendList2.add(Datapoint.newDatapoint(datapointaddress).setValue(value));
+			//JsonArray array2 = GsonUtils.convertListToJsonArray(sendList2);
+			//parameter2.add(Datapoint.newDatapoint("datapoints").setValue(array2));
+
+			Datapoint resultdp = client.getCommunicator().execute(receiver, "read", sendList2, 100000).get(0);
+
+			//Datapoint resultdp = client.getCell().getCommunicator().read(datapointaddress, receiver, 10000000);
+
+			String result = resultdp.getValue().getAsString();
+			log.info("Received result={}. Expected result={}", result, value);
+
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			assertEquals(value, result);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Cannot test system", e);
+			fail("Error");
+		}
+	}
+
+	/**
+	 * First write a value, then read the same value. The test is passed if the
+	 * read value is equal to the original one.
+	 */
+	@Test
 	public void writeAndReadTest() {
 		try {
-			String receiver = "CellAgent";
+			String receiver = "Server";
 			String datapointaddress = "testaddress";
 			String value = "testvalue";
 
 			// Create inspectoragent
 			CellGatewayImpl client = this.launchUtil
-					.createAgent(CellConfig.newConfig("inspectorgateway", CellImpl.class.getName()));
+					.createAgent(CellConfig.newConfig("client", CellImpl.class.getName()));
 			// Create receiver agent
-			this.launchUtil.createAgent(CellConfig.newConfig(receiver, CellImpl.class.getName()));
+			CellGatewayImpl receivergw = this.launchUtil
+					.createAgent(CellConfig.newConfig(receiver, CellImpl.class.getName()));
 
-			// synchronized (this) {
-			// try {
-			// this.wait(200);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			client.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value), receiver);
-			Datapoint resultdp = client.getCell().getCommunicator().read(datapointaddress, receiver, 100000);
+			Datapoint resultdp = client.getCell().getCommunicator().read(datapointaddress, receiver, 1000000);
 
 			String result = resultdp.getValue().getAsString();
 			log.info("Received result={}. Expected result={}", result, value);
@@ -157,16 +234,25 @@ public class CellBasicServiceTester {
 			String value1 = "Wrong value";
 			String value2 = "MuHaahAhaAaahAAHA";
 
-			CellGatewayImpl cellControlSubscriber = this.launchUtil
-					.createAgent(CellConfig.newConfig(subscriberAgentName));
-			CellGatewayImpl cellControlPublisher = this.launchUtil
-					.createAgent(CellConfig.newConfig(publisherAgentName));
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(subscriberAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
+							.addSyncDatapoint(datapointaddress, datapointaddress, publisherAgentName, SyncMode.push)));
+			CellGatewayImpl cellControlPublisher = this.launchUtil.createAgent(CellConfig.newConfig(publisherAgentName));
+
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			// Set init value
 			cellControlPublisher.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value1));
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 
-			cellControlSubscriber.getCommunicator().subscribe(Arrays.asList(datapointaddress), publisherAgentName);
+			List<Datapoint> originalValue = cellControlSubscriber.getCommunicator().subscribe(Arrays.asList(datapointaddress), publisherAgentName);
+			cellControlSubscriber.getCommunicator().write(originalValue);
 
 			log.debug("Get database of publisher={}", cellControlPublisher.getCell().getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getCell().getDataStorage());
@@ -175,7 +261,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(200);
 				} catch (InterruptedException e) {
 
 				}
@@ -198,8 +284,7 @@ public class CellBasicServiceTester {
 
 			log.debug("Datastorage of subscribercell={}", cellControlSubscriber.getCell().getDataStorage());
 
-			String answer = cellControlSubscriber.readLocalDatapoint(datapointaddress).getValue().getAsJsonPrimitive()
-					.getAsString(); // JsonMessage.getBody(result).get(datapointaddress).getAsString();
+			String answer = cellControlSubscriber.readLocalDatapoint(datapointaddress).getValue().getAsJsonPrimitive().getAsString(); // JsonMessage.getBody(result).get(datapointaddress).getAsString();
 
 			log.info("Received result={}. Expected result={}", answer, value2);
 			assertEquals(value2, answer);
@@ -322,6 +407,14 @@ public class CellBasicServiceTester {
 				cell.getCell().getCommunicator().setDefaultTimeout(10000);
 			}
 
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
 			// Set subscriptions
 			for (int i = 1; i < numberOfAgents; i++) {
 				CellGatewayImpl thisController = inspectors.get(i);
@@ -364,6 +457,47 @@ public class CellBasicServiceTester {
 			log.error("Cannot test system", e);
 			fail("Error");
 		}
+	}
+
+	/**
+	 * Idea: The agent shall write a datapoint
+	 * 
+	 */
+	@Test
+	public void CFQueryOnOneAgentTester() {
+		try {
+			String agentName = "agent";
+			String destinationAddress = CFDurationThreadTester.queryDatapointID;
+			String resultAddress = CFDurationThreadTester.resultDatapointID;
+			double value = 1.3;
+			double expectedResult = value;
+
+			//Create cell
+			CellGatewayImpl agent = this.launchUtil.createAgent(CellConfig.newConfig(agentName).addCellfunction(
+					CellFunctionConfig.newConfig(CFDurationThreadTester.class)
+							.addSyncDatapoint(CFDurationThreadTester.queryDatapointID, destinationAddress, "", SyncMode.push)
+							.addWriteDatapoint(CFDurationThreadTester.resultDatapointID, resultAddress, "", SyncMode.pull)));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.info("=== All agents initialized ===");
+			Datapoint resultDP = CFQuery.newQuery(agentName, destinationAddress, new JsonPrimitive(value), agentName, resultAddress, 100000, agent.getCell());
+
+			String result = resultDP.getValue().getAsString();
+			log.debug("correct value={}, actual value={}", expectedResult, result);
+
+			assertEquals(result, "FINISHED");
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
 	}
 
 }

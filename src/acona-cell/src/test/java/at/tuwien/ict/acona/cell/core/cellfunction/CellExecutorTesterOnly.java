@@ -39,21 +39,23 @@ public class CellExecutorTesterOnly {
 
 	@After
 	public void tearDown() throws Exception {
-		executor.setExit();
+		executor.shutDown();
 	}
 
 	@Test
 	public void executorExecuteOnceTest() {
 		log.debug("Start executorExecuteOnceTest");
 		try {
-			String commandDatapoint = "datapoint.command";
-			String queryDatapoint = "datapoint.query";
-			String executeonceDatapoint = "datapoint.executeonce";
+			String commandDatapointAddress = "datapoint.command";
+			String queryDatapointAddress = "datapoint.query";
+			String executeonceDatapointAddress = "datapoint.executeonce";
+			String resultDatapointAddress = "datapoint.result";
 
 			CellFunctionConfig config = CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-					.addSyncDatapoint(DatapointConfig.newConfig("command", commandDatapoint, SyncMode.push))
-					.addSyncDatapoint(DatapointConfig.newConfig("query", queryDatapoint, SyncMode.push))
-					.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapoint, SyncMode.push));
+					.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, SyncMode.push))
+					.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, SyncMode.push))
+					.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapointAddress, SyncMode.push))
+					.addWriteDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.pull));
 
 			// Map<String, List<Condition>> subscriptions = new HashMap<String,
 			// List<Condition>>();
@@ -71,8 +73,8 @@ public class CellExecutorTesterOnly {
 			// Start the executor with anything just to see
 			// Create a datapoint to start the function
 			Map<String, Datapoint> map = new HashMap<String, Datapoint>();
-			map.put(commandDatapoint, Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()));
-			this.executor.updateData(map);// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
+			map.put(commandDatapointAddress, Datapoint.newDatapoint(commandDatapointAddress).setValue(ControlCommand.START.toString()));
+			this.executor.updateSubscribedData(map);// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
 
 			// Put a delay to mitigate thread troubles
 			synchronized (this) {
@@ -85,8 +87,8 @@ public class CellExecutorTesterOnly {
 
 			// Now run something that is purposeful
 			map.clear();
-			map.put(queryDatapoint, Datapoint.newDatapoint(queryDatapoint).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
-			this.executor.updateData(map);
+			map.put(queryDatapointAddress, Datapoint.newDatapoint(queryDatapointAddress).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
+			this.executor.updateSubscribedData(map);
 			// this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT
 			// * FROM ICT DATABASE AND DELETE FILESERVER"));
 
@@ -99,7 +101,7 @@ public class CellExecutorTesterOnly {
 				}
 			}
 
-			String result = cell.getDataStorage().read("datapoint.result").getValue().getAsString();
+			String result = cell.getDataStorage().read(resultDatapointAddress).getValue().getAsString();
 			log.info("Shall match={}, Received result={}", "FINISHED", result);
 			assertEquals("FINISHED", result);
 			log.info("Test passed");

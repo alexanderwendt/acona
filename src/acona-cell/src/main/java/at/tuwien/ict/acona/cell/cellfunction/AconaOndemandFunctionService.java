@@ -164,7 +164,7 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 			log.info("New config set={}", data.get(parameter).getValue());
 
 			data.keySet().forEach(key -> {
-				this.getConfig().setProperty(key, data.get(key).getValue());
+				this.getFunctionConfig().setProperty(key, data.get(key).getValue());
 			});
 		}
 

@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +47,12 @@ public class CFIncrementService extends AconaOndemandFunctionService {
 			log.error("Cannot execute incrementation service", e);
 			throw new Exception(e.getMessage());
 		}
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -22,6 +22,8 @@ public class CellFunctionConfig {
 	public static final String CELLWRITEDATAPOINTS = "writedatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
+	public static final String GENERATERESPONDER = "generateresponder";
+	public static final String RESPONDERPROTOCOL = "responderprotocol";
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
 
@@ -56,6 +58,7 @@ public class CellFunctionConfig {
 		this.configObject = new JsonObject();
 		this.configObject.add(CELLSYNCDATAPOINTS, new JsonArray());
 		this.configObject.add(CELLWRITEDATAPOINTS, new JsonArray());
+		this.setGenerateReponder(false);
 		this.setName(name).setClassName(className);
 	}
 
@@ -68,9 +71,19 @@ public class CellFunctionConfig {
 		return this;
 	}
 
+	// ======================//
+
+	public String getName() {
+		return this.configObject.getAsJsonPrimitive(CELLFUNCTIONNAME).getAsString();
+	}
+
 	private CellFunctionConfig setClassName(String className) {
 		this.configObject.addProperty(CELLFUNCTIONCLASS, className);
 		return this;
+	}
+
+	public String getClassName() {
+		return this.configObject.getAsJsonPrimitive(CELLFUNCTIONCLASS).getAsString();
 	}
 
 	public CellFunctionConfig setExecuterate(int rateInMs) {
@@ -78,12 +91,121 @@ public class CellFunctionConfig {
 		return this;
 	}
 
+	// ======================//
+
+	public JsonPrimitive getExecuteRate() {
+		return this.configObject.getAsJsonPrimitive(CELLEXECUTERATE);
+	}
+
 	public CellFunctionConfig setExecuteOnce(boolean isExecuteOnce) {
 		this.configObject.addProperty(CELLEXECUTEONCE, isExecuteOnce);
 		return this;
 	}
 
-	//=== Syncdatapoints ===//
+	// ======================//
+
+	public JsonPrimitive isExecuteOnce() {
+		return this.configObject.getAsJsonPrimitive(CELLEXECUTEONCE);
+	}
+
+	public CellFunctionConfig setGenerateReponder(boolean isGenerateResponder) {
+		this.configObject.addProperty(GENERATERESPONDER, isGenerateResponder);
+		return this;
+	}
+
+	// ======================//
+
+	public JsonPrimitive getGenerateReponder() {
+		return this.configObject.getAsJsonPrimitive(GENERATERESPONDER);
+	}
+
+	public CellFunctionConfig setResponderProtocol(String responderProtocol) {
+		this.configObject.addProperty(RESPONDERPROTOCOL, responderProtocol);
+		return this;
+	}
+
+	public String getResponderProtocol() {
+		return this.getProperty(RESPONDERPROTOCOL, "");
+	}
+
+	public CellFunctionConfig setProperty(String name, String value) {
+		this.configObject.addProperty(name, value);
+		return this;
+	}
+
+	public CellFunctionConfig setProperty(String name, JsonObject value) {
+		this.configObject.add(name, value);
+		return this;
+	}
+
+	// === Syncdatapoints ===//
+
+	// =======================//
+
+	// === Write datapoints ===//
+
+	public <DATA_TYPE> DATA_TYPE getProperty(String key, Class<DATA_TYPE> type) {
+		Gson gson = new Gson();
+
+		return gson.fromJson(this.configObject.get(key), type);
+	}
+
+	public void setProperty(String key, Object value) {
+		// TODO: Method not tested yet
+		this.configObject.add(key, new Gson().toJsonTree(value));
+	}
+
+	public String getProperty(String key) throws Exception {
+		String result = "";
+		try {
+			result = this.configObject.getAsJsonPrimitive(key).getAsString();
+		} catch (Exception e) {
+			throw new Exception("Cannot read key " + key + ", " + e);
+		}
+
+		return result;
+	}
+
+	public String getProperty(String key, String defaultValue) {
+		String result = defaultValue;
+
+		if (configObject.has(key)) {
+			result = this.configObject.getAsJsonPrimitive(key).getAsString();
+		}
+
+		return result;
+	}
+
+	public JsonObject getPropertyAsJsonObject(String key) {
+		return this.configObject.getAsJsonObject(key);
+	}
+
+	// === Syncdatapoints ===//
+
+	// =======================//
+
+	// === Write datapoints ===//
+
+	// === Syncdatapoints ===//
+
+	private List<DatapointConfig> getDatapointConfig(String type) {
+		JsonArray array = this.configObject.getAsJsonArray(type);
+		// Gson gson = new Gson();
+		// Type type = new TypeToken<List<SubscriptionConfig>>(){}.getType();
+		// List<SubscriptionConfig> configList = gson.fromJson(array, type);
+		List<DatapointConfig> result = new ArrayList<DatapointConfig>();
+		array.forEach(a -> {
+
+			try {
+				result.add(DatapointConfig.newConfig(a.getAsJsonObject()));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+
+		return result;
+	}
 
 	public CellFunctionConfig addSyncDatapoint(DatapointConfig config) {
 		this.configObject.getAsJsonArray(CELLSYNCDATAPOINTS).add(config.toJsonObject());
@@ -112,9 +234,9 @@ public class CellFunctionConfig {
 		return result;
 	}
 
-	//=======================//
+	// =======================//
 
-	//=== Write datapoints ===//
+	// === Write datapoints ===//
 
 	public CellFunctionConfig addWriteDatapoint(DatapointConfig config) {
 		this.configObject.getAsJsonArray(CELLWRITEDATAPOINTS).add(config.toJsonObject());
@@ -143,92 +265,15 @@ public class CellFunctionConfig {
 		return this.getDatapointConfig(CELLWRITEDATAPOINTS);
 	}
 
-	//======================//
-
-	public String getName() {
-		return this.configObject.getAsJsonPrimitive(CELLFUNCTIONNAME).getAsString();
-	}
-
-	public String getClassName() {
-		return this.configObject.getAsJsonPrimitive(CELLFUNCTIONCLASS).getAsString();
-	}
-
-	public JsonPrimitive isExecuteOnce() {
-		return this.configObject.getAsJsonPrimitive(CELLEXECUTEONCE);
-	}
-
-	public JsonPrimitive getExecuteRate() {
-		return this.configObject.getAsJsonPrimitive(CELLEXECUTERATE);
-	}
-
-	private List<DatapointConfig> getDatapointConfig(String type) {
-		JsonArray array = this.configObject.getAsJsonArray(type);
-		// Gson gson = new Gson();
-		// Type type = new TypeToken<List<SubscriptionConfig>>(){}.getType();
-		// List<SubscriptionConfig> configList = gson.fromJson(array, type);
-		List<DatapointConfig> result = new ArrayList<DatapointConfig>();
-		array.forEach(a -> {
-
-			try {
-				result.add(DatapointConfig.newConfig(a.getAsJsonObject()));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
-
-		return result;
-	}
-
-	public String getProperty(String key) throws Exception {
-		String result = "";
-		try {
-			result = this.configObject.getAsJsonPrimitive(key).getAsString();
-		} catch (Exception e) {
-			throw new Exception("Cannot read key " + key + ", " + e);
-		}
-
-		return result;
-	}
-
-	public String getProperty(String key, String defaultValue) {
-		String result = defaultValue;
-
-		if (configObject.has(key)) {
-			result = this.configObject.getAsJsonPrimitive(key).getAsString();
-		}
-
-		return result;
-	}
-
-	public CellFunctionConfig setProperty(String name, String value) {
-		this.configObject.addProperty(name, value);
-		return this;
-	}
-
-	public CellFunctionConfig setProperty(String name, JsonObject value) {
-		this.configObject.add(name, value);
-		return this;
-	}
-
-	public JsonObject getPropertyAsJsonObject(String key) {
-		return this.configObject.getAsJsonObject(key);
-	}
-
 	public JsonObject toJsonObject() {
 		return this.configObject;
 	}
 
-	public <DATA_TYPE> DATA_TYPE getProperty(String key, Class<DATA_TYPE> type) {
-		Gson gson = new Gson();
+	// === Syncdatapoints ===//
 
-		return gson.fromJson(this.configObject.get(key), type);
-	}
+	// =======================//
 
-	public void setProperty(String key, Object value) {
-		// TODO: Method not tested yet
-		this.configObject.add(key, new Gson().toJsonTree(value));
-	}
+	// === Write datapoints ===//
 
 	@Override
 	public String toString() {

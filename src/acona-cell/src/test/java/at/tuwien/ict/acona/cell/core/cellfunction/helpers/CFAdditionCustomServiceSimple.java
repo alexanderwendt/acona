@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -68,10 +69,10 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	protected void cellFunctionInternalInit() throws Exception {
 		// Add the datapoints from the config to the subscriptions
 		this.trackedDatapoints.put(OPERAND1,
-				DatapointConfig.newConfig(this.getConfig().getPropertyAsJsonObject(OPERAND1)));
+				DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND1)));
 		this.trackedDatapoints.put(OPERAND2,
-				DatapointConfig.newConfig(this.getConfig().getPropertyAsJsonObject(OPERAND2)));
-		this.trackedDatapoints.put(RESULT, DatapointConfig.newConfig(this.getConfig().getPropertyAsJsonObject(RESULT)));
+				DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND2)));
+		this.trackedDatapoints.put(RESULT, DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(RESULT)));
 
 	}
 
@@ -105,6 +106,12 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 			log.info("An unknown or empty command was put on the datapoint={}", data);
 		}
 
+	}
+
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

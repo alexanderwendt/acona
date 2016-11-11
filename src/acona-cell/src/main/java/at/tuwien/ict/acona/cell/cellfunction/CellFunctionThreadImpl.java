@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
-import java.lang.Thread.State;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  *         be executed if a subscribed datapoint is received
  *
  */
-public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements Runnable {
+public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl implements Runnable {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 
@@ -30,7 +29,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	}
 
 	@Override
-	public void cellFunctionInit() throws Exception {
+	protected void cellFunctionExecutorInit() throws Exception {
 		// this.name = name;
 		// this.cell = caller;
 		// this.subscriptions.putAll(subscriptionMapping);
@@ -113,9 +112,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
 		// If the thread is running, the method shall wait or produce timeout
-		while (!t.getState().equals(State.WAITING)) {
-
-		}
+		//		if (t != null) {
+		//			while (!t.getState().equals(State.WAITING)) {
+		//
+		//			}
+		//		}
 
 		this.updateDatapointsByIdOnThread(data);
 	}
@@ -159,6 +160,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		} else if (this.getCurrentCommand().equals(ControlCommand.EXIT) == true) {
 			this.setActive(false);
 		}
+	}
+
+	@Override
+	protected void shutDownImplementation() {
+		this.setCommand(ControlCommand.EXIT);
+
 	}
 
 	public boolean isActive() {

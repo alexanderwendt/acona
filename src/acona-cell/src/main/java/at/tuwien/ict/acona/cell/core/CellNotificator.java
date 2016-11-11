@@ -34,13 +34,11 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 		this.cell = cell;
 	}
 
-	private ExecutorService threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
-			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+	private ExecutorService threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
 	@Override
 	public synchronized void notifySubscribers(List<String> subscribers, String caller, Datapoint subscribedData) {
-		threadPoolExecutor.execute(new WorkerThread(cell.getFunctionHandler(), cell.getCommunicator(), subscribers,
-				caller, cell.getLocalName(), subscribedData));
+		threadPoolExecutor.execute(new WorkerThread(cell.getFunctionHandler(), cell.getCommunicator(), subscribers, caller, cell.getLocalName(), subscribedData));
 
 	}
 
@@ -61,8 +59,7 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 		private final Communicator communicator;
 		private final String localName;
 
-		public WorkerThread(CellFunctionHandler activationHandler, Communicator communicator, List<String> subscribers,
-				String caller, String localName, Datapoint subscribedData) {
+		public WorkerThread(CellFunctionHandler activationHandler, Communicator communicator, List<String> subscribers, String caller, String localName, Datapoint subscribedData) {
 			this.communicator = communicator;
 			this.activationHandler = activationHandler;
 			this.subscribers = subscribers;
@@ -73,41 +70,32 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 
 		@Override
 		public void run() {
-			log.trace("running subscription notification for data={} and subscribers={}",
-					this.subscribedData.getAddress(), this.subscribers);
-			if (subscribers.contains(this.localName)) {
-				log.trace("activate local behaviors for agent {}", this.localName);
-				// Write
-				// data
-				// to
-				// thread
-				// +
-				// activate
-				// thread
-				// after
-				// that
-				this.activationHandler.activateLocalFunctions(subscribedData);
-
-				// Revove it from the list before sending to external
-				// application
-				// because this agent does not subscribe through external
-				// subscriptions
-				subscribers.remove(this.localName);
-			}
-
-			// Remove the caller itself because the caller is writing this
-			// datapoint
-			if (subscribers.contains(caller)) {
-				log.debug("caller is writing a subscribed datapoint. Remove the caller. No subscription necessary");
-				subscribers.remove(caller);
-			}
+			log.trace("running subscription notification for data={} and subscribers={}", this.subscribedData.getAddress(), this.subscribers);
+			//			if (subscribers.contains(this.localName)) {
+			//				log.trace("activate local behaviors for agent={}", this.localName);
+			//
+			//				this.activationHandler.activateNotifySubscribers(this.localName, subscribedData);
+			//
+			//				// Revove it from the list before sending to external
+			//				// application
+			//				// because this agent does not subscribe through external
+			//				// subscriptions
+			//				subscribers.remove(this.localName);
+			//			}
+			//
+			//			// Remove the caller itself because the caller is writing this
+			//			// datapoint
+			//			if (subscribers.contains(caller)) {
+			//				log.debug("caller is writing a subscribed datapoint. Remove the caller. No subscription necessary");
+			//				subscribers.remove(caller);
+			//			}
 
 			// Notify external agents that subscribe a value from this data
 			// storage
 			if (subscribers.isEmpty() == false) {
 				subscribers.forEach(s -> {
 					try {
-						this.communicator.write(subscribedData, s);
+						this.communicator.notifySubscriber(subscribedData, s);
 					} catch (Exception e) {
 						log.error("Cannot notify datapoint={} to subscriber={}", subscribedData, s, e);
 					}

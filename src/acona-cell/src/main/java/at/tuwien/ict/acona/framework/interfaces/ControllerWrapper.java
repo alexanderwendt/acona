@@ -54,7 +54,7 @@ public class ControllerWrapper implements ControllerCellGateway {
 
 		ServiceState result = ServiceState.ERROR;
 		try {
-			Datapoint dp = this.communicator.query(Datapoint.newDatapoint(servicecommand).setValue(ControlCommand.START.toString()), agentName, Datapoint.newDatapoint(serviceresult),
+			Datapoint dp = this.communicator.queryDatapoints(Datapoint.newDatapoint(servicecommand).setValue(ControlCommand.START.toString()), agentName, Datapoint.newDatapoint(serviceresult),
 					agentName, timeout);
 			result = ServiceState.valueOf(dp.getValueAsString());
 		} catch (Exception e) {
