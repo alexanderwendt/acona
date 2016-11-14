@@ -8,18 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceNotifySubscribers;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceRead;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceSubscribe;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceUnsubscribe;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceWrite;
 import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import jade.core.Agent;
@@ -71,21 +64,23 @@ public class CellImpl extends Agent implements CellInitialization {
 		// Set configuration
 		this.conf = conf;
 
+		//Important notice: All cell functions are initialized through the CellConfig
+
 		// Add standard functions like write, read and subscribe
-		CellFunctionConfig writeServiceConfig = CellFunctionConfig.newConfig("write", BasicServiceWrite.class);
-		CellFunction writeService = this.builder.createCellFunctionFromConfig(writeServiceConfig.toJsonObject(), this);
-
-		CellFunctionConfig readServiceConfig = CellFunctionConfig.newConfig("read", BasicServiceRead.class);
-		CellFunction readService = this.builder.createCellFunctionFromConfig(readServiceConfig.toJsonObject(), this);
-
-		CellFunctionConfig subscribeServiceConfig = CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class);
-		CellFunction subscribeService = this.builder.createCellFunctionFromConfig(subscribeServiceConfig.toJsonObject(), this);
-
-		CellFunctionConfig unsubscribeServiceConfig = CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class);
-		CellFunction unsubscribeService = this.builder.createCellFunctionFromConfig(unsubscribeServiceConfig.toJsonObject(), this);
-
-		CellFunctionConfig notifyServiceConfig = CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class);
-		CellFunction notifyService = this.builder.createCellFunctionFromConfig(notifyServiceConfig.toJsonObject(), this);
+		//		CellFunctionConfig writeServiceConfig = CellFunctionConfig.newConfig("write", BasicServiceWrite.class);
+		//		CellFunction writeService = this.builder.createCellFunctionFromConfig(writeServiceConfig.toJsonObject(), this);
+		//
+		//		CellFunctionConfig readServiceConfig = CellFunctionConfig.newConfig("read", BasicServiceRead.class);
+		//		CellFunction readService = this.builder.createCellFunctionFromConfig(readServiceConfig.toJsonObject(), this);
+		//
+		//		CellFunctionConfig subscribeServiceConfig = CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class);
+		//		CellFunction subscribeService = this.builder.createCellFunctionFromConfig(subscribeServiceConfig.toJsonObject(), this);
+		//
+		//		CellFunctionConfig unsubscribeServiceConfig = CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class);
+		//		CellFunction unsubscribeService = this.builder.createCellFunctionFromConfig(unsubscribeServiceConfig.toJsonObject(), this);
+		//
+		//		CellFunctionConfig notifyServiceConfig = CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class);
+		//		CellFunction notifyService = this.builder.createCellFunctionFromConfig(notifyServiceConfig.toJsonObject(), this);
 
 		builder.initializeCellConfig(this.conf, this);
 	}

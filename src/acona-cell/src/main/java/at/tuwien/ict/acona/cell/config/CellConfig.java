@@ -4,6 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceNotifySubscribers;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceRead;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceSubscribe;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceUnsubscribe;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceWrite;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 
 public class CellConfig {
@@ -72,6 +77,17 @@ public class CellConfig {
 		this.configObject = new JsonObject();
 		this.setName(name).setClassName(className);
 		this.configObject.add(CELLFUNCTIONS, new JsonArray());
+
+		//Add basic cell functions. Then nothing has to be generated in the code
+		this.addBasicCellFunctions();
+	}
+
+	private void addBasicCellFunctions() {
+		this.addCellfunction(CellFunctionConfig.newConfig("write", BasicServiceWrite.class));
+		this.addCellfunction(CellFunctionConfig.newConfig("read", BasicServiceRead.class));
+		this.addCellfunction(CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class));
+		this.addCellfunction(CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class));
+		this.addCellfunction(CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class));
 	}
 
 	/**

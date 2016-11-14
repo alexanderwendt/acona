@@ -63,7 +63,7 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 
 	@Override
 	public void createResponderForFunction(CellFunction function) {
-		AconaServiceBehaviour responder = new AconaServiceBehaviour(this.cell, function);
+		ExternalServiceBehaviour responder = new ExternalServiceBehaviour(this.cell, function);
 
 		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 		cell.addBehaviour(tbf.wrap(responder));

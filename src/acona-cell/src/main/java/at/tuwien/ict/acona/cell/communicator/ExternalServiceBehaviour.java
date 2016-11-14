@@ -23,7 +23,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.SimpleAchieveREResponder;
 
-public class AconaServiceBehaviour extends SimpleAchieveREResponder {
+public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 
 	public static final String METHODNAME = "methodname";
 	public static final String PARAMETER = "parameter";
@@ -36,7 +36,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static Logger log = LoggerFactory.getLogger(AconaServiceBehaviour.class);
+	private static Logger log = LoggerFactory.getLogger(ExternalServiceBehaviour.class);
 	private final static Gson gson = new Gson();
 	private final CellImpl cell;
 
@@ -46,7 +46,7 @@ public class AconaServiceBehaviour extends SimpleAchieveREResponder {
 	private String methodName;
 	private final CellFunction service;
 
-	public AconaServiceBehaviour(CellImpl caller, CellFunction service) {
+	public ExternalServiceBehaviour(CellImpl caller, CellFunction service) {
 		// In the super class, it shall use the message template here
 		// super(caller, MessageTemplate.and(
 		// MessageTemplate.MatchProtocol((AconaServiceType.SUBSCRIBE ==
