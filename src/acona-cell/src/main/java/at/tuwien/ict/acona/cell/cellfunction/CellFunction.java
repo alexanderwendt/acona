@@ -30,7 +30,7 @@ public interface CellFunction {
 	 *            which are subscribe
 	 * @throws Exception
 	 */
-	public void updateSubscribedData(Map<String, Datapoint> data) throws Exception;
+	public void updateSubscribedData(Map<String, Datapoint> data, String caller) throws Exception;
 
 	/**
 	 * Return the name of the function, which has been specified in the config

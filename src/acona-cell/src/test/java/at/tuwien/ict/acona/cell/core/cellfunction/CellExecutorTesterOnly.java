@@ -75,7 +75,7 @@ public class CellExecutorTesterOnly {
 			// Create a datapoint to start the function
 			Map<String, Datapoint> map = new HashMap<String, Datapoint>();
 			map.put(commandDatapointAddress, Datapoint.newDatapoint(commandDatapointAddress).setValue(ControlCommand.START.toString()));
-			this.executor.updateSubscribedData(map);// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
+			this.executor.updateSubscribedData(map, cell.getLocalName());// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
 
 			// Put a delay to mitigate thread troubles
 			synchronized (this) {
@@ -89,7 +89,7 @@ public class CellExecutorTesterOnly {
 			// Now run something that is purposeful
 			map.clear();
 			map.put(queryDatapointAddress, Datapoint.newDatapoint(queryDatapointAddress).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
-			this.executor.updateSubscribedData(map);
+			this.executor.updateSubscribedData(map, cell.getLocalName());
 			// this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT
 			// * FROM ICT DATABASE AND DELETE FILESERVER"));
 

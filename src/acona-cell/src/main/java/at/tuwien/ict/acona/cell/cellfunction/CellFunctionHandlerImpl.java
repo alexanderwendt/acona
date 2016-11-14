@@ -46,7 +46,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
 			instanceList.forEach((CellFunction a) -> {
 				try {
-					a.updateSubscribedData(subscribedDatapointMap);
+					a.updateSubscribedData(subscribedDatapointMap, callerAgent);
 				} catch (Exception e) {
 					log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
 				}

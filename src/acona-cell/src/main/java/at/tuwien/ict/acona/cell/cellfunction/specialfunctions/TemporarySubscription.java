@@ -54,7 +54,7 @@ public class TemporarySubscription implements CellFunction {
 	}
 
 	@Override
-	public void updateSubscribedData(Map<String, Datapoint> data) throws Exception {
+	public void updateSubscribedData(Map<String, Datapoint> data, String caller) throws Exception {
 		log.debug("Received update message for temp subscription={}", data);
 		Datapoint dp = data.get(subscriptionAddress);
 		this.queue.put(dp);

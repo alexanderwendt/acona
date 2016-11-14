@@ -132,7 +132,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	// protected abstract void updateDatapoint(Datapoint subscribedData) throws
 	// Exception;
 	@Override
-	public void updateSubscribedData(Map<String, Datapoint> data) {
+	public void updateSubscribedData(Map<String, Datapoint> data, String caller) {
 		// Create datapointmapping ID to datapoint with new value
 		Map<String, Datapoint> subscriptions = new HashMap<String, Datapoint>();
 		this.getSubscribedDatapoints().forEach((k, v) -> {
