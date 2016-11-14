@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.communicator.Communicator;
@@ -54,8 +55,7 @@ public class ControllerWrapper implements ControllerCellGateway {
 
 		ServiceState result = ServiceState.ERROR;
 		try {
-			Datapoint dp = this.communicator.queryDatapoints(Datapoint.newDatapoint(servicecommand).setValue(ControlCommand.START.toString()), agentName, Datapoint.newDatapoint(serviceresult),
-					agentName, timeout);
+			Datapoint dp = this.communicator.queryDatapoints(servicecommand, new JsonPrimitive(ControlCommand.START.toString()), agentName, serviceresult, agentName, timeout);
 			result = ServiceState.valueOf(dp.getValueAsString());
 		} catch (Exception e) {
 			log.error("Cannot execute query or the service state is erroneus", e);

@@ -6,6 +6,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -21,16 +23,13 @@ public class SequenceController extends CellFunctionThreadImpl {
 	// execute service 1
 
 	private ServiceState executeServiceById(String serviceNameId, String agentNameId, int timeout) throws Exception {
-		return executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId),
-				timeout);
+		return executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId), timeout);
 	}
 
 	private ServiceState executeService(String serviceName, String agentName, int timeout) throws Exception {
 		String commandDatapoint = serviceName + ".command";
 		String resultDatapoint = serviceName + ".state";
-		Datapoint result1 = this.getCommunicator().queryDatapoints(
-				Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()), agentName,
-				Datapoint.newDatapoint(resultDatapoint), agentName, timeout);
+		Datapoint result1 = this.getCommunicator().queryDatapoints(commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), agentName, resultDatapoint, agentName, timeout);
 
 		return ServiceState.valueOf(result1.getValueAsString());
 	}

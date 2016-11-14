@@ -81,4 +81,10 @@ public class CFVisualizer extends CellFunctionThreadImpl implements Visualizatio
 
 	}
 
+	@Override
+	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

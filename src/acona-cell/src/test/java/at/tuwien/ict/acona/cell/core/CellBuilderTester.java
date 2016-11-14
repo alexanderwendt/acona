@@ -3,12 +3,16 @@ package at.tuwien.ict.acona.cell.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
@@ -61,8 +65,7 @@ public class CellBuilderTester {
 			cellConfig
 					.addCellfunction(
 							CellFunctionConfig.newConfig("function1", DummyFunction.class)
-									.addSyncDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value",
-											SyncMode.push))
+									.addSyncDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value", SyncMode.push))
 									.setExecuteOnce(true).setExecuterate(500)
 									.setProperty("TESTPROPERTY1", "valuesuccess"));
 
@@ -122,12 +125,13 @@ public class CellBuilderTester {
 			// cellConfig.getAsJsonArray(CELLBEHAVIOURS).add(behaviourToExecuteConfig);
 			// cellConfig.getAsJsonArray(CELLACTIVATORS).add(activatorConfig);
 
-			DummyCell cell = new DummyCell();
+			DummyCell cell = new DummyCell(cellConfig);
 			CellBuilder builder = new CellBuilder();
 
-			builder.initializeCellConfig(cellConfig, cell);// .initializeCellConfig(cellConfig,
-															// cell);
-			String actualResult = cell.getFunctionHandler().getCellFunctionDatapointMapping().get("agent1.dp1.value").get(0).getFunctionConfig().getProperty("TESTPROPERTY1");
+			builder.initializeCellConfig(cellConfig, cell);// .initializeCellConfig(cellConfig, cell);
+
+			Map<String, List<CellFunction>> function = cell.getFunctionHandler().getCellFunctionDatapointMapping();
+			String actualResult = cell.getFunctionHandler().getCellFunctionDatapointMapping().get("testcell:agent1.dp1.value").get(0).getFunctionConfig().getProperty("TESTPROPERTY1");
 
 			// Get the name of one of the activators
 

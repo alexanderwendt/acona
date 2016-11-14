@@ -121,13 +121,11 @@ public class AconaServiceTester {
 					.addCellfunction(CellFunctionConfig.newConfig(SequenceController.class)
 							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
-							.setProperty("delay", "1000").addSyncDatapoint(
-									DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.push)));
+							.setProperty("delay", "1000")
+							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.push)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
 
 			controller.getCommunicator().write(Datapoint.newDatapoint("Test"), memoryAgentName);
-			// controller.subscribeForeignDatapoint(processDatapoint,
-			// memoryAgentName);
 
 			// Create services
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
@@ -154,60 +152,12 @@ public class AconaServiceTester {
 			}
 			log.info("=== All agents initialized ===");
 
-			memoryAgent.writeLocalDatapoint(
-					Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			//memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			memoryAgent.writeLocalDatapoint(
-					Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().queryDatapoints(
-					Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.START.toString()),
-					controller.getCell().getLocalName(), Datapoint.newDatapoint("state"),
-					controller.getCell().getLocalName(), 1000000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
 
-			// Write the numbers in the database agents
-			// client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
-			// client2.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
-			//
-			// //Query the service with start and then get the status
-			// //Set default timeout to a high number to be able to debug
-			// controlAgent.getCommunicator().setDefaultTimeout(100000);
-			// log.debug("Execute query");
-			// Datapoint resultState =
-			// controlAgent.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive(ControlCommand.START.toString())),
-			// additionAgentName, Datapoint.newDatapoint(STATUSDATAPOINTNAME),
-			// additionAgentName, 100000);
-			// log.debug("Query executed with result={}", resultState);
-			//
-			// double sum = controlAgent.getCommunicator().read(resultdatapoint,
-			// outputmemoryAgentName).getValue().getAsJsonPrimitive().getAsDouble();
-			// client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive("START")), drivetrackAgentName);
-			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
-
-			// synchronized (this) {
-			// try {
-			// this.wait(6000);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
-
-			// client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1+1)),
-			// "nothing");
-			// client1.getDataStorage().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2+2)),
-			// "nothing");
-
-			// client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive("START")), drivetrackAgentName);
-			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
-
-			// Get the result from the result receiver agent
-			// String result =
-			// client2.getCommunicator().read(resultdatapoint).getValueAsString();
 			double result = memoryAgent.getCommunicator().read(processDatapoint).getValue().getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
@@ -351,8 +301,7 @@ public class AconaServiceTester {
 			// Test the wrapper for controllers too
 			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(
-					Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.START.toString()), Datapoint.newDatapoint("state"), 100000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), "state", 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
@@ -468,8 +417,7 @@ public class AconaServiceTester {
 			log.info("=== System initialized ===");
 			// === System operation ===//
 
-			Datapoint resultState = topController.getCommunicator().queryDatapoints(Datapoint.newDatapoint(controllerServiceName + ".command").setValue(ControlCommand.START.toString()),
-					Datapoint.newDatapoint(controllerServiceName + ".state"), 100000);
+			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", 100000);
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//

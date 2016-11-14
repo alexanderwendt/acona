@@ -187,8 +187,8 @@ public class CogSysTester {
 					Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			Datapoint state = controller.getCommunicator().queryDatapoints(
-					Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.START.toString()),
-					controller.getCell().getLocalName(), Datapoint.newDatapoint("state"),
+					COMMANDDATAPOINTNAME, ControlCommand.START.toString(),
+					controller.getCell().getLocalName(), "state",
 					controller.getCell().getLocalName(), 1000000);
 
 			// Write the numbers in the database agents
@@ -382,9 +382,7 @@ public class CogSysTester {
 			// Test the wrapper for controllers too
 			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(
-					Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.START.toString()),
-					Datapoint.newDatapoint("state"), 100000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), "state", 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
@@ -503,9 +501,7 @@ public class CogSysTester {
 			// === System operation ===//
 
 			Datapoint resultState = topController.getCommunicator()
-					.queryDatapoints(Datapoint.newDatapoint(controllerServiceName + ".command")
-							.setValue(ControlCommand.START.toString()),
-							Datapoint.newDatapoint(controllerServiceName + ".state"), 100000);
+					.queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", 100000);
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//

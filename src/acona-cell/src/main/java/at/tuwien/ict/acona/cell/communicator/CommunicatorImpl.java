@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
@@ -453,6 +454,16 @@ public class CommunicatorImpl extends BaseCommunicatorImpl implements Communicat
 	@Override
 	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, int timeout) throws Exception {
 		return this.queryDatapoints(writeAddress, content, this.getLocalAgentName(), resultAddress, this.getLocalAgentName(), timeout);
+	}
+
+	@Override
+	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception {
+		return this.queryDatapoints(writeAddress, new JsonPrimitive(content), resultAddress, timeout);
+	}
+
+	@Override
+	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
+		return this.queryDatapoints(writeAddress, new JsonPrimitive(content), writeAgentName, resultAddress, resultAgentName, timeout);
 	}
 
 	@Override

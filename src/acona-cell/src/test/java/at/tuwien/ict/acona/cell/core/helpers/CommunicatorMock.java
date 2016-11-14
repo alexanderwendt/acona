@@ -2,6 +2,8 @@ package at.tuwien.ict.acona.cell.core.helpers;
 
 import java.util.List;
 
+import com.google.gson.JsonElement;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.core.Cell;
@@ -130,13 +132,31 @@ public class CommunicatorMock implements Communicator {
 	}
 
 	@Override
-	public Datapoint queryDatapoints(Datapoint datapointtowrite, String agentNameToWrite, Datapoint result, String agentNameResult, int timeout) throws Exception {
+	public void notifySubscriber(Datapoint datapoint, String agentName) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Datapoint queryDatapoints(Datapoint datapointtowrite, Datapoint result, int timeout) throws Exception {
+	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

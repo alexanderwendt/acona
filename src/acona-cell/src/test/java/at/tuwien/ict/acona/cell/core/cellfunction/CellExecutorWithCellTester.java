@@ -13,6 +13,7 @@ import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFDataStorageUpdate;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
@@ -101,7 +102,9 @@ public class CellExecutorWithCellTester {
 			testAgent.getCommunicator().setDefaultTimeout(100000);
 
 			// Create inspector or the new gateway
-			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
+			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class)
+					.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
+							.addSyncDatapoint(resultDatapointAddress, resultDatapointAddress, "testagent", SyncMode.push)));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
 
 			// Write the numbers in the database agents
@@ -162,7 +165,9 @@ public class CellExecutorWithCellTester {
 
 			// Create inspector or the new gateway
 			CellGatewayImpl cellControlSubscriber = this.launcher
-					.createAgent(CellConfig.newConfig("subscriber", CellImpl.class));
+					.createAgent(CellConfig.newConfig("subscriber", CellImpl.class)
+							.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
+									.addSyncDatapoint(resultDatapoint, resultDatapoint, "testagent", SyncMode.push)));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
 
 			// Write the numbers in the database agents

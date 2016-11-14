@@ -16,6 +16,7 @@ public class BasicServiceNotifySubscribers extends BasicService {
 	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		List<Datapoint> result = new ArrayList<Datapoint>();
+		log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.keySet());
 
 		parameterdata.values().forEach(dp -> {
 			this.getCell().getFunctionHandler().activateNotifySubscribers(caller, dp);

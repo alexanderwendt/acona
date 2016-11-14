@@ -63,6 +63,13 @@ public class CellBasicServiceTester {
 			// log.debug("Create gateway");
 			// comm = new GatewayImpl();
 			// comm.init();
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
@@ -78,7 +85,7 @@ public class CellBasicServiceTester {
 	public void tearDown() throws Exception {
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException e) {
 
 			}
@@ -88,7 +95,7 @@ public class CellBasicServiceTester {
 		runtime.shutDown();
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException e) {
 
 			}
@@ -261,7 +268,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(200);
+					this.wait(500);
 				} catch (InterruptedException e) {
 
 				}
@@ -276,7 +283,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(100);
+					this.wait(500);
 				} catch (InterruptedException e) {
 
 				}
@@ -317,10 +324,20 @@ public class CellBasicServiceTester {
 			String value1 = "Wrong value1";
 			String value2 = "MuHaahAhaAaahAAHA2";
 
-			CellGatewayImpl cellControlSubscriber = this.launchUtil
-					.createAgent(CellConfig.newConfig(subscriberAgentName, CellImpl.class.getName()));
-			CellGatewayImpl cellControlPublisher = this.launchUtil
-					.createAgent(CellConfig.newConfig(publisherAgentName, CellImpl.class.getName()));
+			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(subscriberAgentName, CellImpl.class.getName())
+					.addCellfunction(CellFunctionConfig.newConfig(CFDataStorageUpdate.class).addSyncDatapoint(datapointaddress, datapointaddress, publisherAgentName, SyncMode.push)));
+			CellGatewayImpl cellControlPublisher = this.launchUtil.createAgent(CellConfig.newConfig(publisherAgentName, CellImpl.class.getName()));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
+			cellControlPublisher.getCommunicator().setDefaultTimeout(100000);
 
 			// Set init value
 			cellControlPublisher.writeLocalDatapoint(Datapoint.newDatapoint(datapointaddress).setValue(value1));
@@ -328,6 +345,14 @@ public class CellBasicServiceTester {
 
 			// Subscribe a datapoint of the publisher agent
 			cellControlSubscriber.subscribeForeignDatapoint(datapointaddress, publisherAgentName);
+
+			synchronized (this) {
+				try {
+					this.wait(500);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			cellControlPublisher.writeLocalDatapoint(Datapoint.newDatapoint(datapointaddress).setValue(value1));
 			// Both shall have the same value
@@ -363,7 +388,7 @@ public class CellBasicServiceTester {
 			assertEquals(value1, answer);
 			log.info("Test passed");
 		} catch (Exception e) {
-			log.error("Cannot init system", e);
+			log.error("Cannot test system", e);
 			fail("Error");
 		}
 	}
@@ -400,11 +425,16 @@ public class CellBasicServiceTester {
 
 			// Create X=5 agents
 			List<CellGatewayImpl> inspectors = new ArrayList<CellGatewayImpl>();
-			for (int i = 0; i < numberOfAgents; i++) {
+			CellGatewayImpl firstCell = this.launchUtil.createAgent(CellConfig.newConfig(agentNameTemplate + 0));
+			inspectors.add(firstCell);
+			for (int i = 1; i < numberOfAgents; i++) {
 				CellGatewayImpl cell = (this.launchUtil
-						.createAgent(CellConfig.newConfig(agentNameTemplate + i, CellImpl.class.getName())));
+						.createAgent(CellConfig.newConfig(agentNameTemplate + i)
+								.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
+										.addSyncDatapoint(datapointaddress, datapointaddress, inspectors.get(i - 1).getCell().getLocalName(), SyncMode.push))));
 				inspectors.add(cell);
 				cell.getCell().getCommunicator().setDefaultTimeout(10000);
+
 			}
 
 			synchronized (this) {

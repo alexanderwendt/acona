@@ -52,5 +52,9 @@ public interface Communicator extends BaseCommunicator {
 	 */
 	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception;
 
+	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception;
+
 	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, int timeout) throws Exception;
+
+	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception;
 }

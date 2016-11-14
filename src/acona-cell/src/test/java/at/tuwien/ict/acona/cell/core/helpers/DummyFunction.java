@@ -25,8 +25,7 @@ public class DummyFunction extends CellFunctionImpl {
 				log.info("No configuration was passed");
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Cannot init function", e);
 		}
 	}
 

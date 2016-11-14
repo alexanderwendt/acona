@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
@@ -64,7 +65,7 @@ public class CellExecutorTesterOnly {
 			// subscriptions.put(executeonceDatapoint, new
 			// ArrayList<Condition>());
 
-			DummyCell cell = new DummyCell();
+			DummyCell cell = new DummyCell(CellConfig.newConfig("dummycell"));
 
 			this.executor.init(config, cell);
 			// executor.initWithConditions("testexecutor", subscriptions, "",

@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
 import java.util.Map;
+import java.util.concurrent.SynchronousQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,27 +25,20 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 	private boolean isActive = true;
 
+	/**
+	 * The blocker is a queue, which is cleared at the start of the method and
+	 * the value true is put at the end of the method. In that way, external
+	 * applications can execute blocking functions with a non-blocking class.
+	 */
+	private final SynchronousQueue<Boolean> blocker = new SynchronousQueue<Boolean>();
+
 	public CellFunctionThreadImpl() {
 
 	}
 
 	@Override
 	protected void cellFunctionExecutorInit() throws Exception {
-		// this.name = name;
-		// this.cell = caller;
-		// this.subscriptions.putAll(subscriptionMapping);
-
 		try {
-			// Execute internal init
-			// cellFunctionInit(); //e.g. add subscriptions
-
-			// Subscribe datapoints
-			// this.getCommunicator().subscribe(this.getSubscribedDatapoints(),
-			// cell.getName());
-			// this.subscriptions.values().forEach(s->{
-			// this.getCommunicator().subscribeDatapoint(s, cell.getName());
-			// });
-
 			cellFunctionInternalInit();
 
 			// Create a thread from this class
@@ -74,11 +68,16 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 			try {
 				if (this.isAllowedToRun() == true) {
+					//Clear the blocker queue
+					blocker.clear();
 					executePreProcessing();
 
 					executeFunction();
 
 					executePostProcessing();
+
+					//Add true to release the queue
+					blocker.put(true);
 				}
 			} catch (Exception e1) {
 				log.error("Error in program execution", e1);
@@ -174,6 +173,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	protected SynchronousQueue<Boolean> getBlocker() {
+		return blocker;
 	}
 
 }

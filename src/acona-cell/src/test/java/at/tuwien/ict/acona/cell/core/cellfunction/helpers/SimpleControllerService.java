@@ -6,11 +6,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.AconaOndemandFunctionService;
+import com.google.gson.JsonPrimitive;
+
+import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class SimpleControllerService extends AconaOndemandFunctionService {
+public class SimpleControllerService extends OndemandFunctionService {
 
 	private static Logger log = LoggerFactory.getLogger(SimpleControllerService.class);
 
@@ -45,8 +47,7 @@ public class SimpleControllerService extends AconaOndemandFunctionService {
 
 			log.info("Start simple controller service to execute one service {} at agent {}", serviceName, agentName);
 
-			Datapoint result = this.getCommunicator().queryDatapoints(Datapoint.newDatapoint(serviceName + ".command").setValue(ControlCommand.START.toString()), agentName,
-					Datapoint.newDatapoint(serviceName + ".state"), agentName, 10000);
+			Datapoint result = this.getCommunicator().queryDatapoints(serviceName + ".command", new JsonPrimitive(ControlCommand.START.toString()), agentName, serviceName + ".state", agentName, 10000);
 			log.debug("Service executed with the result={}", result);
 		} catch (Exception e) {
 			log.error("Cannot execute simple controller service", e);

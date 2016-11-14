@@ -232,4 +232,11 @@ public class CellConfig {
 	public JsonObject toJsonObject() {
 		return this.configObject;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(configObject);
+		return builder.toString();
+	}
 }

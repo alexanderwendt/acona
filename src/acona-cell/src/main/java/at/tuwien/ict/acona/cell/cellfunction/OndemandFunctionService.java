@@ -2,6 +2,8 @@ package at.tuwien.ict.acona.cell.cellfunction;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.SynchronousQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +34,9 @@ import at.tuwien.ict.acona.framework.modules.ServiceState;
  * @author wendt
  *
  */
-public abstract class AconaOndemandFunctionService extends CellFunctionThreadImpl {
+public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 
-	private static Logger log = LoggerFactory.getLogger(AconaOndemandFunctionService.class);
+	private static Logger log = LoggerFactory.getLogger(OndemandFunctionService.class);
 
 	protected String COMMANDDATAPOINTNAME = "command";
 	protected String STATEDATAPOINTNAME = "state";
@@ -43,6 +45,14 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 	protected String CONFIGDATAPOINTNAME = "config";
 
 	protected Datapoint command, state, description, parameter, config;
+
+	/**
+	 * In the value map all, subscribed values as well as read values are put.
+	 * Syntac: Key: Datapointid, value: Datapoint address
+	 */
+	protected Map<String, Datapoint> valueMap = new ConcurrentHashMap<String, Datapoint>();
+
+	protected SynchronousQueue<Boolean> blocker;
 
 	@Override
 	protected void cellFunctionInternalInit() throws Exception {
@@ -102,15 +112,15 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 	@Override
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
-		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(),
-				this.getReadDatapoints());
+		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+
 		this.getReadDatapoints().forEach((k, v) -> {
 			try {
 				// Read the remote datapoint
 				if (v.getAgentid().equals(this.getCell().getLocalName()) == false) {
 					Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid());
 					// Write local value to synchronize the datapoints
-					this.writeLocal(temp);
+					this.valueMap.put(k, temp);
 					log.trace("{}> Preprocessing phase: Read datapoint and write local={}", temp);
 				}
 			} catch (Exception e) {
@@ -129,7 +139,7 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 		// local datapoints
 		this.getWriteDatapoints().values().forEach(config -> {
 			try {
-				Datapoint dp = this.readLocal(config.getAddress());
+				Datapoint dp = this.valueMap.get(config.getAddress());
 				String agentName = config.getAgentid();
 				this.getCommunicator().write(dp, agentName);
 				log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
@@ -180,6 +190,8 @@ public abstract class AconaOndemandFunctionService extends CellFunctionThreadImp
 			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(),
 					this.getSubscribedDatapoints().values());
 		}
+
+		valueMap.putAll(data);
 
 	}
 

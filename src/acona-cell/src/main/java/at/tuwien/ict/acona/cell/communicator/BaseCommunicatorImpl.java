@@ -123,20 +123,21 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 			// Blocking read and write
 			SynchronousQueue<String> queue = new SynchronousQueue<String>();
 
-			this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
-			String writeBehaviourFinished = "";
-			try {
-				writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
-				if (writeBehaviourFinished == null) {
-					throw new Exception("Operation timed out after " + timeout + "ms.");
+			synchronized (this) {
+				this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
+				String writeBehaviourFinished = "";
+				try {
+					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
+					if (writeBehaviourFinished == null) {
+						throw new Exception("Operation timed out after " + timeout + "ms.");
+					}
+
+					result.addAll(new Gson().fromJson(writeBehaviourFinished, new TypeToken<List<Datapoint>>() {
+					}.getType()));
+				} catch (InterruptedException e) {
+					log.warn("Queue interrupted");
 				}
-
-				result.addAll(new Gson().fromJson(writeBehaviourFinished, new TypeToken<List<Datapoint>>() {
-				}.getType()));
-			} catch (InterruptedException e) {
-				log.warn("Queue interrupted");
 			}
-
 		}
 
 		return result;

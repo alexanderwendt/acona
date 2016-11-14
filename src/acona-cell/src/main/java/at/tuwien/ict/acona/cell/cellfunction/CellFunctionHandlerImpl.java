@@ -95,7 +95,9 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 					if (subscriptionConfig.getAgentid() != "") {
 						agentName = subscriptionConfig.getAgentid();
 					}
+
 					this.caller.getCommunicator().subscribe(Arrays.asList(subscriptionConfig.getAddress()), agentName);
+
 				} catch (Exception e) {
 					log.error("Cannot subscribe address={}", subscriptionConfig.getAddress(), e);
 				}
