@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 /**
  * Service function 1. Register DF service from function name 2.
@@ -84,7 +83,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		CONFIGDATAPOINTNAME = serviceName + "." + "config";
 
 		command = Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
-		state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.STOPPED.toString());
+		state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.IDLE.toString());
 		description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
 		parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
 		config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
@@ -149,7 +148,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		});
 
 		this.writeLocal(this.command.setValue(ControlCommand.PAUSE.toString()));
-		this.writeLocal(this.state.setValue(ServiceState.STOPPED.toString()));
+		this.writeLocal(this.state.setValue(ServiceState.IDLE.toString()));
 
 		log.info("{}>Service execution finished", this.getFunctionName());
 	}

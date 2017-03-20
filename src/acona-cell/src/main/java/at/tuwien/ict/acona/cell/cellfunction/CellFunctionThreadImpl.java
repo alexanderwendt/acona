@@ -30,7 +30,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	 * the value true is put at the end of the method. In that way, external
 	 * applications can execute blocking functions with a non-blocking class.
 	 */
-	private final SynchronousQueue<Boolean> blocker = new SynchronousQueue<Boolean>();
+	private final SynchronousQueue<Boolean> blocker = new SynchronousQueue<>();
 
 	public CellFunctionThreadImpl() {
 
@@ -69,7 +69,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			try {
 				if (this.isAllowedToRun() == true) {
 					//Clear the blocker queue
-					blocker.clear();
+					//blocker.clear();
 					executePreProcessing();
 
 					executeFunction();
@@ -77,7 +77,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 					executePostProcessing();
 
 					//Add true to release the queue
-					blocker.put(true);
+					//blocker.(true);
 				}
 			} catch (Exception e1) {
 				log.error("Error in program execution", e1);
@@ -92,7 +92,9 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			} else {
 				// Set datapoint as pause and set pause command here
 				try {
-					this.setCommand(ControlCommand.PAUSE.toString());
+					if (this.getCurrentCommand().equals(ControlCommand.EXIT) == false) {
+						this.setCommand(ControlCommand.PAUSE.toString());
+					}
 				} catch (Exception e) {
 					log.error("Error setting pause", e);
 				}
@@ -128,8 +130,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	 * Check, which command is valid and block until finished
 	 */
 	private synchronized void executeWait() {
-		while (this.getCurrentCommand().equals(ControlCommand.STOP)
-				|| getCurrentCommand().equals(ControlCommand.PAUSE)) {
+		while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
 			try {
 				// Block profile controller
 				this.setAllowedToRun(false);
@@ -158,6 +159,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			this.notify();
 		} else if (this.getCurrentCommand().equals(ControlCommand.EXIT) == true) {
 			this.setActive(false);
+			this.notify();
 		}
 	}
 

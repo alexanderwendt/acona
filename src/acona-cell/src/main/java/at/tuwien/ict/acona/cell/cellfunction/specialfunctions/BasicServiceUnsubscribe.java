@@ -8,10 +8,11 @@ import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import jade.domain.FIPANames;
 
-public class BasicServiceUnsubscribe extends BasicService {
+public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
 
@@ -29,11 +30,11 @@ public class BasicServiceUnsubscribe extends BasicService {
 
 			this.unsubscribe(datapoints, caller);
 
-			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ACKNOWLEDGE));
+			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ACKNOWLEDGEVALUE));
 
 		} catch (Exception e) {
 			log.error("Cannot perform operation of parameter={}", parameter, e);
-			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ERROR));
+			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ERRORVALUE));
 		}
 
 		return result;

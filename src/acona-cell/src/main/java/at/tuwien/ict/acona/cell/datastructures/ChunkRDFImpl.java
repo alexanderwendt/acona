@@ -1,4 +1,4 @@
-package at.tuwien.ict.kore.datastructures;
+package at.tuwien.ict.acona.cell.datastructures;
 
 import java.util.List;
 

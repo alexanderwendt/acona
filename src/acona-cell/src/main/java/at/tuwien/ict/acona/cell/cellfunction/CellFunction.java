@@ -52,4 +52,6 @@ public interface CellFunction {
 	public void shutDown();
 
 	public CellFunctionConfig getFunctionConfig();
+
+	public ServiceState getCurrentState();
 }

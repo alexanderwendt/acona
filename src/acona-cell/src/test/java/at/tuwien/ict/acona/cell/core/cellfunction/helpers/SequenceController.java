@@ -10,8 +10,8 @@ import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 public class SequenceController extends CellFunctionThreadImpl {
 
@@ -110,7 +110,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executePostProcessing() throws Exception {
-		this.writeLocal(Datapoint.newDatapoint("state").setValue(ServiceState.STOPPED.toString()));
+		this.writeLocal(Datapoint.newDatapoint("state").setValue(ServiceState.IDLE.toString()));
 
 	}
 

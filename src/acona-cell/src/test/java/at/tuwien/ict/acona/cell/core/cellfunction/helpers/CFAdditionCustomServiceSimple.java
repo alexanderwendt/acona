@@ -11,9 +11,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 
@@ -80,7 +80,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	protected void executePostProcessing() throws Exception {
 		// Set status that process is finished. Use it to release subscriptions
 		this.getCommunicator()
-				.write(Datapoint.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.STOPPED.toString()));
+				.write(Datapoint.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.IDLE.toString()));
 		log.info("Function end after setting status={}", this.getCommunicator().read(STATUSDATAPOINTNAME));
 	}
 

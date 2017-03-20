@@ -407,7 +407,7 @@ public class CellBasicServiceTester {
 	@Test
 	public void massOfSubscribersTest() {
 		// final int minWaitTime = 5;
-		final int numberOfAgents = 10; // If there are errors with nullpointers.
+		final int numberOfAgents = 100; // If there are errors with nullpointers.
 										// Set the timeouts of the queues in the
 										// communication!!
 
@@ -455,7 +455,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(2000);
+					this.wait(10000);
 				} catch (InterruptedException e) {
 
 				}
@@ -464,12 +464,16 @@ public class CellBasicServiceTester {
 			// Set the first value and let the chain update itself
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
+
+			//Start tic
+			long starttime = System.currentTimeMillis();
+			log.info("=================Start time measurement: {}=====================", starttime);
 			inspectors.get(0).writeLocalDatapoint(Datapoint.newDatapoint(datapointaddress).setValue(value2));
 			log.debug("Get database of publisher={}", inspectors.get(0).getCell().getDataStorage());
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(10000);
 				} catch (InterruptedException e) {
 
 				}
@@ -478,8 +482,8 @@ public class CellBasicServiceTester {
 			// Get the value from the last agent
 			log.info("Datastorage of the last agent={}", inspectors.get(numberOfAgents - 1).getCell().getDataStorage());
 
-			String answer = inspectors.get(numberOfAgents - 1).readLocalDatapoint(datapointaddress).getValue()
-					.getAsString();// JsonMessage.getBody(result).get(datapointaddress).getAsString();
+			log.info("=================End time measurement: {}=====================", System.currentTimeMillis() - starttime);
+			String answer = inspectors.get(numberOfAgents - 1).readLocalDatapoint(datapointaddress).getValue().getAsString();// JsonMessage.getBody(result).get(datapointaddress).getAsString();
 
 			assertEquals(value2, answer);
 

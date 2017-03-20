@@ -1,23 +1,22 @@
-package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
+package at.tuwien.ict.acona.cell.cellfunction;
 
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import jade.domain.FIPANames;
 
-public abstract class BasicService extends CellFunctionImpl {
+public abstract class CellFunctionBasicService extends CellFunctionImpl {
 
-	private static Logger log = LoggerFactory.getLogger(BasicService.class);
+	private static Logger log = LoggerFactory.getLogger(CellFunctionBasicService.class);
 
 	//public final String METHODNAME;
 
-	protected static final String ACKNOWLEDGE = "OK";
-	protected static final String ERROR = "ERROR";
-	protected static final String PARAMETERRESULT = "result";
+	protected static final String ACKNOWLEDGEVALUE = "OK";
+	protected static final String ERRORVALUE = "ERROR";
+	protected static final String PARAMETERRESULTADDRESS = "result";
 	//private static final String PARAMETERSENDER = "sender";
 	//private static final String METHODPROPERTY = "method";
 	//protected static final String PARAMETER = "datapoints";

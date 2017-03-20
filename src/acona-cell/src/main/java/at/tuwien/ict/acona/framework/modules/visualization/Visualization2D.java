@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import at.tuwien.ict.acona.framework.modules.ServiceState;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 
 /**
  *

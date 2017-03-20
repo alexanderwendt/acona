@@ -7,9 +7,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class BasicServiceNotifySubscribers extends BasicService {
+public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
 
@@ -22,11 +23,11 @@ public class BasicServiceNotifySubscribers extends BasicService {
 			this.getCell().getFunctionHandler().activateNotifySubscribers(caller, dp);
 		});
 		try {
-			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ACKNOWLEDGE));
+			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ACKNOWLEDGEVALUE));
 
 		} catch (Exception e) {
 			log.error("Cannot perform notify on parameter={}", parameterdata, e);
-			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ERROR));
+			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ERRORVALUE));
 		}
 
 		return result;

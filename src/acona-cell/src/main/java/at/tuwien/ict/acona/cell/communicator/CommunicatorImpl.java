@@ -76,8 +76,8 @@ public class CommunicatorImpl extends BaseCommunicatorImpl implements Communicat
 
 	@Override
 	public List<Datapoint> read(List<String> datapointaddress, String agentName, int timeout) throws Exception {
-		final List<Datapoint> result = new ArrayList<Datapoint>();
-		List<Datapoint> inputList = new ArrayList<Datapoint>();
+		final List<Datapoint> result = new ArrayList<>();
+		List<Datapoint> inputList = new ArrayList<>();
 
 		try {
 			//Make the inputlist a parameter
@@ -85,7 +85,7 @@ public class CommunicatorImpl extends BaseCommunicatorImpl implements Communicat
 
 			result.addAll(this.execute(agentName, READSERVICENAME, inputList, timeout));
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERROR)) {
+			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
 				throw new Exception("Cannot read values. Error returned from destination");
 			}
 		} catch (Exception e) {
@@ -193,7 +193,7 @@ public class CommunicatorImpl extends BaseCommunicatorImpl implements Communicat
 		try {
 			result = this.execute(agentComplementedName, WRITESERVICENAME, datapoints, timeout);
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERROR)) {
+			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
 				throw new Exception("Cannot write values. Error returned from destination");
 			}
 		} catch (Exception e) {
@@ -262,16 +262,16 @@ public class CommunicatorImpl extends BaseCommunicatorImpl implements Communicat
 
 	@Override
 	public List<Datapoint> subscribe(List<String> datapointaddress, String agentName) throws Exception {
-		final List<Datapoint> result = new ArrayList<Datapoint>();
+		final List<Datapoint> result = new ArrayList<>();
 
-		List<Datapoint> inputList = new ArrayList<Datapoint>();
+		List<Datapoint> inputList = new ArrayList<>();
 
 		try {
 			datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
 
 			result.addAll(this.execute(agentName, SUBSCRIBESERVICENAME, inputList, this.defaultTimeout, true));
 
-			if (result.isEmpty() == true || result.get(0).getValueAsString().equals(CommVocabulary.ERROR)) {
+			if (result.isEmpty() == true || result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
 				throw new Exception("Cannot subscribe values. Error returned from destination");
 			}
 
@@ -368,12 +368,12 @@ public class CommunicatorImpl extends BaseCommunicatorImpl implements Communicat
 		List<Datapoint> result;
 
 		try {
-			List<Datapoint> inputList = new ArrayList<Datapoint>();
+			List<Datapoint> inputList = new ArrayList<>();
 			datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
 
 			result = this.execute(agentName, UNSUBSCRIBESERVICENAME, inputList, this.defaultTimeout);
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERROR)) {
+			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
 				throw new Exception("Cannot unsubscribe values. Error returned from destination");
 			}
 		} catch (Exception e) {

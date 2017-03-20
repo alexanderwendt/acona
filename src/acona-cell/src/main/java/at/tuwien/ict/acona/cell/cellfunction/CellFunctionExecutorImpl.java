@@ -9,6 +9,9 @@ public abstract class CellFunctionExecutorImpl extends CellFunctionImpl {
 	private int executeRate = 1000;
 	private boolean executeOnce = true;
 
+	protected ControlCommand currentCommand = ControlCommand.STOP;
+	protected boolean runAllowed = false;
+
 	protected abstract void executeFunction() throws Exception;
 
 	protected abstract void executePostProcessing() throws Exception;
@@ -82,6 +85,22 @@ public abstract class CellFunctionExecutorImpl extends CellFunctionImpl {
 
 	protected void setExecuteOnce(boolean executeOnce) {
 		this.executeOnce = executeOnce;
+	}
+
+	protected ControlCommand getCurrentCommand() {
+		return currentCommand;
+	}
+
+	protected void setCurrentCommand(ControlCommand currentCommand) {
+		this.currentCommand = currentCommand;
+	}
+
+	protected boolean isAllowedToRun() {
+		return runAllowed;
+	}
+
+	protected void setAllowedToRun(boolean isAllowedToRun) {
+		this.runAllowed = isAllowedToRun;
 	}
 
 }

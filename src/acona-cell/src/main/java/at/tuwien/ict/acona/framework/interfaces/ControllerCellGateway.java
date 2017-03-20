@@ -2,7 +2,7 @@ package at.tuwien.ict.acona.framework.interfaces;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.framework.modules.ServiceState;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 
 public interface ControllerCellGateway { // extends
 											// cellgateway

@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
 import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
-import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 public class LoopController extends OndemandFunctionService {
 

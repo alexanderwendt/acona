@@ -20,8 +20,8 @@ import jade.domain.FIPANames;
 public abstract class CellFunctionImpl implements CellFunction {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
-	protected static final String SYNCMODEPUSH = "push";
-	protected static final String SYNCMODEPULL = "pull";
+	//protected static final String SYNCMODEPUSH = "push";
+	//protected static final String SYNCMODEPULL = "pull";
 
 	/**
 	 * Cell, which executes this function
@@ -37,20 +37,17 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final Map<String, DatapointConfig> subscriptions = new HashMap<String, DatapointConfig>(); // Variable,
-																										// datapoint
-	private final Map<String, DatapointConfig> readDatapoints = new HashMap<String, DatapointConfig>(); // Variable,
-																										// //
-																										// datapoint
-	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<String, DatapointConfig>();
-	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<String, DatapointConfig>();
+	private final Map<String, DatapointConfig> subscriptions = new HashMap<>(); // Variable, datapoint
+	private final Map<String, DatapointConfig> readDatapoints = new HashMap<>(); // Variable, datapoint
+	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<>();
+	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<>();
 
-	protected ControlCommand currentCommand = ControlCommand.STOP;
-	protected boolean runAllowed = false;
+	private ServiceState currentServiceState = ServiceState.INITIALIZING;
 
 	@Override
 	public CellFunction init(CellFunctionConfig config, Cell caller) throws Exception {
 		try {
+			this.setServiceState(ServiceState.INITIALIZING);
 			// === Extract fundamental settings ===//
 			// Extract settings
 			this.config = config;
@@ -110,6 +107,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 			throw new Exception(e.getMessage());
 		}
 
+		this.setServiceState(ServiceState.IDLE);
+
 		return this;
 	}
 
@@ -129,12 +128,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected abstract void shutDownImplementation();
 
-	// protected abstract void updateDatapoint(Datapoint subscribedData) throws
-	// Exception;
 	@Override
 	public void updateSubscribedData(Map<String, Datapoint> data, String caller) {
 		// Create datapointmapping ID to datapoint with new value
-		Map<String, Datapoint> subscriptions = new HashMap<String, Datapoint>();
+		Map<String, Datapoint> subscriptions = new HashMap<>();
 		this.getSubscribedDatapoints().forEach((k, v) -> {
 			if (data.containsKey(v.getAddress())) {
 				subscriptions.put(k, data.get(v.getAddress()));
@@ -224,22 +221,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return cell;
 	}
 
-	protected ControlCommand getCurrentCommand() {
-		return currentCommand;
-	}
-
-	protected void setCurrentCommand(ControlCommand currentCommand) {
-		this.currentCommand = currentCommand;
-	}
-
-	protected boolean isAllowedToRun() {
-		return runAllowed;
-	}
-
-	protected void setAllowedToRun(boolean isAllowedToRun) {
-		this.runAllowed = isAllowedToRun;
-	}
-
 	/**
 	 * Return the subscribed datapoint based on its ID in the function
 	 * 
@@ -274,6 +255,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected Map<String, DatapointConfig> getWriteDatapoints() {
 		return writeDatapoints;
+	}
+
+	@Override
+	public ServiceState getCurrentState() {
+		return null;
+
+	}
+
+	protected void setServiceState(ServiceState serviceState) {
+		this.currentServiceState = serviceState;
 	}
 
 }

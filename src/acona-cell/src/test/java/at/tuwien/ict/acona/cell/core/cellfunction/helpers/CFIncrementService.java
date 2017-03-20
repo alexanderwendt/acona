@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.framework.modules.ServiceState;
 
 public class CFIncrementService extends OndemandFunctionService {
 
@@ -67,7 +67,7 @@ public class CFIncrementService extends OndemandFunctionService {
 	}
 
 	private Datapoint executeCommandStart() {
-		String message = ServiceState.STOPPED.toString();
+		String message = ServiceState.IDLE.toString();
 
 		try {
 			//Start the incrementor

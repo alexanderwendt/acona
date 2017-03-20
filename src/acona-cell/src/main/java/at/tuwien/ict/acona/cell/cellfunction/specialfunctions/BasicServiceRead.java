@@ -8,9 +8,10 @@ import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class BasicServiceRead extends BasicService implements ReadDatapoint {
+public class BasicServiceRead extends CellFunctionBasicService implements ReadDatapoint {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
 
@@ -60,7 +61,7 @@ public class BasicServiceRead extends BasicService implements ReadDatapoint {
 
 		} catch (Exception e) {
 			log.error("Cannot perform operation", e);
-			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ERROR));
+			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ERRORVALUE));
 		}
 
 		// TODO Auto-generated method stub
