@@ -72,4 +72,9 @@ public interface Cell {
 	 */
 	public void registerService(String name);
 
+	/**
+	 * Close cell
+	 */
+	public void takeDownCell();
+
 }

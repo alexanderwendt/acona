@@ -288,15 +288,21 @@ public class CellImpl extends Agent implements CellInitialization {
 	@Override
 	protected void takeDown() {
 		this.notificator.shutDown();
-		this.doDelete();
 		// Deregister from the yellow pages
 		try {
 			DFService.deregister(this);
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+
+		this.doDelete();
 		// Printout a dismissal message
-		log.info("Cell agent" + getAID().getName() + " is terminating.");
+		log.info("Cell agent" + getAID().getName() + " terminated.");
+	}
+
+	@Override
+	public void takeDownCell() {
+		this.takeDown();
 	}
 
 	@Override

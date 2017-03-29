@@ -102,6 +102,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		}
 
 		log.debug("Stop executor {}", this.getFunctionName());
+		this.getCell().takeDownCell();
 	}
 
 	@Override

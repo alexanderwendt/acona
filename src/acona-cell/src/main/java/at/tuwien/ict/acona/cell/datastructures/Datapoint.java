@@ -13,6 +13,8 @@ public class Datapoint {
 	//private final static String KEYTYPE = "TYPE";
 	private final static String KEYVALUE = "VALUE";
 
+	private final static String NULLADDRESS = "NULLDATAPOINT";
+
 	private String ADDRESS = "";
 	//private String TYPE = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
@@ -28,6 +30,10 @@ public class Datapoint {
 		// this.jsondatapoint.addProperty(KEYADDRESS, address);
 		// this.jsondatapoint.addProperty(KEYTYPE, "");
 		// this.jsondatapoint.addProperty(KEYVALUE, "");
+	}
+
+	public static Datapoint newNullDatapoint() {
+		return new Datapoint(NULLADDRESS);
 	}
 
 	public static Datapoint newDatapoint(String address) {
@@ -62,6 +68,16 @@ public class Datapoint {
 		boolean result = false;
 
 		if (data.has(KEYADDRESS) && data.has(KEYVALUE)) {
+			result = true;
+		}
+
+		return result;
+	}
+
+	public static boolean isNullDatapoint(JsonObject data) {
+		boolean result = false;
+
+		if (data.has(KEYADDRESS) && data.get(KEYADDRESS).equals(NULLADDRESS)) {
 			result = true;
 		}
 

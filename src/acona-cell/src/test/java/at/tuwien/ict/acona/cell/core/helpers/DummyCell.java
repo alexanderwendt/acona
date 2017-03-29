@@ -120,4 +120,10 @@ public class DummyCell implements CellInitialization {
 
 	}
 
+	@Override
+	public void takeDownCell() {
+		// TODO Auto-generated method stub
+
+	}
+
 }
