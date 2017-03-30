@@ -54,33 +54,12 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	@Override
 	public void setupCellFunctions(CellConfig conf) throws Exception {
-		// clear the current behaviour
-		// conditionMap.clear();
-		// cellFunctionMap.clear();
 
 		// TODO: Delete all activators and all running behaviours by
 		// unsubscription of the activators and deletion of the behaviours.
 
 		// Set configuration
 		this.conf = conf;
-
-		//Important notice: All cell functions are initialized through the CellConfig
-
-		// Add standard functions like write, read and subscribe
-		//		CellFunctionConfig writeServiceConfig = CellFunctionConfig.newConfig("write", BasicServiceWrite.class);
-		//		CellFunction writeService = this.builder.createCellFunctionFromConfig(writeServiceConfig.toJsonObject(), this);
-		//
-		//		CellFunctionConfig readServiceConfig = CellFunctionConfig.newConfig("read", BasicServiceRead.class);
-		//		CellFunction readService = this.builder.createCellFunctionFromConfig(readServiceConfig.toJsonObject(), this);
-		//
-		//		CellFunctionConfig subscribeServiceConfig = CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class);
-		//		CellFunction subscribeService = this.builder.createCellFunctionFromConfig(subscribeServiceConfig.toJsonObject(), this);
-		//
-		//		CellFunctionConfig unsubscribeServiceConfig = CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class);
-		//		CellFunction unsubscribeService = this.builder.createCellFunctionFromConfig(unsubscribeServiceConfig.toJsonObject(), this);
-		//
-		//		CellFunctionConfig notifyServiceConfig = CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class);
-		//		CellFunction notifyService = this.builder.createCellFunctionFromConfig(notifyServiceConfig.toJsonObject(), this);
 
 		builder.initializeCellConfig(this.conf, this);
 	}
@@ -175,7 +154,7 @@ public class CellImpl extends Agent implements CellInitialization {
 				// controller = ((CellInspectorController)args[0]); //Mode=0:
 				// return message in return message, Mode=1: append
 				// returnmessage, mode=2: return incoming message
-				log.debug("agent will use an inspector as controller");
+				//log.debug("agent will use an inspector as controller");
 
 				// Init internally with local variables
 				internalInit();

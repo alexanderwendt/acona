@@ -64,6 +64,8 @@ public class CellBuilder {
 						throw new NullPointerException("activator does not exist");
 					}
 
+					log.debug("Cell function {} created.", cellfunction.getFunctionName());
+
 				} catch (Exception e) {
 					log.error("Cannot create activator from {}", activatorConfig, e);
 				}

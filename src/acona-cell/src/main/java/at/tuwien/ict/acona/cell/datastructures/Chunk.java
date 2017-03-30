@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -15,11 +14,32 @@ public class Chunk implements ChunkMethods {
 	private static Logger log = LoggerFactory.getLogger(Chunk.class);
 
 	private JsonObject chunkObject;
-	private Gson gson = new Gson();
+	//private Gson gson = new Gson();
 
 	public static final String NAMEPROPERTY = "hasName";
 	public static final String TYPEPROPERTY = "hasType";
 	public static final String IDPROPERTY = "hasID";
+
+	public static Chunk newChunk(String name, String type) throws Exception {
+		return new Chunk(name, type);
+	}
+
+	public static Chunk newChunk(JsonObject object) throws Exception {
+		Chunk result = null;
+
+		if (Chunk.isChunk(object) == true) {
+			result = new Chunk(object);
+		} else {
+			throw new ClassCastException("The object " + object + " is no chunk object");
+		}
+
+		return result;
+
+	}
+
+	public static Chunk newChunk(Chunk object) throws Exception {
+		return new Chunk(object.toJsonObject());
+	}
 
 	public Chunk(JsonObject object) throws Exception {
 		if (isChunk(object) == true) {
@@ -29,7 +49,7 @@ public class Chunk implements ChunkMethods {
 		}
 	}
 
-	public Chunk(String name, String type) throws Exception {
+	private Chunk(String name, String type) throws Exception {
 		this.init(name, type);
 	}
 
@@ -135,7 +155,7 @@ public class Chunk implements ChunkMethods {
 	@Override
 	public List<Chunk> getAssociatedContent(String key) {
 		JsonArray array = this.chunkObject.get(key).getAsJsonArray();
-		List<Chunk> result = new ArrayList<Chunk>();
+		List<Chunk> result = new ArrayList<>();
 		array.forEach(element -> {
 			try {
 				result.add(new Chunk(element.getAsJsonObject()));

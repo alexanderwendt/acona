@@ -109,6 +109,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 		this.setServiceState(ServiceState.IDLE);
 
+		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.syncDatapoints);
+
 		return this;
 	}
 

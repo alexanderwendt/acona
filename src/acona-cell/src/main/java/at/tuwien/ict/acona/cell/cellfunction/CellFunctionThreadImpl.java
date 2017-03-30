@@ -45,7 +45,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			t = new Thread(this, this.getCell().getLocalName() + "#" + this.getFunctionName());
 			t.start();
 
-			log.info("CellFunction {} initilized", this.getFunctionName());
+			log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 		} catch (Exception e) {
 			log.error("CellFunction {} could not be initialized", this.getFunctionName());
 			throw new Exception(e.getMessage());
@@ -158,7 +158,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
 			this.setAllowedToRun(true);
 			this.notify();
+		} else if (this.getCurrentCommand().equals(ControlCommand.STOP) == true) {
+			this.setAllowedToRun(false);
+			this.notify();
 		} else if (this.getCurrentCommand().equals(ControlCommand.EXIT) == true) {
+			this.setAllowedToRun(false);
 			this.setActive(false);
 			this.notify();
 		}
