@@ -2,15 +2,15 @@ package at.tuwien.ict.acona.cell.core;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
-import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
+import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import jade.core.behaviours.Behaviour;
 
 public interface Cell {
 
-	public Communicator getCommunicator();
+	public BasicServiceCommunicator getCommunicator();
 
 	/**
 	 * Get data storage

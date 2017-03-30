@@ -5,11 +5,11 @@ import java.util.List;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class CommunicatorMock implements Communicator {
+public class CommunicatorMock implements BasicServiceCommunicator {
 
 	private Cell cell;
 
@@ -157,6 +157,24 @@ public class CommunicatorMock implements Communicator {
 
 	@Override
 	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeResponderForFunction(CellFunction function) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Datapoint subscribeDatapoint(String agentid, String address, CellFunction callingCellfunctionName) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Datapoint unsubscribeDatapoint(String agentid, String address, CellFunction callingCellFunctionName) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -102,10 +102,10 @@ public class CellSendTester {
 			// Create service agent
 			CellConfig testagent = CellConfig.newConfig(serviceAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapointAddress, SyncMode.push))
-							.addWriteDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.pull)));
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapointAddress, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.WRITEONLY)));
 			CellGatewayImpl cellService = this.launchUtil.createAgent(testagent);
 			cellService.getCommunicator().setDefaultTimeout(1000000);
 
@@ -158,16 +158,16 @@ public class CellSendTester {
 			// Create service agent
 			CellConfig testagent = CellConfig.newConfig(serviceAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, serviceAgentName, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, serviceAgentName, SyncMode.push))
-							.addSyncDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapointAddress, serviceAgentName, SyncMode.push))
-							.addWriteDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.pull)));
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.WRITEONLY)));
 			this.launchUtil.createAgent(testagent);
 
 			// Create inspector or the new gateway
 			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
-							.addSyncDatapoint(resultDatapointAddress, resultDatapointAddress, serviceAgentName, SyncMode.push)));
+							.addManagedDatapoint(resultDatapointAddress, resultDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY)));
 
 			String result = cellControlSubscriber.getCommunicator().queryDatapoints(queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, serviceAgentName, 10000).getValueAsString();
 			log.debug("Received back from query={}", result);

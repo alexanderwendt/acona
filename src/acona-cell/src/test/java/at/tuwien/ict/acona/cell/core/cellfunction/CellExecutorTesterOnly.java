@@ -53,10 +53,10 @@ public class CellExecutorTesterOnly {
 			String resultDatapointAddress = "datapoint.result";
 
 			CellFunctionConfig config = CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
-					.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, SyncMode.push))
-					.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, SyncMode.push))
-					.addSyncDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapointAddress, SyncMode.push))
-					.addWriteDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.pull));
+					.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, SyncMode.SUBSCRIBEONLY))
+					.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, SyncMode.SUBSCRIBEONLY))
+					.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.executeonceDatapointID, executeonceDatapointAddress, SyncMode.SUBSCRIBEONLY))
+					.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.WRITEONLY));
 
 			// Map<String, List<Condition>> subscriptions = new HashMap<String,
 			// List<Condition>>();
@@ -73,7 +73,7 @@ public class CellExecutorTesterOnly {
 
 			// Start the executor with anything just to see
 			// Create a datapoint to start the function
-			Map<String, Datapoint> map = new HashMap<String, Datapoint>();
+			Map<String, Datapoint> map = new HashMap<>();
 			map.put(commandDatapointAddress, Datapoint.newDatapoint(commandDatapointAddress).setValue(ControlCommand.START.toString()));
 			this.executor.updateSubscribedData(map, cell.getLocalName());// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
 

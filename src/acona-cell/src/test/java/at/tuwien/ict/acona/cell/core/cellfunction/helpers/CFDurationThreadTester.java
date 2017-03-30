@@ -42,7 +42,7 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 				log.debug("waited {}ms", i * 100);
 			}
 
-			this.writeLocal(Datapoint.newDatapoint(this.getFunctionConfig().getWriteDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("FINISHED"));
+			this.writeLocal(Datapoint.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("FINISHED"));
 			log.info("Something was proceeded. Give back to tester");
 
 		} else {

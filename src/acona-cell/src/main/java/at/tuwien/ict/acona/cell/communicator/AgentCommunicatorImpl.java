@@ -16,7 +16,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
@@ -30,21 +29,23 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SimpleAchieveREInitiator;
 
-public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
+public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
-	protected static Logger log = LoggerFactory.getLogger(BaseCommunicatorImpl.class);
+	protected static Logger log = LoggerFactory.getLogger(AgentCommunicatorImpl.class);
+
+	//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
 	protected int defaultTimeout = 10000;
 
 	private final CellImpl cell;
-	protected final CellFunctionHandler cellFunctions;
+	protected final CellFunctionHandler cellFunctionHandler;
 	//private final static Gson gson = new Gson();
 	private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
-	public BaseCommunicatorImpl(CellImpl cell) {
+	public AgentCommunicatorImpl(CellImpl cell) {
 		this.cell = cell;
 		//this.datastorage = this.cell.getDataStorage();
-		this.cellFunctions = this.cell.getFunctionHandler();
+		this.cellFunctionHandler = this.cell.getFunctionHandler();
 	}
 
 	protected String getLocalAgentName() {
@@ -65,8 +66,13 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 	public void createResponderForFunction(CellFunction function) {
 		ExternalServiceBehaviour responder = new ExternalServiceBehaviour(this.cell, function);
 
-		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 		cell.addBehaviour(tbf.wrap(responder));
+	}
+
+	@Override
+	public void removeResponderForFunction(CellFunction function) {
+		//TODO: Remove a behaviour responder too.
+
 	}
 
 	@Override
@@ -77,12 +83,13 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 	@Override
 	public void executeAsynchronous(String agentName, String serviceName, List<Datapoint> methodParameters) throws Exception {
 		//TODO Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public List<Datapoint> execute(String agentName, String serviceName, List<Datapoint> methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception {
 
-		final List<Datapoint> result = new ArrayList<Datapoint>();
+		final List<Datapoint> result = new ArrayList<>();
 		// If a local data storage is meant, then write it there, else a foreign
 		// data storage is meant.
 		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
@@ -91,10 +98,10 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 
 		if (agentName.equals(this.cell.getLocalName()) == true) {
 			// Execute local function
-			Map<String, Datapoint> parametermap = new HashMap<String, Datapoint>();
+			Map<String, Datapoint> parametermap = new HashMap<>();
 			methodParameters.forEach(dp -> parametermap.put(dp.getAddress(), dp));
 
-			result.addAll(this.getCellFunctions().getCellFunction(serviceName).performOperation(parametermap, this.getLocalAgentName()));
+			result.addAll(this.getCellFunctionHandler().getCellFunction(serviceName).performOperation(parametermap, this.getLocalAgentName()));
 		} else {
 			// Create a InitiatorBehaviour to write the datapoints to the target
 			// agent if that agent is external
@@ -121,7 +128,7 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 			requestMsg.setContent(object.toString());
 
 			// Blocking read and write
-			SynchronousQueue<String> queue = new SynchronousQueue<String>();
+			SynchronousQueue<String> queue = new SynchronousQueue<>();
 
 			synchronized (this) {
 				this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
@@ -207,8 +214,8 @@ public class BaseCommunicatorImpl extends Thread implements BaseCommunicator {
 		}
 	}
 
-	protected CellFunctionHandler getCellFunctions() {
-		return cellFunctions;
+	protected CellFunctionHandler getCellFunctionHandler() {
+		return cellFunctionHandler;
 	}
 
 	protected CellImpl getCell() {

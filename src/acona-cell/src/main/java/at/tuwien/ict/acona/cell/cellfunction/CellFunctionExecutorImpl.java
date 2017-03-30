@@ -2,9 +2,14 @@ package at.tuwien.ict.acona.cell.cellfunction;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public abstract class CellFunctionExecutorImpl extends CellFunctionImpl {
+
+	private static final Logger log = LoggerFactory.getLogger(CellFunctionExecutorImpl.class);
 
 	private int executeRate = 1000;
 	private boolean executeOnce = true;
@@ -67,7 +72,11 @@ public abstract class CellFunctionExecutorImpl extends CellFunctionImpl {
 		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
 
 		// Execute specific functions
-		this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+		//		try {
+		//			this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+		//		} catch (Exception e) {
+		//			log.error("No clean shutdown poassible ", e);
+		//		}
 		this.setCommand(ControlCommand.EXIT);
 	}
 

@@ -21,7 +21,7 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 
 	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 		//
 		//		parameterdata.values().forEach(dp -> {
 		//			try {
@@ -45,8 +45,9 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 	protected void cellFunctionInit() throws Exception {
 		log.debug("Datastorageupdate will happen for the following datapoints: {}", this.getSubscribedDatapoints());
 
-		for (DatapointConfig config : this.getFunctionConfig().getSyncDatapoints()) {
-			if (config.getAgentid().equals(this.getCell().getLocalName()) || (config.getAgentid().equals(""))) {
+		for (DatapointConfig config : this.getFunctionConfig().getManagedDatapoints()) {
+
+			if (config.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName())) {
 				throw new Exception("Function " + this.getFunctionName() + " is not allowed to subscribe datapoints of the own agent, in order to avoid circular references. Erroneous subscription: " + config);
 			}
 		}

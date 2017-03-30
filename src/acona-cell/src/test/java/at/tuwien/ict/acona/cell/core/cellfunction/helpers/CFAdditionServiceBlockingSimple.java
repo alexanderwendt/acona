@@ -25,7 +25,7 @@ public class CFAdditionServiceBlockingSimple extends CellFunctionBlockImpl {
 	private final String OPERAND2 = "operand2";
 	private final String RESULT = "result";
 
-	private final Map<String, DatapointConfig> trackedDatapoints = new HashMap<String, DatapointConfig>();
+	private final Map<String, DatapointConfig> trackedDatapoints = new HashMap<>();
 
 	private double operand1;
 	private double operand2;
@@ -42,8 +42,8 @@ public class CFAdditionServiceBlockingSimple extends CellFunctionBlockImpl {
 	protected void executeFunction() throws Exception {
 		//Read the values needed		
 		try {
-			operand1 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND1).getAddress(), this.trackedDatapoints.get(OPERAND1).getAgentid(), 1000000).getValue().getAsDouble();
-			operand2 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND2).getAddress(), this.trackedDatapoints.get(OPERAND2).getAgentid(), 1000000).getValue().getAsDouble();
+			operand1 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND1).getAddress(), this.trackedDatapoints.get(OPERAND1).getAgentid(this.getCell().getLocalName()), 1000000).getValue().getAsDouble();
+			operand2 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND2).getAddress(), this.trackedDatapoints.get(OPERAND2).getAgentid(this.getCell().getLocalName()), 1000000).getValue().getAsDouble();
 
 			log.info("read operand1={} and operand2={}", operand1, operand2);
 		} catch (Exception e) {
@@ -56,7 +56,7 @@ public class CFAdditionServiceBlockingSimple extends CellFunctionBlockImpl {
 		log.info("result={}", result);
 
 		//Now send the result to a result datapoint
-		this.getCommunicator().write(Datapoint.newDatapoint(this.trackedDatapoints.get(RESULT).getAddress()).setValue(new JsonPrimitive(result)), this.trackedDatapoints.get(RESULT).getAgentid());
+		this.getCommunicator().write(Datapoint.newDatapoint(this.trackedDatapoints.get(RESULT).getAddress()).setValue(new JsonPrimitive(result)), this.trackedDatapoints.get(RESULT).getAgentid(this.getCell().getLocalName()));
 	}
 
 	@Override

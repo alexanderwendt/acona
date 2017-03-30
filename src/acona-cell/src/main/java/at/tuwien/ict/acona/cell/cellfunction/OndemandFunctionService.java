@@ -49,7 +49,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 	 * In the value map all, subscribed values as well as read values are put.
 	 * Syntac: Key: Datapointid, value: Datapoint address
 	 */
-	protected Map<String, Datapoint> valueMap = new ConcurrentHashMap<String, Datapoint>();
+	protected Map<String, Datapoint> valueMap = new ConcurrentHashMap<>();
 
 	protected SynchronousQueue<Boolean> blocker;
 
@@ -93,16 +93,11 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 				command.getAddress(), state.getAddress(), description.getAddress(), parameter.getAddress(),
 				config.getAddress());
 
-		this.getSubscribedDatapoints().put(command.getAddress(),
-				DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(state.getAddress(),
-				DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(description.getAddress(),
-				DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(parameter.getAddress(),
-				DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.push));
-		this.getSubscribedDatapoints().put(config.getAddress(),
-				DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.push));
+		this.getSubscribedDatapoints().put(command.getAddress(), DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.getSubscribedDatapoints().put(state.getAddress(), DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.getSubscribedDatapoints().put(description.getAddress(), DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.getSubscribedDatapoints().put(parameter.getAddress(), DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.getSubscribedDatapoints().put(config.getAddress(), DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
 
 		this.getCommunicator().write(Arrays.asList(command, state, description, parameter, config));
 
@@ -116,8 +111,8 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		this.getReadDatapoints().forEach((k, v) -> {
 			try {
 				// Read the remote datapoint
-				if (v.getAgentid().equals(this.getCell().getLocalName()) == false) {
-					Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid());
+				if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
+					Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid(this.getCell().getLocalName()));
 					// Write local value to synchronize the datapoints
 					this.valueMap.put(k, temp);
 					log.trace("{}> Preprocessing phase: Read datapoint and write local={}", temp);
@@ -132,14 +127,13 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 	@Override
 	protected void executePostProcessing() throws Exception {
 		// FIXME: The update here is not working well
-		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(),
-				this.getWriteDatapoints());
+		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
 		this.getWriteDatapoints().values().forEach(config -> {
 			try {
 				Datapoint dp = this.valueMap.get(config.getAddress());
-				String agentName = config.getAgentid();
+				String agentName = config.getAgentid(this.getCell().getLocalName());
 				this.getCommunicator().write(dp, agentName);
 				log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 			} catch (Exception e) {

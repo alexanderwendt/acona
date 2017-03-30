@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class SimpleControllerService extends OndemandFunctionService {
 
-	private static Logger log = LoggerFactory.getLogger(SimpleControllerService.class);
+	private static final Logger log = LoggerFactory.getLogger(SimpleControllerService.class);
 
 	private int delay = 200;
 

@@ -11,20 +11,25 @@ public enum SyncMode {
 	/**
 	 * Get the datappoint by reading it from an address. No write back.
 	 */
-	pull,
+	READONLY,
 	/**
 	 * Get the datappoint by subscribing it from an address. No write back.
 	 */
-	push,
+	SUBSCRIBEONLY,
 	/**
 	 * Get the datappoint by reading it from an address. Write back value after
 	 * function finished
 	 */
-	pullreturn,
+	READWRITEBACK,
 	/**
 	 * Get the datappoint by subscribing it from an address. Write back value
 	 * after function finished
 	 */
-	pushreturn;
+	SUBSCRIBEWRITEBACK,
+
+	/**
+	 * Write only this datapoint
+	 */
+	WRITEONLY;
 
 }

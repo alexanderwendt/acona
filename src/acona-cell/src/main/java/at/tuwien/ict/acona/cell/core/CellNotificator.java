@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
-import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
+import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorageSubscriberNotificator;
 
@@ -56,10 +56,10 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 		private final String caller;
 		private final Datapoint subscribedData;
 		private final CellFunctionHandler activationHandler;
-		private final Communicator communicator;
+		private final BasicServiceCommunicator communicator;
 		private final String localName;
 
-		public WorkerThread(CellFunctionHandler activationHandler, Communicator communicator, List<String> subscribers, String caller, String localName, Datapoint subscribedData) {
+		public WorkerThread(CellFunctionHandler activationHandler, BasicServiceCommunicator communicator, List<String> subscribers, String caller, String localName, Datapoint subscribedData) {
 			this.communicator = communicator;
 			this.activationHandler = activationHandler;
 			this.subscribers = subscribers;

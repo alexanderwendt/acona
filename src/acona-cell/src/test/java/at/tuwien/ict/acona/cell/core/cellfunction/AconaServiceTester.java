@@ -122,7 +122,7 @@ public class AconaServiceTester {
 							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
 							.setProperty("delay", "1000")
-							.addSyncDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.push)));
+							.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
 
 			controller.getCommunicator().write(Datapoint.newDatapoint("Test"), memoryAgentName);
@@ -130,17 +130,17 @@ public class AconaServiceTester {
 			// Create services
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pushreturn)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service1 = this.launcher.createAgent(serviceAgent1);
 
 			CellConfig serviceAgent2 = CellConfig.newConfig(agentName2)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pushreturn)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service2 = this.launcher.createAgent(serviceAgent2);
 
 			CellConfig serviceAgent3 = CellConfig.newConfig(agentName3)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addSyncDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pushreturn)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service3 = this.launcher.createAgent(serviceAgent3);
 
 			synchronized (this) {
@@ -213,18 +213,18 @@ public class AconaServiceTester {
 							.addCellfunction(CellFunctionConfig.newConfig("controllerservice", SequenceController.class)
 									.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 									.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
-									.setProperty("delay", "1").addSyncDatapoint(
-											DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.push))))
+									.setProperty("delay", "1").addManagedDatapoint(
+											DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))))
 					.addMemory(CellConfig.newConfig(memoryAgentName))
 					.addService(CellConfig.newConfig(agentName1)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addSyncDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pullreturn)))
+									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)))
 					.addService(CellConfig.newConfig(agentName2)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addSyncDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pullreturn)))
+									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)))
 					.addService(CellConfig.newConfig(agentName3)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addSyncDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pullreturn)))
+									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)))
 					.setTopController(controllerAgentName);
 
 			// this.launcher.createDebugUserInterface();
@@ -399,7 +399,7 @@ public class AconaServiceTester {
 
 			totalConfig.addService(CellConfig.newConfig(serviceAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
-							.addSyncDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.pullreturn)));
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)));
 
 			// === System initialization ===//
 
@@ -491,7 +491,7 @@ public class AconaServiceTester {
 			for (int i = 1; i <= numberOfAgents; i++) {
 				totalConfig.addService(CellConfig.newConfig(serviceAgentName + i)
 						.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
-								.addSyncDatapoint(IncrementFunctionDatapointID, processDatapoint, memoryAgentName, SyncMode.pullreturn)));
+								.addManagedDatapoint(IncrementFunctionDatapointID, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)));
 			}
 
 			// this.launcher.createDebugUserInterface();

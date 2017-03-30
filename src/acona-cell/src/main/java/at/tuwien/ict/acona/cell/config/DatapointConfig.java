@@ -6,7 +6,7 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 
 public class DatapointConfig {
 	public final static String LOCALAGENTNAME = "";
-	public final static SyncMode DEFAULTSYNCMODE = SyncMode.pull;
+	//public final static SyncMode DEFAULTSYNCMODE = SyncMode.READONLY;
 
 	public static final String ID = "id";
 	public static final String ADDRESS = "address";
@@ -20,9 +20,9 @@ public class DatapointConfig {
 
 	private final JsonObject configObject;
 
-	public static DatapointConfig newConfig(String name, String address) {
-		return new DatapointConfig(name, address, LOCALAGENTNAME, DEFAULTSYNCMODE);
-	}
+	//	public static DatapointConfig newConfig(String name, String address) {
+	//		return new DatapointConfig(name, address, LOCALAGENTNAME, DEFAULTSYNCMODE);
+	//	}
 
 	public static DatapointConfig newConfig(String name, String address, SyncMode syncmode) {
 		return new DatapointConfig(name, address, LOCALAGENTNAME, syncmode);
@@ -92,8 +92,22 @@ public class DatapointConfig {
 		return this.configObject.get(ADDRESS).getAsString();
 	}
 
-	public String getAgentid() {
-		return this.configObject.get(AGENTID).getAsString();
+	/**
+	 * Return the destination agentid. Compare the local agent id with the
+	 * destination id. If the default value "" is used, it means that the
+	 * destination should be the local agent
+	 * 
+	 * @param callerAgentName
+	 * @return
+	 */
+	public String getAgentid(String callerAgentName) {
+		String agentName = this.configObject.get(AGENTID).getAsString();
+
+		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
+			agentName = callerAgentName;
+		}
+
+		return agentName;
 	}
 
 	public SyncMode getSyncMode() {

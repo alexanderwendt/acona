@@ -65,7 +65,7 @@ public class CellBuilderTester {
 			cellConfig
 					.addCellfunction(
 							CellFunctionConfig.newConfig("function1", DummyFunction.class)
-									.addSyncDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value", SyncMode.push))
+									.addManagedDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value", SyncMode.SUBSCRIBEONLY))
 									.setExecuteOnce(true).setExecuterate(500)
 									.setProperty("TESTPROPERTY1", "valuesuccess"));
 

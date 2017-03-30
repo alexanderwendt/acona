@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
-import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
+import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
+import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
 import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
@@ -439,7 +439,7 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	@Override
-	public Communicator getCommunicator() {
+	public BasicServiceCommunicator getCommunicator() {
 		return this.comm;
 	}
 

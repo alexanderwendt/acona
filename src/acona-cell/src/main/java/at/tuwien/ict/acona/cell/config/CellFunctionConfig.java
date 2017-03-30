@@ -18,8 +18,7 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 public class CellFunctionConfig {
 	public static final String CELLFUNCTIONNAME = "functionname";
 	public static final String CELLFUNCTIONCLASS = "functionclass";
-	public static final String CELLSYNCDATAPOINTS = "syncdatapoints";
-	public static final String CELLWRITEDATAPOINTS = "writedatapoints";
+	public static final String CELLMANAGEDDATAPOINTS = "syncdatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
 	public static final String GENERATERESPONDER = "generateresponder";
@@ -56,8 +55,7 @@ public class CellFunctionConfig {
 
 	private CellFunctionConfig(String name, String className) {
 		this.configObject = new JsonObject();
-		this.configObject.add(CELLSYNCDATAPOINTS, new JsonArray());
-		this.configObject.add(CELLWRITEDATAPOINTS, new JsonArray());
+		this.configObject.add(CELLMANAGEDDATAPOINTS, new JsonArray());
 		this.setGenerateReponder(false);
 		this.setName(name).setClassName(className);
 	}
@@ -193,7 +191,7 @@ public class CellFunctionConfig {
 		// Gson gson = new Gson();
 		// Type type = new TypeToken<List<SubscriptionConfig>>(){}.getType();
 		// List<SubscriptionConfig> configList = gson.fromJson(array, type);
-		List<DatapointConfig> result = new ArrayList<DatapointConfig>();
+		List<DatapointConfig> result = new ArrayList<>();
 		array.forEach(a -> {
 
 			try {
@@ -207,27 +205,27 @@ public class CellFunctionConfig {
 		return result;
 	}
 
-	public CellFunctionConfig addSyncDatapoint(DatapointConfig config) {
-		this.configObject.getAsJsonArray(CELLSYNCDATAPOINTS).add(config.toJsonObject());
+	public CellFunctionConfig addManagedDatapoint(DatapointConfig config) {
+		this.configObject.getAsJsonArray(CELLMANAGEDDATAPOINTS).add(config.toJsonObject());
 		return this;
 	}
 
-	public CellFunctionConfig addSyncDatapoint(String address) {
-		return this.addSyncDatapoint(DatapointConfig.newConfig(address, address));
+	public CellFunctionConfig addManagedDatapoint(String address, SyncMode mode) {
+		return this.addManagedDatapoint(DatapointConfig.newConfig(address, address, mode));
 	}
 
-	public CellFunctionConfig addSyncDatapoint(String id, String address, String agentId, SyncMode syncMode) {
-		return this.addSyncDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
+	public CellFunctionConfig addManagedDatapoint(String id, String address, String agentId, SyncMode syncMode) {
+		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
 	}
 
-	public List<DatapointConfig> getSyncDatapoints() {
-		return this.getDatapointConfig(CELLSYNCDATAPOINTS);
+	public List<DatapointConfig> getManagedDatapoints() {
+		return this.getDatapointConfig(CELLMANAGEDDATAPOINTS);
 	}
 
-	public Map<String, DatapointConfig> getSyncDatapointsAsMap() {
-		Map<String, DatapointConfig> result = new HashMap<String, DatapointConfig>();
+	public Map<String, DatapointConfig> getManagedDatapointsAsMap() {
+		Map<String, DatapointConfig> result = new HashMap<>();
 
-		this.getSyncDatapoints().forEach(s -> {
+		this.getManagedDatapoints().forEach(s -> {
 			result.put(s.getId(), s);
 		});
 
@@ -235,35 +233,6 @@ public class CellFunctionConfig {
 	}
 
 	// =======================//
-
-	// === Write datapoints ===//
-
-	public CellFunctionConfig addWriteDatapoint(DatapointConfig config) {
-		this.configObject.getAsJsonArray(CELLWRITEDATAPOINTS).add(config.toJsonObject());
-		return this;
-	}
-
-	public CellFunctionConfig addWriteDatapoint(String address) {
-		return this.addWriteDatapoint(DatapointConfig.newConfig(address, address));
-	}
-
-	public CellFunctionConfig addWriteDatapoint(String id, String address, String agentId, SyncMode syncMode) {
-		return this.addWriteDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
-	}
-
-	public Map<String, DatapointConfig> getWriteDatapointsAsMap() {
-		Map<String, DatapointConfig> result = new HashMap<String, DatapointConfig>();
-
-		this.getWriteDatapoints().forEach(s -> {
-			result.put(s.getId(), s);
-		});
-
-		return result;
-	}
-
-	public List<DatapointConfig> getWriteDatapoints() {
-		return this.getDatapointConfig(CELLWRITEDATAPOINTS);
-	}
 
 	public JsonObject toJsonObject() {
 		return this.configObject;

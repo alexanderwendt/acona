@@ -20,8 +20,6 @@ import jade.domain.FIPANames;
 public abstract class CellFunctionImpl implements CellFunction {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
-	//protected static final String SYNCMODEPUSH = "push";
-	//protected static final String SYNCMODEPULL = "pull";
 
 	/**
 	 * Cell, which executes this function
@@ -37,10 +35,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final Map<String, DatapointConfig> subscriptions = new HashMap<>(); // Variable, datapoint
+	private final Map<String, DatapointConfig> subscriptions = new HashMap<>(); // Variable datapoint config id, datapoint
 	private final Map<String, DatapointConfig> readDatapoints = new HashMap<>(); // Variable, datapoint
-	private final Map<String, DatapointConfig> syncDatapoints = new HashMap<>();
 	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<>();
+	private final Map<String, DatapointConfig> managedDatapoints = new HashMap<>();
 
 	private ServiceState currentServiceState = ServiceState.INITIALIZING;
 
@@ -77,27 +75,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 			}
 
 			// Get subscriptions from config and add to subscription list
-			this.config.getSyncDatapoints().forEach(s -> {
-				if (s.getSyncMode().equals(SyncMode.push)) {
-					this.subscriptions.put(s.getId(), s);
-				} else if (s.getSyncMode().equals(SyncMode.pushreturn)) {
-					this.subscriptions.put(s.getId(), s);
-					this.writeDatapoints.put(s.getId(), s);
-				} else if (s.getSyncMode().equals(SyncMode.pull)) {
-					this.readDatapoints.put(s.getId(), s);
-				} else if (s.getSyncMode().equals(SyncMode.pullreturn)) {
-					this.readDatapoints.put(s.getId(), s);
-					this.writeDatapoints.put(s.getId(), s);
-				} else {
-					try {
-						throw new Exception("No syncmode=" + s.getSyncMode() + ". only pull and push available");
-					} catch (Exception e) {
-						log.error("Cannot set sync mode", e);
-					}
-				}
-
-				syncDatapoints.put(s.getId(), s);
-
+			this.config.getManagedDatapoints().forEach(s -> {
+				this.addManagedDatapoint(s);
 			});
 
 			// === Register in the function handler ===//
@@ -109,9 +88,40 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 		this.setServiceState(ServiceState.IDLE);
 
-		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.syncDatapoints);
+		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.managedDatapoints);
 
 		return this;
+	}
+
+	/**
+	 * Add a datapoint that shall be syncronized with read, subscribe or write.
+	 * this method should be used in the init method of a function
+	 * 
+	 * @param config
+	 */
+	protected void addManagedDatapoint(DatapointConfig config) {
+		if (config.getSyncMode().equals(SyncMode.SUBSCRIBEONLY)) { //Subscribe only
+			this.subscriptions.put(config.getId(), config);
+		} else if (config.getSyncMode().equals(SyncMode.SUBSCRIBEWRITEBACK)) { //Subscribe and write back to the source
+			this.subscriptions.put(config.getId(), config);
+			this.writeDatapoints.put(config.getId(), config);
+		} else if (config.getSyncMode().equals(SyncMode.READONLY)) { //Read only the value (pull instead of push)
+			this.readDatapoints.put(config.getId(), config);
+		} else if (config.getSyncMode().equals(SyncMode.READWRITEBACK)) { //Read and write back to the server
+			this.readDatapoints.put(config.getId(), config);
+			this.writeDatapoints.put(config.getId(), config);
+		} else if (config.getSyncMode().equals(SyncMode.WRITEONLY)) {
+			this.writeDatapoints.put(config.getId(), config);
+		} else {
+			try {
+				throw new Exception("No syncmode=" + config.getSyncMode() + ". only pull and push available");
+			} catch (Exception e) {
+				log.error("Cannot set sync mode", e);
+			}
+		}
+
+		//All datapoints are put into the managed datapoints
+		managedDatapoints.put(config.getId(), config);
 	}
 
 	protected abstract void cellFunctionInit() throws Exception;
@@ -120,12 +130,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 	public void shutDown() {
 		// Unsubscribe all datapoints
 		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+		try {
+			// Execute specific functions
+			this.shutDownImplementation();
 
-		// Execute specific functions
-		this.shutDownImplementation();
+			//Execute general deregister
 
-		//Execute general deregister
-		this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+			this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+		} catch (Exception e) {
+			log.error("No clean shutdown possible", e);
+		}
 	}
 
 	protected abstract void shutDownImplementation();
@@ -196,7 +210,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected <T> T readLocalById(String id, Class<T> type) throws Exception {
 		Gson gson = new Gson();
-		JsonElement value = this.readLocal(this.getFunctionConfig().getSyncDatapointsAsMap().get(id).getAddress())
+		JsonElement value = this.readLocal(this.getFunctionConfig().getManagedDatapointsAsMap().get(id).getAddress())
 				.getValue();
 		T convertedValue = gson.fromJson(value, type);
 
@@ -211,7 +225,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 		// Gson gson = new Gson();
 
 		JsonElement writeValue = new Gson().toJsonTree(value);
-		this.writeLocal(Datapoint.newDatapoint(this.getFunctionConfig().getSyncDatapointsAsMap().get(id).getAddress())
+		this.writeLocal(Datapoint.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(id).getAddress())
 				.setValue(writeValue));
 	}
 
@@ -248,7 +262,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	}
 
 	protected Map<String, DatapointConfig> getSyncDatapoints() {
-		return syncDatapoints;
+		return managedDatapoints;
 	}
 
 	protected Map<String, DatapointConfig> getReadDatapoints() {
@@ -261,7 +275,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	@Override
 	public ServiceState getCurrentState() {
-		return null;
+		return this.currentServiceState;
 
 	}
 

@@ -1,8 +1,10 @@
-package at.tuwien.ict.acona.cell.cellfunction;
+package at.tuwien.ict.acona.cell.communicator;
 
 import java.util.List;
 import java.util.Map;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
@@ -24,20 +26,24 @@ public interface CellFunctionHandler {
 	 * activations
 	 * 
 	 * @param activatorInstance
+	 * @throws Exception
 	 */
-	public void registerCellFunctionInstance(CellFunction activatorInstance);
+	public void registerCellFunctionInstance(CellFunction activatorInstance) throws Exception;
 
 	/**
 	 * Deregister an activator instance that is linked to datapoints through its
 	 * activations
 	 * 
 	 * @param activatorInstanceName
+	 * @throws Exception
 	 */
-	public void deregisterActivatorInstance(CellFunction activatorInstanceName);
+	public void deregisterActivatorInstance(CellFunction activatorInstanceName) throws Exception;
 
-	public void addSubscription(String functionName, String destinationAgent, String address) throws Exception;
+	public void addSubscription(CellFunction cellFunctionInstance, DatapointConfig subscriptionConfig) throws Exception;
 
-	public void removeSubscription(String functionName, String destinationAgent, String address) throws Exception;
+	public void removeSubscription(CellFunction activatorInstance, DatapointConfig subscriptionConfig) throws Exception;
+
+	public void removeSubscription(CellFunction cellFunctionInstance, String address, String agentid) throws Exception;
 
 	public Map<String, List<CellFunction>> getCellFunctionDatapointMapping();
 

@@ -2,9 +2,9 @@ package at.tuwien.ict.acona.cell.core.helpers;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandler;
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionHandlerImpl;
-import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
+import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
+import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.core.CellInitialization;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
@@ -23,7 +23,7 @@ public class DummyCell implements CellInitialization {
 	//private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
 
 	private DataStorage data = new DataStorageImpl().init(new DataStorageSubscriberNotificatorMock());
-	private Communicator comm = new CommunicatorMock(this);
+	private BasicServiceCommunicator comm = new CommunicatorMock(this);
 	private CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
 
 	public DummyCell(CellConfig conf) throws Exception {
@@ -104,7 +104,7 @@ public class DummyCell implements CellInitialization {
 	}
 
 	@Override
-	public Communicator getCommunicator() {
+	public BasicServiceCommunicator getCommunicator() {
 		return this.comm;
 	}
 

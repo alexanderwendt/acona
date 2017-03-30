@@ -34,7 +34,7 @@ public class CFQuery extends CellFunctionImpl {
 			//create and register instance
 			String name = "CFQuery_" + destinationAddress + "_" + resultAddress;
 			log.trace("Service {}>Initialize with dest={}:{}, result={}:{}", name, destinationAgentName, destinationAddress, resultAgentName, resultAddress);
-			instance.init(CellFunctionConfig.newConfig(name, CFQuery.class).addSyncDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.push), cell);
+			instance.init(CellFunctionConfig.newConfig(name, CFQuery.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
 			result = instance.query(destinationAgentName, destinationAddress, content, resultAgentName, resultAddress, timeout);

@@ -15,8 +15,8 @@ public class DataStorageImpl implements DataStorage {
 
 	private static Logger log = LoggerFactory.getLogger(DataStorageImpl.class);
 
-	private final Map<String, Datapoint> data = new ConcurrentHashMap<String, Datapoint>();
-	private final Map<String, List<String>> subscribers = new ConcurrentHashMap<String, List<String>>();
+	private final Map<String, Datapoint> data = new ConcurrentHashMap<>();
+	private final Map<String, List<String>> subscribers = new ConcurrentHashMap<>();
 	private DataStorageSubscriberNotificator subscriberNotificator;
 
 	@Override
@@ -62,16 +62,16 @@ public class DataStorageImpl implements DataStorage {
 
 	private synchronized void notifySubscribers(Datapoint datapackage, String caller) {
 		// Get all subscribers for this datapoint if it exists
-		final List<String> subscribers = new LinkedList<String>(); // Important
-																	// to make
-																	// if final
-																	// as the
-																	// caller is
-																	// being
-																	// removed.
-																	// Else the
-																	// source is
-																	// modified
+		final List<String> subscribers = new LinkedList<>(); // Important
+																// to make
+																// if final
+																// as the
+																// caller is
+																// being
+																// removed.
+																// Else the
+																// source is
+																// modified
 		if (this.subscribers.containsKey(datapackage.getAddress()) == true) {
 			subscribers.addAll(this.subscribers.get(datapackage.getAddress()));
 		}
@@ -91,7 +91,7 @@ public class DataStorageImpl implements DataStorage {
 			}
 		} else {
 			// Add key
-			List<String> subscriberlist = new LinkedList<String>();
+			List<String> subscriberlist = new LinkedList<>();
 			subscriberlist.add(caller);
 			this.subscribers.put(address, subscriberlist);
 		}
@@ -121,10 +121,18 @@ public class DataStorageImpl implements DataStorage {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("data=");
-		builder.append(data);
-		builder.append(", subscribers=");
-		builder.append(subscribers);
+		builder.append("\nData storage content:\n");
+		data.keySet().forEach(k -> {
+			builder.append(k + " : " + data.get(k));
+			builder.append("\n");
+		});
+
+		builder.append("Subscribers:\n");
+		subscribers.keySet().forEach(k -> {
+			builder.append(k + " : " + subscribers.get(k));
+			builder.append("\n");
+		});
+
 		return builder.toString();
 	}
 
