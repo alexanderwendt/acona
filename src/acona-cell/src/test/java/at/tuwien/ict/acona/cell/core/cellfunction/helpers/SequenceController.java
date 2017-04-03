@@ -103,7 +103,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void cellFunctionInternalInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		this.delay = Integer.valueOf(this.getFunctionConfig().getProperty("delay", String.valueOf(this.delay)));
 
 	}
@@ -124,6 +124,12 @@ public class SequenceController extends CellFunctionThreadImpl {
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

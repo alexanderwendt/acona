@@ -66,7 +66,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void cellFunctionInternalInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		// Add the datapoints from the config to the subscriptions
 		this.trackedDatapoints.put(OPERAND1,
 				DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND1)));
@@ -112,6 +112,12 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

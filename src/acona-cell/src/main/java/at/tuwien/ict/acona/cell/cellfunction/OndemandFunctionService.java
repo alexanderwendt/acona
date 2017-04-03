@@ -54,7 +54,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 	protected SynchronousQueue<Boolean> blocker;
 
 	@Override
-	protected void cellFunctionInternalInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		log.debug("{}> Init service", this.getFunctionName());
 		// 1. Register DF service from function name
 		// this.getCell().registerService(this.getFunctionName());

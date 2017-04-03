@@ -76,4 +76,10 @@ public class LoopController extends OndemandFunctionService {
 		return null;
 	}
 
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

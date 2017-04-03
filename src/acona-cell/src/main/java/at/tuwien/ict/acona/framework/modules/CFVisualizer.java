@@ -22,7 +22,7 @@ public class CFVisualizer extends CellFunctionThreadImpl implements Visualizatio
 	private JFrame frame;
 
 	@Override
-	protected void cellFunctionInternalInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		// Create the visualization frame
 
 		frame = new Visualization2D(this);
@@ -85,6 +85,12 @@ public class CFVisualizer extends CellFunctionThreadImpl implements Visualizatio
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

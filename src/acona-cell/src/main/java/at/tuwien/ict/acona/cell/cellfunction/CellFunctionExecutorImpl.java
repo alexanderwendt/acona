@@ -67,18 +67,12 @@ public abstract class CellFunctionExecutorImpl extends CellFunctionImpl {
 	}
 
 	@Override
-	public void shutDown() {
-		// Unsubscribe all datapoints
-		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
-
-		// Execute specific functions
-		//		try {
-		//			this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
-		//		} catch (Exception e) {
-		//			log.error("No clean shutdown poassible ", e);
-		//		}
+	protected void shutDownImplementation() {
 		this.setCommand(ControlCommand.EXIT);
+		this.shutDownExecutor();
 	}
+
+	protected abstract void shutDownExecutor();
 
 	public int getExecuteRate() {
 		return executeRate;

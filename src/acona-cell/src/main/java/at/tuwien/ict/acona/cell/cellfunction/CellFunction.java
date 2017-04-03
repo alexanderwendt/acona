@@ -47,11 +47,32 @@ public interface CellFunction {
 	 */
 	public Map<String, DatapointConfig> getSubscribedDatapoints();
 
+	/**
+	 * Perform an operation of this service. The actual method that is executed,
+	 * is defined in the parameter data.
+	 * 
+	 * @param parameterdata
+	 * @param caller
+	 * @return
+	 */
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller);
 
+	/**
+	 * Shut down function
+	 */
 	public void shutDown();
 
+	/**
+	 * Get the cell function configuration
+	 * 
+	 * @return
+	 */
 	public CellFunctionConfig getFunctionConfig();
 
+	/**
+	 * Get the current state of the function
+	 *
+	 * @return
+	 */
 	public ServiceState getCurrentState();
 }

@@ -39,4 +39,10 @@ public class KollmansService extends OndemandFunctionService {
 		return null;
 	}
 
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

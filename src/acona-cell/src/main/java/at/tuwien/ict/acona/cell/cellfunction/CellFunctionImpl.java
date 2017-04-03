@@ -93,6 +93,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return this;
 	}
 
+	protected abstract void cellFunctionInit() throws Exception;
+
 	/**
 	 * Add a datapoint that shall be syncronized with read, subscribe or write.
 	 * this method should be used in the init method of a function
@@ -124,8 +126,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 		managedDatapoints.put(config.getId(), config);
 	}
 
-	protected abstract void cellFunctionInit() throws Exception;
-
 	@Override
 	public void shutDown() {
 		// Unsubscribe all datapoints
@@ -142,7 +142,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 		}
 	}
 
-	protected abstract void shutDownImplementation();
+	protected abstract void shutDownImplementation() throws Exception;
 
 	@Override
 	public void updateSubscribedData(Map<String, Datapoint> data, String caller) {

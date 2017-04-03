@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.Statement;
 
 import com.google.gson.JsonObject;
 
+@Deprecated
 public class ChunkRDFImpl implements ChunkMethods {
 
 	private Model model;
@@ -33,50 +34,56 @@ public class ChunkRDFImpl implements ChunkMethods {
 	}
 
 	@Override
-	public void setName(String name) {
+	public ChunkMethods setName(String name) {
 		model.add(this.baseResource, model.createProperty(NAMEPROPERTY), name);
+		return this;
 	}
 
 	@Override
-	public void setId(String id) {
+	public ChunkMethods setId(String id) {
 		throw new UnsupportedOperationException();
 
 	}
 
 	@Override
-	public void setType(String type) {
+	public ChunkMethods setType(String type) {
 		model.add(this.baseResource, model.createProperty(TYPEPROPERTY), type);
+		return this;
 
 	}
 
 	@Override
-	public void setValue(String key, String value) {
+	public ChunkMethods setValue(String key, String value) {
 		model.createProperty(key);
 		Statement statement = model.createStatement(this.baseResource, model.getProperty(key), value);
 		model.add(statement);
+		return this;
 	}
 
 	@Override
-	public void setValue(String key, double value) {
+	public ChunkMethods setValue(String key, double value) {
 		model.createProperty(key);
 		Statement statement = model.createLiteralStatement(this.baseResource, model.getProperty(key), value);
 		model.add(statement);
-
-	}
-
-	@Override
-	public void setValue(String key, int value) {
-		model.createProperty(key);
-		Statement statement = model.createLiteralStatement(this.baseResource, model.getProperty(key), value);
-		model.add(statement);
+		return this;
 
 	}
 
 	@Override
-	public void setValue(String key, boolean value) {
+	public ChunkMethods setValue(String key, int value) {
 		model.createProperty(key);
 		Statement statement = model.createLiteralStatement(this.baseResource, model.getProperty(key), value);
 		model.add(statement);
+		return this;
+
+	}
+
+	@Override
+	public ChunkMethods setValue(String key, boolean value) {
+		model.createProperty(key);
+		Statement statement = model.createLiteralStatement(this.baseResource, model.getProperty(key), value);
+		model.add(statement);
+		return this;
 
 	}
 
@@ -133,9 +140,9 @@ public class ChunkRDFImpl implements ChunkMethods {
 	}
 
 	@Override
-	public void setAssociatedContent(String association, Chunk content) {
+	public ChunkMethods setAssociatedContent(String association, ChunkMethods content) {
 		// TODO Auto-generated method stub
-
+		return this;
 	}
 
 	@Override
@@ -145,8 +152,9 @@ public class ChunkRDFImpl implements ChunkMethods {
 	}
 
 	@Override
-	public void setValue(String key, Chunk value) {
+	public ChunkMethods setValue(String key, ChunkMethods value) {
 		// TODO Auto-generated method stub
+		return this;
 
 	}
 

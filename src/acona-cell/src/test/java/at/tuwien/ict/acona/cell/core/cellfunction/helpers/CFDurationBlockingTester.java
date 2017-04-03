@@ -113,4 +113,10 @@ public class CFDurationBlockingTester extends CellFunctionBlockImpl {
 
 	}
 
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

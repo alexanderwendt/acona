@@ -68,4 +68,10 @@ public class SimpleControllerService extends OndemandFunctionService {
 		return null;
 	}
 
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

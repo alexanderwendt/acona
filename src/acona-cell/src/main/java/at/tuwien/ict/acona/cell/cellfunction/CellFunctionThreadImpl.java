@@ -39,7 +39,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	@Override
 	protected void cellFunctionExecutorInit() throws Exception {
 		try {
-			cellFunctionInternalInit();
+			cellFunctionThreadInit();
 
 			// Create a thread from this class
 			t = new Thread(this, this.getCell().getLocalName() + "#" + this.getFunctionName());
@@ -52,7 +52,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		}
 	}
 
-	protected abstract void cellFunctionInternalInit() throws Exception;
+	protected abstract void cellFunctionThreadInit() throws Exception;
 
 	@Override
 	protected abstract void executeFunction() throws Exception;
@@ -166,12 +166,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			this.setActive(false);
 			this.notify();
 		}
-	}
-
-	@Override
-	protected void shutDownImplementation() {
-		this.setCommand(ControlCommand.EXIT);
-
 	}
 
 	public boolean isActive() {

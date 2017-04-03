@@ -83,7 +83,7 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void cellFunctionInternalInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		log.info("Command datapoint={}, query datapoint={}, result datapoint={}", commandDatapointID, queryDatapointID, resultDatapointID);
 
 	}
@@ -104,6 +104,12 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

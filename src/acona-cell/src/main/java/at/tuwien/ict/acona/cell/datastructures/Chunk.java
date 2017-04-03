@@ -9,12 +9,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class Chunk implements ChunkMethods {
+public class Chunk {
 
 	private static Logger log = LoggerFactory.getLogger(Chunk.class);
 
 	private JsonObject chunkObject;
-	//private Gson gson = new Gson();
 
 	public static final String NAMEPROPERTY = "hasName";
 	public static final String TYPEPROPERTY = "hasType";
@@ -84,44 +83,43 @@ public class Chunk implements ChunkMethods {
 		this.setType(type);
 	}
 
-	@Override
-	public void setName(String name) {
+	public Chunk setName(String name) {
 		chunkObject.addProperty(NAMEPROPERTY, name);
+		return this;
 	}
 
-	@Override
-	public void setId(String id) {
+	public Chunk setId(String id) {
 		chunkObject.addProperty(IDPROPERTY, id);
+		return this;
 	}
 
-	@Override
-	public void setType(String type) {
+	public Chunk setType(String type) {
 		chunkObject.addProperty(TYPEPROPERTY, type);
+		return this;
 
 	}
 
-	@Override
-	public void setValue(String key, String value) {
+	public Chunk setValue(String key, String value) {
 		this.chunkObject.addProperty(key, value);
+		return this;
 	}
 
-	@Override
-	public void setValue(String key, double value) {
+	public Chunk setValue(String key, double value) {
 		this.chunkObject.addProperty(key, value);
+		return this;
 	}
 
-	@Override
-	public void setValue(String key, int value) {
+	public Chunk setValue(String key, int value) {
 		this.chunkObject.addProperty(key, value);
+		return this;
 	}
 
-	@Override
-	public void setValue(String key, boolean value) {
+	public Chunk setValue(String key, boolean value) {
 		this.chunkObject.addProperty(key, value);
+		return this;
 	}
 
-	@Override
-	public void setAssociatedContent(String association, Chunk content) {
+	public Chunk setAssociatedContent(String association, Chunk content) {
 		if (this.chunkObject.getAsJsonArray(association) == null) {
 			this.chunkObject.add(association, new JsonArray());
 		}
@@ -130,29 +128,25 @@ public class Chunk implements ChunkMethods {
 			this.chunkObject.getAsJsonArray(association).add(content.toJsonObject());
 		}
 
+		return this;
 	}
 
-	@Override
 	public String getName() {
 		return this.chunkObject.getAsJsonPrimitive(NAMEPROPERTY).getAsString();
 	}
 
-	@Override
 	public String getID() {
 		return this.chunkObject.getAsJsonPrimitive(IDPROPERTY).getAsString();
 	}
 
-	@Override
 	public String getValue(String key) {
 		return this.chunkObject.getAsJsonPrimitive(key).getAsString();
 	}
 
-	@Override
 	public double getDoubleValue(String key) {
 		return this.chunkObject.getAsJsonPrimitive(key).getAsDouble();
 	}
 
-	@Override
 	public List<Chunk> getAssociatedContent(String key) {
 		JsonArray array = this.chunkObject.get(key).getAsJsonArray();
 		List<Chunk> result = new ArrayList<>();
@@ -180,23 +174,20 @@ public class Chunk implements ChunkMethods {
 		return builder.toString();
 	}
 
-	@Override
 	public String getType() {
 		return this.chunkObject.getAsJsonPrimitive(TYPEPROPERTY).getAsString();
 	}
 
-	@Override
 	public JsonObject toJsonObject() {
 		return this.chunkObject;
 	}
 
-	@Override
-	public void setValue(String key, Chunk value) {
+	public Chunk setValue(String key, Chunk value) {
 		this.chunkObject.add(key, value.toJsonObject());
+		return this;
 
 	}
 
-	@Override
 	public Chunk getValueAsChunk(String key) throws Exception {
 		return new Chunk(this.chunkObject.getAsJsonObject(key));
 	}

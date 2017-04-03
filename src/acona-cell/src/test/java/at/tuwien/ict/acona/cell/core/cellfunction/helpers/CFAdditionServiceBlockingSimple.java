@@ -116,4 +116,10 @@ public class CFAdditionServiceBlockingSimple extends CellFunctionBlockImpl {
 
 	}
 
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

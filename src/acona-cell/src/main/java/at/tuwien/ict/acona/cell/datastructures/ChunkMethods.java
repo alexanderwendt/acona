@@ -6,23 +6,23 @@ import com.google.gson.JsonObject;
 
 public interface ChunkMethods {
 
-	public void setName(String name);
+	public ChunkMethods setName(String name);
 
-	public void setType(String type);
+	public ChunkMethods setType(String type);
 
-	public void setId(String id);
+	public ChunkMethods setId(String id);
 
-	public void setValue(String key, String value);
+	public ChunkMethods setValue(String key, String value);
 
-	public void setValue(String key, double value);
+	public ChunkMethods setValue(String key, double value);
 
-	public void setValue(String key, int value);
+	public ChunkMethods setValue(String key, int value);
 
-	public void setValue(String key, boolean value);
+	public ChunkMethods setValue(String key, boolean value);
 
-	public void setValue(String key, Chunk value);
+	public ChunkMethods setValue(String key, ChunkMethods value);
 
-	public void setAssociatedContent(String association, Chunk content);
+	public ChunkMethods setAssociatedContent(String association, ChunkMethods content);
 
 	public JsonObject toJsonObject();
 

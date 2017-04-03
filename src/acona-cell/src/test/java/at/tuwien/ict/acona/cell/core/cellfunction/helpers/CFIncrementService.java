@@ -54,7 +54,7 @@ public class CFIncrementService extends OndemandFunctionService {
 
 	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 		//Syntax
 		//address: command, value START, STOP, EXIT
 		//get command
@@ -90,6 +90,12 @@ public class CFIncrementService extends OndemandFunctionService {
 		}
 
 		return Datapoint.newDatapoint("state").setValue(message);
+
+	}
+
+	@Override
+	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
 
 	}
 
