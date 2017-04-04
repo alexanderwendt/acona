@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
+import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import jade.domain.FIPANames;
 
@@ -22,7 +23,7 @@ public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 
 	@Override
 	public List<Datapoint> performOperation(final Map<String, Datapoint> parameter, String caller) {
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 		try {
 			// Convert parameter to datapoint
 			//JsonArray array = parameter.get(PARAMETER).getValue().getAsJsonArray();
@@ -30,11 +31,11 @@ public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 
 			this.unsubscribe(datapoints, caller);
 
-			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ACKNOWLEDGEVALUE));
+			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 
 		} catch (Exception e) {
 			log.error("Cannot perform operation of parameter={}", parameter, e);
-			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ERRORVALUE));
+			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
 		}
 
 		return result;

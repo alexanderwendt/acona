@@ -10,7 +10,7 @@ import com.google.gson.JsonPrimitive;
 
 public class Datapoint {
 	private final static String KEYADDRESS = "ADDRESS";
-	//private final static String KEYTYPE = "TYPE";
+	private final static String KEYAGENT = "AGENT";
 	private final static String KEYVALUE = "VALUE";
 
 	private final static String NULLADDRESS = "NULLDATAPOINT";
@@ -24,6 +24,13 @@ public class Datapoint {
 
 	private static Logger log = LoggerFactory.getLogger(Datapoint.class);
 
+	/**
+	 * Create a datapoint from an address
+	 * 
+	 * @param address:
+	 *            The following syntax can be used: x.x for local datapoints,
+	 *            [agent]:[localaddress] for global datapoints
+	 */
 	private Datapoint(String address) {
 		// VALUE = new JsonObject();
 		this.ADDRESS = address;

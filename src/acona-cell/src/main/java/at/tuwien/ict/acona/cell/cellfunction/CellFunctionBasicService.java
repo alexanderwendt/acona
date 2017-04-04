@@ -14,12 +14,12 @@ public abstract class CellFunctionBasicService extends CellFunctionImpl {
 
 	//public final String METHODNAME;
 
-	protected static final String ACKNOWLEDGEVALUE = "OK";
-	protected static final String ERRORVALUE = "ERROR";
-	protected static final String PARAMETERRESULTADDRESS = "result";
-	//private static final String PARAMETERSENDER = "sender";
-	//private static final String METHODPROPERTY = "method";
-	//protected static final String PARAMETER = "datapoints";
+	//	protected static final String ACKNOWLEDGEVALUE = "OK";
+	//	protected static final String ERRORVALUE = "ERROR";
+	//	protected static final String PARAMETERRESULTADDRESS = "result";
+	//	//private static final String PARAMETERSENDER = "sender";
+	//	//private static final String METHODPROPERTY = "method";
+	//	//protected static final String PARAMETER = "datapoints";
 
 	// Parameter
 	// SENDER: name,

@@ -42,6 +42,13 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	private ServiceState currentServiceState = ServiceState.INITIALIZING;
 
+	/**
+	 * Constructor
+	 */
+	public CellFunctionImpl() {
+		this.setServiceState(ServiceState.BUILDING);
+	}
+
 	@Override
 	public CellFunction init(CellFunctionConfig config, Cell caller) throws Exception {
 		try {

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
  *         be executed if a subscribed datapoint is received
  *
  */
+@Deprecated
 public abstract class CellFunctionBlockImpl extends CellFunctionExecutorImpl {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionBlockImpl.class);

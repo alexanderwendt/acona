@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
+import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class BasicServiceRead extends CellFunctionBasicService implements ReadDatapoint {
@@ -34,7 +35,7 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 
 	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameter, String caller) {
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 		try {
 			//Set the current caller of the method
 			//this.currentCaller = caller;
@@ -61,7 +62,7 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 
 		} catch (Exception e) {
 			log.error("Cannot perform operation", e);
-			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ERRORVALUE));
+			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
 		}
 
 		// TODO Auto-generated method stub
@@ -91,7 +92,7 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 
 	@Override
 	public List<Datapoint> read(final List<Datapoint> datapointList) {
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 
 		datapointList.forEach(dp -> {
 			result.add(this.getCell().getDataStorage().read(dp.getAddress()));

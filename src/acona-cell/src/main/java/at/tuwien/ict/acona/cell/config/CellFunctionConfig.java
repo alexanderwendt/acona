@@ -148,9 +148,10 @@ public class CellFunctionConfig {
 		return gson.fromJson(this.configObject.get(key), type);
 	}
 
-	public void setProperty(String key, Object value) {
+	public CellFunctionConfig setProperty(String key, Object value) {
 		// TODO: Method not tested yet
 		this.configObject.add(key, new Gson().toJsonTree(value));
+		return this;
 	}
 
 	public String getProperty(String key) throws Exception {

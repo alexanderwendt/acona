@@ -67,12 +67,12 @@ public abstract class CellFunctionExecutorImpl extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void shutDownImplementation() {
+	protected void shutDownImplementation() throws Exception {
 		this.setCommand(ControlCommand.EXIT);
 		this.shutDownExecutor();
 	}
 
-	protected abstract void shutDownExecutor();
+	protected abstract void shutDownExecutor() throws Exception;
 
 	public int getExecuteRate() {
 		return executeRate;

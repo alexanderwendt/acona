@@ -33,6 +33,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  * @author wendt
  *
  */
+@Deprecated
 public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 
 	private static Logger log = LoggerFactory.getLogger(OndemandFunctionService.class);

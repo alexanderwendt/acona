@@ -20,6 +20,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl implements Runnable {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
+	private static final int INITIALIZATIONPAUSE = 500;
 
 	private Thread t;
 
@@ -39,13 +40,14 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	@Override
 	protected void cellFunctionExecutorInit() throws Exception {
 		try {
-			cellFunctionThreadInit();
 
+			cellFunctionThreadInit();
 			// Create a thread from this class
 			t = new Thread(this, this.getCell().getLocalName() + "#" + this.getFunctionName());
+			//Start the thread as well as the internal initialization
 			t.start();
 
-			log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
+			//log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 		} catch (Exception e) {
 			log.error("CellFunction {} could not be initialized", this.getFunctionName());
 			throw new Exception(e.getMessage());
@@ -60,6 +62,25 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	@Override
 	public void run() {
 		log.debug("Start cell function {}", this.getFunctionName());
+
+		//		log.debug("Start internal initialization");
+		//		boolean initFinished = false;
+		//		do {
+		//			try {
+		//				cellFunctionThreadInit();
+		//				initFinished = true;
+		//			} catch (Exception e2) {
+		//				log.error("Cannot initialize cell function={}. Try again in {}ms", this.getFunctionName(), INITIALIZATIONPAUSE, e2);
+		//				synchronized (this) {
+		//					try {
+		//						this.wait(INITIALIZATIONPAUSE);
+		//					} catch (InterruptedException e3) {
+		//
+		//					}
+		//				}
+		//			}
+		//		} while (initFinished == false);
+		//		log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 
 		while (isActive == true) {
 			// Stop the system at the end of the turn, if STOP command has been

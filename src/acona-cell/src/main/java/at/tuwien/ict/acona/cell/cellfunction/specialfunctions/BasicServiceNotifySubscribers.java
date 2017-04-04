@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
+import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
@@ -16,18 +17,18 @@ public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 
 	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 		log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.keySet());
 
 		parameterdata.values().forEach(dp -> {
 			this.getCell().getFunctionHandler().activateNotifySubscribers(caller, dp);
 		});
 		try {
-			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ACKNOWLEDGEVALUE));
+			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 
 		} catch (Exception e) {
 			log.error("Cannot perform notify on parameter={}", parameterdata, e);
-			result.add(Datapoint.newDatapoint(PARAMETERRESULTADDRESS).setValue(ERRORVALUE));
+			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
 		}
 
 		return result;
