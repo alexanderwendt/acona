@@ -84,7 +84,6 @@ public class Codelettester {
 			String controllerAgentName = "CodeletExecutorAgent";
 
 			String processDatapoint = "workingmemory.changeme";
-			String notificationDatapoint = "workingmemory.notification";
 			// values
 			double startValue = 1;
 			int expectedResult = 3;
@@ -105,7 +104,7 @@ public class Codelettester {
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(500);
 				} catch (InterruptedException e) {
 
 				}
@@ -113,49 +112,64 @@ public class Codelettester {
 			log.info("=== All agents initialized ===");
 
 			//memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
 					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
+					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+					controllerAgentName, handlerName + ".result", 20000);
 
-			synchronized (this) {
-				try {
-					this.wait(500);
-				} catch (InterruptedException e) {
-
-				}
-			}
+			//			synchronized (this) {
+			//				try {
+			//					this.wait(500);
+			//				} catch (InterruptedException e) {
+			//
+			//				}
+			//			}
 
 			log.info("Datapoints on the way. Set 1");
 			controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
 
-			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
 					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
+					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+					controllerAgentName, handlerName + ".result", 20000);
 
-			synchronized (this) {
-				try {
-					this.wait(500);
-				} catch (InterruptedException e) {
-
-				}
-			}
-
+			//			synchronized (this) {
+			//				try {
+			//					this.wait(500);
+			//				} catch (InterruptedException e) {
+			//
+			//				}
+			//			}
+			//controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(3)));
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
-			//Execute codelets once again
-			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//			//Execute codelets once again
+			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
 					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
+					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+					controllerAgentName, handlerName + ".result", 20000);
 
-			synchronized (this) {
-				try {
-					this.wait(500);
-				} catch (InterruptedException e) {
-
-				}
-			}
+			//			synchronized (this) {
+			//				try {
+			//					this.wait(500);
+			//				} catch (InterruptedException e) {
+			//
+			//				}
+			//			}
 
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
@@ -188,7 +202,7 @@ public class Codelettester {
 			String controllerAgentName = "CodeletExecutorAgent";
 
 			String processDatapoint = "workingmemory.changeme";
-			String notificationDatapoint = "workingmemory.notification";
+			//String notificationDatapoint = "workingmemory.notification";
 			// values
 			double startValue = 1;
 			int expectedResult = 3;
@@ -219,34 +233,44 @@ public class Codelettester {
 			log.info("=== All agents initialized ===");
 
 			//memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
 					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
+					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+					controllerAgentName, handlerName + ".result", 20000);
 
-			synchronized (this) {
-				try {
-					this.wait(500);
-				} catch (InterruptedException e) {
-
-				}
-			}
+			//			synchronized (this) {
+			//				try {
+			//					this.wait(500);
+			//				} catch (InterruptedException e) {
+			//
+			//				}
+			//			}
 
 			log.info("Datapoints on the way. Set 1");
 			controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
 
-			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 1000);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
 					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
+					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+					controllerAgentName, handlerName + ".result", 20000);
 
-			synchronized (this) {
-				try {
-					this.wait(500);
-				} catch (InterruptedException e) {
-
-				}
-			}
+			//			synchronized (this) {
+			//				try {
+			//					this.wait(500);
+			//				} catch (InterruptedException e) {
+			//
+			//				}
+			//			}
 
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 

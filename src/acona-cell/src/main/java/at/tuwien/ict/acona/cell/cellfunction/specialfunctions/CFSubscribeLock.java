@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
@@ -9,35 +8,40 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
-
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
+import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class CFQuery extends CellFunctionImpl {
+public class CFSubscribeLock extends CellFunctionImpl {
 
-	protected static Logger log = LoggerFactory.getLogger(CFQuery.class);
+	protected static Logger log = LoggerFactory.getLogger(CFSubscribeLock.class);
 
 	private final SynchronousQueue<Datapoint> queue = new SynchronousQueue<>();
 
 	private String resultAddress = "";
-	private boolean isExitSet = false;
 
-	public static Datapoint newQuery(String destinationAgentName, String destinationAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+	public static Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
 		Datapoint result = null;
 
-		CFQuery instance = new CFQuery();
+		CFSubscribeLock instance = new CFSubscribeLock();
 		try {
 			//create and register instance
-			String name = "CFQuery_" + destinationAddress + "_" + resultAddress;
-			log.trace("Service {}>Initialize with dest={}:{}, result={}:{}", name, destinationAgentName, destinationAddress, resultAgentName, resultAddress);
-			instance.init(CellFunctionConfig.newConfig(name, CFQuery.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
+			String name = "CFSubscribeLock_" + resultAgentName + ":" + resultAddress;
+			log.trace("Service {}>Initialize with result={}:{}", name, resultAgentName, resultAddress);
+			instance.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
-			result = instance.query(destinationAgentName, destinationAddress, content, resultAgentName, resultAddress, timeout);
+			List<Datapoint> functionResult = instance.executeService(agentName, serviceName, serviceParameter, timeout);
+
+			if (functionResult.isEmpty() == false && functionResult.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
+				throw new Exception("Cannot execute the service=" + serviceName + " with the parameter=" + serviceParameter + " in the agent=" + agentName);
+			}
+
+			//Wait for subscribed value
+			result = instance.waitForSubscription(resultAgentName, resultAddress, timeout);
 
 			//Deregister
 			//instance.shutDown();
@@ -83,18 +87,16 @@ public class CFQuery extends CellFunctionImpl {
 		}
 	}
 
-	private Datapoint query(String destinationAgentName, String destinationAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception {
+	private List<Datapoint> executeService(String agentName, String serviceName, List<Datapoint> serviceParameter, int timeout) throws Exception {
+		return this.getCommunicator().execute(agentName, serviceName, serviceParameter, timeout);
+	}
+
+	private Datapoint waitForSubscription(String resultAgentName, String resultAddress, int timeout) throws Exception {
 		Datapoint result = null;
 		this.resultAddress = resultAddress;
 		//this.resultAgent = resultAgentName;
 
 		try {
-			//subscribe
-			//this.getCommunicator().subscribe(resultAddress, resultAgentName);
-
-			//write to destination
-			this.getCommunicator().write(Arrays.asList(Datapoint.newDatapoint(destinationAddress).setValue(content)), destinationAgentName, timeout, false);
-
 			try {
 				log.trace("Service {}>Poll temp queue", this.getFunctionConfig().getName());
 				result = this.queue.poll(timeout, TimeUnit.MILLISECONDS);

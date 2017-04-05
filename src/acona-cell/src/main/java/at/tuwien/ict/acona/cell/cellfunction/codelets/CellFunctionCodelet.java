@@ -91,6 +91,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 		} else {
 			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
+
 		}
 
 		return result;
@@ -111,7 +112,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	@Override
 	protected void executePostProcessing() throws Exception {
-		// TODO Auto-generated method stub
 		//Set state of the codelet to finished
 		//Register codelet in the codelethandler
 		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
@@ -124,7 +124,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	@Override
 	protected void executePreProcessing() throws Exception {
-		// TODO Auto-generated method stub
 		//Set state to running
 		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
 				Datapoint.newDatapoint(KEYMETHOD).setValue(SETSTATESERVICENAME),

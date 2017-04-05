@@ -153,6 +153,20 @@ public interface Communicator extends AgentCommunicator {
 	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception;
 
 	/**
+	 * Execute a service in an agent and wait for a value in a certain datapoint
+	 * 
+	 * @param writeAgentName
+	 * @param serviceName
+	 * @param serviceParameter
+	 * @param resultAgentName
+	 * @param resultAddress
+	 * @param timeout
+	 * @return
+	 * @throws Exception
+	 */
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception;
+
+	/**
 	 * Subscribe a datapoint (also outside of the init function
 	 * 
 	 * @param agentid

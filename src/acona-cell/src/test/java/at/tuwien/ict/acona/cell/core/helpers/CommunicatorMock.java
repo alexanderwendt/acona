@@ -179,4 +179,10 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 		return null;
 	}
 
+	@Override
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

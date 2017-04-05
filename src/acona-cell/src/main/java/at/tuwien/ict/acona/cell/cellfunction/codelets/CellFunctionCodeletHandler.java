@@ -12,9 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
+import at.tuwien.ict.acona.cell.datastructures.Chunk;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implements CodeletHandler {
@@ -29,11 +32,13 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private final static String KEYMETHOD = "method";
 	private final static String KEYCALLERADDRESS = "calleraddress";
 	private final static String KEYEXECUTIONORDERNAME = "executionorder";
-	private final static String KEYNOTIFICATIONADDRESS = "notificationaddress";
+	private final static String KEYISBLOCKING = "blockingmethod";
 	private final static String KEYSTATE = "state";
-	private final static int METHODTIMEOUT = 1000;
 
-	private String notificationDatapointAddress = "";
+	private String resultDatapointAddress = "";
+
+	private final static int METHODTIMEOUT = 1000;
+	private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
 	private final Map<Integer, List<String>> executionOrderMap = new TreeMap<>();
@@ -42,7 +47,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
-		// TODO Auto-generated method stub
+		this.resultDatapointAddress = this.getFunctionName() + "." + "result";
 
 	}
 
@@ -52,9 +57,9 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		try {
 			if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(EXECUTECODELETEHANDLER)) {
-				String notificationAddress = parameterdata.get(KEYNOTIFICATIONADDRESS).getValueAsString();
+				boolean isBlocking = parameterdata.get(KEYISBLOCKING).getValue().getAsBoolean();
 				log.debug("Execute the codelet handler");
-				this.startCodeletHandlerBlocking(notificationAddress);
+				this.startCodeletHandler(isBlocking);
 				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 
 			} else if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(REGISTERCODELETSERVICENAME)) {
@@ -107,27 +112,39 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public void setCodeletState(ServiceState state, String codeletID) throws Exception {
+	public synchronized void setCodeletState(ServiceState state, String codeletID) throws Exception {
 		if (this.getCodeletMap().containsKey(codeletID) == true) {
 			this.getCodeletMap().put(codeletID, state);
 
+			//Check if all codelets for a certain run order state are ready
 			boolean isRunOrderStateReady = false;
-			if (this.currentRunOrder >= 0) {
-				isRunOrderStateReady = this.isRunOrderStateReady(this.currentRunOrder);
+			if (this.getCurrentRunOrder() >= 0) {
+				isRunOrderStateReady = this.isRunOrderStateReady(this.getCurrentRunOrder());
 			}
-			boolean isCurrentRunOrderLast = false;
-			if (this.getNextRunOrderState(currentRunOrder) == -1) { //Run order has reached the end
-				isCurrentRunOrderLast = true;
-				this.currentRunOrder = this.getNextRunOrderState(currentRunOrder);
 
-			}
+			boolean isCurrentRunOrderLast = false;
+			//			if (this.getNextRunOrderState(this.getCurrentRunOrder()) == -1) { //Run order has reached the end
+			//				isCurrentRunOrderLast = true;
+			//			}
 
 			log.debug("Codelet={} updated its state to state={}", codeletID, state);
-			if ((isRunOrderStateReady == true) && (isCurrentRunOrderLast == false)) {
-				log.debug("The next codelet run can start");
-				this.setStart();
-			}
+			log.debug("Current states of codelets={}. Current run execution={}", this.getCodeletMap(), this.getCurrentRunOrder());
 
+			//If the current run order state is ready, increment it
+			if (isRunOrderStateReady == true) {
+				int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
+				this.setCurrentRunOrder(nextRunOrder);
+				if (this.getCurrentRunOrder() == -1) { //Run order has reached the end
+					isCurrentRunOrderLast = true;
+
+					//Write finish notification
+					this.writeLocal(Datapoint.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
+					log.debug("Codelet handler finished and has written ACK to datapoint address={}", this.resultDatapointAddress);
+				} else {
+					log.debug("The next codelet run can start");
+					this.setStart();
+				}
+			}
 		} else {
 			throw new Exception("Codelet not registered");
 		}
@@ -136,12 +153,10 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	@Override
 	protected void executeFunction() throws Exception {
 		//Load all codelets to execute, i.e. only the codelets that shall run in parallel, get the map
-		//Get the next runOrder by incrementing the current one
-		this.currentRunOrder = this.getNextRunOrderState(this.currentRunOrder);
-		log.debug("Start running the run order={}", this.currentRunOrder);
+		log.debug("Start running the run order={} of total run orders={}", this.getCurrentRunOrder(), this.retrieveExecutionOrder());
 
 		//Check that all codelets are ready (it shall always be true, else there is an error)
-		boolean runAllowed = this.isRunOrderStateReady(this.currentRunOrder);
+		boolean runAllowed = this.isRunOrderStateReady(this.getCurrentRunOrder());
 
 		if (runAllowed == false) {
 			log.warn("Not all codelets are ready to run. States={}", this.getCodeletMap());
@@ -183,6 +198,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		//Notify the caller on the provided datapoint that the codelets are finished
 
+		//Get the next runOrder by incrementing the current one
 	}
 
 	/**
@@ -277,17 +293,40 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public boolean startCodeletHandlerBlocking(String notificationDatapointAddress) {
+	public boolean startCodeletHandler(boolean isBlocking) throws Exception {
+		boolean isAllowedToRun = false;
+
 		//Check if the whole system is ready
-		boolean isAllowedToRun = this.isRunOrderStateReady() && this.currentRunOrder == -1; //if all codelets are idle and runorder is reset
+		try {
+			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1; //if all codelets are idle and runorder is reset
 
-		if (isAllowedToRun == true) {
-			log.debug("All codelets are in state IDLE");
-			this.setStart();
+			if (isAllowedToRun == true) {
+				log.debug("All codelets are in state IDLE");
+				//Clear the blocker
 
-		} else {
-			log.warn("Not all codelets are ready. Codelet states={}", this.getCodeletMap());
+				//Increment to start with the first run order
+				int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
+				this.setCurrentRunOrder(nextRunOrder);
 
+				this.setStart();
+
+				//				if (isBlocking) {
+				//					try {
+				//						this.getBlocker().clear();
+				//						boolean runComplete = this.getBlocker().poll(CODELETHANDLERTIMEOUT, TimeUnit.MILLISECONDS);
+				//					} catch (InterruptedException e) {
+				//
+				//					}
+				//				}
+			} else {
+				log.warn("Not all codelets are ready. Codelet states={}", this.getCodeletMap());
+			}
+		} catch (NullPointerException e) {
+			log.error("Method timeout", e);
+			throw new Exception(e.getMessage());
+		} catch (Exception e) {
+			log.error("Cannot execute the codelet handler correctly", e);
+			throw new Exception(e.getMessage());
 		}
 
 		return isAllowedToRun;
@@ -297,6 +336,12 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		return codeletMap;
 	}
 
+	/**
+	 * Add codelet execution order
+	 * 
+	 * @param name
+	 * @param order
+	 */
 	private void putCodeletExecutionOrder(String name, int order) {
 		if (this.getExecutionOrderMap().containsKey(order)) {
 			//Add to existing list
@@ -314,6 +359,11 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 	}
 
+	/**
+	 * Remove codelet execution order
+	 * 
+	 * @param name
+	 */
 	private void removeCodeletExecutionOrder(String name) {
 		Iterator<Entry<Integer, List<String>>> iter = this.getExecutionOrderMap().entrySet().iterator();
 
@@ -327,21 +377,58 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 	}
 
+	/**
+	 * Retrieve a sorted list of execution orders
+	 * 
+	 * @return
+	 */
 	private List<Integer> retrieveExecutionOrder() {
 		List<Integer> result = new ArrayList<>(this.getExecutionOrderMap().keySet());
 		return result;
 	}
 
+	/**
+	 * Get execution order map
+	 * 
+	 * @return
+	 */
 	protected synchronized Map<Integer, List<String>> getExecutionOrderMap() {
 		return executionOrderMap;
 	}
 
-	protected int getCurrentRunOrder() {
-		return currentRunOrder;
+	/**
+	 * Get current run order
+	 * 
+	 * @return
+	 */
+	private int getCurrentRunOrder() {
+		return this.currentRunOrder;
 	}
 
-	protected void setCurrentRunOrder(int currentRunOrder) {
+	/**
+	 * set current run order
+	 * 
+	 * @param currentRunOrder
+	 */
+	private void setCurrentRunOrder(int currentRunOrder) {
 		this.currentRunOrder = currentRunOrder;
+	}
+
+	@Override
+	public JsonObject getCodeletHandlerState() {
+		String runningCodelets = this.getExecutionOrderMap().get(this.getCurrentRunOrder()).toString();
+
+		Chunk state = null;
+		try {
+			state = Chunk.newChunk(this.getFunctionName() + "_State", "CODELETHANDLERSTATE");
+			state.setValue("RUNNINGCODELETS", runningCodelets);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return state.toJsonObject();
 	}
 
 }

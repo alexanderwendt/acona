@@ -1,5 +1,7 @@
 package at.tuwien.ict.acona.cell.cellfunction.codelets;
 
+import com.google.gson.JsonObject;
+
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 
 public interface CodeletHandler {
@@ -37,6 +39,10 @@ public interface CodeletHandler {
 
 	/**
 	 * Trigger to start the codelet handler as non blocking instance
+	 * 
+	 * @throws Exception
 	 */
-	public boolean startCodeletHandlerBlocking(String notificationDatapointAddress);
+	public boolean startCodeletHandler(boolean isBlocking) throws Exception;
+
+	public JsonObject getCodeletHandlerState();
 }

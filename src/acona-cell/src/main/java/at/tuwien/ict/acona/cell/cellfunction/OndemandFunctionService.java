@@ -33,18 +33,18 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  * @author wendt
  *
  */
-@Deprecated
 public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 
 	private static Logger log = LoggerFactory.getLogger(OndemandFunctionService.class);
 
-	protected String COMMANDDATAPOINTNAME = "command";
+	protected String COMMANDDATAPOINTNAME = "command"; //method=controllcommand, command=start
 	protected String STATEDATAPOINTNAME = "state";
 	protected String DESCRIPTIONDATAPOINTNAME = "description";
-	protected String PARAMETERDATAPOINTNAME = "parameter";
+	//protected String PARAMETERDATAPOINTNAME = "parameter";
 	protected String CONFIGDATAPOINTNAME = "config";
+	protected String RESULTDATAPOINTNAME = "result";
 
-	protected Datapoint command, state, description, parameter, config;
+	protected Datapoint command, state, description, config, result;
 
 	/**
 	 * In the value map all, subscribed values as well as read values are put.
@@ -80,27 +80,30 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		COMMANDDATAPOINTNAME = serviceName + "." + "command";
 		STATEDATAPOINTNAME = serviceName + "." + "state";
 		DESCRIPTIONDATAPOINTNAME = serviceName + "." + "description";
-		PARAMETERDATAPOINTNAME = serviceName + "." + "parameter";
+		//PARAMETERDATAPOINTNAME = serviceName + "." + "parameter";
 		CONFIGDATAPOINTNAME = serviceName + "." + "config";
+		RESULTDATAPOINTNAME = serviceName + "." + "result";
 
 		command = Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
 		state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.IDLE.toString());
 		description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
-		parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
+		//parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
 		config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
+		result = Datapoint.newDatapoint(RESULTDATAPOINTNAME).setValue("");
 
-		log.trace(
-				"Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
-				command.getAddress(), state.getAddress(), description.getAddress(), parameter.getAddress(),
-				config.getAddress());
+		log.debug("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
+				command.getAddress(), state.getAddress(), description.getAddress(),
+				config.getAddress(), result.getAddress());
 
-		this.getSubscribedDatapoints().put(command.getAddress(), DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
-		this.getSubscribedDatapoints().put(state.getAddress(), DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
-		this.getSubscribedDatapoints().put(description.getAddress(), DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
-		this.getSubscribedDatapoints().put(parameter.getAddress(), DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.SUBSCRIBEONLY));
-		this.getSubscribedDatapoints().put(config.getAddress(), DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
+		//Add subscriptions
+		this.addManagedDatapoint(DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
+		//this.addManagedDatapoint(DatapointConfig.newConfig(parameter.getAddress(), parameter.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
+		//Result will only be written
 
-		this.getCommunicator().write(Arrays.asList(command, state, description, parameter, config));
+		this.getCommunicator().write(Arrays.asList(command, state, description, config, result));
 
 	}
 
@@ -152,37 +155,36 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, command.getAddress());
 		// 4. If update datapoints is executed, do start command or other update
+
+		//		// Update parameters
+		//		if (data.containsKey(this.parameter.getAddress())) {
+		//			log.info("New parameter set={}", data.get(parameter).getValue());
+		//
+		//			this.parameter.setValue(data.get(this.parameter.getAddress()).getValue());
+		//		}
+
 		// Update command
 		if (data.containsKey(command.getAddress())
 				&& data.get(command.getAddress()).getValue().toString().equals("{}") == false) {
 			try {
 				this.setCommand(data.get(command.getAddress()).getValueAsString());
 			} catch (Exception e) {
-				log.error("{}>Cannot execute command={}", this.getFunctionName(),
-						data.get(command.getAddress()).getValueAsString(), e);
+				log.error("{}>Cannot execute command={}", this.getFunctionName(), data.get(command.getAddress()).getValueAsString(), e);
 			}
 		}
 
 		// Update config
 		if (data.containsKey(this.config.getAddress())) {
-			log.info("New config set={}", data.get(parameter).getValue());
+			log.info("New config set={}", data.get(config).getValue());
 
 			data.keySet().forEach(key -> {
 				this.getFunctionConfig().setProperty(key, data.get(key).getValue());
 			});
 		}
 
-		// Update parameters
-		if (data.containsKey(this.parameter.getAddress())) {
-			log.info("New parameter set={}", data.get(parameter).getValue());
-
-			this.parameter.setValue(data.get(this.parameter.getAddress()).getValue());
-		}
-
 		// Else
-		if (data.containsKey(command.getAddress()) == false && data.containsKey(parameter.getAddress()) == false) {
-			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(),
-					this.getSubscribedDatapoints().values());
+		if (data.containsKey(command.getAddress()) == false) {
+			log.info("{}>Datapoint {} received. Expected datapoints={}", this.getFunctionName(), data.values(), this.getSubscribedDatapoints().values());
 		}
 
 		valueMap.putAll(data);

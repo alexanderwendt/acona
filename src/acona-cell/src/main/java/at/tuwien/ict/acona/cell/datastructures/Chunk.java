@@ -119,7 +119,14 @@ public class Chunk {
 		return this;
 	}
 
-	public Chunk setAssociatedContent(String association, Chunk content) {
+	public Chunk addAssociatedContent(String association, List<Chunk> content) {
+		content.forEach(c -> {
+			this.addAssociatedContent(association, c);
+		});
+		return this;
+	}
+
+	public Chunk addAssociatedContent(String association, Chunk content) {
 		if (this.chunkObject.getAsJsonArray(association) == null) {
 			this.chunkObject.add(association, new JsonArray());
 		}

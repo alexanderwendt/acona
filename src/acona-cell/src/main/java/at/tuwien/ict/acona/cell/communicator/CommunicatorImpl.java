@@ -15,6 +15,7 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFSubscribeLock;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -57,7 +58,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 			result.addAll(this.execute(agentName, READSERVICENAME, inputList, timeout));
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
+			if (result.isEmpty() == false && result.get(0).getValue().isJsonPrimitive() == true && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
 				throw new Exception("Cannot read values. Error returned from destination");
 			}
 		} catch (Exception e) {
@@ -89,7 +90,15 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public Datapoint read(String datapointName) throws Exception {
-		return this.read(datapointName, this.getLocalAgentName());
+		Datapoint result = null;
+
+		//If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and read from an agent
+		if (datapointName.contains(":") == true) {
+			result = this.read(datapointName.split(":")[1], datapointName.split(":")[0]);
+		} else {
+			result = this.read(datapointName, this.getLocalAgentName());
+		}
+		return result;
 	}
 
 	@Override
@@ -123,7 +132,16 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void write(Datapoint datapoint) throws Exception {
-		this.write(Arrays.asList(datapoint), this.getLocalAgentName(), defaultTimeout, true);
+		//If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and write to the agent
+		if (datapoint.getAddress().contains(":") == true) {
+			String agent = datapoint.getAddress().split(":")[0];
+			String address = datapoint.getAddress().split(":")[1];
+			Datapoint writeDatapoint = Datapoint.newDatapoint(address).setValue(datapoint.getValue());
+
+			this.write(Arrays.asList(writeDatapoint), agent, defaultTimeout, true);
+		} else {
+			this.write(Arrays.asList(datapoint), this.getLocalAgentName(), defaultTimeout, true);
+		}
 
 	}
 
@@ -253,18 +271,19 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 		try {
 			result = CFQuery.newQuery(writeAgentName, writeAddress, content, resultAgentName, resultAddress, timeout, this.getCell());
+		} catch (Exception e) {
+			log.error("Cannot execute query", e);
+		}
 
-			//			// SynchronousQueue<Datapoint> queue = new
-			//			// SynchronousQueue<Datapoint>();
-			//			// Subscribe the result and init queue
-			//			subscription = new TemporarySubscription(this.getCell(), datapointwithresult.getAddress(), agentNameResult, timeout);
-			//
-			//			// Write the datapoint
-			//			this.write(datapointtowrite, agentNameToWrite);
-			//
-			//			// Wait for result
-			//			result = subscription.getDatapoint(); // queue.poll(timeout, // TimeUnit.MILLISECONDS);
+		return result;
+	}
 
+	@Override
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
+		Datapoint result = null;
+
+		try {
+			result = CFSubscribeLock.newServiceExecutionAndSubscribeLock(writeAgentName, serviceName, serviceParameter, resultAgentName, resultAddress, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 		}
