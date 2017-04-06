@@ -15,6 +15,8 @@ public class Datapoint {
 
 	private final static String NULLADDRESS = "NULLDATAPOINT";
 
+	//TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
+
 	private String ADDRESS = "";
 	//private String TYPE = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();

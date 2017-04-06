@@ -13,6 +13,8 @@ public class Chunk {
 
 	private static Logger log = LoggerFactory.getLogger(Chunk.class);
 
+	//TODO: The nullpointer chunk shall not need any try-catch
+
 	private JsonObject chunkObject;
 
 	public static final String NAMEPROPERTY = "hasName";
@@ -62,8 +64,16 @@ public class Chunk {
 		return result;
 	}
 
-	public static Chunk nullChunk() throws Exception {
-		return new Chunk("null", Chunk.class.getSimpleName());
+	public static Chunk nullChunk() {
+		Chunk result = null;
+
+		try {
+			result = new Chunk("null", Chunk.class.getSimpleName());
+		} catch (Exception e) {
+			log.error("Cannot create the null chunk. The value is NULL", e);
+		}
+
+		return result;
 	}
 
 	public static boolean isNullChunk(Chunk chunk) {

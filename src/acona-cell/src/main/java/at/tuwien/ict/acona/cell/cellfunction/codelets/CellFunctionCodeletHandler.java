@@ -35,6 +35,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private final static String KEYISBLOCKING = "blockingmethod";
 	private final static String KEYSTATE = "state";
 
+	private String codeletStateDatapointAddress;
+
 	private String resultDatapointAddress = "";
 
 	private final static int METHODTIMEOUT = 1000;
@@ -48,7 +50,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		this.resultDatapointAddress = this.getFunctionName() + "." + "result";
-
+		this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 	}
 
 	@Override
@@ -145,9 +147,41 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 					this.setStart();
 				}
 			}
+
+			//Write the current state of the system
+			Datapoint handlerState = writeStateOfTheSystemAsDatapoint();
+			this.writeLocal(handlerState);
+
 		} else {
 			throw new Exception("Codelet not registered");
 		}
+	}
+
+	private Datapoint writeStateOfTheSystemAsDatapoint() throws Exception {
+		Datapoint result = Datapoint.newDatapoint(this.codeletStateDatapointAddress);
+
+		Chunk systemState = null;
+		try {
+			systemState = Chunk.newChunk(this.getFunctionName() + "_State", "STATE");
+			for (Entry<String, ServiceState> entry : this.getCodeletMap().entrySet()) {
+				try {
+					systemState.addAssociatedContent("hasCodelet", Chunk.newChunk(entry.getKey(), "CODELETSTATE").setValue("State", entry.getValue().toString()));
+				} catch (Exception e) {
+					log.error("Cannot set the associated codelet={}", entry, e);
+				}
+			}
+
+			//TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
+			//TODO: The nullpointer chunk shall not need any try-catch
+
+			result.setValue(systemState.toJsonObject());
+		} catch (Exception e) {
+			log.error("Cannot create the system state", e);
+			throw new Exception(e.getMessage());
+		}
+
+		return result;
+
 	}
 
 	@Override
@@ -191,14 +225,6 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				}
 			});
 		}
-
-		//Set function state to running. Use a timeout for how long the codelets may work. No new requests can be made
-
-		//When the codelets are finished, they set the new state. The process is finished, when all codelets are in the state idle.
-
-		//Notify the caller on the provided datapoint that the codelets are finished
-
-		//Get the next runOrder by incrementing the current one
 	}
 
 	/**

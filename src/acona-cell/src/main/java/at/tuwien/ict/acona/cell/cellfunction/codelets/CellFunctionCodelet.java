@@ -32,6 +32,8 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	public final static String ATTRIBUTECODELETHANDLERADDRESS = "handleraddress";
 	public final static String ATTRIBUTEEXECUTIONORDER = "executionorder";
 
+	private String codeletStateDatapointAddress;
+
 	private String codeletHandlerAgentName = "";
 	private String codeletHandlerServiceName = "";
 	private String callerAddress = "";
@@ -42,6 +44,9 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		try {
 			//Set the caller address
 			this.callerAddress = this.getCell().getLocalName() + ":" + this.getFunctionName();
+
+			//Set the system state datapoint
+			codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 
 			//Start internal init
 			this.cellFunctionCodeletInit();
@@ -158,6 +163,10 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 				Datapoint.newDatapoint(KEYMETHOD).setValue(DEREGISTERCODELETSERVICENAME),
 				Datapoint.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress)));
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, methodParameters, METHODTIMEOUT);
+	}
+
+	protected String getCodeletStateDatapointAddress() {
+		return codeletStateDatapointAddress;
 	}
 
 }
