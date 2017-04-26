@@ -254,6 +254,9 @@ public class CellBasicServiceTester {
 				}
 			}
 
+			cellControlSubscriber.getCommunicator().setDefaultTimeout(20000);
+			cellControlPublisher.getCommunicator().setDefaultTimeout(20000);
+
 			// Set init value
 			cellControlPublisher.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value1));
 			log.debug("Get database of publisher={}. Database of subscriber={}", cellControlPublisher.getDataStorage(), cellControlSubscriber.getDataStorage());
@@ -267,7 +270,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(1500);
 				} catch (InterruptedException e) {
 
 				}
@@ -282,7 +285,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(1500);
 				} catch (InterruptedException e) {
 
 				}

@@ -178,6 +178,29 @@ public class Chunk {
 		return result;
 	}
 
+	public List<Chunk> getAssociatedContentFromAttribute(String content, String subchunkAttributeName, String subChunkValue) {
+		List<Chunk> result = new ArrayList<>();
+
+		this.getAssociatedContent(content).forEach((Chunk c) -> {
+			if (c.getValue(subchunkAttributeName).equals(subChunkValue)) {
+				result.add(c);
+			}
+		});
+
+		return result;
+	}
+
+	public Chunk getFirstAssociatedContentFromAttribute(String content, String subchunkAttributeName, String subChunkValue) {
+		Chunk result = null;
+
+		List<Chunk> allMatches = this.getAssociatedContentFromAttribute(content, subchunkAttributeName, subChunkValue);
+		if (allMatches.isEmpty() == false) {
+			result = allMatches.get(0);
+		}
+
+		return result;
+	}
+
 	public JsonArray getAssociatedContentAsArray(String key) {
 		JsonArray array = this.chunkObject.get(key).getAsJsonArray();
 
