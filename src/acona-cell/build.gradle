@@ -95,7 +95,7 @@ jar {
   	manifest { 
 	  	version = project.version.replace('-','.');		//Create a version in the manifest from the variable "version" of this file
     	//symbolicName = bundleSymbolicName
-    	name = "KORE Cell"
+    	//name = "KORE Cell"
   	}
  }
 
