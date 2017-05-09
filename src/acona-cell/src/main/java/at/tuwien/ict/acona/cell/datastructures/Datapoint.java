@@ -111,6 +111,12 @@ public class Datapoint {
 		return this;
 	}
 
+	public <T> Datapoint setValue(T value) {
+		this.VALUE = gson.toJsonTree(value);
+
+		return this;
+	}
+
 	public JsonObject toJsonObject() {
 		return gson.fromJson(this.toJsonString(), JsonObject.class);
 	}
@@ -129,6 +135,10 @@ public class Datapoint {
 
 	public JsonElement getValue() {
 		return VALUE;
+	}
+
+	public <T> T getValue(Class<T> clzz) {
+		return gson.fromJson(this.VALUE, clzz);
 	}
 
 	public String getValueAsString() {
