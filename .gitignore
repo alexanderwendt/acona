@@ -13,3 +13,4 @@ log/*
 .metadata
 RemoteSystemsTempFiles
 .recommenders
+/src/acona-cell/dependencies
