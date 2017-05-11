@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,6 +15,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 public class GsonUtils {
 
 	private static Gson gson = new Gson();
+	private static Gson gsonExtended = new GsonBuilder().setPrettyPrinting().create();
 
 	public static enum ConflictStrategy {
 		THROW_EXCEPTION, PREFER_FIRST_OBJ, PREFER_SECOND_OBJ, PREFER_NON_NULL;
@@ -150,4 +152,8 @@ public class GsonUtils {
 		JsonArray jsonArray = element.getAsJsonArray();
 		return jsonArray;
 	}
+
+	//	public String jsonPrettyPrint(Object obj) {
+	//		return gsonExtended.toJson(obj);
+	//	}
 }

@@ -1,25 +1,24 @@
 package at.tuwien.ict.acona.cell.storage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.storage.DataStorage;
-import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.cell.storage.helpers.DataStorageSubscriberNotificatorMock;
 import at.tuwien.ict.acona.cell.storage.helpers.SubscriberMock;
 
 public class DataStorageTester {
-	
+
 	protected static Logger log = LoggerFactory.getLogger(DataStorageTester.class);
-	
+
 	private DataStorageSubscriberNotificatorMock notificator;
 	private DataStorage data;
 	private SubscriberMock sub1;
@@ -43,10 +42,10 @@ public class DataStorageTester {
 		notificator.addSubscriber(sub1);
 		notificator.addSubscriber(sub2);
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
-		
+
 	}
 
 	@Test
@@ -56,22 +55,49 @@ public class DataStorageTester {
 		try {
 			//write data
 			this.data.write(Datapoint.newDatapoint(address).setValue(value), dataprovider);
-			
+
 			//read written data
-			String actualResult = this.data.read(address).getValue().getAsString();
-			
+			String actualResult = this.data.readFirst(address).getValue().getAsString();
+
 			//assert with proposed data
 			log.debug("expected result={}, actual result={}", value, actualResult);
 			assertEquals(value, actualResult);
-			
-			
-			
+
 		} catch (Exception e) {
 			log.error("Failed test due to error", e);
 			fail("Error");
 		}
 	}
-	
+
+	@Test
+	public void readwildcardsTest() {
+		log.debug("Start Read with wildcards test");
+
+		try {
+			//write data
+			String address1 = "datapoint.xxx.sss.ttt";
+			String address2 = "datapoint.sss.ddd.rrr";
+			String address3 = "datapoint.sss.xxx.aaa";
+
+			String wildcardaddress = "datapoint.ss*";
+
+			this.data.write(Datapoint.newDatapoint(address1).setValue(value), dataprovider);
+			this.data.write(Datapoint.newDatapoint(address2).setValue(value), dataprovider);
+			this.data.write(Datapoint.newDatapoint(address3).setValue(value), dataprovider);
+
+			//read written data
+			List<Datapoint> actualResult = this.data.read(wildcardaddress);
+
+			//assert with proposed data
+			log.debug("expected result={}, actual result={}", 2, actualResult);
+			assertEquals(2, actualResult.size());
+
+		} catch (Exception e) {
+			log.error("Failed test due to error", e);
+			fail("Error");
+		}
+	}
+
 	@Test
 	public void subscribeAndNotifyTest() {
 		try {
@@ -82,16 +108,16 @@ public class DataStorageTester {
 			data.write(Datapoint.newDatapoint(address).setValue(value), dataprovider);
 			//Get data from subscriberMock
 			String actualValue = sub2.getValue();
-			
+
 			log.debug("expected result={}, actual result={}", value, actualValue);
 			assertEquals(value, actualValue);
-			
+
 		} catch (Exception e) {
 			log.error("Failed test due to error", e);
 			fail("Error");
 		}
 	}
-	
+
 	@Test
 	public void unSubscribeTest() {
 		try {
@@ -100,24 +126,21 @@ public class DataStorageTester {
 				data.subscribeDatapoint(this.address, sub1.getName());
 				//Write data
 				data.write(Datapoint.newDatapoint(address).setValue(value), dataprovider);
-				
+
 				data.unsubscribeDatapoint(address, sub1.getName());
-				
+
 				data.write(Datapoint.newDatapoint(address).setValue(value2), dataprovider);
 				//Get data from subscriberMock
 				String actualValue = sub1.getValue();
-				
+
 				log.debug("expected result={}, actual result={}", value, actualValue);
 				assertEquals(value, actualValue);
-				
+
 			} catch (Exception e) {
 				log.error("Failed test due to error", e);
 				fail("Error");
 			}
-			
-			
-			
-			
+
 		} catch (Exception e) {
 			log.error("Failed test due to error", e);
 			fail("Error");

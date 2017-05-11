@@ -47,7 +47,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 			//instance.shutDown();
 
 		} catch (Exception e) {
-			log.error("Query error");
+			log.error("Query error", e);
 			throw new Exception(e);
 		} finally {
 			//Deregister

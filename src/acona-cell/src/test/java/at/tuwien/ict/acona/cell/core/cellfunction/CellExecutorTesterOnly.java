@@ -102,7 +102,7 @@ public class CellExecutorTesterOnly {
 				}
 			}
 
-			String result = cell.getDataStorage().read(resultDatapointAddress).getValue().getAsString();
+			String result = cell.getDataStorage().readFirst(resultDatapointAddress).getValue().getAsString();
 			log.info("Shall match={}, Received result={}", "FINISHED", result);
 			assertEquals("FINISHED", result);
 			log.info("Test passed");

@@ -14,23 +14,27 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.util.DatapointList;
 
 public abstract class CellFunctionCodelet extends CellFunctionThreadImpl implements Codelet {
 
 	private final static Logger log = LoggerFactory.getLogger(CellFunctionCodelet.class);
 
-	private final static String SETSTATESERVICENAME = "setstate";
-	private final static String REGISTERCODELETSERVICENAME = "registercodelet";
-	private final static String DEREGISTERCODELETSERVICENAME = "deregistercodelet";
-	private final static String EXECUTECODELETMETHODNAME = "execute";
-	private final static String KEYMETHOD = "method";
-	private final static String KEYCALLERADDRESS = "calleraddress";
-	private final static String KEYEXECUTIONORDERNAME = "executionorder";
-	private final static String KEYSTATE = "state";
+	public final static String SETSTATESERVICENAME = "setstate";
+	public final static String REGISTERCODELETSERVICENAME = "registercodelet";
+	public final static String DEREGISTERCODELETSERVICENAME = "deregistercodelet";
+	public final static String EXECUTECODELETMETHODNAME = "execute";
+	public final static String KEYMETHOD = "method";
+	public final static String KEYCALLERADDRESS = "calleraddress";
+	public final static String KEYEXECUTIONORDERNAME = "executionorder";
+	public final static String KEYSTATE = "state";
 	private final static int METHODTIMEOUT = 1000;
 
 	public final static String ATTRIBUTECODELETHANDLERADDRESS = "handleraddress";
 	public final static String ATTRIBUTEEXECUTIONORDER = "executionorder";
+
+	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
+	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
 	private String codeletStateDatapointAddress;
 
@@ -38,6 +42,9 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	private String codeletHandlerServiceName = "";
 	private String callerAddress = "";
 	private int exeutionOrder = 0;
+
+	private String workingMemoryAddress = "workingmemory";
+	private String internalStateMemoryAddress = "internalstatememory";
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
@@ -62,11 +69,22 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 					Datapoint.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress),
 					Datapoint.newDatapoint(ATTRIBUTEEXECUTIONORDER).setValue(new JsonPrimitive(this.exeutionOrder))));
 			try {
-				List<Datapoint> result = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, methodParameters, METHODTIMEOUT);
+				DatapointList result = DatapointList.newDatapointList(this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, methodParameters, METHODTIMEOUT));
 				String value = updateServiceStateInCodeletHandler(ServiceState.IDLE);
-				if (result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE) == true) {
-					//log.error()
+
+				//Check the result
+				if (result.has(CommVocabulary.PARAMETERRESULTADDRESS) && result.get(CommVocabulary.PARAMETERRESULTADDRESS).getValueAsString().equals(CommVocabulary.ERRORVALUE) == true) {
 					throw new Exception("Cannot register the codelet. Maybe the codelet handler has not been started yet");
+				}
+
+				//Get the working memory addresses
+				if (result.has(ATTRIBUTEWORKINGMEMORYADDRESS)) {
+					this.setWorkingMemoryAddress(result.get(ATTRIBUTEWORKINGMEMORYADDRESS).getValueAsString());
+				}
+
+				//Get the internal state memory address
+				if (result.has(ATTRIBUTEINTERNALMEMORYADDRESS)) {
+					this.setInternalStateMemoryAddress(result.get(ATTRIBUTEINTERNALMEMORYADDRESS).getValueAsString());
 				}
 
 			} catch (Exception e) {
@@ -150,12 +168,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		return result;
 	}
 
-	//	@Override
-	//	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-	//		// TODO Auto-generated method stub
-	//
-	//	}
-
 	@Override
 	protected void shutDownExecutor() throws Exception {
 		//Deregister codelet
@@ -167,6 +179,22 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	protected String getCodeletStateDatapointAddress() {
 		return codeletStateDatapointAddress;
+	}
+
+	protected String getWorkingMemoryAddress() {
+		return workingMemoryAddress;
+	}
+
+	protected void setWorkingMemoryAddress(String workingMemoryAddress) {
+		this.workingMemoryAddress = workingMemoryAddress;
+	}
+
+	protected String getInternalStateMemoryAddress() {
+		return internalStateMemoryAddress;
+	}
+
+	protected void setInternalStateMemoryAddress(String internalStateMemoryAddress) {
+		this.internalStateMemoryAddress = internalStateMemoryAddress;
 	}
 
 }

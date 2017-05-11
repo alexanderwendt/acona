@@ -131,6 +131,21 @@ public class CellFunctionConfig {
 		return this;
 	}
 
+	public CellFunctionConfig setProperty(String name, int value) {
+		this.configObject.addProperty(name, value);
+		return this;
+	}
+
+	public CellFunctionConfig setProperty(String name, double value) {
+		this.configObject.addProperty(name, value);
+		return this;
+	}
+
+	public CellFunctionConfig setProperty(String name, boolean value) {
+		this.configObject.addProperty(name, value);
+		return this;
+	}
+
 	public CellFunctionConfig setProperty(String name, JsonObject value) {
 		this.configObject.add(name, value);
 		return this;

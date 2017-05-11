@@ -24,18 +24,23 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	private final static Logger log = LoggerFactory.getLogger(CellFunctionCodeletHandler.class);
 
-	private final static String SETSTATESERVICENAME = "setstate";
-	private final static String REGISTERCODELETSERVICENAME = "registercodelet";
-	private final static String DEREGISTERCODELETSERVICENAME = "deregistercodelet";
-	private final static String EXECUTECODELETMETHODNAME = "execute";
-	private final static String EXECUTECODELETEHANDLER = "executecodelethandler";
-	private final static String KEYMETHOD = "method";
-	private final static String KEYCALLERADDRESS = "calleraddress";
-	private final static String KEYEXECUTIONORDERNAME = "executionorder";
-	private final static String KEYISBLOCKING = "blockingmethod";
-	private final static String KEYSTATE = "state";
+	public final static String SETSTATESERVICENAME = "setstate";
+	public final static String REGISTERCODELETSERVICENAME = "registercodelet";
+	public final static String DEREGISTERCODELETSERVICENAME = "deregistercodelet";
+	public final static String EXECUTECODELETMETHODNAME = "execute";
+	public final static String EXECUTECODELETEHANDLER = "executecodelethandler";
+	public final static String KEYMETHOD = "method";
+	public final static String KEYCALLERADDRESS = "calleraddress";
+	public final static String KEYEXECUTIONORDERNAME = "executionorder";
+	public final static String KEYISBLOCKING = "blockingmethod";
+	public final static String KEYSTATE = "state";
+
+	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
+	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
 	private String codeletStateDatapointAddress;
+	private String workingMemoryAddress = "workingmemory";
+	private String internalStateMemoryAddress = "internalmemoryaddress";
 
 	private String resultDatapointAddress = "";
 
@@ -51,6 +56,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	protected void cellFunctionThreadInit() throws Exception {
 		this.resultDatapointAddress = this.getFunctionName() + "." + "result";
 		this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
+		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
+		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEINTERNALMEMORYADDRESS, internalStateMemoryAddress);
 	}
 
 	@Override
@@ -70,6 +77,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				log.debug("Execute the to register a codelet with parameter caller address={} and execution order={}", callerAddress, executionOrder);
 				this.registerCodelet(callerAddress, executionOrder);
 				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
+				result.add(Datapoint.newDatapoint(ATTRIBUTEWORKINGMEMORYADDRESS).setValue(this.workingMemoryAddress));
+				result.add(Datapoint.newDatapoint(ATTRIBUTEINTERNALMEMORYADDRESS).setValue(this.internalStateMemoryAddress));
 
 			} else if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(DEREGISTERCODELETSERVICENAME)) {
 				String callerAddress = parameterdata.get(KEYCALLERADDRESS).getValueAsString();
@@ -324,7 +333,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		//Check if the whole system is ready
 		try {
-			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1; //if all codelets are idle and runorder is reset
+			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1 && this.executionOrderMap.isEmpty() == false; //if all codelets are idle and runorder is reset
 
 			if (isAllowedToRun == true) {
 				log.debug("All codelets are in state IDLE");
@@ -345,7 +354,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				//					}
 				//				}
 			} else {
-				log.warn("Not all codelets are ready. Codelet states={}", this.getCodeletMap());
+				log.warn("Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getCodeletMap());
 			}
 		} catch (NullPointerException e) {
 			log.error("Method timeout", e);

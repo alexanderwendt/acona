@@ -248,14 +248,14 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(100);
 				} catch (InterruptedException e) {
 
 				}
 			}
 
-			cellControlSubscriber.getCommunicator().setDefaultTimeout(20000);
-			cellControlPublisher.getCommunicator().setDefaultTimeout(20000);
+			cellControlSubscriber.getCommunicator().setDefaultTimeout(2000);
+			cellControlPublisher.getCommunicator().setDefaultTimeout(2000);
 
 			// Set init value
 			cellControlPublisher.getCommunicator().write(Datapoint.newDatapoint(datapointaddress).setValue(value1));
@@ -270,7 +270,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(1500);
+					this.wait(100);
 				} catch (InterruptedException e) {
 
 				}
@@ -285,7 +285,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(1500);
+					this.wait(100);
 				} catch (InterruptedException e) {
 
 				}
@@ -457,7 +457,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(100);
+					this.wait(1000);
 				} catch (InterruptedException e) {
 
 				}

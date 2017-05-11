@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
+package at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers;
 
 import java.util.Map;
 
@@ -10,12 +10,12 @@ import com.google.gson.JsonPrimitive;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class IncrementCodelet extends CellFunctionCodelet {
+public class IncrementOnConditionCodelet extends CellFunctionCodelet {
 
-	private static Logger log = LoggerFactory.getLogger(IncrementCodelet.class);
+	private static Logger log = LoggerFactory.getLogger(IncrementOnConditionCodelet.class);
 
 	public static final String attributeCheckAddress = "checkaddress";
-	public static final String attributeCheckValue = "checkvalue";
+	public static final String attributeConditionValue = "checkvalue";
 
 	private String checkAddress = "";
 	private int conditionValue = -1;
@@ -23,7 +23,7 @@ public class IncrementCodelet extends CellFunctionCodelet {
 	@Override
 	protected void cellFunctionCodeletInit() throws Exception {
 		this.checkAddress = this.getFunctionConfig().getProperty(attributeCheckAddress);
-		this.conditionValue = Integer.valueOf(this.getFunctionConfig().getProperty(attributeCheckValue));
+		this.conditionValue = Integer.valueOf(this.getFunctionConfig().getProperty(attributeConditionValue));
 		log.info("Codelet initialized");
 	}
 

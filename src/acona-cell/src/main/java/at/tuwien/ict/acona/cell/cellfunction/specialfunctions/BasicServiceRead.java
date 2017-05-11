@@ -12,6 +12,13 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
+/**
+ * @author wendt
+ * 
+ *         A list of datapoints is read. Automatically, wildcards are used. If a
+ *         name is not complete, all completing names
+ *
+ */
 public class BasicServiceRead extends CellFunctionBasicService implements ReadDatapoint {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
@@ -95,7 +102,7 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 		List<Datapoint> result = new ArrayList<>();
 
 		datapointList.forEach(dp -> {
-			result.add(this.getCell().getDataStorage().read(dp.getAddress()));
+			result.addAll(this.getCell().getDataStorage().read(dp.getAddress()));
 		});
 
 		return result;

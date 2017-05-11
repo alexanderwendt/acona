@@ -1,10 +1,12 @@
 package at.tuwien.ict.acona.cell.storage;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,12 +51,38 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public Datapoint read(String address) {
+	public Datapoint readFirst(String address) {
 		Datapoint result = null;
-		if (this.data.containsKey(address)) {
-			result = this.data.get(address);
+		List<Datapoint> list = this.read(address);
+
+		if (list.isEmpty() == false) {
+			result = list.get(0);
 		} else {
 			result = Datapoint.newDatapoint(address);
+		}
+
+		return result;
+	}
+
+	@Override
+	public List<Datapoint> read(String address) {
+		List<Datapoint> result = new ArrayList<>();
+
+		if (address.endsWith("*")) {
+			String startAddress = address.substring(0, address.length() - 1);
+			result = this.data.entrySet()
+					.stream()
+					.filter(entry -> entry.getKey().startsWith(startAddress))
+					.map(Map.Entry::getValue)
+					.collect(Collectors.toList());
+		} else {
+			if (this.data.containsKey(address)) {
+				result.add(this.data.get(address));
+			}
+		}
+
+		if (result.isEmpty()) {
+			result.add(Datapoint.newDatapoint(address));
 		}
 
 		return result;

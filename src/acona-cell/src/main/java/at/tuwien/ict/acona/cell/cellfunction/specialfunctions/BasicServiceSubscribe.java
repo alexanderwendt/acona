@@ -67,7 +67,7 @@ public class BasicServiceSubscribe extends CellFunctionBasicService {
 		datapointNameList.forEach(dp -> {
 			try {
 				this.getCell().getDataStorage().subscribeDatapoint(dp.getAddress(), caller);
-				result.add(this.getCell().getDataStorage().read(dp.getAddress()));
+				result.add(this.getCell().getDataStorage().readFirst(dp.getAddress()));
 			} catch (Exception e) {
 				log.error("Cannot subscribe datapoint={}", dp.getAddress(), e);
 			}
