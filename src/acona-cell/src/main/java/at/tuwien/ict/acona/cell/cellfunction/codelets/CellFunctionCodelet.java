@@ -134,7 +134,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	//	}
 
 	@Override
-	protected void executePostProcessing() throws Exception {
+	protected void executeCustomPostProcessing() throws Exception {
 		//Set state of the codelet to finished
 		//Register codelet in the codelethandler
 		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
@@ -146,7 +146,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	}
 
 	@Override
-	protected void executePreProcessing() throws Exception {
+	protected void executeCustomPreProcessing() throws Exception {
 		//Set state to running
 		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
 				Datapoint.newDatapoint(KEYMETHOD).setValue(SETSTATESERVICENAME),

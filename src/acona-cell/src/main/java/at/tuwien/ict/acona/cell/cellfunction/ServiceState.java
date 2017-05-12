@@ -6,6 +6,7 @@ public enum ServiceState {
 	IDLE, //Ready to be used
 	ERROR, //Error
 	UNDEFINED, //Also error
-	RUNNING //Currently in action
+	RUNNING, //Currently in action
+	FINISHED //Running action has finished
 
 }

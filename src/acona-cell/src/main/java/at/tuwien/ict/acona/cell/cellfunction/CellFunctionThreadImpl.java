@@ -1,11 +1,13 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
+import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 /**
@@ -19,19 +21,24 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  */
 public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl implements Runnable {
 
+	public final static String STATESUFFIX = "state";
+	public final static String RESULTSUFFIX = "result";
+	public final static String COMMANDSUFFIX = "command";
+	public final static String DESCRIPTIONSUFFIX = "description";
+	public final static String CONFIGSUFFIX = "config";
+
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 	private static final int INITIALIZATIONPAUSE = 500;
+
+	/**
+	 * In the value map all, subscribed values as well as read values are put.
+	 * Syntac: Key: Datapointid, value: Datapoint address
+	 */
+	private Map<String, Datapoint> valueMap = new ConcurrentHashMap<>();
 
 	private Thread t;
 
 	private boolean isActive = true;
-
-	/**
-	 * The blocker is a queue, which is cleared at the start of the method and
-	 * the value true is put at the end of the method. In that way, external
-	 * applications can execute blocking functions with a non-blocking class.
-	 */
-	private final SynchronousQueue<Boolean> blocker = new SynchronousQueue<>();
 
 	public CellFunctionThreadImpl() {
 
@@ -47,11 +54,34 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			//Start the thread as well as the internal initialization
 			t.start();
 
+			//Init all service datapoints, which present the system
+			this.initServiceDatapoints();
 			//log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 		} catch (Exception e) {
 			log.error("CellFunction {} could not be initialized", this.getFunctionName());
 			throw new Exception(e.getMessage());
 		}
+	}
+
+	private void initServiceDatapoints() throws Exception {
+		Datapoint command = Datapoint.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
+		Datapoint state = Datapoint.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.IDLE.toString());
+		Datapoint description = Datapoint.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue("Service " + this.getFunctionName());
+		Datapoint config = Datapoint.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
+		Datapoint result = Datapoint.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");
+
+		log.debug("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
+				command.getAddress(), state.getAddress(), description.getAddress(),
+				config.getAddress(), result.getAddress());
+
+		//Add subscriptions
+		this.addManagedDatapoint(DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
+		//Result will only be written
+
+		this.getCommunicator().write(Arrays.asList(command, state, description, config, result));
 	}
 
 	protected abstract void cellFunctionThreadInit() throws Exception;
@@ -127,19 +157,82 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	}
 
 	@Override
-	protected abstract void executePostProcessing() throws Exception;
+	protected void executePreProcessing() throws Exception {
+		// Read all values from the store or other agent
+		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+
+		this.getReadDatapoints().forEach((k, v) -> {
+			try {
+
+				//FIXME: Make that also local datapoints are put in the table
+
+				// Read the remote datapoint
+				//if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
+				Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid(this.getCell().getLocalName()));
+				// Write local value to synchronize the datapoints
+				this.valueMap.put(k, temp);
+				log.trace("{}> Preprocessing phase: Read datapoint and write into value table={}", temp);
+				//}
+			} catch (Exception e) {
+				log.error("{}>Cannot read datapoint={}", this.getFunctionName(), v, e);
+			}
+		});
+
+		this.executeCustomPreProcessing();
+
+	}
 
 	@Override
-	protected abstract void executePreProcessing() throws Exception;
+	protected void executePostProcessing() throws Exception {
+		// FIXME: The update here is not working well
+		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
+		// 6. At end, write subscribed datapoints to remote datapoints from
+		// local datapoints
+		this.getWriteDatapoints().values().forEach(config -> {
+			try {
+				Datapoint dp = this.valueMap.get(config.getAddress());
+				String agentName = config.getAgentid(this.getCell().getLocalName());
+				this.getCommunicator().write(dp, agentName);
+				log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
+			} catch (Exception e) {
+				log.error("{}>Cannot write datapoint {} to remote memory module", this.getFunctionName(), config, e);
+			}
+		});
+
+		this.executeCustomPostProcessing();
+
+		this.setServiceState(ServiceState.FINISHED);
+		this.setServiceState(ServiceState.IDLE);
+		this.writeLocal(Datapoint.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
+		log.info("{}>Service execution finished", this.getFunctionName());
+	}
+
+	protected abstract void executeCustomPostProcessing() throws Exception;
+
+	protected abstract void executeCustomPreProcessing() throws Exception;
 
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		// If the thread is running, the method shall wait or produce timeout
-		//		if (t != null) {
-		//			while (!t.getState().equals(State.WAITING)) {
-		//
-		//			}
-		//		}
+		log.trace("{}>Update datapoints={}. Command name={}", this.getFunctionName(), data, this.addServiceName(COMMANDSUFFIX));
+		// Update command
+		if (data.containsKey(this.addServiceName(COMMANDSUFFIX)) && data.get(this.addServiceName(COMMANDSUFFIX)).getValue().toString().equals("{}") == false) {
+			try {
+				this.setCommand(data.get(this.addServiceName(COMMANDSUFFIX)).getValueAsString());
+			} catch (Exception e) {
+				log.error("{}>Cannot execute command={}", this.getFunctionName(), data.get(this.addServiceName(COMMANDSUFFIX)).getValueAsString(), e);
+			}
+		}
+
+		// Update config
+		if (data.containsKey(this.addServiceName(CONFIGSUFFIX))) {
+			log.info("New config set={}", data.get(CONFIGSUFFIX).getValue());
+
+			data.keySet().forEach(key -> {
+				this.getFunctionConfig().setProperty(key, data.get(key).getValue());
+			});
+		}
+
+		valueMap.putAll(data);
 
 		this.updateDatapointsByIdOnThread(data);
 	}
@@ -197,8 +290,29 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		this.isActive = isActive;
 	}
 
-	protected SynchronousQueue<Boolean> getBlocker() {
-		return blocker;
+	/**
+	 * For a certain datapoint suffix, add the service name and a . to the
+	 * suffix.
+	 * 
+	 * @param suffix
+	 * @return
+	 */
+	protected String addServiceName(String suffix) {
+		return this.getFunctionName() + "." + suffix;
+	}
+
+	@Override
+	protected void processServiceState() throws Exception {
+		try {
+			this.getCommunicator().write(Datapoint.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(this.getCurrentState().toString()));
+		} catch (Exception e) {
+			log.error("Cannot write the state = {} to datapoint = {}", this.getCurrentState(), this.addServiceName(STATESUFFIX));
+			throw new Exception(e.getMessage());
+		}
+	}
+
+	protected Map<String, Datapoint> getValueMap() {
+		return valueMap;
 	}
 
 }

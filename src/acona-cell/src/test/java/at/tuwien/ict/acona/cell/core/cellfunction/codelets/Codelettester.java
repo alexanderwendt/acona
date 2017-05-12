@@ -19,8 +19,8 @@ import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionHandlerTrigger
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
+import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementNumberCodelet;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementServiceCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.framework.modules.ActionExecutorCodelet;
 import at.tuwien.ict.acona.framework.modules.OptionSelectorCodelet;
@@ -308,10 +308,8 @@ public class Codelettester {
 	}
 
 	/**
-	 * 2 codelets register in the codelet handler. Both of them will increment a
-	 * number by 1 if a condition applies. The condition is the number. The
-	 * purpose is that the codelet handler is triggered 1 time but execute both
-	 * codelets in series because they have different execution order
+	 * Execute the full ACONA architecture with 2 codelets for each codelet
+	 * handler. They shall increment different addresses in parallel.
 	 * 
 	 */
 	@Test
@@ -423,30 +421,76 @@ public class Codelettester {
 
 			//Add the specific codelets
 			String incrementServiceName = "incrementservice";
-			String incrementDatapoint = "incrementme";
+			String incrementDatapoint1 = "incrementme1";
+			String incrementDatapoint2 = "incrementme2";
 
 			cognitiveAgentConfig
 					//.addCellfunction(CellFunctionConfig.newConfig(incrementServiceName, CFIncrementService.class)
 					//		.addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, namespaceWorkingMemory + "." + incrementDatapoint, SyncMode.SUBSCRIBEWRITEBACK)))
-					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet1", IncrementServiceCodelet.class)
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet11", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + activateConceptsCodeletHandlerName)
 							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
-							.setProperty(IncrementServiceCodelet.ATTRIBUTESERVICENAME, incrementServiceName))
-					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet2", IncrementServiceCodelet.class)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet12", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + createGoalsCodeletHandlerName)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0))
-					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet3", IncrementServiceCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet13", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + activateBeliefsCodeletHandlerName)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0))
-					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet4", IncrementServiceCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet14", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + proposeOptionsCodeletHandlerName)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0))
-					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet5", IncrementServiceCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet15", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + proposeActionsCodeletHandlerName)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0))
-					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet6", IncrementServiceCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet16", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0));
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1));
+
+			cognitiveAgentConfig
+					//.addCellfunction(CellFunctionConfig.newConfig(incrementServiceName, CFIncrementService.class)
+					//		.addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, namespaceWorkingMemory + "." + incrementDatapoint, SyncMode.SUBSCRIBEWRITEBACK)))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet21", IncrementNumberCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + activateConceptsCodeletHandlerName)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet22", IncrementNumberCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + createGoalsCodeletHandlerName)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet23", IncrementNumberCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + activateBeliefsCodeletHandlerName)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet24", IncrementNumberCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + proposeOptionsCodeletHandlerName)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet25", IncrementNumberCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + proposeActionsCodeletHandlerName)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
+					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet26", IncrementNumberCodelet.class)
+							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName)
+							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
+							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2));
 
 			log.debug("Start agent with config={}", cognitiveAgentConfig);
 
@@ -461,82 +505,42 @@ public class Codelettester {
 			}
 
 			//Write initial value on the incrementaddress
-			cogsys.getCommunicator().write(Datapoint.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint).setValue(0));
+			cogsys.getCommunicator().write(Datapoint.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint1).setValue(0));
+			cogsys.getCommunicator().write(Datapoint.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint2).setValue(0));
 
 			log.info("=== All agents initialized ===");
 
 			//			memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			cogsys.getCommunicator().execute(cognitiveAgentName, mainCodeletHandlerName, Arrays.asList(
+			//			cogsys.getCommunicator().execute(cognitiveAgentName, mainCodeletHandlerName, Arrays.asList(
+			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 10000);
+
+			cogsys.getCommunicator().executeServiceQueryDatapoints(cognitiveAgentName, mainCodeletHandlerName, Arrays.asList(
 					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 10000);
-
-			//			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-			//					controllerAgentName, handlerName + ".result", 20000);
+					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+					cognitiveAgentName, mainCodeletHandlerName + ".result", 20000);
 
 			//			synchronized (this) {
 			//				try {
-			//					this.wait(500);
+			//					this.wait(1000);
 			//				} catch (InterruptedException e) {
 			//
 			//				}
 			//			}
-
-			//			log.info("Datapoints on the way. Set 1");
-			//			controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			// Start the system by setting start
-			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
-
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 1000);
-
-			//			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-			//					controllerAgentName, handlerName + ".result", 20000);
-
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
-			//
-			//				}
-			//			}
-
-			//			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
-
-			//Execute codelets once again
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
-			//
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
-			//
-			//				}
-			//			}
-			//
-
-			synchronized (this) {
-				try {
-					this.wait(1000);
-				} catch (InterruptedException e) {
-
-				}
-			}
 
 			log.info("Read working memory={}", cogsys.getDataStorage());
 
-			int result = (int) (cogsys.getCommunicator().read(namespaceWorkingMemory + "." + incrementDatapoint).getValue().getAsDouble());
-			int expectedResult = 6;
+			int result1 = (int) (cogsys.getCommunicator().read(namespaceWorkingMemory + "." + incrementDatapoint1).getValue().getAsDouble());
+			int result2 = (int) (cogsys.getCommunicator().read(namespaceWorkingMemory + "." + incrementDatapoint1).getValue().getAsDouble());
+			int expectedResult1 = 6;
+			int expectedResult2 = 6;
 
-			log.debug("correct value={}, actual value={}", expectedResult, result);
+			log.debug("correct value={}, actual value={}", expectedResult1, result1);
 
-			assertEquals(expectedResult, result);
+			assertEquals(expectedResult1, result1);
+
+			log.debug("correct value={}, actual value={}", expectedResult2, result2);
+			assertEquals(expectedResult2, result2);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

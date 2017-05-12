@@ -37,9 +37,14 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 		log.info("Run codelet trigger for codelet handler={}", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
 
 		//run the codelet handler
-		this.getCommunicator().execute(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
+		//		this.getCommunicator().execute(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
+		//				Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+		//				Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+
+		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
 				Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-				Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+				Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+				codeletHandlerAgent, codeletHandlerAddress + ".result", 20000);
 
 	}
 

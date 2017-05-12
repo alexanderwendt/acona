@@ -77,7 +77,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void executePostProcessing() throws Exception {
+	protected void executeCustomPostProcessing() throws Exception {
 		// Set status that process is finished. Use it to release subscriptions
 		this.getCommunicator()
 				.write(Datapoint.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.IDLE.toString()));
@@ -85,7 +85,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void executePreProcessing() throws Exception {
+	protected void executeCustomPreProcessing() throws Exception {
 		// Set status that the system is running
 		// this.getCommunicator().write(Datapoint.newDatapoint(this.getSubscribedDatapoints().get(STATUSDATAPOINTNAME).getAddress()).setValue(ServiceState.RUNNING.toString()));
 

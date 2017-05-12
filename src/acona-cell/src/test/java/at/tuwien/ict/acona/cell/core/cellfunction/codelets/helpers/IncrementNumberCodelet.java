@@ -8,17 +8,20 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class IncrementServiceCodelet extends CellFunctionCodelet {
+public class IncrementNumberCodelet extends CellFunctionCodelet {
 
-	private static final Logger log = LoggerFactory.getLogger(IncrementServiceCodelet.class);
+	private static final Logger log = LoggerFactory.getLogger(IncrementNumberCodelet.class);
 
 	public static final String ATTRIBUTESERVICENAME = "servicename";
+	public static final String ATTRIBUTESUBADDRESS = "subaddress";
 	private String serviceName = "";
+	private String subAddress = "incrementme";
 
 	@Override
 	protected void cellFunctionCodeletInit() throws Exception {
 		serviceName = this.getFunctionConfig().getProperty(ATTRIBUTESERVICENAME, serviceName);
-		log.info("IncrementCodelet initialized with servicename = {}", this.serviceName);
+		subAddress = this.getFunctionConfig().getProperty(ATTRIBUTESUBADDRESS, subAddress);
+		log.info("IncrementCodelet initialized with servicename = {} and subaddress= {}", this.serviceName, "." + subAddress);
 	}
 
 	@Override
@@ -28,11 +31,11 @@ public class IncrementServiceCodelet extends CellFunctionCodelet {
 		//String commandDatapoint = serviceName + ".command";
 		//String resultDatapoint = serviceName + ".state";
 		//Datapoint result1 = this.getCommunicator().queryDatapoints(commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), this.getCell().getLocalName(), resultDatapoint, this.getCell().getLocalName(), 10000);
-		int value = this.getCommunicator().read(this.getWorkingMemoryAddress() + ".incrementme").getValue().getAsInt(); //this.getWorkingMemoryAddress()
+		int value = this.getCommunicator().read(this.getWorkingMemoryAddress() + "." + subAddress).getValue().getAsInt(); //this.getWorkingMemoryAddress()
 		log.debug("Read value={} from working memory");
 		log.debug("Increment");
 		value++;
-		this.getCommunicator().write(Datapoint.newDatapoint(this.getWorkingMemoryAddress() + ".incrementme").setValue(value));
+		this.getCommunicator().write(Datapoint.newDatapoint(this.getWorkingMemoryAddress() + "." + subAddress).setValue(value));
 		log.debug("Value={} written to working memory", value);
 	}
 

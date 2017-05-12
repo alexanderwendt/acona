@@ -9,6 +9,7 @@ import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public interface CellFunction {
+
 	/**
 	 * Initialize the cellfunction with the cell and a jsonobject with settings
 	 * 

@@ -19,7 +19,7 @@ import jade.domain.FIPANames;
 
 public abstract class CellFunctionImpl implements CellFunction {
 
-	private static Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
 
 	/**
 	 * Cell, which executes this function
@@ -30,7 +30,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * Name of the activator
 	 */
-	private String name;
+	private String cellFunctionName;
 
 	/**
 	 * List of datapoints that shall be subscribed
@@ -40,13 +40,17 @@ public abstract class CellFunctionImpl implements CellFunction {
 	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<>();
 	private final Map<String, DatapointConfig> managedDatapoints = new HashMap<>();
 
+	/**
+	 * Current state of the service. Every time the service is set, a datapoint
+	 * is updated.
+	 */
 	private ServiceState currentServiceState = ServiceState.INITIALIZING;
 
 	/**
 	 * Constructor
 	 */
 	public CellFunctionImpl() {
-		this.setServiceState(ServiceState.BUILDING);
+
 	}
 
 	@Override
@@ -61,7 +65,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 			// Get the settings but set also default values
 
 			// Get name
-			this.name = this.config.getName();
+			this.cellFunctionName = this.config.getName();
 
 			// === Internal init ===//
 
@@ -168,7 +172,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	@Override
 	public String getFunctionName() {
-		return this.name;
+		return this.cellFunctionName;
 	}
 
 	@Override
@@ -187,7 +191,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 		// Restart system
 		this.shutDown();
-
 		this.init(this.config, this.cell);
 	}
 
@@ -237,7 +240,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	}
 
 	protected <T> T getCustomSetting(String key, Class<T> type) {
-		return this.getFunctionConfig().getProperty(name, type);
+		return this.getFunctionConfig().getProperty(cellFunctionName, type);
 	}
 
 	protected Cell getCell() {
@@ -261,7 +264,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CellFunctionImpl [name=");
-		builder.append(name);
+		builder.append(cellFunctionName);
 		builder.append(", subscriptions=");
 		builder.append(subscriptions);
 		builder.append("]");
@@ -286,8 +289,19 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	}
 
-	protected void setServiceState(ServiceState serviceState) {
+	/**
+	 * Set the current service state
+	 * 
+	 * @param serviceState
+	 * @throws Exception
+	 */
+	protected void setServiceState(ServiceState serviceState) throws Exception {
 		this.currentServiceState = serviceState;
+		this.processServiceState();
+	}
+
+	protected void processServiceState() throws Exception {
+
 	}
 
 }
