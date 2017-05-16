@@ -49,6 +49,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public List<Datapoint> read(List<String> datapointaddress, String agentName, int timeout) throws Exception {
+		//TODO: Change the syntax that the agentname is part of the read address with the format agent:datapoint. If no agentname is present, the current agentname is the default agent name.
 		final List<Datapoint> result = new ArrayList<>();
 		List<Datapoint> inputList = new ArrayList<>();
 
@@ -67,6 +68,23 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		}
 
 		return result;
+	}
+
+	@Override
+	public List<Datapoint> readWildcard(String datapointName) throws Exception {
+		String agentName = this.getLocalAgentName();
+		String address = datapointName;
+
+		String[] completeAddress = datapointName.split(":");
+
+		if (completeAddress.length == 2) {
+			agentName = completeAddress[0];
+			address = completeAddress[1];
+		}
+
+		List<Datapoint> list = read(Arrays.asList(address), agentName, defaultTimeout);
+
+		return list;
 	}
 
 	@Override

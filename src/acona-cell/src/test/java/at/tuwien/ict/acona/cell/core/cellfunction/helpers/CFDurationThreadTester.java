@@ -89,13 +89,13 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void executePostProcessing() {
+	protected void executeCustomPostProcessing() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void executePreProcessing() {
+	protected void executeCustomPreProcessing() {
 		// TODO Auto-generated method stub
 
 	}

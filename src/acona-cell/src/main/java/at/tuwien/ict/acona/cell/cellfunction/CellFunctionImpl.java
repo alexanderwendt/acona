@@ -56,7 +56,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 	@Override
 	public CellFunction init(CellFunctionConfig config, Cell caller) throws Exception {
 		try {
-			this.setServiceState(ServiceState.INITIALIZING);
 			// === Extract fundamental settings ===//
 			// Extract settings
 			this.config = config;
@@ -68,6 +67,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 			this.cellFunctionName = this.config.getName();
 
 			// === Internal init ===//
+			this.setServiceState(ServiceState.INITIALIZING);
 
 			// Possibility to add more subscriptions and to overwrite default
 			// settings

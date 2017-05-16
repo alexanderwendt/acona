@@ -111,6 +111,7 @@ public class CellSendTester {
 
 			// Create inspector or the new gateway
 			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class));
+			cellControlSubscriber.getCommunicator().setDefaultTimeout(1000000);
 
 			String result = cellControlSubscriber.getCommunicator().queryDatapoints(queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, serviceAgentName, 1000000).getValueAsString();
 			log.debug("Received back from query={}", result);

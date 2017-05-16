@@ -42,13 +42,13 @@ public class CFVisualizer extends CellFunctionThreadImpl implements Visualizatio
 	}
 
 	@Override
-	protected void executePostProcessing() throws Exception {
+	protected void executeCustomPostProcessing() throws Exception {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void executePreProcessing() throws Exception {
+	protected void executeCustomPreProcessing() throws Exception {
 		// TODO Auto-generated method stub
 
 	}

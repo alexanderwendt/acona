@@ -109,13 +109,13 @@ public class SequenceController extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void executePostProcessing() throws Exception {
+	protected void executeCustomPostProcessing() throws Exception {
 		this.writeLocal(Datapoint.newDatapoint("state").setValue(ServiceState.IDLE.toString()));
 
 	}
 
 	@Override
-	protected void executePreProcessing() throws Exception {
+	protected void executeCustomPreProcessing() throws Exception {
 		// TODO Auto-generated method stub
 
 	}

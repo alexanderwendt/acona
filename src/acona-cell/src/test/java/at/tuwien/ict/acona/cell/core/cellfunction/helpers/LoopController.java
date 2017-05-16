@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
 import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
 
-public class LoopController extends OndemandFunctionService {
+public class LoopController extends CellFunctionThreadImpl {
 
 	private static Logger log = LoggerFactory.getLogger(LoopController.class);
 
@@ -65,12 +65,6 @@ public class LoopController extends OndemandFunctionService {
 	}
 
 	@Override
-	protected void serviceInit() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
@@ -78,6 +72,30 @@ public class LoopController extends OndemandFunctionService {
 
 	@Override
 	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void cellFunctionThreadInit() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void executeCustomPreProcessing() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		// TODO Auto-generated method stub
 
 	}

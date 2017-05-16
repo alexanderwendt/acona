@@ -57,6 +57,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 			//Init all service datapoints, which present the system
 			this.initServiceDatapoints();
 			//log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
+
 		} catch (Exception e) {
 			log.error("CellFunction {} could not be initialized", this.getFunctionName());
 			throw new Exception(e.getMessage());
@@ -191,9 +192,14 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		this.getWriteDatapoints().values().forEach(config -> {
 			try {
 				Datapoint dp = this.valueMap.get(config.getAddress());
-				String agentName = config.getAgentid(this.getCell().getLocalName());
-				this.getCommunicator().write(dp, agentName);
-				log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
+				if (dp != null) {
+					String agentName = config.getAgentid(this.getCell().getLocalName());
+					this.getCommunicator().write(dp, agentName);
+					log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
+				} else {
+					log.warn("A datapoint in the write config is not available in the value map with values that should be written");
+				}
+
 			} catch (Exception e) {
 				log.error("{}>Cannot write datapoint {} to remote memory module", this.getFunctionName(), config, e);
 			}

@@ -37,6 +37,8 @@ public interface Communicator extends AgentCommunicator {
 	 */
 	public Datapoint read(String datapointName) throws Exception;
 
+	public List<Datapoint> readWildcard(String datapointName) throws Exception;
+
 	/**
 	 * Read a datapoint from another agent
 	 * 

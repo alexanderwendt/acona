@@ -185,4 +185,10 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 		return null;
 	}
 
+	@Override
+	public List<Datapoint> readWildcard(String datapointName) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

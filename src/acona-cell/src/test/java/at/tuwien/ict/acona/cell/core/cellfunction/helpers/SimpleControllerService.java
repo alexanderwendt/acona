@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
-import at.tuwien.ict.acona.cell.cellfunction.OndemandFunctionService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
-public class SimpleControllerService extends OndemandFunctionService {
+public class SimpleControllerService extends CellFunctionThreadImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(SimpleControllerService.class);
 
@@ -57,12 +57,6 @@ public class SimpleControllerService extends OndemandFunctionService {
 	}
 
 	@Override
-	protected void serviceInit() {
-		this.delay = Integer.valueOf(this.getFunctionConfig().getProperty("delay", String.valueOf(this.delay)));
-
-	}
-
-	@Override
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
@@ -70,6 +64,30 @@ public class SimpleControllerService extends OndemandFunctionService {
 
 	@Override
 	protected void shutDownExecutor() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void cellFunctionThreadInit() throws Exception {
+		this.delay = Integer.valueOf(this.getFunctionConfig().getProperty("delay", String.valueOf(this.delay)));
+
+	}
+
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void executeCustomPreProcessing() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		// TODO Auto-generated method stub
 
 	}
