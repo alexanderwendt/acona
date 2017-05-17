@@ -44,7 +44,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	private String resultDatapointAddress = "";
 
-	private final static int METHODTIMEOUT = 1000;
+	private final static int METHODTIMEOUT = 10000;
 	private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();

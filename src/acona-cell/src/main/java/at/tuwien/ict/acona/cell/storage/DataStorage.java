@@ -9,7 +9,7 @@ public interface DataStorage {
 
 	public DataStorage init(DataStorageSubscriberNotificator subscriberManager);
 
-	public void write(Datapoint datapackage, String caller);
+	public void write(Datapoint datapackage, String caller) throws Exception;
 
 	public void add(Datapoint datapackage, String caller);
 

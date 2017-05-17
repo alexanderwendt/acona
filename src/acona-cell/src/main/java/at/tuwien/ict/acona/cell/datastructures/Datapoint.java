@@ -24,7 +24,7 @@ public class Datapoint {
 	private final static Gson gson = new Gson();
 	// private final JsonObject jsondatapoint;
 
-	private static Logger log = LoggerFactory.getLogger(Datapoint.class);
+	private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
 
 	/**
 	 * Create a datapoint from an address

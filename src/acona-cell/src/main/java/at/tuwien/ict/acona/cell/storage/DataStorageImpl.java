@@ -29,12 +29,16 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public synchronized void write(Datapoint datapackage, String caller) {
+	public synchronized void write(Datapoint datapackage, String caller) throws Exception {
 		// Get data
 		// Datapackage previousDatapackage = this.read(address);
 		// Only update subscribers if value has changed and one of them were
 		// empty before
 		// if (datapackage.isEmpty()==false && datapackage.isEmpty()==false) {
+
+		if (datapackage.getAddress().contains("*") || datapackage.getAddress().contains(":")) {
+			throw new Exception("* or : was part of the address: " + datapackage.getAddress() + "This is not allowed");
+		}
 
 		this.data.put(datapackage.getAddress(), datapackage);
 		log.debug("write datapoint={}", datapackage);
@@ -58,7 +62,12 @@ public class DataStorageImpl implements DataStorage {
 		if (list.isEmpty() == false) {
 			result = list.get(0);
 		} else {
-			result = Datapoint.newDatapoint(address);
+			if (address.contains("*")) {
+				result = Datapoint.newNullDatapoint();
+			} else {
+				result = Datapoint.newDatapoint(address);
+			}
+
 		}
 
 		return result;
@@ -81,9 +90,9 @@ public class DataStorageImpl implements DataStorage {
 			}
 		}
 
-		if (result.isEmpty()) {
-			result.add(Datapoint.newDatapoint(address));
-		}
+		//		if (result.isEmpty()) {
+		//			result.add(Datapoint.newDatapoint(address));
+		//		}
 
 		return result;
 	}

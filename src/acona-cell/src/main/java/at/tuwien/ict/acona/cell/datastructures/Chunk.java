@@ -21,11 +21,11 @@ public class Chunk {
 	public static final String TYPEPROPERTY = "hasType";
 	public static final String IDPROPERTY = "hasID";
 
-	public static Chunk newChunk(String name, String type) throws Exception {
+	public synchronized static Chunk newChunk(String name, String type) throws Exception {
 		return new Chunk(name, type);
 	}
 
-	public static Chunk newChunk(JsonObject object) throws Exception {
+	public synchronized static Chunk newChunk(JsonObject object) throws Exception {
 		Chunk result = null;
 
 		if (Chunk.isChunk(object) == true) {
@@ -38,7 +38,7 @@ public class Chunk {
 
 	}
 
-	public static Chunk newChunk(Chunk object) throws Exception {
+	public synchronized static Chunk newChunk(Chunk object) throws Exception {
 		return new Chunk(object.toJsonObject());
 	}
 
@@ -54,7 +54,7 @@ public class Chunk {
 		this.init(name, type);
 	}
 
-	public static boolean isChunk(JsonObject object) {
+	public synchronized static boolean isChunk(JsonObject object) {
 		boolean result = false;
 
 		if (object.get(NAMEPROPERTY) != null && object.get(TYPEPROPERTY) != null && object.get(IDPROPERTY) != null) {
@@ -76,7 +76,7 @@ public class Chunk {
 		return result;
 	}
 
-	public static boolean isNullChunk(Chunk chunk) {
+	public synchronized static boolean isNullChunk(Chunk chunk) {
 		boolean result = false;
 
 		if (chunk.getName().equals("null")) {
@@ -157,7 +157,12 @@ public class Chunk {
 	}
 
 	public String getValue(String key) {
-		return this.chunkObject.getAsJsonPrimitive(key).getAsString();
+		String result = "";
+
+		if (this.chunkObject.has(key)) {
+			result = this.chunkObject.getAsJsonPrimitive(key).getAsString();
+		}
+		return result;
 	}
 
 	public double getDoubleValue(String key) {
@@ -178,11 +183,25 @@ public class Chunk {
 		return result;
 	}
 
-	public List<Chunk> getAssociatedContentFromAttribute(String content, String subchunkAttributeName, String subChunkValue) {
+	/**
+	 * From a chunk with associated other chunks, search for all subs chunks
+	 * with a certain predicate in the association and a certain attribute like
+	 * name and if the value of the name matches a reference value, the sub
+	 * chunk is added to the list
+	 * 
+	 * @param predicate:
+	 *            Set the predicate e.g. hasCondition
+	 * @param subchunkAttributeName:
+	 *            Define the name of the attribute that shall be received
+	 * @param subChunkCompareValue:
+	 *            Define the value of the received attribute
+	 * @return
+	 */
+	public List<Chunk> getAssociatedContentFromAttribute(String predicate, String subchunkAttributeName, String subChunkCompareValue) {
 		List<Chunk> result = new ArrayList<>();
 
-		this.getAssociatedContent(content).forEach((Chunk c) -> {
-			if (c.getValue(subchunkAttributeName).equals(subChunkValue)) {
+		this.getAssociatedContent(predicate).forEach((Chunk c) -> {
+			if (c.getValue(subchunkAttributeName).equals(subChunkCompareValue)) {
 				result.add(c);
 			}
 		});
@@ -190,10 +209,10 @@ public class Chunk {
 		return result;
 	}
 
-	public Chunk getFirstAssociatedContentFromAttribute(String content, String subchunkAttributeName, String subChunkValue) {
+	public Chunk getFirstAssociatedContentFromAttribute(String predicate, String subchunkAttributeName, String subChunkValue) {
 		Chunk result = null;
 
-		List<Chunk> allMatches = this.getAssociatedContentFromAttribute(content, subchunkAttributeName, subChunkValue);
+		List<Chunk> allMatches = this.getAssociatedContentFromAttribute(predicate, subchunkAttributeName, subChunkValue);
 		if (allMatches.isEmpty() == false) {
 			result = allMatches.get(0);
 		}

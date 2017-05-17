@@ -45,10 +45,21 @@ public class BasicServiceWrite extends CellFunctionBasicService {
 		return result;
 	}
 
-	private void write(final List<Datapoint> datapointList, String caller) {
+	private void write(final List<Datapoint> datapointList, String caller) throws Exception {
+		List<String> errorList = new ArrayList<>();
+
 		datapointList.forEach(dp -> {
-			this.getCell().getDataStorage().write(dp, caller);
+			try {
+				this.getCell().getDataStorage().write(dp, caller);
+			} catch (Exception e) {
+				errorList.add(dp.getAddress());
+				log.error("Cannot write data " + dp, e);
+			}
 		});
+
+		if (errorList.isEmpty() == false) {
+			throw new Exception("Error writing the following data: " + errorList);
+		}
 	}
 
 }
