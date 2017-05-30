@@ -7,7 +7,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
@@ -35,7 +34,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	//private final CellImpl cell;
 	//private final DataStorage datastorage;
 	//private final CellFunctionHandler cellFunctions;
-	private final static Gson gson = new Gson();
+	//private final static Gson gson = new Gson();
 	//private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
 	public CommunicatorImpl(CellImpl cell) {

@@ -44,4 +44,12 @@ public class DatapointList extends ArrayList<Datapoint> {
 		return result;
 	}
 
+	public <T> List<T> getValueList(Class<T> className) {
+		List<T> result = new ArrayList<>();
+
+		this.forEach(dp -> result.add(dp.getValue(className)));
+
+		return result;
+	}
+
 }
