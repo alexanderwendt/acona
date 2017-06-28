@@ -14,14 +14,14 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class GsonUtils {
 
-	private static Gson gson = new Gson();
-	private static Gson gsonExtended = new GsonBuilder().setPrettyPrinting().create();
+	private Gson gson = new Gson();
+	private Gson gsonExtended = new GsonBuilder().setPrettyPrinting().create();
 
 	public static enum ConflictStrategy {
 		THROW_EXCEPTION, PREFER_FIRST_OBJ, PREFER_SECOND_OBJ, PREFER_NON_NULL;
 	}
 
-	public static class JsonObjectExtensionConflictException extends Exception {
+	public class JsonObjectExtensionConflictException extends Exception {
 
 		/**
 		* 
@@ -44,14 +44,13 @@ public class GsonUtils {
 	 * @param objs
 	 * @throws JsonObjectExtensionConflictException
 	 */
-	public static void extendJsonObject(JsonObject destinationObject, ConflictStrategy conflictResolutionStrategy,
-			JsonObject... objs) throws JsonObjectExtensionConflictException {
+	public void extendJsonObject(JsonObject destinationObject, ConflictStrategy conflictResolutionStrategy, JsonObject... objs) throws JsonObjectExtensionConflictException {
 		for (JsonObject obj : objs) {
 			extendJsonObject(destinationObject, obj, conflictResolutionStrategy);
 		}
 	}
 
-	private static void extendJsonObject(JsonObject leftObj, JsonObject rightObj, ConflictStrategy conflictStrategy)
+	private void extendJsonObject(JsonObject leftObj, JsonObject rightObj, ConflictStrategy conflictStrategy)
 			throws JsonObjectExtensionConflictException {
 		for (Map.Entry<String, JsonElement> rightEntry : rightObj.entrySet()) {
 			String rightKey = rightEntry.getKey();
@@ -80,7 +79,7 @@ public class GsonUtils {
 		}
 	}
 
-	private static void handleMergeConflict(String key, JsonObject leftObj, JsonElement leftVal, JsonElement rightVal,
+	private void handleMergeConflict(String key, JsonObject leftObj, JsonElement leftVal, JsonElement rightVal,
 			ConflictStrategy conflictStrategy) throws JsonObjectExtensionConflictException {
 
 		switch (conflictStrategy) {
@@ -114,7 +113,7 @@ public class GsonUtils {
 	 * @param clzz
 	 * @return
 	 */
-	public static List<Datapoint> convertJsonArrayToDatapointList(JsonArray jsonArray) {
+	public List<Datapoint> convertJsonArrayToDatapointList(JsonArray jsonArray) {
 		List<Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<List<Datapoint>>() {
 		}.getType());
 		return result;
@@ -127,7 +126,7 @@ public class GsonUtils {
 	 * @param clzz
 	 * @return
 	 */
-	public static <T> List<T> convertJsonArrayToList(JsonArray jsonArray, TypeToken<T> token) {
+	public <T> List<T> convertJsonArrayToList(JsonArray jsonArray, TypeToken<T> token) {
 		List<T> result = gson.fromJson(jsonArray.toString(), token.getType());
 		return result;
 	}
@@ -139,7 +138,7 @@ public class GsonUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static JsonArray convertListToJsonArray(List<?> list) throws Exception {
+	public JsonArray convertListToJsonArray(List<?> list) throws Exception {
 		Gson gson = new Gson();
 		JsonElement element = gson.toJsonTree(list, new TypeToken<List<?>>() {
 		}.getType());

@@ -11,6 +11,8 @@ public interface DataStorage {
 
 	public void write(Datapoint datapackage, String caller) throws Exception;
 
+	public void append(Datapoint datapackage, String caller) throws Exception;
+
 	public void add(Datapoint datapackage, String caller);
 
 	public void remove(String address, String caller);

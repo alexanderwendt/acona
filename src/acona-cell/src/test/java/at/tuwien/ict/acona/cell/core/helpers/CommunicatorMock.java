@@ -191,4 +191,22 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 		return null;
 	}
 
+	@Override
+	public void remove(Datapoint datapoint) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void remove(List<Datapoint> datapoint) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void remove(List<Datapoint> datapoint, String agentName, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
 }

@@ -23,6 +23,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	private static Logger log = LoggerFactory.getLogger(CellFunctionHandlerImpl.class);
 	//The datapoint activation map consists of agent:datapointaddress
 	private final Map<String, List<CellFunction>> datapointActivationMap = new ConcurrentHashMap<>();
+
 	private final Map<String, CellFunction> cellFunctionsMap = new ConcurrentHashMap<>();
 
 	private Cell caller;
@@ -255,6 +256,11 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			log.error("Address={}: Cannot deregister activator={}", key, cellFunctionInstance, e);
 			throw new Exception(e.getMessage());
 		}
+	}
+
+	@Override
+	public List<String> getCellFunctionNames() {
+		return new ArrayList<>(this.cellFunctionsMap.keySet());
 	}
 
 }

@@ -93,6 +93,10 @@ public class Datapoint {
 		return result;
 	}
 
+	public boolean isNullDatapoint() {
+		return isNullDatapoint(this.toJsonObject());
+	}
+
 	//	public Datapoint setType(String type) {
 	//		this.TYPE = type;
 	//

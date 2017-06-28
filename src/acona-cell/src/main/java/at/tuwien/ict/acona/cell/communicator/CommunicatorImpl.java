@@ -28,6 +28,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	private static final String SUBSCRIBESERVICENAME = "subscribe";
 	private static final String UNSUBSCRIBESERVICENAME = "unsubscribe";
 	private static final String NOTIFYSERVICENAME = "notify";
+	private static final String REMOVESERVICENAME = "remove";
 
 	//private int defaultTimeout = 10000;
 
@@ -116,6 +117,35 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			result = this.read(datapointName, this.getLocalAgentName());
 		}
 		return result;
+	}
+
+	@Override
+	public void remove(Datapoint datapoint) throws Exception {
+		this.remove(Arrays.asList(datapoint));
+
+	}
+
+	@Override
+	public void remove(List<Datapoint> datapoints) throws Exception {
+		this.remove(datapoints, this.getLocalAgentName(), this.defaultTimeout);
+
+	}
+
+	@Override
+	public void remove(List<Datapoint> datapoints, String agentName, int timeout) throws Exception {
+		List<Datapoint> result;
+
+		try {
+			result = this.execute(agentName, REMOVESERVICENAME, datapoints, timeout);
+
+			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
+				throw new Exception("Cannot remove values. Error returned from destination");
+			}
+		} catch (Exception e) {
+			log.error("Cannot remove value for addresses={} of agent={}", datapoints, agentName);
+			throw new Exception(e.getMessage());
+		}
+
 	}
 
 	@Override

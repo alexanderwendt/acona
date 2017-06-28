@@ -44,58 +44,17 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 	public List<Datapoint> performOperation(Map<String, Datapoint> parameter, String caller) {
 		List<Datapoint> result = new ArrayList<>();
 		try {
-			//Set the current caller of the method
-			//this.currentCaller = caller;
 
-			// Convert parameter to datapoint
-			//String sender = parameter.get(PARAMETERSENDER).getValueAsString();
-			//String method = parameter.get(METHOD).getValueAsString();
-
-			//JsonArray array = parameter.get(PARAMETER).getValue().getAsJsonArray();
-			List<Datapoint> datapoints = Lists.newArrayList(parameter.values()); //GsonUtils.convertJsonArrayToDatapointList(array);
-			// array.forEach(o -> {
-			// datapoints.add(Datapoint.toDatapoint(o.getAsJsonObject()));
-			// });
-
-			//List<Datapoint> readDatapoints = new ArrayList<Datapoint>();
-
-			//switch (method) {
-			//case READMETHOD:
+			List<Datapoint> datapoints = Lists.newArrayList(parameter.values());
 			result.addAll(this.read(datapoints));
-			//	break;
-			//default:
-			//	throw new Exception("Method " + method + " not available.");
-			//}
 
 		} catch (Exception e) {
 			log.error("Cannot perform operation", e);
 			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
 		}
 
-		// TODO Auto-generated method stub
 		return result;
 	}
-
-	//	@Override
-	//	protected void cellFunctionInit() throws Exception {
-	//		// Generate external service in JADE
-	//		this.getFunctionConfig().setGenerateReponder(true);
-	//		// Use the request protocol
-	//		this.getFunctionConfig().setResponderProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-	//
-	//	}
-
-	//	@Override
-	//	protected void shutDownImplementation() {
-	//		// TODO Auto-generated method stub
-	//
-	//	}
-	//
-	//	@Override
-	//	protected void updateDatapointsById(Map<String, Datapoint> data) {
-	//		// TODO Auto-generated method stub
-	//
-	//	}
 
 	@Override
 	public List<Datapoint> read(final List<Datapoint> datapointList) {

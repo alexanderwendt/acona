@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceNotifySubscribers;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceRead;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceRemove;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceSubscribe;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceUnsubscribe;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceWrite;
@@ -88,6 +89,7 @@ public class CellConfig {
 		this.addCellfunction(CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class));
 		this.addCellfunction(CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class));
 		this.addCellfunction(CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class));
+		this.addCellfunction(CellFunctionConfig.newConfig("remove", BasicServiceRemove.class));
 	}
 
 	/**

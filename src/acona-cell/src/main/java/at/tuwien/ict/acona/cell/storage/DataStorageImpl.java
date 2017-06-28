@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
+import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils.ConflictStrategy;
 
 public class DataStorageImpl implements DataStorage {
 
@@ -44,6 +46,39 @@ public class DataStorageImpl implements DataStorage {
 		log.debug("write datapoint={}", datapackage);
 		this.notifySubscribers(datapackage, caller);
 		// }
+	}
+
+	@Override
+	public void append(Datapoint datapackage, String caller) throws Exception {
+		if (datapackage.getAddress().contains("*") || datapackage.getAddress().contains(":")) {
+			throw new Exception("* or : was part of the address: " + datapackage.getAddress() + "This is not allowed");
+		}
+
+		//Lock data
+		synchronized (this.data) {
+			GsonUtils util = new GsonUtils();
+			Datapoint source = this.data.get(datapackage.getAddress());
+			if (source != null) {
+				if (source.getValue().isJsonObject() == false || datapackage.getValue().isJsonObject() == false) {
+					throw new Exception(source + " is no json object or " + datapackage + " is no json object.");
+				}
+
+				util.extendJsonObject(source.getValue().getAsJsonObject(), ConflictStrategy.PREFER_SECOND_OBJ, datapackage.getValue().getAsJsonObject());
+
+				//write appended message
+				this.write(source, caller);
+
+			} else {
+				//write only new message
+				this.write(datapackage, caller);
+			}
+		}
+
+		//this.data.put(datapackage.getAddress(), datapackage);
+		//log.debug("write datapoint={}", datapackage);
+		//this.notifySubscribers(datapackage, caller);
+		// }
+
 	}
 
 	@Override

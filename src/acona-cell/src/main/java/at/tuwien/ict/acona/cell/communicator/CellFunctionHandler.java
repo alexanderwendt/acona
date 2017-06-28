@@ -49,4 +49,6 @@ public interface CellFunctionHandler {
 
 	public CellFunction getCellFunction(String functionName);
 
+	public List<String> getCellFunctionNames();
+
 }

@@ -118,7 +118,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 			requestMsg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
 			requestMsg.setOntology(serviceName);
 
-			JsonArray object = GsonUtils.convertListToJsonArray(methodParameters);
+			JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
 			//			methodParameters.values().forEach(dp -> {
 			//				object.add(dp.toJsonObject());
 			//			});

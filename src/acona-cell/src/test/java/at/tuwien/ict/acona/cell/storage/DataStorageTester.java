@@ -11,6 +11,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.helpers.DataStorageSubscriberNotificatorMock;
 import at.tuwien.ict.acona.cell.storage.helpers.SubscriberMock;
@@ -49,7 +52,41 @@ public class DataStorageTester {
 	}
 
 	@Test
-	public void writerAndReadTest() {
+	public void appendAndReadTest() {
+		log.debug("Start write and read test");
+
+		try {
+			JsonObject obj1 = new JsonObject();
+			obj1.add("property1", new JsonPrimitive("value1"));
+
+			JsonObject obj2 = new JsonObject();
+			obj1.add("property2", new JsonPrimitive("value2"));
+
+			JsonObject expectation = new JsonObject();
+			expectation.add("property1", new JsonPrimitive("value1"));
+			expectation.add("property2", new JsonPrimitive("value2"));
+
+			//write data
+			this.data.write(Datapoint.newDatapoint(address).setValue(obj1), dataprovider);
+
+			//Append second data
+			this.data.append(Datapoint.newDatapoint(address).setValue(obj2), dataprovider);
+
+			//read written data
+			JsonObject actualResult = this.data.readFirst(address).getValue().getAsJsonObject();
+
+			//assert with proposed data
+			log.debug("expected result={}, actual result={}", expectation, actualResult);
+			assertEquals(expectation.toString(), actualResult.toString());
+
+		} catch (Exception e) {
+			log.error("Failed test due to error", e);
+			fail("Error");
+		}
+	}
+
+	@Test
+	public void writeAndReadTest() {
 		log.debug("Start write and read test");
 
 		try {
@@ -146,4 +183,5 @@ public class DataStorageTester {
 			fail("Error");
 		}
 	}
+
 }

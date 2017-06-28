@@ -86,8 +86,8 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 			// instruction for the function
 			String content = request.getContent();
 			JsonArray object = gson.fromJson(content, JsonArray.class);
-			List<Datapoint> datapoints = GsonUtils.convertJsonArrayToDatapointList(object);
-			this.datapointMap = new HashMap<String, Datapoint>();
+			List<Datapoint> datapoints = (new GsonUtils()).convertJsonArrayToDatapointList(object);
+			this.datapointMap = new HashMap<>();
 			for (Datapoint dp : datapoints) {
 				this.datapointMap.put(dp.getAddress(), dp);
 			}
@@ -143,7 +143,7 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 		ACLMessage msg = request.createReply();
 		msg.setOntology(AconaServiceType.NONE.toString());
 
-		List<Datapoint> resultDatapoints = new ArrayList<Datapoint>();
+		List<Datapoint> resultDatapoints = new ArrayList<>();
 
 		try {
 			// Execute the service action
@@ -174,7 +174,7 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 		// List<Datapoint> readDatapoints;
 		// String serializedDatapoints = "";
 
-		List<Datapoint> result = new ArrayList<Datapoint>();
+		List<Datapoint> result = new ArrayList<>();
 		// try {
 		result = function.performOperation(parameter, caller);
 
