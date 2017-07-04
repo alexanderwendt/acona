@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
 /**
  * @author wendt
@@ -19,7 +20,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
  *         be executed if a subscribed datapoint is received
  *
  */
-public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl implements Runnable {
+public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements Runnable {
 
 	public final static String STATESUFFIX = "state";
 	public final static String RESULTSUFFIX = "result";
@@ -29,6 +30,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 	private static final int INITIALIZATIONPAUSE = 500;
+
+	private int executeRate = 1000;
+	private boolean executeOnce = true;
+
+	protected ControlCommand currentCommand = ControlCommand.STOP;
+	protected boolean runAllowed = false;
 
 	/**
 	 * In the value map all, subscribed values as well as read values are put.
@@ -45,8 +52,21 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	}
 
 	@Override
-	protected void cellFunctionExecutorInit() throws Exception {
+	protected void cellFunctionInit() throws Exception {
 		try {
+			// Get execute once as optional
+			if (this.getFunctionConfig().isExecuteOnce() != null) {
+				this.setExecuteOnce(this.getFunctionConfig().isExecuteOnce().getAsBoolean());
+			} else {
+				this.getFunctionConfig().setExecuterate(executeRate);
+			}
+
+			// Get executerate as optional
+			if (this.getFunctionConfig().getExecuteRate() != null) {
+				this.setExecuteRate(this.getFunctionConfig().getExecuteRate().getAsInt());
+			} else {
+				this.getFunctionConfig().setExecuteOnce(executeOnce);
+			}
 
 			cellFunctionThreadInit();
 			// Create a thread from this class
@@ -65,11 +85,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	}
 
 	private void initServiceDatapoints() throws Exception {
-		Datapoint command = Datapoint.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
-		Datapoint state = Datapoint.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.IDLE.toString());
-		Datapoint description = Datapoint.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue("Service " + this.getFunctionName());
-		Datapoint config = Datapoint.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
-		Datapoint result = Datapoint.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");
+		Datapoint command = Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
+		Datapoint state = Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.IDLE.toString());
+		Datapoint description = Datapoints.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue("Service " + this.getFunctionName());
+		Datapoint config = Datapoints.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
+		Datapoint result = Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");
 
 		log.debug("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
 				command.getAddress(), state.getAddress(), description.getAddress(),
@@ -87,7 +107,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 	protected abstract void cellFunctionThreadInit() throws Exception;
 
-	@Override
 	protected abstract void executeFunction() throws Exception;
 
 	@Override
@@ -157,7 +176,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		this.getCell().takeDownCell();
 	}
 
-	@Override
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
 		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
@@ -183,7 +201,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 	}
 
-	@Override
 	protected void executePostProcessing() throws Exception {
 		// FIXME: The update here is not working well
 		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
@@ -209,7 +226,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 
 		this.setServiceState(ServiceState.FINISHED);
 		this.setServiceState(ServiceState.IDLE);
-		this.writeLocal(Datapoint.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
+		this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
 		log.info("{}>Service execution finished", this.getFunctionName());
 	}
 
@@ -272,7 +289,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		}
 	}
 
-	@Override
 	public synchronized void setCommand(ControlCommand command) {
 		this.setCurrentCommand(command);
 		if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
@@ -296,6 +312,59 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 		this.isActive = isActive;
 	}
 
+	public void setStart() {
+		this.setCommand(ControlCommand.START);
+	}
+
+	public void setStop() {
+		this.setCommand(ControlCommand.STOP);
+	}
+
+	public void setPause() {
+		this.setCommand(ControlCommand.PAUSE);
+
+	}
+
+	public int getExecuteRate() {
+		return executeRate;
+	}
+
+	public void setExecuteRate(int blockingTime) {
+		this.executeRate = blockingTime;
+	}
+
+	protected boolean isExecuteOnce() {
+		return executeOnce;
+	}
+
+	protected void setExecuteOnce(boolean executeOnce) {
+		this.executeOnce = executeOnce;
+	}
+
+	protected ControlCommand getCurrentCommand() {
+		return currentCommand;
+	}
+
+	protected void setCurrentCommand(ControlCommand currentCommand) {
+		this.currentCommand = currentCommand;
+	}
+
+	protected boolean isAllowedToRun() {
+		return runAllowed;
+	}
+
+	protected void setAllowedToRun(boolean isAllowedToRun) {
+		this.runAllowed = isAllowedToRun;
+	}
+
+	@Override
+	protected void shutDownImplementation() throws Exception {
+		this.setCommand(ControlCommand.EXIT);
+		this.shutDownExecutor();
+	}
+
+	protected abstract void shutDownExecutor() throws Exception;
+
 	/**
 	 * For a certain datapoint suffix, add the service name and a . to the
 	 * suffix.
@@ -310,7 +379,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionExecutorImpl im
 	@Override
 	protected void processServiceState() throws Exception {
 		try {
-			this.getCommunicator().write(Datapoint.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(this.getCurrentState().toString()));
+			this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(this.getCurrentState().toString()));
 		} catch (Exception e) {
 			log.error("Cannot write the state = {} to datapoint = {}", this.getCurrentState(), this.addServiceName(STATESUFFIX));
 			throw new Exception(e.getMessage());

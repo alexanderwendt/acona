@@ -9,15 +9,18 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFSubscribeLock;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServiceCommunicator {
 
@@ -51,19 +54,37 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public List<Datapoint> read(List<String> datapointaddress, String agentName, int timeout) throws Exception {
 		//TODO: Change the syntax that the agentname is part of the read address with the format agent:datapoint. If no agentname is present, the current agentname is the default agent name.
 		final List<Datapoint> result = new ArrayList<>();
-		List<Datapoint> inputList = new ArrayList<>();
+		//List<Datapoint> inputList = new ArrayList<>();
 
 		try {
 			//Make the inputlist a parameter
-			datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
+			//Create the request
 
-			result.addAll(this.execute(agentName, READSERVICENAME, inputList, timeout));
+			//Convert list to jsonArray
+			//			GsonUtils util = new GsonUtils();
+			//			JsonArray array = util.convertListToJsonArray(datapointaddress);
+			//			Object[] input = new Object[1];
+			//			input[0] = array;
 
-			if (result.isEmpty() == false && result.get(0).getValue().isJsonPrimitive() == true && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
-				throw new Exception("Cannot read values. Error returned from destination");
+			JsonRpcRequest request = new JsonRpcRequest(READSERVICENAME, false, new Object[1]);
+			request.setParameterAsList(0, datapointaddress);
+
+			//datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
+
+			JsonRpcResponse response = this.execute(agentName, READSERVICENAME, request, timeout);
+
+			if (response.getError() != null) {
+				throw new Exception("Cannot read values. Error returned from destination. Error:" + response.getError());
 			}
+
+			//Get the result and convert it to datapoints
+			//response.getResultAsList(new TypeToken<List<Datapoint>>(){}.getType());
+			List<Datapoint> responseList = response.getResult(new TypeToken<List<Datapoint>>() {
+			});
+			result.addAll(responseList);
+
 		} catch (Exception e) {
-			log.error("Cannot read value for addresses={} of agent={}", datapointaddress, agentName);
+			log.error("Cannot read value for addresses={} of agent={}", datapointaddress, agentName, e);
 			throw new Exception(e.getMessage());
 		}
 
@@ -133,19 +154,23 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void remove(List<Datapoint> datapoints, String agentName, int timeout) throws Exception {
-		List<Datapoint> result;
+		//JsonRpcResponse result;
 
 		try {
-			result = this.execute(agentName, REMOVESERVICENAME, datapoints, timeout);
+			//Make the inputlist a parameter
+			//Create the request
+			JsonRpcRequest request = new JsonRpcRequest(REMOVESERVICENAME, false, datapoints.toArray());
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
-				throw new Exception("Cannot remove values. Error returned from destination");
+			JsonRpcResponse response = this.execute(agentName, REMOVESERVICENAME, request, timeout);
+
+			if (response.getError() != null) {
+				throw new Exception("Cannot remove values. Error returned from destination. Error:" + response.getError());
 			}
+
 		} catch (Exception e) {
 			log.error("Cannot remove value for addresses={} of agent={}", datapoints, agentName);
 			throw new Exception(e.getMessage());
 		}
-
 	}
 
 	@Override
@@ -155,20 +180,14 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void write(List<Datapoint> datapoints, String agentComplementedName, int timeout, boolean blocking) throws Exception {
-		// If a local data storage is meant, then write it there, else a foreign
-		// data storage is meant.
-		//		String agentName = agentComplementedName;
-		//		if (agentComplementedName == null || agentComplementedName.isEmpty() || agentComplementedName.equals("")) {
-		//			agentName = this.getLocalAgentName();
-		//		}
-
-		List<Datapoint> result;
-
 		try {
-			result = this.execute(agentComplementedName, WRITESERVICENAME, datapoints, timeout);
+			JsonRpcRequest request = new JsonRpcRequest(WRITESERVICENAME, false, new Object[1]);
+			request.setParameterAsList(0, datapoints);
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
-				throw new Exception("Cannot write values. Error returned from destination");
+			JsonRpcResponse result = this.execute(agentComplementedName, WRITESERVICENAME, request, timeout);
+
+			if (result.getError() != null) {
+				throw new Exception("Cannot write values. Error returned from destination. Error:" + result.getError());
 			}
 		} catch (Exception e) {
 			log.error("Cannot write value for addresses={} of agent={}", datapoints, agentComplementedName);
@@ -183,7 +202,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		if (datapoint.getAddress().contains(":") == true) {
 			String agent = datapoint.getAddress().split(":")[0];
 			String address = datapoint.getAddress().split(":")[1];
-			Datapoint writeDatapoint = Datapoint.newDatapoint(address).setValue(datapoint.getValue());
+			Datapoint writeDatapoint = Datapoints.newDatapoint(address).setValue(datapoint.getValue());
 
 			this.write(Arrays.asList(writeDatapoint), agent, defaultTimeout, true);
 		} else {
@@ -201,22 +220,21 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public List<Datapoint> subscribe(List<String> datapointaddress, String agentName) throws Exception {
 		final List<Datapoint> result = new ArrayList<>();
 
-		List<Datapoint> inputList = new ArrayList<>();
+		//List<Datapoint> inputList = new ArrayList<>();
 
 		try {
-			datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
+			JsonRpcRequest request = new JsonRpcRequest(SUBSCRIBESERVICENAME, false, new Object[1]);
+			request.setParameterAsList(0, datapointaddress);
 
-			result.addAll(this.execute(agentName, SUBSCRIBESERVICENAME, inputList, this.defaultTimeout, true));
+			JsonRpcResponse response = this.execute(agentName, SUBSCRIBESERVICENAME, request, this.defaultTimeout, true);
 
-			if (result.isEmpty() == true || result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
-				throw new Exception("Cannot subscribe values. Error returned from destination");
+			if (response.getError() != null) {
+				throw new Exception("Cannot subscribe values. Error returned from destination. Error: " + response.getError());
 			}
 
-			//Register in function handler
-
-			//Add subscription
-			//FIXME: Not clean solution
-			//this.cellFunctions.addSubscription(functionName, address);
+			//Get the result and convert it to datapoints
+			result.addAll(response.getResult(new TypeToken<List<Datapoint>>() {
+			}));
 
 		} catch (Exception e) {
 			log.error("Cannot subscribe value for addresses={} of agent={}", datapointaddress, agentName, e);
@@ -242,16 +260,19 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	@Override
 	public void unsubscribe(List<String> datapointaddress, String agentName) throws Exception {
 
-		List<Datapoint> result;
+		//List<Datapoint> result;
 
 		try {
-			List<Datapoint> inputList = new ArrayList<>();
-			datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
+			//List<Datapoint> inputList = new ArrayList<>();
+			//datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
 
-			result = this.execute(agentName, UNSUBSCRIBESERVICENAME, inputList, this.defaultTimeout);
+			JsonRpcRequest request = new JsonRpcRequest(UNSUBSCRIBESERVICENAME, false, new Object[1]);
+			request.setParameterAsList(0, datapointaddress);
 
-			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
-				throw new Exception("Cannot unsubscribe values. Error returned from destination");
+			JsonRpcResponse result = this.execute(agentName, UNSUBSCRIBESERVICENAME, request, this.defaultTimeout);
+
+			if (result.getError() != null) {
+				throw new Exception("Cannot unsubscribe values. Error returned from destination. Error: " + result.getError());
 			}
 		} catch (Exception e) {
 			log.error("Cannot unsubscribe value for addresses={} of agent={}", datapointaddress, agentName);
@@ -270,13 +291,16 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		//Datapoint result;
 
 		try {
-			this.execute(agentName, NOTIFYSERVICENAME, Arrays.asList(datapoint), this.defaultTimeout);
+			JsonRpcRequest request = new JsonRpcRequest(NOTIFYSERVICENAME, true, new Object[1]);
+			request.setParameterAsValue(0, datapoint.toJsonObject());
 
-			//			if (result.isEmpty() == false && result.get(0).getValueAsString().equals(CommVocabulary.ERROR)) {
-			//				throw new Exception("Cannot write values. Error returned from destination");
-			//			}
+			JsonRpcResponse response = this.execute(agentName, NOTIFYSERVICENAME, request, this.defaultTimeout);
+
+			if (response.getError() != null) {
+				throw new Exception("Cannot notify values. Error returned from destination. Error: " + response.getError());
+			}
 		} catch (Exception e) {
-			log.error("Cannot write value for addresses={} of agent={}", datapoint, agentName);
+			log.error("Cannot write value for addresses={} of agent={}", datapoint, agentName, e);
 			throw new Exception(e.getMessage());
 		}
 	}
@@ -317,6 +341,8 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		Datapoint result = null;
 
 		try {
+			//The write command always need a list of datapoints.
+
 			result = CFQuery.newQuery(writeAgentName, writeAddress, content, resultAgentName, resultAddress, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
@@ -326,7 +352,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
 		Datapoint result = null;
 
 		try {

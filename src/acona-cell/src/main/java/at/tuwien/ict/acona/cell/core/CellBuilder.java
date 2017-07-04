@@ -69,7 +69,6 @@ public class CellBuilder {
 				} catch (Exception e) {
 					log.error("Cannot create activator from {}", activatorConfig, e);
 				}
-
 			});
 
 			// Set all activators

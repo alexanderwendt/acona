@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 
 public interface Communicator extends AgentCommunicator {
 	/**
@@ -172,7 +173,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception;
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception;
 
 	/**
 	 * Subscribe a datapoint (also outside of the init function

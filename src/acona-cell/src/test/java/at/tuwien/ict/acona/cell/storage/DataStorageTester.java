@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.storage.helpers.DataStorageSubscriberNotificatorMock;
 import at.tuwien.ict.acona.cell.storage.helpers.SubscriberMock;
 
@@ -67,10 +68,10 @@ public class DataStorageTester {
 			expectation.add("property2", new JsonPrimitive("value2"));
 
 			//write data
-			this.data.write(Datapoint.newDatapoint(address).setValue(obj1), dataprovider);
+			this.data.write(Datapoints.newDatapoint(address).setValue(obj1), dataprovider);
 
 			//Append second data
-			this.data.append(Datapoint.newDatapoint(address).setValue(obj2), dataprovider);
+			this.data.append(Datapoints.newDatapoint(address).setValue(obj2), dataprovider);
 
 			//read written data
 			JsonObject actualResult = this.data.readFirst(address).getValue().getAsJsonObject();
@@ -91,7 +92,7 @@ public class DataStorageTester {
 
 		try {
 			//write data
-			this.data.write(Datapoint.newDatapoint(address).setValue(value), dataprovider);
+			this.data.write(Datapoints.newDatapoint(address).setValue(value), dataprovider);
 
 			//read written data
 			String actualResult = this.data.readFirst(address).getValue().getAsString();
@@ -118,9 +119,9 @@ public class DataStorageTester {
 
 			String wildcardaddress = "datapoint.ss*";
 
-			this.data.write(Datapoint.newDatapoint(address1).setValue(value), dataprovider);
-			this.data.write(Datapoint.newDatapoint(address2).setValue(value), dataprovider);
-			this.data.write(Datapoint.newDatapoint(address3).setValue(value), dataprovider);
+			this.data.write(Datapoints.newDatapoint(address1).setValue(value), dataprovider);
+			this.data.write(Datapoints.newDatapoint(address2).setValue(value), dataprovider);
+			this.data.write(Datapoints.newDatapoint(address3).setValue(value), dataprovider);
 
 			//read written data
 			List<Datapoint> actualResult = this.data.read(wildcardaddress);
@@ -142,7 +143,7 @@ public class DataStorageTester {
 			data.subscribeDatapoint(this.address, sub1.getName());
 			data.subscribeDatapoint(this.address, sub2.getName());
 			//Write data
-			data.write(Datapoint.newDatapoint(address).setValue(value), dataprovider);
+			data.write(Datapoints.newDatapoint(address).setValue(value), dataprovider);
 			//Get data from subscriberMock
 			String actualValue = sub2.getValue();
 
@@ -162,11 +163,11 @@ public class DataStorageTester {
 				//REgister subscribers
 				data.subscribeDatapoint(this.address, sub1.getName());
 				//Write data
-				data.write(Datapoint.newDatapoint(address).setValue(value), dataprovider);
+				data.write(Datapoints.newDatapoint(address).setValue(value), dataprovider);
 
 				data.unsubscribeDatapoint(address, sub1.getName());
 
-				data.write(Datapoint.newDatapoint(address).setValue(value2), dataprovider);
+				data.write(Datapoints.newDatapoint(address).setValue(value2), dataprovider);
 				//Get data from subscriberMock
 				String actualValue = sub1.getValue();
 

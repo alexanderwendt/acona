@@ -1,16 +1,20 @@
 package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import jade.domain.FIPANames;
 
 public class BasicServiceUnsubscribe extends CellFunctionBasicService {
@@ -22,20 +26,18 @@ public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 	// Datapoints as JsonArray with datapoints as Json objects
 
 	@Override
-	public List<Datapoint> performOperation(final Map<String, Datapoint> parameter, String caller) {
-		List<Datapoint> result = new ArrayList<>();
+	public JsonRpcResponse performOperation(final JsonRpcRequest parameter, String caller) {
+		JsonRpcResponse result = null;
 		try {
-			// Convert parameter to datapoint
-			//JsonArray array = parameter.get(PARAMETER).getValue().getAsJsonArray();
-			List<Datapoint> datapoints = Lists.newArrayList(parameter.values());//GsonUtils.convertJsonArrayToDatapointList(array);
 
-			this.unsubscribe(datapoints, caller);
+			List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {
+			});
+			this.unsubscribe(addresses, caller);
 
-			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-
+			result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 		} catch (Exception e) {
 			log.error("Cannot perform operation of parameter={}", parameter, e);
-			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
+			result = new JsonRpcResponse(parameter, new JsonRpcError("UnsubscribeError", -1, e.getMessage(), e.getLocalizedMessage()));
 		}
 
 		return result;
@@ -65,12 +67,12 @@ public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 
 	}
 
-	private void unsubscribe(final List<Datapoint> datapointList, String caller) {
+	private void unsubscribe(final List<String> datapointList, String caller) {
 		datapointList.forEach(dp -> {
 			try {
-				this.getCell().getDataStorage().unsubscribeDatapoint(dp.getAddress(), caller);
+				this.getCell().getDataStorage().unsubscribeDatapoint(dp, caller);
 			} catch (Exception e) {
-				log.error("Cannot unsubscribe datapoint={}", dp.getAddress(), e);
+				log.error("Cannot unsubscribe datapoint={}", dp, e);
 			}
 
 		});

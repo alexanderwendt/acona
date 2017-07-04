@@ -120,6 +120,19 @@ public class GsonUtils {
 	}
 
 	/**
+	 * Convert any jsonarray with to a map of datapoints
+	 * 
+	 * @param jsonArray
+	 * @param clzz
+	 * @return
+	 */
+	public Map<String, Datapoint> convertJsonArrayToDatapointMap(JsonArray jsonArray) {
+		Map<String, Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<Map<String, Datapoint>>() {
+		}.getType());
+		return result;
+	}
+
+	/**
 	 * Convert any jsonarray with convertable objects to a List
 	 * 
 	 * @param jsonArray
@@ -149,6 +162,20 @@ public class GsonUtils {
 		}
 
 		JsonArray jsonArray = element.getAsJsonArray();
+		return jsonArray;
+	}
+
+	public JsonObject convertListToJsonArray(Map<?, ?> map) throws Exception {
+		Gson gson = new Gson();
+		JsonElement element = gson.toJsonTree(map, new TypeToken<Map<?, ?>>() {
+		}.getType());
+
+		if (!element.isJsonObject()) {
+			// fail appropriately
+			throw new Exception("Element is no JsonArray");
+		}
+
+		JsonObject jsonArray = element.getAsJsonObject();
 		return jsonArray;
 	}
 

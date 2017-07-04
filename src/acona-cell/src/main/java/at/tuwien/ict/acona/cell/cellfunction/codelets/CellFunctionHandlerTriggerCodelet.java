@@ -1,14 +1,12 @@
 package at.tuwien.ict.acona.cell.cellfunction.codelets;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonPrimitive;
-
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 
 /**
  * This is a codelet that executes codelet handlers.
@@ -41,10 +39,10 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 		//				Datapoint.newDatapoint("method").setValue("executecodelethandler"),
 		//				Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
 
-		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
-				Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-				Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-				codeletHandlerAgent, codeletHandlerAddress + ".result", 20000);
+		JsonRpcRequest req = new JsonRpcRequest("executecodelethandler", 1);
+		req.setParameterAsValue(0, false);
+
+		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, req, codeletHandlerAgent, codeletHandlerAddress + ".result", 20000);
 
 	}
 

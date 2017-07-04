@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class CFIncrementService extends CellFunctionThreadImpl {
 
@@ -38,7 +39,7 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 			value++;
 			log.info("New value={}", value);
 			// write new value back to the same datapoint
-			this.getValueMap().put(this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress(), Datapoint.newDatapoint(this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress()).setValue(String.valueOf(value)));
+			this.getValueMap().put(this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress(), Datapoints.newDatapoint(this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress()).setValue(String.valueOf(value)));
 			log.debug("Function execution finished");
 		} catch (Exception e) {
 			log.error("Cannot execute incrementation service. Often the problem is that the value of the address {} has not been initialized yet", address, e);
@@ -47,14 +48,14 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		List<Datapoint> result = new ArrayList<>();
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+
 		//Syntax
 		//address: command, value START, STOP, EXIT
 		//get command
 		//if (parameterdata.containsKey("command")) {
 		log.debug("Execute method Setcommand with parameter {}", parameterdata);
-		result.add(this.executeCommandStart());
+		JsonRpcResponse result = new JsonRpcResponse(parameterdata, this.executeCommandStart().toJsonObject());
 		//}
 
 		return result;
@@ -83,7 +84,7 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 			message = ServiceState.ERROR.toString();
 		}
 
-		return Datapoint.newDatapoint("state").setValue(message);
+		return Datapoints.newDatapoint("state").setValue(message);
 
 	}
 

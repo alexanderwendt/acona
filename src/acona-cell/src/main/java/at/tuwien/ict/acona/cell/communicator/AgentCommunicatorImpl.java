@@ -1,9 +1,5 @@
 package at.tuwien.ict.acona.cell.communicator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -12,13 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import jade.content.abs.AbsPredicate;
 import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
@@ -76,20 +73,20 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	}
 
 	@Override
-	public List<Datapoint> execute(String agentName, String serviceName, List<Datapoint> methodParameters, int timeout) throws Exception {
+	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout) throws Exception {
 		return this.execute(agentName, serviceName, methodParameters, timeout, false);
 	}
 
 	@Override
-	public void executeAsynchronous(String agentName, String serviceName, List<Datapoint> methodParameters) throws Exception {
+	public void executeAsynchronous(String agentName, String serviceName, JsonRpcRequest methodParameters) throws Exception {
 		//TODO Implement this
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<Datapoint> execute(String agentName, String serviceName, List<Datapoint> methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception {
+	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception {
 
-		final List<Datapoint> result = new ArrayList<>();
+		JsonRpcResponse result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); //= new ArrayList<>();
 		// If a local data storage is meant, then write it there, else a foreign
 		// data storage is meant.
 		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
@@ -98,10 +95,10 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 		if (agentName.equals(this.cell.getLocalName()) == true) {
 			// Execute local function
-			Map<String, Datapoint> parametermap = new HashMap<>();
-			methodParameters.forEach(dp -> parametermap.put(dp.getAddress(), dp));
+			//Map<String, Datapoint> parametermap = new HashMap<>();
+			//methodParameters.forEach(dp -> parametermap.put(dp.getAddress(), dp));
 
-			result.addAll(this.getCellFunctionHandler().getCellFunction(serviceName).performOperation(parametermap, this.getLocalAgentName()));
+			result = this.getCellFunctionHandler().getCellFunction(serviceName).performOperation(methodParameters, this.getLocalAgentName());
 		} else {
 			// Create a InitiatorBehaviour to write the datapoints to the target
 			// agent if that agent is external
@@ -118,14 +115,9 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 			requestMsg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
 			requestMsg.setOntology(serviceName);
 
-			JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
-			//			methodParameters.values().forEach(dp -> {
-			//				object.add(dp.toJsonObject());
-			//			});
-			// String serializedDatapoints = gson.toJson(datapoints);
-			// List<TestObject> list2 = gson.fromJson(s, listOfTestObject);
+			//JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
 
-			requestMsg.setContent(object.toString());
+			requestMsg.setContent(methodParameters.toJson().toString());
 
 			// Blocking read and write
 			SynchronousQueue<String> queue = new SynchronousQueue<>();
@@ -139,10 +131,12 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 						throw new Exception("Operation timed out after " + timeout + "ms.");
 					}
 
-					result.addAll(new Gson().fromJson(writeBehaviourFinished, new TypeToken<List<Datapoint>>() {
-					}.getType()));
+					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {
+					}.getType());
 				} catch (InterruptedException e) {
 					log.warn("Queue interrupted");
+				} catch (JsonSyntaxException e) {
+					log.error("Cannot read respond message={}", writeBehaviourFinished);
 				}
 			}
 		}
@@ -175,6 +169,12 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 		}
 
 		@Override
+		protected void handleRefuse(ACLMessage msg) {
+			log.info("Service {}>Received refused handling of request={}", this.serviceName, msg.getContent());
+			releseQueue(msg.getContent());
+		}
+
+		@Override
 		protected void handleInform(ACLMessage msg) {
 			//log.info("Write operation successfully completed");
 
@@ -190,7 +190,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 		@Override
 		protected void handleFailure(ACLMessage msg) {
-			log.info("Service {}>Service failed", this.serviceName);
+			log.info("Service {}>Service failed. Error received={}", this.serviceName, msg.getContent());
 			// Get the failure reason and communicate it to the user
 			try {
 				AbsPredicate absPred = (AbsPredicate) myAgent.getContentManager().extractContent(msg);
@@ -205,7 +205,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 			releseQueue(msg.getContent());
 		}
 
-		private void releseQueue(String dp) {
+		private synchronized void releseQueue(String dp) {
 			try {
 				queue.put(dp);
 			} catch (InterruptedException e) {

@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.cell.core.helpers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -9,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class DummyFunction extends CellFunctionImpl {
 	private static Logger log = LoggerFactory.getLogger(DummyFunction.class);
@@ -84,15 +85,15 @@ public class DummyFunction extends CellFunctionImpl {
 	}
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	protected void shutDownImplementation() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

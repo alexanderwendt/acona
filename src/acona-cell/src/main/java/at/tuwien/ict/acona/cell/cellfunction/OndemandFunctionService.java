@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
 /**
  * Service function 1. Register DF service from function name 2.
@@ -85,12 +86,12 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		CONFIGDATAPOINTNAME = serviceName + "." + "config";
 		RESULTDATAPOINTNAME = serviceName + "." + "result";
 
-		command = Datapoint.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
-		state = Datapoint.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.IDLE.toString());
-		description = Datapoint.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
+		command = Datapoints.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
+		state = Datapoints.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.IDLE.toString());
+		description = Datapoints.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
 		//parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
-		config = Datapoint.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
-		result = Datapoint.newDatapoint(RESULTDATAPOINTNAME).setValue("");
+		config = Datapoints.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
+		result = Datapoints.newDatapoint(RESULTDATAPOINTNAME).setValue("");
 
 		log.debug("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
 				command.getAddress(), state.getAddress(), description.getAddress(),

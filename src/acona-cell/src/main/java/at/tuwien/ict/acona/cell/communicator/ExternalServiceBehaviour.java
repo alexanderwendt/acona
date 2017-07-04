@@ -1,21 +1,14 @@
 package at.tuwien.ict.acona.cell.communicator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.core.CellImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.cell.datastructures.types.AconaServiceType;
-import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
 import jade.core.AID;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.RefuseException;
@@ -36,15 +29,12 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static Logger log = LoggerFactory.getLogger(ExternalServiceBehaviour.class);
-	private final static Gson gson = new Gson();
-	private final CellImpl cell;
+	private final static Logger log = LoggerFactory.getLogger(ExternalServiceBehaviour.class);
 
-	private Map<String, Datapoint> datapointMap;
-	private String senderAgent;
 	private final String serviceName;
-	private String methodName;
 	private final CellFunction service;
+
+	private JsonRpcRequest rpcrequest;
 
 	public ExternalServiceBehaviour(CellImpl caller, CellFunction service) {
 		// In the super class, it shall use the message template here
@@ -60,7 +50,7 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 		// FIPANames.InteractionProtocol.FIPA_REQUEST)
 		this.service = service;
 		this.serviceName = service.getFunctionName();
-		this.cell = caller;
+		//this.cell = caller;
 		log.debug("Service={}>Responder ready.", service.getFunctionName());
 	}
 
@@ -78,62 +68,20 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 		temp = request.createReply();
 		temp.setOntology(AconaServiceType.NONE.toString());
 
-		senderAgent = request.getSender().getLocalName();
+		//senderAgent = request.getSender().getLocalName();
 
 		// Extract content
 		try {
-			// Extract datapoints into a datapointmap. Each datapoint has an
-			// instruction for the function
-			String content = request.getContent();
-			JsonArray object = gson.fromJson(content, JsonArray.class);
-			List<Datapoint> datapoints = (new GsonUtils()).convertJsonArrayToDatapointList(object);
-			this.datapointMap = new HashMap<>();
-			for (Datapoint dp : datapoints) {
-				this.datapointMap.put(dp.getAddress(), dp);
-			}
-
-			// Add the caller
-			//this.datapointMap.put(SENDER, Datapoint.newDatapoint(SENDER).setValue(request.getSender().getLocalName()));
-
-			// switch (input.getAddress()) {
-			// case METHODNAME:
-			// this.methodName = input.getValueAsString();
-			// break;
-			// case PARAMETER:
-			// this.parameter = input.getValue().getAsJsonObject();
-			// this.parameter.addProperty(CALLER, senderAgent);
-			// break;
-			// case CONFIG:
-			// this.config = input.getValue().getAsJsonObject();
-			// break;
-			// default:
-			// throw new Exception("Unknown datapoint " + input.getAddress());
-			// }
-			// this.datapointList.add();
-
-			// if (this.serviceName.equals(AconaServiceType.QUERY) == true) {
-			// log.warn("Check if service is available");
-			// // TODO: Implement this
-			// // Todo: Check if input matches the description
-			// // Todo: Check if service is running. If yes, create queue to
-			// // wait until the run has finished and then set new data,
-			// // optional
-			//
-			// throw new UnsupportedOperationException();
-			//
-			// }
-
+			//Check if there is a problem with the conversion
+			String stringRequest = request.getContent();
+			rpcrequest = new JsonRpcRequest(stringRequest);
 			temp.setPerformative(ACLMessage.AGREE);
 			log.info("Service={}>OK to execute.", serviceName);
-
 		} catch (Exception fe) {
-			log.error("Service={}>Received message with sender: {}, receiver={}, service={},\n content={}", request.getOntology(), request.getSender(),
-					request.getAllIntendedReceiver(), request.getContent());
-			log.error("Service={}>Error handling the action.", serviceName, fe);
+			log.error("Service={}>Error. Request refused. Received message with \nsender: {}, \nreceiver={},\nservice={},\n content={}.", serviceName, request.getOntology(), request.getSender(), request.getAllIntendedReceiver(), request.getContent(), fe);
 			temp.setPerformative(ACLMessage.REFUSE);
 			throw new RefuseException("check-failed");
 		}
-		// }
 
 		return temp;
 	}
@@ -143,106 +91,47 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 		ACLMessage msg = request.createReply();
 		msg.setOntology(AconaServiceType.NONE.toString());
 
-		List<Datapoint> resultDatapoints = new ArrayList<>();
+		JsonRpcResponse resultDatapoint = null;//new JsonRpcResponse(new JsonRpcRequest(RESULTNOTIFICATIONMETHODNAME, true, new Object[0]), new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error"));
 
+		String stringRequest = "";
 		try {
+			//Create a JsonRpc request
+			//stringRequest = request.getContent();
+			//log.debug("Request as String: {}", );
+			//JsonRpcRequest rpcrequest = new JsonRpcRequest(stringRequest);
+			//rpcrequest.setParameterAsList(0, Arrays.asList(datapointMap.values()));
+
 			// Execute the service action
-			resultDatapoints.addAll(this.executeServiceAction(this.service, this.datapointMap, request.getSender().getLocalName()));
+			resultDatapoint = this.executeServiceAction(this.service, rpcrequest, request.getSender().getLocalName());
 
 			//resultDatapoints.add(result);
 
 			// Set performative that all is ok
 			msg.setPerformative(ACLMessage.INFORM);
 
+			if (resultDatapoint.getError() != null) {
+				throw new Exception("Error executing function. Incoming message=" + stringRequest);
+			}
+
 		} catch (Exception e) {
-			log.error("Service={}>Cannot process request", this.serviceName, e);
+			log.error("Service={}>Cannot process request. Incoming request={}", this.serviceName, stringRequest, e);
 			msg.setPerformative(ACLMessage.FAILURE);
 
+			resultDatapoint = new JsonRpcResponse(new JsonRpcRequest("test", true, new Object[0]), new JsonRpcError("ExecutionFailure", -1, e.getMessage(), e.getMessage()));
 			// send error back
-			resultDatapoints.add(Datapoint.newDatapoint(RESULT).setValue("ERROR"));
+			//resultDatapoint = .add(Datapoint.newDatapoint(RESULT).setValue("ERROR"));
 			// throw new FailureException("unexpected-error");
 		}
 
-		String serializedResult = gson.toJson(resultDatapoints);
+		String serializedResult = resultDatapoint.toJson().toString(); //gson.toJson(resultDatapoints);
 		msg.setContent(serializedResult);
 
 		log.debug("Service={}>Received result, receiver={}, content={}", msg.getOntology(), ((AID) msg.getAllReceiver().next()).getLocalName(), (msg.getContent().length() > 1000 ? msg.getContent().substring(0, 1000) : msg.getContent()));
 		return msg;
 	}
 
-	protected List<Datapoint> executeServiceAction(CellFunction function, Map<String, Datapoint> parameter, String caller) {
-		// List<Datapoint> readDatapoints;
-		// String serializedDatapoints = "";
-
-		List<Datapoint> result = new ArrayList<>();
-		// try {
-		result = function.performOperation(parameter, caller);
-
-		// } catch (Exception e) {
-		// log.error("Cannot execute method={} with parameter={}", methodName,
-		// parameter);
-
-		// }
-
+	protected JsonRpcResponse executeServiceAction(CellFunction function, JsonRpcRequest parameter, String caller) {
+		JsonRpcResponse result = function.performOperation(parameter, caller);
 		return result;
-
-		// switch (serviceType) {
-		// case WRITE:
-		// // For each datapoint, write it to the database
-		// this.datapointList.forEach(dp -> {
-		// this.cell.getDataStorage().write(dp, senderAgent);
-		// });
-		// break;
-		// case READ:
-		// // For each datapoint, write it to the database
-		// readDatapoints = new ArrayList<Datapoint>();
-		// this.datapointList.forEach(dp -> {
-		// readDatapoints.add(this.cell.getDataStorage().read(dp.getAddress()));
-		// });
-		//
-		// // serialize datapoints
-		// JsonArray jsonarray = new JsonArray();
-		// readDatapoints.forEach(dp -> {
-		// jsonarray.add(dp.toJsonObject());
-		// });
-		// serializedDatapoints = jsonarray.toString();
-		// msg.setContent(serializedDatapoints);
-		// break;
-		// case SUBSCRIBE:
-		// readDatapoints = new ArrayList<Datapoint>();
-		//
-		// // For each datapoint, write it to the database
-		// this.datapointList.forEach(dp -> {
-		// log.info("Sender={}", new AID(msg.getReplyWith(),
-		// AID.ISGUID).getLocalName());
-		// this.cell.getDataStorage().subscribeDatapoint(dp.getAddress(),
-		// senderAgent);
-		// readDatapoints.add(this.cell.getDataStorage().read(dp.getAddress()));
-		// });
-		//
-		// // serialize datapoints
-		// serializedDatapoints = gson.toJson(readDatapoints);
-		// msg.setContent(serializedDatapoints);
-		// break;
-		// case UNSUBSCRIBE:
-		// // For each datapoint, write it to the database
-		// this.datapointList.forEach(dp -> {
-		// this.cell.getDataStorage().unsubscribeDatapoint(dp.getAddress(),
-		// senderAgent);
-		// });
-		// break;
-		// case QUERY:
-		// // Execute the service and create a temporary subscription queue
-		// // function to wait for answer
-		// // put the input in a datapoint command
-		// // wait for an answer on the return datapoint
-		//
-		// throw new UnsupportedOperationException();
-		// // break;
-		// default:
-		// throw new Exception("Serive type not supported");
-		//
-		// }
-
 	}
 }

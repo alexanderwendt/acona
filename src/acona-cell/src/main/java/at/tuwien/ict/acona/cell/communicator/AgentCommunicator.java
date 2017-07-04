@@ -1,9 +1,8 @@
 package at.tuwien.ict.acona.cell.communicator;
 
-import java.util.List;
-
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 /**
  * The basic class for communication between functions, services in or within
@@ -42,7 +41,7 @@ public interface AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Datapoint> execute(String agentName, String serviceName, List<Datapoint> methodParameters, int timeout) throws Exception;
+	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout) throws Exception;
 
 	/**
 	 * Execute a service
@@ -60,7 +59,7 @@ public interface AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Datapoint> execute(String agentName, String serviceName, List<Datapoint> methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception;
+	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception;
 
 	/**
 	 * Execute the service as a non-blocking function
@@ -70,7 +69,7 @@ public interface AgentCommunicator {
 	 * @param methodParameters
 	 * @throws Exception
 	 */
-	public void executeAsynchronous(String agentName, String serviceName, List<Datapoint> methodParameters) throws Exception;
+	public void executeAsynchronous(String agentName, String serviceName, JsonRpcRequest methodParameters) throws Exception;
 
 	// === Init Cellfunctions as services, which shall have exteral access ===//
 	/**

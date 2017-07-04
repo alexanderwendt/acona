@@ -10,6 +10,8 @@ import javax.swing.WindowConstants;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.framework.modules.visualization.Position;
 import at.tuwien.ict.acona.framework.modules.visualization.Visualization2D;
 import at.tuwien.ict.acona.framework.modules.visualization.VisualizationData;
@@ -82,15 +84,15 @@ public class CFVisualizer extends CellFunctionThreadImpl implements Visualizatio
 	}
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	protected void shutDownExecutor() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

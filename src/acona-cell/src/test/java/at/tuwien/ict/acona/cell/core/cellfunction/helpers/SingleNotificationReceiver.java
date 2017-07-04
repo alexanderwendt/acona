@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,6 +9,8 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class SingleNotificationReceiver extends CellFunctionImpl {
 
@@ -22,7 +23,7 @@ public class SingleNotificationReceiver extends CellFunctionImpl {
 	private String address = "";
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
 	}

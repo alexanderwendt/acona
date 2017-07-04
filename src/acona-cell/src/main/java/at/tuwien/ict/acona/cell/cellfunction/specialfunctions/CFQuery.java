@@ -16,6 +16,9 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class CFQuery extends CellFunctionImpl {
 
@@ -54,7 +57,7 @@ public class CFQuery extends CellFunctionImpl {
 	}
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -93,7 +96,8 @@ public class CFQuery extends CellFunctionImpl {
 			//this.getCommunicator().subscribe(resultAddress, resultAgentName);
 
 			//write to destination
-			this.getCommunicator().write(Arrays.asList(Datapoint.newDatapoint(destinationAddress).setValue(content)), destinationAgentName, timeout, false);
+			List<Datapoint> sendlist = Arrays.asList(Datapoints.newDatapoint(destinationAddress).setValue(content));
+			this.getCommunicator().write(sendlist, destinationAgentName, timeout, false);
 
 			try {
 				log.trace("Service {}>Poll temp queue", this.getFunctionConfig().getName());

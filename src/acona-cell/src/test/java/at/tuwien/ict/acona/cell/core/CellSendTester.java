@@ -45,6 +45,14 @@ public class CellSendTester {
 			log.debug("Create subcontainer");
 			this.launchUtil.createSubContainer("localhost", 1099, "Subcontainer");
 
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
 		}
@@ -59,7 +67,7 @@ public class CellSendTester {
 	public void tearDown() throws Exception {
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException e) {
 
 			}
@@ -69,7 +77,7 @@ public class CellSendTester {
 		runtime.shutDown();
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException e) {
 
 			}

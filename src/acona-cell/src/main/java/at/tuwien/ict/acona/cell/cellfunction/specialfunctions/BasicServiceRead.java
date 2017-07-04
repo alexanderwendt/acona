@@ -2,15 +2,17 @@ package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.reflect.TypeToken;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
-import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 /**
  * @author wendt
@@ -41,27 +43,38 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 	// Datapoints as JsonArray with datapoints as Json objects
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameter, String caller) {
-		List<Datapoint> result = new ArrayList<>();
+	public JsonRpcResponse performOperation(JsonRpcRequest parameter, String caller) {
+		JsonRpcResponse result = null;
 		try {
+			switch (parameter.getMethod()) {
+			case "read":
+				//All datapoints are in the first parameter of the method call
+				List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {
+				});
+				//List<Datapoint> datapoints = Lists.newArrayList(parameter.values());
+				List<Datapoint> readValues = this.read(addresses);
 
-			List<Datapoint> datapoints = Lists.newArrayList(parameter.values());
-			result.addAll(this.read(datapoints));
+				result = new JsonRpcResponse(parameter, readValues);
+
+				break;
+			default:
+				throw new Exception("Erroneous method name");
+			}
 
 		} catch (Exception e) {
 			log.error("Cannot perform operation", e);
-			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
+			result = new JsonRpcResponse(parameter, new JsonRpcError("ReadError", -1, e.getMessage(), e.getLocalizedMessage()));
 		}
 
 		return result;
 	}
 
 	@Override
-	public List<Datapoint> read(final List<Datapoint> datapointList) {
+	public List<Datapoint> read(final List<String> datapointList) {
 		List<Datapoint> result = new ArrayList<>();
 
 		datapointList.forEach(dp -> {
-			result.addAll(this.getCell().getDataStorage().read(dp.getAddress()));
+			result.addAll(this.getCell().getDataStorage().read(dp));
 		});
 
 		return result;

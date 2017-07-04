@@ -3,8 +3,6 @@ package at.tuwien.ict.acona.cell.core.cellfunction.codelets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +19,8 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementNumberCodelet;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.framework.modules.ActionExecutorCodelet;
 import at.tuwien.ict.acona.framework.modules.OptionSelectorCodelet;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
@@ -56,7 +55,7 @@ public class Codelettester {
 	public void tearDown() throws Exception {
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException e) {
 
 			}
@@ -66,7 +65,7 @@ public class Codelettester {
 		runtime.shutDown();
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException e) {
 
 			}
@@ -116,15 +115,10 @@ public class Codelettester {
 			}
 			log.info("=== All agents initialized ===");
 
-			//memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
+			request1.setParameterAsValue(0, false);
 
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-					controllerAgentName, handlerName + ".result", 20000);
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1, controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -135,18 +129,13 @@ public class Codelettester {
 			//			}
 
 			log.info("Datapoints on the way. Set 1");
-			controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			controller.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
 
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
+			request2.setParameterAsValue(0, false);
 
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-					controllerAgentName, handlerName + ".result", 20000);
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2, controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -159,14 +148,10 @@ public class Codelettester {
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
 			//			//Execute codelets once again
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+			JsonRpcRequest request3 = new JsonRpcRequest("executecodelethandler", 1);
+			request3.setParameterAsValue(0, false);
 
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-					controllerAgentName, handlerName + ".result", 20000);
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request3, controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -242,9 +227,10 @@ public class Codelettester {
 			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
 			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
 
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
+			request1.setParameterAsValue(0, false);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1,
 					controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
@@ -256,7 +242,7 @@ public class Codelettester {
 			//			}
 
 			log.info("Datapoints on the way. Set 1");
-			controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			controller.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
 
@@ -264,9 +250,10 @@ public class Codelettester {
 			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
 			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 1000);
 
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, Arrays.asList(
-					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
+			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
+			request2.setParameterAsValue(0, false);
+
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2,
 					controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
@@ -498,15 +485,15 @@ public class Codelettester {
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(5000);
 				} catch (InterruptedException e) {
 
 				}
 			}
 
 			//Write initial value on the incrementaddress
-			cogsys.getCommunicator().write(Datapoint.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint1).setValue(0));
-			cogsys.getCommunicator().write(Datapoint.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint2).setValue(0));
+			cogsys.getCommunicator().write(Datapoints.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint1).setValue(0));
+			cogsys.getCommunicator().write(Datapoints.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint2).setValue(0));
 
 			log.info("=== All agents initialized ===");
 
@@ -515,10 +502,10 @@ public class Codelettester {
 			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
 			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 10000);
 
-			cogsys.getCommunicator().executeServiceQueryDatapoints(cognitiveAgentName, mainCodeletHandlerName, Arrays.asList(
-					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))),
-					cognitiveAgentName, mainCodeletHandlerName + ".result", 20000);
+			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
+			request1.setParameterAsValue(0, false);
+
+			cogsys.getCommunicator().executeServiceQueryDatapoints(cognitiveAgentName, mainCodeletHandlerName, request1, cognitiveAgentName, mainCodeletHandlerName + ".result", 200000);
 
 			//			synchronized (this) {
 			//				try {

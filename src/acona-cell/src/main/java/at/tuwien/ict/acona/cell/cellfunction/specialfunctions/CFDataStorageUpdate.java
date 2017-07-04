@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class CFDataStorageUpdate extends CellFunctionImpl {
 
@@ -20,8 +20,8 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 	protected static final String PARAMETERRESULT = "result";
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
-		List<Datapoint> result = new ArrayList<>();
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+		JsonRpcResponse result = null;
 		//
 		//		parameterdata.values().forEach(dp -> {
 		//			try {

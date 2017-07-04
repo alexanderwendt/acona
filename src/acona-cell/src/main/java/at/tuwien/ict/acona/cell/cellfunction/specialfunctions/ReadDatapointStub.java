@@ -12,14 +12,8 @@ public class ReadDatapointStub extends ServiceStub implements ReadDatapoint {
 	}
 
 	@Override
-	public List<Datapoint> read(List<Datapoint> datapointList) {
-		//Convert Datapointlist
-
-		//execute communicator
-		//execute(agentName, "read", parameter2, 100000)
-
-		//Convert in desired format
-		//this.comm.execute(agentName, "READ", methodParameters, timeout)
+	public List<Datapoint> read(List<String> datapointList) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

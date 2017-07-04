@@ -1,12 +1,13 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
-import java.util.List;
 import java.util.Map;
 
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public interface CellFunction {
 
@@ -22,7 +23,7 @@ public interface CellFunction {
 	 *         time
 	 * @throws Exception
 	 */
-	public CellFunction init(CellFunctionConfig config, Cell cell) throws Exception;
+	public void init(CellFunctionConfig config, Cell cell) throws Exception;
 
 	/**
 	 * Update subscribed data
@@ -56,7 +57,7 @@ public interface CellFunction {
 	 * @param caller
 	 * @return
 	 */
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller);
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller);
 
 	/**
 	 * Shut down function

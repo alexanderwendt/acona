@@ -9,6 +9,7 @@ import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
 public class IncrementOnConditionCodelet extends CellFunctionCodelet {
 
@@ -40,7 +41,7 @@ public class IncrementOnConditionCodelet extends CellFunctionCodelet {
 		if (value == conditionValue) {
 			log.info("Value={} matched. Increment it by 1", value);
 			int newValue = value + 1;
-			this.getCommunicator().write(Datapoint.newDatapoint(this.checkAddress).setValue(new JsonPrimitive(newValue)));
+			this.getCommunicator().write(Datapoints.newDatapoint(this.checkAddress).setValue(new JsonPrimitive(newValue)));
 		} else {
 			log.info("Value={} does not match the condition value={}.", value, conditionValue);
 		}

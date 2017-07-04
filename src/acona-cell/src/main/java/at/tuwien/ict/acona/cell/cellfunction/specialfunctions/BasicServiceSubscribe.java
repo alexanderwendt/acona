@@ -2,15 +2,17 @@ package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.reflect.TypeToken;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
-import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import jade.domain.FIPANames;
 
 public class BasicServiceSubscribe extends CellFunctionBasicService {
@@ -33,18 +35,20 @@ public class BasicServiceSubscribe extends CellFunctionBasicService {
 	// Datapoints as JsonArray with datapoints as Json objects
 
 	@Override
-	public List<Datapoint> performOperation(final Map<String, Datapoint> parameter, String caller) {
-		List<Datapoint> result = new ArrayList<>();
+	public JsonRpcResponse performOperation(JsonRpcRequest parameter, String caller) {
+		JsonRpcResponse result = null;
 		try {
-			// Convert parameter to datapoint
-			//JsonArray array = parameter.get(PARAMETER).getValue().getAsJsonArray();
-			List<Datapoint> datapoints = Lists.newArrayList(parameter.values());//GsonUtils.convertJsonArrayToDatapointList(array);
 
-			result.addAll(this.subscribe(datapoints, caller));
+			List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {
+			});
+			List<Datapoint> readValues = this.subscribe(addresses, caller);
+
+			result = new JsonRpcResponse(parameter, readValues);
+
 			log.debug("Agent {} subscribed {}", caller, result);
 		} catch (Exception e) {
 			log.error("Cannot perform operation of parameter={}", parameter, e);
-			result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
+			result = new JsonRpcResponse(parameter, new JsonRpcError("SubscribeError", -1, e.getMessage(), e.getLocalizedMessage()));
 		}
 
 		return result;
@@ -62,14 +66,14 @@ public class BasicServiceSubscribe extends CellFunctionBasicService {
 
 	}
 
-	private List<Datapoint> subscribe(final List<Datapoint> datapointNameList, String caller) {
+	private List<Datapoint> subscribe(final List<String> datapointNameList, String caller) {
 		List<Datapoint> result = new ArrayList<>();
 		datapointNameList.forEach(dp -> {
 			try {
-				this.getCell().getDataStorage().subscribeDatapoint(dp.getAddress(), caller);
-				result.add(this.getCell().getDataStorage().readFirst(dp.getAddress()));
+				this.getCell().getDataStorage().subscribeDatapoint(dp, caller);
+				result.add(this.getCell().getDataStorage().readFirst(dp));
 			} catch (Exception e) {
-				log.error("Cannot subscribe datapoint={}", dp.getAddress(), e);
+				log.error("Cannot subscribe datapoint={}", dp, e);
 			}
 		});
 

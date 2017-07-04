@@ -21,6 +21,7 @@ import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.core.helpers.DummyCell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
 public class CellExecutorTesterOnly {
 	private static Logger log = LoggerFactory.getLogger(CellExecutorTesterOnly.class);
@@ -74,7 +75,7 @@ public class CellExecutorTesterOnly {
 			// Start the executor with anything just to see
 			// Create a datapoint to start the function
 			Map<String, Datapoint> map = new HashMap<>();
-			map.put(commandDatapointAddress, Datapoint.newDatapoint(commandDatapointAddress).setValue(ControlCommand.START.toString()));
+			map.put(commandDatapointAddress, Datapoints.newDatapoint(commandDatapointAddress).setValue(ControlCommand.START.toString()));
 			this.executor.updateSubscribedData(map, cell.getLocalName());// .runActivation(Datapoint.newDatapoint(commandDatapoint).setValue(ControlComm;and.START.toString()));
 
 			// Put a delay to mitigate thread troubles
@@ -88,7 +89,7 @@ public class CellExecutorTesterOnly {
 
 			// Now run something that is purposeful
 			map.clear();
-			map.put(queryDatapointAddress, Datapoint.newDatapoint(queryDatapointAddress).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
+			map.put(queryDatapointAddress, Datapoints.newDatapoint(queryDatapointAddress).setValue("SELECT * FROM ICT DATABASE AND DELETE FILESERVER"));
 			this.executor.updateSubscribedData(map, cell.getLocalName());
 			// this.executor.runActivation(Datapoint.newDatapoint(queryDatapoint).setValue("SELECT
 			// * FROM ICT DATABASE AND DELETE FILESERVER"));

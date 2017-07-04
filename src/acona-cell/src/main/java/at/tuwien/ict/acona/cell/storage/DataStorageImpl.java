@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
 import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils.ConflictStrategy;
 
@@ -98,9 +99,9 @@ public class DataStorageImpl implements DataStorage {
 			result = list.get(0);
 		} else {
 			if (address.contains("*")) {
-				result = Datapoint.newNullDatapoint();
+				result = Datapoints.newNullDatapoint();
 			} else {
-				result = Datapoint.newDatapoint(address);
+				result = Datapoints.newDatapoint(address);
 			}
 
 		}
@@ -125,9 +126,9 @@ public class DataStorageImpl implements DataStorage {
 			}
 		}
 
-		//		if (result.isEmpty()) {
-		//			result.add(Datapoint.newDatapoint(address));
-		//		}
+		if (result.isEmpty()) {
+			result.add(Datapoints.newDatapoint(address));
+		}
 
 		return result;
 	}
@@ -181,7 +182,7 @@ public class DataStorageImpl implements DataStorage {
 	@Override
 	public void remove(String address, String caller) {
 		this.data.remove(address);
-		this.notifySubscribers(Datapoint.newDatapoint(address), caller);
+		this.notifySubscribers(Datapoints.newDatapoint(address), caller);
 
 	}
 

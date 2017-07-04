@@ -15,6 +15,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import jade.domain.FIPANames;
 
 public abstract class CellFunctionImpl implements CellFunction {
@@ -54,7 +55,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	}
 
 	@Override
-	public CellFunction init(CellFunctionConfig config, Cell caller) throws Exception {
+	public void init(CellFunctionConfig config, Cell caller) throws Exception {
 		try {
 			// === Extract fundamental settings ===//
 			// Extract settings
@@ -91,17 +92,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 			});
 
 			// === Register in the function handler ===//
-			this.cell.getFunctionHandler().registerCellFunctionInstance(this);
+			this.cell.getFunctionHandler().registerCellFunctionInstance(this); //Here are also the default subscriptions
 		} catch (Exception e) {
 			log.error("Cannot init function with config={}", config);
+			//this.shutDown();
 			throw new Exception(e.getMessage());
 		}
 
 		this.setServiceState(ServiceState.IDLE);
 
 		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.managedDatapoints);
-
-		return this;
 	}
 
 	protected abstract void cellFunctionInit() throws Exception;
@@ -148,6 +148,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 			//Execute general deregister
 
 			this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+			//this.getCell().takeDownCell();
+			log.info("Agent {}> ==== shut down function={} ====", this.getCell().getLocalName(), this.getFunctionName());
 		} catch (Exception e) {
 			log.error("No clean shutdown possible", e);
 		}
@@ -207,7 +209,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	protected <DATATYPE> void writeLocal(String address, DATATYPE datapoint) throws Exception {
 		Gson gson = new Gson();
 		String value = gson.toJson(datapoint);
-		this.getCommunicator().write(Datapoint.newDatapoint(address).setValue(value));
+		this.getCommunicator().write(Datapoints.newDatapoint(address).setValue(value));
 	}
 
 	protected Datapoint readLocal(String address) throws Exception {
@@ -235,7 +237,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 		// Gson gson = new Gson();
 
 		JsonElement writeValue = new Gson().toJsonTree(value);
-		this.writeLocal(Datapoint.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(id).getAddress())
+		this.writeLocal(Datapoints.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(id).getAddress())
 				.setValue(writeValue));
 	}
 

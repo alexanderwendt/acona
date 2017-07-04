@@ -80,7 +80,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 				}
 
 				// Go through each address and add the activator to this address
-				activatorAddresses.forEach(subscriptionConfig -> {
+				for (DatapointConfig subscriptionConfig : activatorAddresses) {
 					try {
 						//Adds the subscription to the handler
 						//Subscribe the datapoint		
@@ -96,9 +96,10 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 						//Add subscription to the function handler
 						this.addSubscription(cellFunctionInstance, subscriptionConfig);
 					} catch (Exception e) {
-						log.error("Cannot subscribe address={}", subscriptionConfig.getAddress(), e);
+						log.error("Cannot subscribe address={}", subscriptionConfig.getAddress());
+						throw new Exception(e.getMessage());
 					}
-				});
+				}
 			}
 		} catch (Exception e) {
 			log.error("Cannot register cell function " + cellFunctionInstance + ".", e);

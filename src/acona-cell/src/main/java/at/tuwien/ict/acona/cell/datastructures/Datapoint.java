@@ -1,19 +1,14 @@
 package at.tuwien.ict.acona.cell.datastructures;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class Datapoint {
-	private final static String KEYADDRESS = "ADDRESS";
-	private final static String KEYAGENT = "AGENT";
-	private final static String KEYVALUE = "VALUE";
-
-	private final static String NULLADDRESS = "NULLDATAPOINT";
+	public final static String KEYADDRESS = "ADDRESS";
+	public final static String KEYAGENT = "AGENT";
+	public final static String KEYVALUE = "VALUE";
 
 	//TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
 
@@ -21,10 +16,10 @@ public class Datapoint {
 	//private String TYPE = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
 
-	private final static Gson gson = new Gson();
+	private transient Gson gson = new Gson(); //Add transient not to serialize this
 	// private final JsonObject jsondatapoint;
 
-	private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
+	//private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
 
 	/**
 	 * Create a datapoint from an address
@@ -33,75 +28,9 @@ public class Datapoint {
 	 *            The following syntax can be used: x.x for local datapoints,
 	 *            [agent]:[localaddress] for global datapoints
 	 */
-	private Datapoint(String address) {
-		// VALUE = new JsonObject();
+	protected Datapoint(String address) {
 		this.ADDRESS = address;
-		// this.jsondatapoint.addProperty(KEYADDRESS, address);
-		// this.jsondatapoint.addProperty(KEYTYPE, "");
-		// this.jsondatapoint.addProperty(KEYVALUE, "");
 	}
-
-	public static Datapoint newNullDatapoint() {
-		return new Datapoint(NULLADDRESS);
-	}
-
-	public static Datapoint newDatapoint(String address) {
-		return new Datapoint(address);
-	}
-
-	public static Datapoint toDatapoint(JsonObject data) throws IllegalArgumentException {
-		Datapoint result = null;
-
-		try {
-			if (Datapoint.isDatapoint(data) == true) {
-				result = Datapoint.newDatapoint(data.get(KEYADDRESS).getAsString()).setValue(data.get(KEYVALUE));
-				//.setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
-			} else {
-				throw new IllegalArgumentException("Cannot cast json data to datapoint " + data);
-			}
-
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
-
-		return result;
-	}
-
-	public static Datapoint toDatapoint(String data) throws Exception {
-		log.debug("Datapoint to convert={}", data);
-		JsonObject jsonData = gson.fromJson(data, JsonObject.class);
-		return Datapoint.toDatapoint(jsonData);
-	}
-
-	public static boolean isDatapoint(JsonObject data) {
-		boolean result = false;
-
-		if (data.has(KEYADDRESS) && data.has(KEYVALUE)) {
-			result = true;
-		}
-
-		return result;
-	}
-
-	public static boolean isNullDatapoint(JsonObject data) {
-		boolean result = false;
-
-		if (data.has(KEYADDRESS) && data.get(KEYADDRESS).equals(NULLADDRESS)) {
-			result = true;
-		}
-
-		return result;
-	}
-
-	public boolean isNullDatapoint() {
-		return isNullDatapoint(this.toJsonObject());
-	}
-
-	//	public Datapoint setType(String type) {
-	//		this.TYPE = type;
-	//
-	//		return this;
-	//	}
 
 	public Datapoint setValue(String value) {
 		this.VALUE = new JsonPrimitive(value);
@@ -116,16 +45,26 @@ public class Datapoint {
 	}
 
 	public <T> Datapoint setValue(T value) {
+		if (gson == null) {
+			gson = new Gson();
+		}
+
 		this.VALUE = gson.toJsonTree(value);
 
 		return this;
 	}
 
 	public JsonObject toJsonObject() {
+		if (gson == null) {
+			gson = new Gson();
+		}
 		return gson.fromJson(this.toJsonString(), JsonObject.class);
 	}
 
 	public String toJsonString() {
+		if (gson == null) {
+			gson = new Gson();
+		}
 		return gson.toJson(this, Datapoint.class);
 	}
 
@@ -142,6 +81,9 @@ public class Datapoint {
 	}
 
 	public <T> T getValue(Class<T> clzz) {
+		if (gson == null) {
+			gson = new Gson();
+		}
 		return gson.fromJson(this.VALUE, clzz);
 	}
 

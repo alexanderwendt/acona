@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.cell.core.cellfunction.helpers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -11,6 +10,8 @@ import com.google.gson.JsonPrimitive;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class SimpleControllerService extends CellFunctionThreadImpl {
 
@@ -57,7 +58,7 @@ public class SimpleControllerService extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
 	}

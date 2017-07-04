@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
@@ -9,11 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class CFSubscribeLock extends CellFunctionImpl {
 
@@ -23,7 +23,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 
 	private String resultAddress = "";
 
-	public static Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, List<Datapoint> serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+	public static Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
 		Datapoint result = null;
 
 		CFSubscribeLock instance = new CFSubscribeLock();
@@ -34,9 +34,9 @@ public class CFSubscribeLock extends CellFunctionImpl {
 			instance.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
-			List<Datapoint> functionResult = instance.executeService(agentName, serviceName, serviceParameter, timeout);
+			JsonRpcResponse functionResult = instance.executeService(agentName, serviceName, serviceParameter, timeout);
 
-			if (functionResult.isEmpty() == false && functionResult.get(0).getValueAsString().equals(CommVocabulary.ERRORVALUE)) {
+			if (functionResult.getError() != null) {
 				throw new Exception("Cannot execute the service=" + serviceName + " with the parameter=" + serviceParameter + " in the agent=" + agentName);
 			}
 
@@ -58,7 +58,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 	}
 
 	@Override
-	public List<Datapoint> performOperation(Map<String, Datapoint> parameterdata, String caller) {
+	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -87,7 +87,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 		}
 	}
 
-	private List<Datapoint> executeService(String agentName, String serviceName, List<Datapoint> serviceParameter, int timeout) throws Exception {
+	private JsonRpcResponse executeService(String agentName, String serviceName, JsonRpcRequest serviceParameter, int timeout) throws Exception {
 		return this.getCommunicator().execute(agentName, serviceName, serviceParameter, timeout);
 	}
 
