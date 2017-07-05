@@ -88,7 +88,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 						String agentName = subscriptionConfig.getAgentid(this.caller.getLocalName());
 						String key = agentName + ":" + subscriptionConfig.getAddress();
 						if (this.datapointActivationMap.containsKey(key) == false) {
-							List<Datapoint> initialValue = this.caller.getCommunicator().subscribe(Arrays.asList(subscriptionConfig.getAddress()), agentName);
+							List<Datapoint> initialValue = this.caller.getCommunicator().subscribe(agentName, Arrays.asList(subscriptionConfig.getAddress()));
 							log.debug("Subscription request sent to agent={}, address={} and acknowledge received", agentName, subscriptionConfig.getAddress());
 						} else {
 							log.debug("Key={} already exists in the function mapping. Therefore no additional subscription is necessary", key);
@@ -125,7 +125,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 
 						String key = subscriptionsConfig.getAgentid(this.caller.getLocalName()) + ":" + subscriptionsConfig.getAddress();
 						if (this.datapointActivationMap.containsKey(key) == false) {
-							this.caller.getCommunicator().unsubscribe(Arrays.asList(subscriptionsConfig.getAddress()), subscriptionsConfig.getAgentid(this.caller.getLocalName()));
+							this.caller.getCommunicator().unsubscribe(subscriptionsConfig.getAgentid(this.caller.getLocalName()), Arrays.asList(subscriptionsConfig.getAddress()));
 							log.debug("Datapoint {}:{} was deregistered as no functions subscribes it", key);
 						} else {
 							log.debug("Datapoint {}:{} was deregistered for the function {}. It is still subscribed by the agent.", key);

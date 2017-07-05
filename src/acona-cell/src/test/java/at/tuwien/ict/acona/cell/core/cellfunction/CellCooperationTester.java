@@ -149,7 +149,7 @@ public class CellCooperationTester {
 									.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
 
-			controller.getCommunicator().write(Datapoints.newDatapoint("Test"), memoryAgentName);
+			controller.getCommunicator().write(memoryAgentName, Datapoints.newDatapoint("Test"));
 			// controller.subscribeForeignDatapoint(processDatapoint,
 			// memoryAgentName);
 
@@ -189,8 +189,8 @@ public class CellCooperationTester {
 			// Start the system by setting start
 			Datapoint state = controller.getCommunicator().queryDatapoints(
 					COMMANDDATAPOINTNAME, ControlCommand.START.toString(),
-					controller.getCell().getLocalName(), "state",
-					controller.getCell().getLocalName(), 1000000);
+					"state",
+					1000000);
 
 			// Write the numbers in the database agents
 			// client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));

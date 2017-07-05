@@ -48,7 +48,7 @@ public class SimpleControllerService extends CellFunctionThreadImpl {
 
 			log.info("Start simple controller service to execute one service {} at agent {}", serviceName, agentName);
 
-			Datapoint result = this.getCommunicator().queryDatapoints(serviceName + ".command", new JsonPrimitive(ControlCommand.START.toString()), agentName, serviceName + ".state", agentName, 10000);
+			Datapoint result = this.getCommunicator().queryDatapoints(agentName, serviceName + ".command", new JsonPrimitive(ControlCommand.START.toString()), agentName, serviceName + ".state", 10000);
 			log.debug("Service executed with the result={}", result);
 		} catch (Exception e) {
 			log.error("Cannot execute simple controller service", e);

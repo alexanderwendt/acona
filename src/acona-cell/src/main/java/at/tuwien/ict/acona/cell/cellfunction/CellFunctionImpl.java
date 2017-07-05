@@ -67,6 +67,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 			// Get name
 			this.cellFunctionName = this.config.getName();
 
+			log.trace("Initialize an agent with config:{}", config);
+
 			// === Internal init ===//
 			this.setServiceState(ServiceState.INITIALIZING);
 

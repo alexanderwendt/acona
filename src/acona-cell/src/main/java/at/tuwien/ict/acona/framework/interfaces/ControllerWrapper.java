@@ -55,7 +55,7 @@ public class ControllerWrapper implements ControllerCellGateway {
 
 		ServiceState result = ServiceState.ERROR;
 		try {
-			Datapoint dp = this.communicator.queryDatapoints(servicecommand, new JsonPrimitive(ControlCommand.START.toString()), agentName, serviceresult, agentName, timeout);
+			Datapoint dp = this.communicator.queryDatapoints(agentName, servicecommand, new JsonPrimitive(ControlCommand.START.toString()), agentName, serviceresult, timeout);
 			result = ServiceState.valueOf(dp.getValueAsString());
 		} catch (Exception e) {
 			log.error("Cannot execute query or the service state is erroneus", e);

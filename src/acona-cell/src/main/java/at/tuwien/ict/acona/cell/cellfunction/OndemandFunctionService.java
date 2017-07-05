@@ -140,7 +140,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 			try {
 				Datapoint dp = this.valueMap.get(config.getAddress());
 				String agentName = config.getAgentid(this.getCell().getLocalName());
-				this.getCommunicator().write(dp, agentName);
+				this.getCommunicator().write(agentName, dp);
 				log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 			} catch (Exception e) {
 				log.error("{}>Cannot write datapoint {} to remote memory module", this.getFunctionName(), config, e);

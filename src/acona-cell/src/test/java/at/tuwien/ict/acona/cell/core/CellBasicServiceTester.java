@@ -208,9 +208,9 @@ public class CellBasicServiceTester {
 
 			client.getCommunicator().setDefaultTimeout(100000);
 			receivergw.getCommunicator().setDefaultTimeout(1000000);
-			client.getCommunicator().write(Datapoints.newDatapoint(datapointaddress).setValue(value), receiver);
+			client.getCommunicator().write(receiver, Datapoints.newDatapoint(datapointaddress).setValue(value));
 			log.debug("Now read values");
-			Datapoint resultdp = client.getCommunicator().read(datapointaddress, receiver, 1000000);
+			Datapoint resultdp = client.getCommunicator().read(receiver, datapointaddress, 1000000);
 
 			String result = resultdp.getValue().getAsString();
 			log.info("Received result={}. Expected result={}", result, value);
@@ -386,7 +386,7 @@ public class CellBasicServiceTester {
 			}
 
 			// Unsubscribe
-			cellControlSubscriber.getCell().getCommunicator().unsubscribe(datapointaddress, publisherAgentName);
+			cellControlSubscriber.getCell().getCommunicator().unsubscribe(publisherAgentName, datapointaddress);
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too

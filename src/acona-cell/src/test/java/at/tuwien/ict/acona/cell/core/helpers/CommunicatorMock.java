@@ -38,12 +38,6 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 	}
 
 	@Override
-	public List<Datapoint> read(List<String> datapoints, String agentName, int timeout) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Datapoint read(String datapointName) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
@@ -68,32 +62,8 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 	}
 
 	@Override
-	public void write(List<Datapoint> datapoints, String agentName, int timeout, boolean blocking) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void write(Datapoint datapoint) throws Exception {
 		this.cell.getDataStorage().write(datapoint, this.cell.getLocalName());
-
-	}
-
-	@Override
-	public void write(Datapoint datapoint, String agentName) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public List<Datapoint> subscribe(List<String> datapoints, String agentName) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void unsubscribe(List<String> datapoints, String agentName) throws Exception {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -113,18 +83,6 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 	public void unsubscribe(String datapointName, String name) throws Exception {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void notifySubscriber(Datapoint datapoint, String agentName) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -182,12 +140,6 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 	}
 
 	@Override
-	public void remove(List<Datapoint> datapoint, String agentName, int timeout) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
@@ -207,6 +159,54 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	@Override
 	public void executeAsynchronous(String agentName, String serviceName, JsonRpcRequest methodParameters) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public List<Datapoint> read(String agentName, List<String> datapoints, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(String agentName, List<Datapoint> datapoint, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void write(String agentName, List<Datapoint> datapoints, int timeout, boolean blocking) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void write(String agentName, Datapoint datapoint) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Datapoint> subscribe(String agentName, List<String> datapointNames) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void unsubscribe(String agentName, List<String> datapoints) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void notifySubscriber(String agentName, Datapoint datapoint) throws Exception {
 		// TODO Auto-generated method stub
 
 	}

@@ -111,7 +111,7 @@ public class CellExecutorWithCellTester {
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			//cellControlSubscriber.subscribeForeignDatapoint(resultDatapointAddress, "testagent");
-			cellControlSubscriber.getCommunicator().write(Datapoints.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"), "testagent");
+			cellControlSubscriber.getCommunicator().write("testagent", Datapoints.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"));
 
 			synchronized (this) {
 				try {
@@ -304,7 +304,7 @@ public class CellExecutorWithCellTester {
 			controlAgent.getCommunicator().setDefaultTimeout(100000);
 			log.debug("Execute query");
 			Datapoint resultState = controlAgent.getCommunicator()
-					.queryDatapoints(commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, additionAgentName, 1000);
+					.queryDatapoints(additionAgentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, 1000);
 			//Datapoint resultState = CFQuery.newQuery(additionAgentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, 10000, controlAgent.getCell());
 			//			Datapoint resultState = controlAgent.getCommunicator()
 			//					.query(Datapoint.newDatapoint(commandDatapoint)
@@ -313,9 +313,9 @@ public class CellExecutorWithCellTester {
 
 			log.debug("Query executed with result={}", resultState);
 
-			Datapoint dpsum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName);
+			Datapoint dpsum = controlAgent.getCommunicator().read(outputmemoryAgentName, resultdatapoint);
 			log.debug("Result={}", dpsum);
-			double sum = controlAgent.getCommunicator().read(resultdatapoint, outputmemoryAgentName).getValue()
+			double sum = controlAgent.getCommunicator().read(outputmemoryAgentName, resultdatapoint).getValue()
 					.getAsJsonPrimitive().getAsDouble();
 			// client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START")), drivetrackAgentName);

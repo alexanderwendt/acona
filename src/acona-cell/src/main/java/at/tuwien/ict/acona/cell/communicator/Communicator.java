@@ -27,7 +27,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Datapoint> read(List<String> datapoints, String agentName, int timeout) throws Exception;
+	public List<Datapoint> read(String agentName, List<String> datapoints, int timeout) throws Exception;
 
 	/**
 	 * Read a datapoint
@@ -48,7 +48,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint read(String datapoint, String agentName) throws Exception;
+	public Datapoint read(String agentName, String datapoint) throws Exception;
 
 	/**
 	 * Read a datapoint from another agent with a timeout
@@ -59,13 +59,13 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint read(String datapoint, String agentName, int timeout) throws Exception;
+	public Datapoint read(String agentName, String datapoint, int timeout) throws Exception;
 
 	public void remove(Datapoint datapoint) throws Exception;
 
 	public void remove(List<Datapoint> datapoint) throws Exception;
 
-	public void remove(List<Datapoint> datapoint, String agentName, int timeout) throws Exception;
+	public void remove(String agentName, List<Datapoint> datapoint, int timeout) throws Exception;
 
 	/**
 	 * Write a list of datapoints to the local agent
@@ -85,7 +85,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @param blocking
 	 * @throws Exception
 	 */
-	public void write(List<Datapoint> datapoints, String agentName, int timeout, boolean blocking) throws Exception;
+	public void write(String agentName, List<Datapoint> datapoints, int timeout, boolean blocking) throws Exception;
 
 	/**
 	 * Write a single local datapoint to the own agent.
@@ -102,7 +102,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @param agentName
 	 * @throws Exception
 	 */
-	public void write(Datapoint datapoint, String agentName) throws Exception;
+	public void write(String agentName, Datapoint datapoint) throws Exception;
 
 	/**
 	 * Send a query and wait for an answer from the queried agent.
@@ -118,7 +118,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception;
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception;
 
 	/**
 	 * Query a datapoint, i.e. write content to an address and wait for an
@@ -133,7 +133,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception;
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, String content, String resultAgentName, String resultAddress, int timeout) throws Exception;
 
 	/**
 	 * Query a datapoint, i.e. write content to an address and wait for an

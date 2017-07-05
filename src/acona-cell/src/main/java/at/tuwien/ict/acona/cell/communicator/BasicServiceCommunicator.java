@@ -14,7 +14,7 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Datapoint> subscribe(List<String> datapointNames, String agentName) throws Exception;
+	public List<Datapoint> subscribe(String agentName, List<String> datapointNames) throws Exception;
 
 	/**
 	 * Subscribe a datapoint from an agent
@@ -24,7 +24,7 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint subscribe(String datapointName, String agentName) throws Exception;
+	public Datapoint subscribe(String agentName, String datapointName) throws Exception;
 
 	/**
 	 * Unsubscribe a list of datapoints from an agent.
@@ -33,7 +33,7 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @param agentName
 	 * @throws Exception
 	 */
-	public void unsubscribe(List<String> datapoints, String agentName) throws Exception;
+	public void unsubscribe(String agentName, List<String> datapoints) throws Exception;
 
 	/**
 	 * Unsubscribe a datapoint from an agent.
@@ -42,7 +42,7 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @param agentName
 	 * @throws Exception
 	 */
-	public void unsubscribe(String datapointName, String name) throws Exception;
+	public void unsubscribe(String name, String datapointName) throws Exception;
 
 	/**
 	 * Notify a subscriber that a datapoint has arrived. This service is
@@ -52,5 +52,5 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @param agentName
 	 * @throws Exception
 	 */
-	public void notifySubscriber(Datapoint datapoint, String agentName) throws Exception;
+	public void notifySubscriber(String agentName, Datapoint datapoint) throws Exception;
 }

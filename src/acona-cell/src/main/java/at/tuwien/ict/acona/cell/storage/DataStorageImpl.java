@@ -43,7 +43,7 @@ public class DataStorageImpl implements DataStorage {
 			throw new Exception("* or : was part of the address: " + datapackage.getAddress() + "This is not allowed");
 		}
 
-		this.data.put(datapackage.getAddress(), datapackage);
+		this.data.put(datapackage.getAddress(), Datapoints.newDatapoint(datapackage.getAddress()).setValue(datapackage.getValue()));
 		log.debug("write datapoint={}", datapackage);
 		this.notifySubscribers(datapackage, caller);
 		// }

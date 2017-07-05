@@ -48,7 +48,8 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 			log.info("Something was proceeded. Give back to tester");
 
 		} else {
-			throw new Exception("Query is empty");
+			log.warn("Query is empty");
+			this.writeLocal(Datapoints.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("NOT STARTED"));
 		}
 
 	}

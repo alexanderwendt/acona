@@ -47,10 +47,8 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 		// Read the values needed
 		try {
 			log.debug("Read from datapoint for OP1={}", this.trackedDatapoints.get(OPERAND1));
-			operand1 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND1).getAddress(),
-					this.trackedDatapoints.get(OPERAND1).getAgentid(this.getCell().getLocalName()), 1000000).getValue().getAsDouble();
-			operand2 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND2).getAddress(),
-					this.trackedDatapoints.get(OPERAND2).getAgentid(this.getCell().getLocalName()), 1000000).getValue().getAsDouble();
+			operand1 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND1).getAgentid(this.getCell().getLocalName()), this.trackedDatapoints.get(OPERAND1).getAddress(), 1000000).getValue().getAsDouble();
+			operand2 = this.getCommunicator().read(this.trackedDatapoints.get(OPERAND2).getAgentid(this.getCell().getLocalName()), this.trackedDatapoints.get(OPERAND2).getAddress(), 1000000).getValue().getAsDouble();
 
 			log.info("read operand1={} and operand2={}", operand1, operand2);
 		} catch (Exception e) {
@@ -63,8 +61,8 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 		log.info("result={}", result);
 
 		// Now send the result to a result datapoint
-		this.getCommunicator().write(Datapoints.newDatapoint(this.trackedDatapoints.get(RESULT).getAddress())
-				.setValue(new JsonPrimitive(result)), this.trackedDatapoints.get(RESULT).getAgentid(this.getCell().getLocalName()));
+		this.getCommunicator().write(this.trackedDatapoints.get(RESULT).getAgentid(this.getCell().getLocalName()), Datapoints.newDatapoint(this.trackedDatapoints.get(RESULT).getAddress())
+				.setValue(new JsonPrimitive(result)));
 	}
 
 	@Override

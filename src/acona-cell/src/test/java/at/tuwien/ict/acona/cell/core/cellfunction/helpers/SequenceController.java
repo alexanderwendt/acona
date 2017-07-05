@@ -31,7 +31,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 	private ServiceState executeService(String serviceName, String agentName, int timeout) throws Exception {
 		String commandDatapoint = serviceName + ".command";
 		String resultDatapoint = serviceName + ".state";
-		Datapoint result1 = this.getCommunicator().queryDatapoints(commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), agentName, resultDatapoint, agentName, timeout);
+		Datapoint result1 = this.getCommunicator().queryDatapoints(agentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), agentName, resultDatapoint, timeout);
 
 		return ServiceState.valueOf(result1.getValueAsString());
 	}

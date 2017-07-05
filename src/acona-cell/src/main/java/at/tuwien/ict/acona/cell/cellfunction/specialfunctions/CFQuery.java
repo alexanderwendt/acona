@@ -97,7 +97,7 @@ public class CFQuery extends CellFunctionImpl {
 
 			//write to destination
 			List<Datapoint> sendlist = Arrays.asList(Datapoints.newDatapoint(destinationAddress).setValue(content));
-			this.getCommunicator().write(sendlist, destinationAgentName, timeout, false);
+			this.getCommunicator().write(destinationAgentName, sendlist, timeout, false);
 
 			try {
 				log.trace("Service {}>Poll temp queue", this.getFunctionConfig().getName());

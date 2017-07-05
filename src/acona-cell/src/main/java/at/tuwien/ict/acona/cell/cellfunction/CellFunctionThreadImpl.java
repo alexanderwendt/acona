@@ -187,7 +187,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 				// Read the remote datapoint
 				//if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
-				Datapoint temp = this.getCommunicator().read(v.getAddress(), v.getAgentid(this.getCell().getLocalName()));
+				Datapoint temp = this.getCommunicator().read(v.getAgentid(this.getCell().getLocalName()), v.getAddress());
 				// Write local value to synchronize the datapoints
 				this.valueMap.put(k, temp);
 				log.trace("{}> Preprocessing phase: Read datapoint and write into value table={}", temp);
@@ -211,7 +211,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				Datapoint dp = this.valueMap.get(config.getAddress());
 				if (dp != null) {
 					String agentName = config.getAgentid(this.getCell().getLocalName());
-					this.getCommunicator().write(dp, agentName);
+					this.getCommunicator().write(agentName, dp);
 					log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 				} else {
 					log.warn("A datapoint in the write config is not available in the value map with values that should be written");

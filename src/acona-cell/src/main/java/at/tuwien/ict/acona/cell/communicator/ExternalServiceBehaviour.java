@@ -80,7 +80,7 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 		} catch (Exception fe) {
 			log.error("Service={}>Error. Request refused. Received message with \nsender: {}, \nreceiver={},\nservice={},\n content={}.", serviceName, request.getOntology(), request.getSender(), request.getAllIntendedReceiver(), request.getContent(), fe);
 			temp.setPerformative(ACLMessage.REFUSE);
-			throw new RefuseException("check-failed");
+			//throw new RefuseException("check-failed");
 		}
 
 		return temp;

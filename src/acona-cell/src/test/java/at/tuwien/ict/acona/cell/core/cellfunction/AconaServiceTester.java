@@ -126,7 +126,7 @@ public class AconaServiceTester {
 							.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
 
-			controller.getCommunicator().write(Datapoints.newDatapoint("Test"), memoryAgentName);
+			controller.getCommunicator().write(memoryAgentName, Datapoints.newDatapoint("Test"));
 
 			// Create services
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
@@ -157,7 +157,7 @@ public class AconaServiceTester {
 			log.info("Datapoints on the way");
 			memoryAgent.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(controller.getCell().getLocalName(), COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", 1000000);
 
 			double result = memoryAgent.getCommunicator().read(processDatapoint).getValue().getAsDouble();
 

@@ -33,38 +33,25 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	private static final String NOTIFYSERVICENAME = "notify";
 	private static final String REMOVESERVICENAME = "remove";
 
-	//private int defaultTimeout = 10000;
-
-	//private final CellImpl cell;
-	//private final DataStorage datastorage;
-	//private final CellFunctionHandler cellFunctions;
-	//private final static Gson gson = new Gson();
-	//private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
-
 	public CommunicatorImpl(CellImpl cell) {
 		super(cell);
 	}
 
 	@Override
 	public List<Datapoint> read(List<String> datapoints) throws Exception {
-		return read(datapoints, this.getLocalAgentName(), defaultTimeout);
+		return read(this.getLocalAgentName(), datapoints, defaultTimeout);
 	}
 
 	@Override
-	public List<Datapoint> read(List<String> datapointaddress, String agentName, int timeout) throws Exception {
+	public List<Datapoint> read(String agentName, List<String> datapointaddress, int timeout) throws Exception {
 		//TODO: Change the syntax that the agentname is part of the read address with the format agent:datapoint. If no agentname is present, the current agentname is the default agent name.
 		final List<Datapoint> result = new ArrayList<>();
-		//List<Datapoint> inputList = new ArrayList<>();
+
+		//The agent name in the parameter decides where to read 
 
 		try {
 			//Make the inputlist a parameter
 			//Create the request
-
-			//Convert list to jsonArray
-			//			GsonUtils util = new GsonUtils();
-			//			JsonArray array = util.convertListToJsonArray(datapointaddress);
-			//			Object[] input = new Object[1];
-			//			input[0] = array;
 
 			JsonRpcRequest request = new JsonRpcRequest(READSERVICENAME, false, new Object[1]);
 			request.setParameterAsList(0, datapointaddress);
@@ -93,29 +80,33 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public List<Datapoint> readWildcard(String datapointName) throws Exception {
-		String agentName = this.getLocalAgentName();
-		String address = datapointName;
+		Datapoint dp = Datapoints.newDatapoint(datapointName);
 
-		String[] completeAddress = datapointName.split(":");
+		//String agentName = this.getLocalAgentName();
+		//String address = datapointName;
 
-		if (completeAddress.length == 2) {
-			agentName = completeAddress[0];
-			address = completeAddress[1];
-		}
+		//String[] completeAddress = datapointName.split(":");
 
-		List<Datapoint> list = read(Arrays.asList(address), agentName, defaultTimeout);
+		//if (completeAddress.length == 2) {
+		//	agentName = completeAddress[0];
+		//	address = completeAddress[1];
+		//}
+
+		List<Datapoint> list = read(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()), defaultTimeout);
 
 		return list;
 	}
 
 	@Override
-	public Datapoint read(String datapoint, String agentName) throws Exception {
-		return read(datapoint, agentName, defaultTimeout);
+	public Datapoint read(String agentName, String datapoint) throws Exception {
+		return read(agentName, datapoint, defaultTimeout);
 	}
 
 	@Override
-	public Datapoint read(String datapoint, String agentName, int timeout) throws Exception {
-		List<Datapoint> list = read(Arrays.asList(datapoint), agentName, timeout);
+	public Datapoint read(String agentName, String datapoint, int timeout) throws Exception {
+		Datapoint dp = Datapoints.newDatapoint(datapoint);
+
+		List<Datapoint> list = read(agentName, Arrays.asList(dp.getAddress()), timeout);
 
 		Datapoint result = null;
 		if (list.isEmpty()) {
@@ -131,12 +122,15 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public Datapoint read(String datapointName) throws Exception {
 		Datapoint result = null;
 
-		//If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and read from an agent
-		if (datapointName.contains(":") == true) {
-			result = this.read(datapointName.split(":")[1], datapointName.split(":")[0]);
-		} else {
-			result = this.read(datapointName, this.getLocalAgentName());
-		}
+		Datapoint dp = Datapoints.newDatapoint(datapointName);
+		result = this.read(dp.getAgent(this.getLocalAgentName()), dp.getAddress());
+
+		//		//If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and read from an agent
+		//		if (datapointName.contains(":") == true) {
+		//			result = this.read(datapointName.split(":")[1], datapointName.split(":")[0]);
+		//		} else {
+		//			result = this.read(datapointName, this.getLocalAgentName());
+		//		}
 		return result;
 	}
 
@@ -148,12 +142,12 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void remove(List<Datapoint> datapoints) throws Exception {
-		this.remove(datapoints, this.getLocalAgentName(), this.defaultTimeout);
+		this.remove(this.getLocalAgentName(), datapoints, this.defaultTimeout);
 
 	}
 
 	@Override
-	public void remove(List<Datapoint> datapoints, String agentName, int timeout) throws Exception {
+	public void remove(String agentName, List<Datapoint> datapoints, int timeout) throws Exception {
 		//JsonRpcResponse result;
 
 		try {
@@ -175,11 +169,11 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {
-		this.write(datapoints, this.getLocalAgentName(), defaultTimeout, true);
+		this.write(this.getLocalAgentName(), datapoints, defaultTimeout, true);
 	}
 
 	@Override
-	public void write(List<Datapoint> datapoints, String agentComplementedName, int timeout, boolean blocking) throws Exception {
+	public void write(String agentComplementedName, List<Datapoint> datapoints, int timeout, boolean blocking) throws Exception {
 		try {
 			JsonRpcRequest request = new JsonRpcRequest(WRITESERVICENAME, false, new Object[1]);
 			request.setParameterAsList(0, datapoints);
@@ -199,25 +193,27 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	@Override
 	public void write(Datapoint datapoint) throws Exception {
 		//If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and write to the agent
-		if (datapoint.getAddress().contains(":") == true) {
-			String agent = datapoint.getAddress().split(":")[0];
-			String address = datapoint.getAddress().split(":")[1];
-			Datapoint writeDatapoint = Datapoints.newDatapoint(address).setValue(datapoint.getValue());
 
-			this.write(Arrays.asList(writeDatapoint), agent, defaultTimeout, true);
-		} else {
-			this.write(Arrays.asList(datapoint), this.getLocalAgentName(), defaultTimeout, true);
-		}
+		this.write(datapoint.getAgent(this.getLocalAgentName()), datapoint);
 
+		//		if (datapoint.getAddress().contains(":") == true) {
+		//			String agent = datapoint.getAddress().split(":")[0];
+		//			String address = datapoint.getAddress().split(":")[1];
+		//			Datapoint writeDatapoint = Datapoints.newDatapoint(address).setValue(datapoint.getValue());
+		//
+		//			this.write(agent, Arrays.asList(writeDatapoint), defaultTimeout, true);
+		//		} else {
+		//			this.write(this.getLocalAgentName(), Arrays.asList(datapoint), defaultTimeout, true);
+		//		}
 	}
 
 	@Override
-	public void write(Datapoint datapoint, String agentName) throws Exception {
-		this.write(Arrays.asList(datapoint), agentName, defaultTimeout, true);
+	public void write(String agentName, Datapoint datapoint) throws Exception {
+		this.write(agentName, Arrays.asList(datapoint), defaultTimeout, true);
 	}
 
 	@Override
-	public List<Datapoint> subscribe(List<String> datapointaddress, String agentName) throws Exception {
+	public List<Datapoint> subscribe(String agentName, List<String> datapointaddress) throws Exception {
 		final List<Datapoint> result = new ArrayList<>();
 
 		//List<Datapoint> inputList = new ArrayList<>();
@@ -245,9 +241,9 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public Datapoint subscribe(String datapointName, String agentName) throws Exception {
+	public Datapoint subscribe(String agentName, String datapointName) throws Exception {
 		Datapoint result = null;
-		List<Datapoint> datapoints = this.subscribe(Arrays.asList(datapointName), agentName);
+		List<Datapoint> datapoints = this.subscribe(agentName, Arrays.asList(datapointName));
 		if (datapoints.isEmpty() == false) {
 			result = datapoints.get(0);
 		} else {
@@ -258,7 +254,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public void unsubscribe(List<String> datapointaddress, String agentName) throws Exception {
+	public void unsubscribe(String agentName, List<String> datapointaddress) throws Exception {
 
 		//List<Datapoint> result;
 
@@ -281,13 +277,13 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public void unsubscribe(String datapointName, String name) throws Exception {
-		this.unsubscribe(Arrays.asList(datapointName), name);
+	public void unsubscribe(String name, String datapointName) throws Exception {
+		this.unsubscribe(name, Arrays.asList(datapointName));
 
 	}
 
 	@Override
-	public void notifySubscriber(Datapoint datapoint, String agentName) throws Exception {
+	public void notifySubscriber(String agentName, Datapoint datapoint) throws Exception {
 		//Datapoint result;
 
 		try {
@@ -322,7 +318,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, int timeout) throws Exception {
-		return this.queryDatapoints(writeAddress, content, this.getLocalAgentName(), resultAddress, this.getLocalAgentName(), timeout);
+		return this.queryDatapoints(this.getLocalAgentName(), writeAddress, content, this.getLocalAgentName(), resultAddress, timeout);
 	}
 
 	@Override
@@ -332,11 +328,11 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
-		return this.queryDatapoints(writeAddress, new JsonPrimitive(content), writeAgentName, resultAddress, resultAgentName, timeout);
+		return this.queryDatapoints(writeAgentName, writeAddress, new JsonPrimitive(content), resultAgentName, resultAddress, timeout);
 	}
 
 	@Override
-	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception {
 		//TemporarySubscription subscription = null;
 		Datapoint result = null;
 
@@ -346,6 +342,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			result = CFQuery.newQuery(writeAgentName, writeAddress, content, resultAgentName, resultAddress, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
+			throw new Exception(e.getMessage());
 		}
 
 		return result;

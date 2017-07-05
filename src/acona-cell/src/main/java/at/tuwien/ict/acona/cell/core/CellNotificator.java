@@ -95,7 +95,7 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 			if (subscribers.isEmpty() == false) {
 				subscribers.forEach(s -> {
 					try {
-						this.communicator.notifySubscriber(subscribedData, s);
+						this.communicator.notifySubscriber(s, subscribedData);
 					} catch (Exception e) {
 						log.error("Cannot notify datapoint={} to subscriber={}", subscribedData, s, e);
 					}

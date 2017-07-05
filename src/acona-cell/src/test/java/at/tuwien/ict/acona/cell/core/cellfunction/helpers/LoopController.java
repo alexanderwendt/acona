@@ -30,19 +30,6 @@ public class LoopController extends CellFunctionThreadImpl {
 		return result;
 	}
 
-	// private ServiceState executeService(String serviceName, String agentName,
-	// int timeout) throws Exception {
-	//
-	// String commandDatapoint = serviceName + ".command";
-	// String resultDatapoint = serviceName + ".state";
-	// Datapoint result1 =
-	// this.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()),
-	// agentName, Datapoint.newDatapoint(resultDatapoint),
-	// agentName, timeout);
-	//
-	// return ServiceState.valueOf(result1.getValueAsString());
-	// }
-
 	@Override
 	protected void executeFunction() throws Exception {
 		log.info("Execute increment service");
@@ -51,13 +38,6 @@ public class LoopController extends CellFunctionThreadImpl {
 		for (int i = 1; i <= numberOfAgents; i++) {
 			ServiceState result = this.executeServiceById("servicename", "agentnameprefix", i, 1000);
 			log.debug("Result = {}", result);
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(delay);
-			//				} catch (InterruptedException e) {
-			//
-			//				}
-			//			}
 
 		}
 

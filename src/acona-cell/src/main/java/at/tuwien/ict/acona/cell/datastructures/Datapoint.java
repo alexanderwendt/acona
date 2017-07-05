@@ -6,18 +6,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class Datapoint {
-	public final static String KEYADDRESS = "ADDRESS";
-	public final static String KEYAGENT = "AGENT";
-	public final static String KEYVALUE = "VALUE";
+	//public final static String KEYADDRESS = "ADDRESS";
+	//public final static String KEYAGENT = "AGENT";
+	//public final static String KEYVALUE = "VALUE";
 
 	//TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
 
 	private String ADDRESS = "";
-	//private String TYPE = "";
+	private String AGENT = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
 
 	private transient Gson gson = new Gson(); //Add transient not to serialize this
-	// private final JsonObject jsondatapoint;
 
 	//private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
 
@@ -28,8 +27,100 @@ public class Datapoint {
 	 *            The following syntax can be used: x.x for local datapoints,
 	 *            [agent]:[localaddress] for global datapoints
 	 */
-	protected Datapoint(String address) {
-		this.ADDRESS = address;
+	public Datapoint(String address) {
+		this.ADDRESS = this.getLocalAddressFromString(address);
+		this.AGENT = this.getAgentNameFromString(address);
+	}
+
+	public Datapoint(String agent, String address) {
+		this.ADDRESS = this.getLocalAddressFromString(address);
+		this.AGENT = agent;
+	}
+
+	private String getAgentNameFromString(String address) {
+		String result = "";
+		if (address.contains(":")) {
+			result = address.split(":")[0];
+		}
+
+		return result;
+	}
+
+	private String getLocalAddressFromString(String address) {
+		String result = address;
+		if (address.contains(":")) {
+			result = address.split(":")[1];
+		}
+
+		return result;
+	}
+
+	private String combineAddress(String agent, String address) {
+		String combinedAddress = address;
+		if (agent.isEmpty() == false) {
+			combinedAddress = agent + ":" + address;
+		}
+
+		return combinedAddress;
+	}
+
+	public String getAddress() {
+		return ADDRESS;
+	}
+
+	public String getCompleteAddress() {
+		return this.combineAddress(this.AGENT, this.ADDRESS);
+	}
+
+	public String getAgent() {
+		return this.AGENT;
+	}
+
+	public String getAgent(String defaultValue) {
+		String result = defaultValue;
+		if (this.AGENT.isEmpty() == false) {
+			result = this.AGENT;
+		}
+
+		return result;
+	}
+
+	public void setAgent(String agent) {
+		this.AGENT = agent;
+	}
+
+	public boolean hasLocalAgent() {
+		boolean result = false;
+		if (this.AGENT == "") {
+			result = true;
+		}
+
+		return result;
+	}
+
+	public void removeAgent() {
+		this.AGENT = "";
+	}
+
+	public JsonElement getValue() {
+		return VALUE;
+	}
+
+	public <T> T getValue(Class<T> clzz) {
+		if (gson == null) {
+			gson = new Gson();
+		}
+		return gson.fromJson(this.VALUE, clzz);
+	}
+
+	public String getValueAsString() {
+		String result = "";
+		if (VALUE.toString().equals("{}") == true) {
+			result = "";
+		} else {
+			result = VALUE.getAsJsonPrimitive().getAsString();
+		}
+		return result;
 	}
 
 	public Datapoint setValue(String value) {
@@ -66,35 +157,6 @@ public class Datapoint {
 			gson = new Gson();
 		}
 		return gson.toJson(this, Datapoint.class);
-	}
-
-	public String getAddress() {
-		return ADDRESS;
-	}
-
-	//	public String getType() {
-	//		return TYPE;
-	//	}
-
-	public JsonElement getValue() {
-		return VALUE;
-	}
-
-	public <T> T getValue(Class<T> clzz) {
-		if (gson == null) {
-			gson = new Gson();
-		}
-		return gson.fromJson(this.VALUE, clzz);
-	}
-
-	public String getValueAsString() {
-		String result = "";
-		if (VALUE.toString().equals("{}") == true) {
-			result = "";
-		} else {
-			result = VALUE.getAsJsonPrimitive().getAsString();
-		}
-		return result;
 	}
 
 	@Override
