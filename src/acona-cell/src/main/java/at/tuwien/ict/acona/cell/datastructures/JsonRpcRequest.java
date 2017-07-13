@@ -45,6 +45,10 @@ public class JsonRpcRequest {
 		this.params = new Object[numberOfParameter];
 	}
 
+	public void setParameters(Object... obj) {
+		this.params = obj;
+	}
+
 	/**
 	 * Get a certain parameter from the parameters if it is a list
 	 * 

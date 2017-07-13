@@ -1,0 +1,32 @@
+<configuration debug="true">
+  <evaluator name="TEST_EVALUATOR">
+    <expression>logger.contains("ControlGateway") &amp;&amp;
+	message.contains("TestTest")</expression>
+  </evaluator>
+  
+  
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <withJansi>false</withJansi>
+	
+	<!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
+	
+	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+      <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <expression>return logger.contains("BidirectionalGatewayAgent");</expression>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>DENY</OnMatch>
+    </filter>
+	
+    <encoder>
+      <!--<pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%highlight(%-5level)) %-25(%cyan(%logger{0}))(%F:%L\) - %msg%n%throwable</pattern>-->
+	  <!--<pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%-5level)) %logger{0}(%F:%L\) - %msg%n%throwable</pattern>-->
+	  <!--<pattern>%-40(%date{HH:mm:ss.SSS} [%thread]) %-40(%-5level %logger{5}) - %msg%n%throwable</pattern>-->
+	  <pattern>%-30(%d{HH:mm:ss.SSS} [%thread]) %-20(%-5level %logger{0} -)(%F:%L\) %msg%n</pattern>
+	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->
+    </encoder>
+  </appender>
+  <root level="TRACE">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

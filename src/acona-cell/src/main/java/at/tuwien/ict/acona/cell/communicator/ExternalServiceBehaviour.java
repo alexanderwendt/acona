@@ -110,7 +110,8 @@ public class ExternalServiceBehaviour extends SimpleAchieveREResponder {
 			msg.setPerformative(ACLMessage.INFORM);
 
 			if (resultDatapoint.getError() != null) {
-				throw new Exception("Error executing function. Incoming message=" + stringRequest);
+				//throw new Exception("Error executing function. Incoming message=" + stringRequest);
+				log.error("Error executing function. Incoming message={}. Error={}", request, resultDatapoint.getError().getMessage());
 			}
 
 		} catch (Exception e) {

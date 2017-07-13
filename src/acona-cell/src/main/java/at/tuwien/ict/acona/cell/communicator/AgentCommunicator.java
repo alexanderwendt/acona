@@ -62,6 +62,17 @@ public interface AgentCommunicator {
 	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception;
 
 	/**
+	 * Execute a service, where the whole address is written in one string, i.e.
+	 * agent:service
+	 * 
+	 * @param agentNameAndService
+	 * @param methodParameters
+	 * @return
+	 * @throws Exception
+	 */
+	public JsonRpcResponse execute(String agentNameAndService, JsonRpcRequest methodParameters) throws Exception;
+
+	/**
 	 * Execute the service as a non-blocking function
 	 * 
 	 * @param agentName

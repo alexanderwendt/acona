@@ -13,6 +13,8 @@ import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.core.CellImpl;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -78,6 +80,12 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	}
 
 	@Override
+	public JsonRpcResponse execute(String agentNameAndService, JsonRpcRequest methodParameters) throws Exception {
+		Datapoint dp = Datapoints.newDatapoint(agentNameAndService);
+		return this.execute(dp.getAgent(), dp.getAddress(), methodParameters, this.defaultTimeout, false);
+	}
+
+	@Override
 	public void executeAsynchronous(String agentName, String serviceName, JsonRpcRequest methodParameters) throws Exception {
 		//TODO Implement this
 		throw new UnsupportedOperationException();
@@ -128,7 +136,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 				try {
 					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
 					if (writeBehaviourFinished == null) {
-						throw new Exception("Operation timed out after " + timeout + "ms.");
+						throw new Exception("No answer. Operation timed out after " + timeout + "ms.");
 					}
 
 					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {

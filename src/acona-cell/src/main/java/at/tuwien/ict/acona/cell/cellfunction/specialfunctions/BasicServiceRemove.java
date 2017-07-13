@@ -10,7 +10,6 @@ import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionBasicService;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -25,10 +24,10 @@ public class BasicServiceRemove extends CellFunctionBasicService {
 
 		try {
 
-			List<Datapoint> datapoints = parameterdata.getParameter(0, new TypeToken<List<Datapoint>>() {
+			List<String> datapoints = parameterdata.getParameter(0, new TypeToken<List<String>>() {
 			});
 
-			datapoints.forEach(dp -> this.getCell().getDataStorage().remove(dp.getAddress(), caller));
+			datapoints.forEach(dp -> this.getCell().getDataStorage().remove(dp, caller));
 
 			result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 		} catch (Exception e) {

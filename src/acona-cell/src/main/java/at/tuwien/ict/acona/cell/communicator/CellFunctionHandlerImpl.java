@@ -77,6 +77,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 				// Create a responder to the cellfunction if it is set in the
 				if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
 					this.caller.getCommunicator().createResponderForFunction(cellFunctionInstance);
+					log.info("{}>Generate external responder", cellFunctionInstance.getFunctionName());
 				}
 
 				// Go through each address and add the activator to this address

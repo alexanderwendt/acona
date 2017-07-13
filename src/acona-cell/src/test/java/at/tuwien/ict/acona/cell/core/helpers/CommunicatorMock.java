@@ -128,18 +128,6 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 	}
 
 	@Override
-	public void remove(Datapoint datapoint) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void remove(List<Datapoint> datapoint) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
@@ -167,12 +155,6 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 	public List<Datapoint> read(String agentName, List<String> datapoints, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void remove(String agentName, List<Datapoint> datapoint, int timeout) throws Exception {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -207,6 +189,24 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	@Override
 	public void notifySubscriber(String agentName, Datapoint datapoint) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void remove(String datapoint) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void remove(List<String> datapoint) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void remove(String agentName, List<String> datapoint, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 
 	}

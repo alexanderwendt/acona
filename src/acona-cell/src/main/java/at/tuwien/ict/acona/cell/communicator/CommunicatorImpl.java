@@ -135,25 +135,26 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public void remove(Datapoint datapoint) throws Exception {
+	public void remove(String datapoint) throws Exception {
 		this.remove(Arrays.asList(datapoint));
 
 	}
 
 	@Override
-	public void remove(List<Datapoint> datapoints) throws Exception {
+	public void remove(List<String> datapoints) throws Exception {
 		this.remove(this.getLocalAgentName(), datapoints, this.defaultTimeout);
 
 	}
 
 	@Override
-	public void remove(String agentName, List<Datapoint> datapoints, int timeout) throws Exception {
+	public void remove(String agentName, List<String> datapoints, int timeout) throws Exception {
 		//JsonRpcResponse result;
 
 		try {
 			//Make the inputlist a parameter
 			//Create the request
-			JsonRpcRequest request = new JsonRpcRequest(REMOVESERVICENAME, false, datapoints.toArray());
+			JsonRpcRequest request = new JsonRpcRequest(REMOVESERVICENAME, 1);
+			request.setParameterAsList(0, datapoints);
 
 			JsonRpcResponse response = this.execute(agentName, REMOVESERVICENAME, request, timeout);
 

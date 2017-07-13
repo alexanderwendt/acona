@@ -61,11 +61,11 @@ public interface Communicator extends AgentCommunicator {
 	 */
 	public Datapoint read(String agentName, String datapoint, int timeout) throws Exception;
 
-	public void remove(Datapoint datapoint) throws Exception;
+	public void remove(String datapoint) throws Exception;
 
-	public void remove(List<Datapoint> datapoint) throws Exception;
+	public void remove(List<String> datapoint) throws Exception;
 
-	public void remove(String agentName, List<Datapoint> datapoint, int timeout) throws Exception;
+	public void remove(String agentName, List<String> datapoint, int timeout) throws Exception;
 
 	/**
 	 * Write a list of datapoints to the local agent
