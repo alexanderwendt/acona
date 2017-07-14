@@ -4,11 +4,16 @@
 	message.contains("TestTest")</expression>
   </evaluator>
   
+  <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
+  <logger name="at.tuwien.ict.acona.cell.communicator" level="WARN"/>
+  <logger name="at.tuwien.ict.acona.cell.storage" level="WARN"/>
+  <logger name="at.tuwien.ict.acona.cell.cellfunction" level="WARN"/>
+  <logger name="at.tuwien.ict.acona.cell.core" level="WARN"/>
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <withJansi>false</withJansi>
 	
-	<!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
+
 	
 	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
       <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->

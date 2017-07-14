@@ -51,7 +51,6 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 				throw new Exception("Function " + this.getFunctionName() + " is not allowed to subscribe datapoints of the own agent, in order to avoid circular references. Erroneous subscription: " + config);
 			}
 		}
-
 	}
 
 	@Override

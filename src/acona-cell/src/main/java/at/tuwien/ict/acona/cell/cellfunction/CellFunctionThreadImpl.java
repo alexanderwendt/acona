@@ -79,7 +79,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			//log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 
 		} catch (Exception e) {
-			log.error("CellFunction {} could not be initialized", this.getFunctionName());
+			log.error("CellFunction {} could not be initialized", this.getFunctionName(), e);
 			throw new Exception(e.getMessage());
 		}
 	}

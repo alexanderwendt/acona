@@ -21,7 +21,7 @@ public class Depot {
 		this.liquid += amount;
 	}
 	
-	public void sell(String stockName, double amount, double price) throws Exception {
+	public void sell(String stockName, int amount, double price) throws Exception {
 		
 		Optional<Asset> asset = this.asset.stream().filter(name -> name.getStockName().equals(stockName)).findFirst();
 		
@@ -41,7 +41,7 @@ public class Depot {
 		}
 	}
 	
-	public void buy(String stockName, double amount, double price) throws Exception {
+	public void buy(String stockName, int amount, double price) throws Exception {
 		Optional<Asset> asset = this.asset.stream().filter(name -> name.getStockName().equals(stockName)).findFirst();
 		
 		if (this.getLiquid()< amount*price) {
@@ -49,10 +49,10 @@ public class Depot {
 		}
 		
 		if (asset.isPresent()) {
-			double oldVolume = asset.get().getVolume();
+			int oldVolume = asset.get().getVolume();
 			double oldPrice = asset.get().getAveragePrice();
 			
-			double newVolume = amount + oldVolume;
+			int newVolume = amount + oldVolume;
 			double newAveragePrice = ((oldPrice*oldVolume) + (amount*price))/(amount + oldVolume);
 			
 			asset.get().setAveragePrice(newAveragePrice);
@@ -60,6 +60,8 @@ public class Depot {
 		} else {
 			this.getAsset().add(new Asset(stockName, amount, price));
 		}
+		
+		this.addLiquid(-amount*price);
 	}
 	
 	public List<Asset> getAsset() {

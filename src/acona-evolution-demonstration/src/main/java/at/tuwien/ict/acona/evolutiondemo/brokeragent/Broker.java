@@ -66,7 +66,7 @@ public class Broker extends CellFunctionImpl {
 						parameterdata.getParameter(0, String.class), 
 						parameterdata.getParameter(1, String.class), 
 						parameterdata.getParameter(2, Double.class), 
-						parameterdata.getParameter(3, Double.class));
+						parameterdata.getParameter(3, Integer.class));
 				result = new JsonRpcResponse(parameterdata, depot);
 				break;
 			case "sell":
@@ -75,7 +75,7 @@ public class Broker extends CellFunctionImpl {
 						parameterdata.getParameter(0, String.class), 
 						parameterdata.getParameter(1, String.class), 
 						parameterdata.getParameter(2, Double.class), 
-						parameterdata.getParameter(3, Double.class));
+						parameterdata.getParameter(3, Integer.class));
 				result = new JsonRpcResponse(parameterdata, depot);
 				break;
 			case "getdepotinfo":
@@ -149,7 +149,7 @@ public class Broker extends CellFunctionImpl {
 		return this.readLocal(this.createDepotAddress(agentName)).getValue();
 	}
 	
-	private JsonElement buy(String agentName, String stockName, double price, double volume) throws Exception {
+	private JsonElement buy(String agentName, String stockName, double price, int volume) throws Exception {
 		Depot depot = this.getDepot(agentName);
 		if (depot==null) {
 			throw new Exception("Depot " + agentName + " does not exist");
@@ -164,7 +164,7 @@ public class Broker extends CellFunctionImpl {
 		return jsonDepot;
 	}
 	
-	private JsonElement sell(String agentName, String stockName, double price, double volume) throws Exception {
+	private JsonElement sell(String agentName, String stockName, double price, int volume) throws Exception {
 		Depot depot = this.getDepot(agentName);
 		if (depot==null) {
 			throw new Exception("Depot " + agentName + " does not exist");

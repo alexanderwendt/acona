@@ -10,7 +10,10 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.evolutiondemo.agents.PriceGenerator;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
+import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
+import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
@@ -51,6 +54,11 @@ public class Launcher {
 			
 			String stockmarketagentName = "stockmarketagent";
 			String stockmarketPriceGeneratorServiceName = "market";
+			String brokerAgentName = "Broker";
+			String brokerServiceName = "BrokerService";
+			String stockName = "Fingerprint";
+			String traderAgentName = "Trader1";
+			String traderFunction = "TraderFunction";
 			
 			//http-server
 			//Command in the web service: http://localhost:8001/korecogsys/getsatisfactoryruleset?simulationid=textfile1&ontologyid=usecase1varition1&breaksimulatorrun=100&breakevaluationco2=0.5&breakevaluationenergy=0.2&breakevaluationpenalty=0.1
@@ -66,15 +74,23 @@ public class Launcher {
 			//Generate the configuration for the KORE system
 			log.info("Generate system configuration");
 			log.info("Generate stock market agent");
-			CellConfig stockmarketAgentConfig = CellConfig.newConfig(stockmarketagentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketPriceGeneratorServiceName, PriceGenerator.class));
-			CellGatewayImpl stockmarket = this.controller.createAgent(stockmarketAgentConfig);
+			CellGatewayImpl stockmarket = this.controller.createAgent(CellConfig.newConfig(stockmarketagentName)
+					.addCellfunction(CellFunctionConfig.newConfig(stockmarketPriceGeneratorServiceName, PriceGenerator.class)));
+			
+			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)));
 			
 			log.info("Generate Controller agent configuration");
-			CellConfig controllerAgentConfig = CellConfig.newConfig(controllerAgentName)
+			CellGatewayImpl controller = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig("userconsole", ConsoleRequestReceiver.class)
-							.setProperty(ConsoleRequestReceiver.ATTRIBUTESTOCKMARKETADDRESS, stockmarketagentName + ":" + stockmarketPriceGeneratorServiceName));
-			CellGatewayImpl controller = this.controller.createAgent(controllerAgentConfig);
+							.setProperty(ConsoleRequestReceiver.ATTRIBUTESTOCKMARKETADDRESS, stockmarketagentName + ":" + stockmarketPriceGeneratorServiceName)));
+			
+			CellGatewayImpl traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(traderFunction, Trader.class)
+							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketagentName + ":" + "data")
+							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, "Indicator"))
+					.addCellfunction(CellFunctionConfig.newConfig("Indicator", PermanentBuySellIndicator.class)));
 			
 			synchronized (this) {
 				try {

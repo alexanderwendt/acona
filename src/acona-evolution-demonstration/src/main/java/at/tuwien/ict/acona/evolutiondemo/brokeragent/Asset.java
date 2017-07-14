@@ -2,21 +2,21 @@ package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
 public class Asset {
 	
-	private double volume;
+	private int volume;
 	private String stockName;
 	private double averagePrice;
 	
-	public Asset(String stockName, double volume, double averagePrice) {
+	public Asset(String stockName, int volume, double averagePrice) {
 		super();
 		this.volume = volume;
 		this.stockName = stockName;
 		this.averagePrice = averagePrice;
 	}
 	
-	public double getVolume() {
+	public int getVolume() {
 		return volume;
 	}
-	public void setVolume(double volume) {
+	public void setVolume(int volume) {
 		this.volume = volume;
 	}
 	public String getStockName() {

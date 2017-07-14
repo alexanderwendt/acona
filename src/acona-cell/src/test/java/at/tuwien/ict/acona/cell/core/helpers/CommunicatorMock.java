@@ -211,4 +211,10 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	}
 
+	@Override
+	public JsonRpcResponse execute(String agentNameAndService, JsonRpcRequest methodParameters) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

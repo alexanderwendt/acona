@@ -29,7 +29,7 @@ public class RequestReceiverUserConsole extends UserConsoleFunction {
 		this.register("exit", "exit program", "exitProgram");
 		this.register("restart", "restart tapchanger", "restart");
 		this.register("set", "Set command", "setExternalCommand");
-		this.register("start", "Set command", "startStockMarket");
+		this.register("s", "Set command", "startStockMarket");
 		
 	}
 	
