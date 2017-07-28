@@ -178,7 +178,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
-		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+		this.setServiceState(ServiceState.RUNNING);
+		if (this.getReadDatapoints().isEmpty() == false) {
+			log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+		}
 
 		this.getReadDatapoints().forEach((k, v) -> {
 			try {
@@ -203,7 +206,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	protected void executePostProcessing() throws Exception {
 		// FIXME: The update here is not working well
-		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
+		if (this.getWriteDatapoints().isEmpty() == false) {
+			log.debug("{}>Execute post processing action write for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
+		}
+
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
 		this.getWriteDatapoints().values().forEach(config -> {
@@ -224,10 +230,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		this.executeCustomPostProcessing();
 
-		this.setServiceState(ServiceState.FINISHED);
-		this.setServiceState(ServiceState.IDLE);
+		//this.setServiceState(ServiceState.FINISHED);
+		//this.setServiceState(ServiceState.IDLE);
 		this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
-		log.info("{}>Service execution finished", this.getFunctionName());
+		log.info("{}>Service execution run finished", this.getFunctionName());
 	}
 
 	protected abstract void executeCustomPostProcessing() throws Exception;

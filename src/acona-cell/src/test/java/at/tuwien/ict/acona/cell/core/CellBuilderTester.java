@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
@@ -130,8 +129,10 @@ public class CellBuilderTester {
 
 			builder.initializeCellConfig(cellConfig, cell);// .initializeCellConfig(cellConfig, cell);
 
-			Map<String, List<CellFunction>> function = cell.getFunctionHandler().getCellFunctionDatapointMapping();
-			String actualResult = cell.getFunctionHandler().getCellFunctionDatapointMapping().get("testcell:agent1.dp1.value").get(0).getFunctionConfig().getProperty("TESTPROPERTY1");
+			Map<String, List<String>> function = cell.getFunctionHandler().getCellFunctionDatapointMapping();
+			String actualResult = cell.getFunctionHandler().getCellFunction(
+					cell.getFunctionHandler().getCellFunctionDatapointMapping().get("testcell:agent1.dp1.value").get(0))
+					.getFunctionConfig().getProperty("TESTPROPERTY1");
 
 			// Get the name of one of the activators
 

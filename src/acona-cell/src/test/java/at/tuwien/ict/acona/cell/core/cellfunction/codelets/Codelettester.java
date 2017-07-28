@@ -84,6 +84,7 @@ public class Codelettester {
 		try {
 			String codeletName1 = "CodeletIncrement1"; // The same name for all services
 			String codeletName2 = "CodeletIncrement2";
+			String codeletName3 = "CodeletIncrement3";
 			String handlerName = "CodeletHandler";
 			String controllerAgentName = "CodeletExecutorAgent";
 
@@ -97,12 +98,19 @@ public class Codelettester {
 					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
 					.addCellfunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + handlerName)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
 					.addCellfunction(CellFunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + handlerName)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
-							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(2)));
+							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(2)))
+					.addCellfunction(CellFunctionConfig.newConfig(codeletName3, IncrementOnConditionCodelet.class)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + handlerName)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
+							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(3)));
 
 			CellGatewayImpl controller = this.launcher.createAgent(codeletAgentConfig);
 
@@ -118,6 +126,7 @@ public class Codelettester {
 			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
 			request1.setParameterAsValue(0, false);
 
+			log.debug("Send request to codeletHandler={} and see that it fails because the condition does not match", request1);
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1, controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
@@ -128,13 +137,14 @@ public class Codelettester {
 			//				}
 			//			}
 
-			log.info("Datapoints on the way. Set 1");
+			log.info("Datapoints on the way. Set datapoint value={} to 1.0", processDatapoint);
 			controller.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 
 			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
 			request2.setParameterAsValue(0, false);
 
+			log.debug("Start codelet handler again");
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2, controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {
@@ -145,12 +155,18 @@ public class Codelettester {
 			//				}
 			//			}
 			//controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(3)));
-			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
+			log.debug("Read if the value has been incremented");
+			int x = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
+			if (x == 2) {
+				log.debug("Value was incremented");
+			}
+			log.info("Value is={}", x);
 
 			//			//Execute codelets once again
 			JsonRpcRequest request3 = new JsonRpcRequest("executecodelethandler", 1);
 			request3.setParameterAsValue(0, false);
 
+			log.debug("See if value can be incremented again");
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request3, controllerAgentName, handlerName + ".result", 20000);
 
 			//			synchronized (this) {

@@ -34,6 +34,7 @@ public class IncrementOnConditionCodelet extends CellFunctionCodelet {
 
 		int value = 0;
 		String checkValue = this.getCommunicator().read(checkAddress).getValue().toString();
+		log.debug("Read value={}", checkValue);
 		if (checkValue.equals("{}") == false) {
 			value = this.getCommunicator().read(checkAddress).getValue().getAsInt();
 		}

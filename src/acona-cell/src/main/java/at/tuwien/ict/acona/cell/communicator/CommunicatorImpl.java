@@ -179,6 +179,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			JsonRpcRequest request = new JsonRpcRequest(WRITESERVICENAME, false, new Object[1]);
 			request.setParameterAsList(0, datapoints);
 
+			//log.warn("Execute service={}, agent={}, request={}", WRITESERVICENAME, agentComplementedName, request);
 			JsonRpcResponse result = this.execute(agentComplementedName, WRITESERVICENAME, request, timeout);
 
 			if (result.getError() != null) {
@@ -305,14 +306,14 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	@Override
 	public Datapoint subscribeDatapoint(String agentId, String datapointAddress, CellFunction callingCellfunctionName) throws Exception {
 		String id = "subsciption" + System.currentTimeMillis();
-		this.cellFunctionHandler.addSubscription(callingCellfunctionName, DatapointConfig.newConfig(id, datapointAddress, agentId, SyncMode.SUBSCRIBEONLY));
+		this.cellFunctionHandler.addSubscription(callingCellfunctionName.getFunctionName(), DatapointConfig.newConfig(id, datapointAddress, agentId, SyncMode.SUBSCRIBEONLY));
 		return null;
 	}
 
 	@Override
 	public Datapoint unsubscribeDatapoint(String agentid, String address, CellFunction callingCellFunctionName) throws Exception {
 
-		this.cellFunctionHandler.removeSubscription(callingCellFunctionName, address, agentid);
+		this.cellFunctionHandler.removeSubscription(callingCellFunctionName.getFunctionName(), address, agentid);
 
 		return null;
 	}
@@ -340,7 +341,8 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		try {
 			//The write command always need a list of datapoints.
 
-			result = CFQuery.newQuery(writeAgentName, writeAddress, content, resultAgentName, resultAddress, timeout, this.getCell());
+			CFQuery query = new CFQuery();
+			result = query.newQuery(writeAgentName, writeAddress, content, resultAgentName, resultAddress, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 			throw new Exception(e.getMessage());
@@ -354,7 +356,8 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		Datapoint result = null;
 
 		try {
-			result = CFSubscribeLock.newServiceExecutionAndSubscribeLock(writeAgentName, serviceName, serviceParameter, resultAgentName, resultAddress, timeout, this.getCell());
+			CFSubscribeLock lock = new CFSubscribeLock();
+			result = lock.newServiceExecutionAndSubscribeLock(writeAgentName, serviceName, serviceParameter, resultAgentName, resultAddress, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 		}

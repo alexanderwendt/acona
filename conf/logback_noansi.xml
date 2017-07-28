@@ -5,9 +5,9 @@
   </evaluator>
   
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
-  <logger name="at.tuwien.ict.acona.cell.communicator" level="WARN"/>
+  <logger name="at.tuwien.ict.acona.cell.communicator" level="TRACE"/>
   <logger name="at.tuwien.ict.acona.cell.storage" level="WARN"/>
-  <logger name="at.tuwien.ict.acona.cell.cellfunction" level="WARN"/>
+  <logger name="at.tuwien.ict.acona.cell.cellfunction" level="TRACE"/>
   <logger name="at.tuwien.ict.acona.cell.core" level="WARN"/>
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

@@ -151,6 +151,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.IDLE.toString());
+		this.setServiceState(ServiceState.IDLE);
 
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
 
@@ -167,6 +168,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
+		this.setServiceState(ServiceState.RUNNING);
 
 	}
 

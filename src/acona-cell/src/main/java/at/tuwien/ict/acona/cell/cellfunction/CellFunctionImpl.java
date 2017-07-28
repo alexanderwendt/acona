@@ -148,7 +148,6 @@ public abstract class CellFunctionImpl implements CellFunction {
 			this.shutDownImplementation();
 
 			//Execute general deregister
-
 			this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
 			//this.getCell().takeDownCell();
 			log.info("Agent {}> ==== shut down function={} ====", this.getCell().getLocalName(), this.getFunctionName());

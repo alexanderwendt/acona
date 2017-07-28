@@ -22,7 +22,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionHandlerImpl.class);
 	//The datapoint activation map consists of agent:datapointaddress
-	private final Map<String, List<CellFunction>> datapointActivationMap = new ConcurrentHashMap<>();
+	private final Map<String, List<String>> datapointActivationMap = new ConcurrentHashMap<>(); //FIXME: Use list of cell names instead of cell function to get indepenent. Only in the function mapping the function names are mapped to functions
 
 	private final Map<String, CellFunction> cellFunctionsMap = new ConcurrentHashMap<>();
 
@@ -36,7 +36,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 		// If there are any functions, then they should be activated
 		if (datapointActivationMap.containsKey(key)) {
 			// Get all instances, which subscribe the datapoint
-			List<CellFunction> instanceList = datapointActivationMap.get(key);
+			List<String> instanceList = datapointActivationMap.get(key);
 			// Add datapoint to map
 			Map<String, Datapoint> subscribedDatapointMap = new HashMap<>();
 			//FIXME: The function itself does not know from which agent the value arrives
@@ -47,9 +47,9 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 
 			// run all activations of that datapoint in parallel
 			log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
-			instanceList.forEach((CellFunction a) -> {
+			instanceList.forEach((String a) -> {
 				try {
-					a.updateSubscribedData(subscribedDatapointMap, callerAgent);
+					this.getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);
 				} catch (Exception e) {
 					log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
 				}
@@ -57,49 +57,51 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 		}
 	}
 
-	private synchronized void updateValuesOfSubscriber(CellFunction function, Datapoint subscribedData, String callerAgent) throws Exception {
-		Map<String, Datapoint> subscribedDatapointMap = new HashMap<>();
-		subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
-		function.updateSubscribedData(subscribedDatapointMap, callerAgent);
-	}
+	//	private synchronized void updateValuesOfSubscriber(CellFunction function, Datapoint subscribedData, String callerAgent) throws Exception {
+	//		Map<String, Datapoint> subscribedDatapointMap = new HashMap<>();
+	//		subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
+	//		function.updateSubscribedData(subscribedDatapointMap, callerAgent);
+	//	}
 
 	@Override
-	public void registerCellFunctionInstance(CellFunction cellFunctionInstance) throws Exception {
+	public synchronized void registerCellFunctionInstance(CellFunction cellFunctionInstance) throws Exception {
 
 		try {
 			// Get all subscribed addresses
-			synchronized (this) {
-				// Add the cellfunction itself
-				this.cellFunctionsMap.put(cellFunctionInstance.getFunctionName(), cellFunctionInstance);
+			//synchronized (this.cellFunctionsMap) {
+			// Add the cellfunction itself
+			this.cellFunctionsMap.put(cellFunctionInstance.getFunctionName(), cellFunctionInstance);
+			//}
 
-				List<DatapointConfig> activatorAddresses = new ArrayList<>(cellFunctionInstance.getSubscribedDatapoints().values());
+			List<DatapointConfig> activatorAddresses = new ArrayList<>(cellFunctionInstance.getSubscribedDatapoints().values());
 
-				// Create a responder to the cellfunction if it is set in the
-				if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
-					this.caller.getCommunicator().createResponderForFunction(cellFunctionInstance);
-					log.info("{}>Generate external responder", cellFunctionInstance.getFunctionName());
-				}
+			// Create a responder to the cellfunction if it is set in the
+			if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
+				this.caller.getCommunicator().createResponderForFunction(cellFunctionInstance);
+				log.info("{}>Generate external responder", cellFunctionInstance.getFunctionName());
+			}
 
-				// Go through each address and add the activator to this address
-				for (DatapointConfig subscriptionConfig : activatorAddresses) {
-					try {
-						//Adds the subscription to the handler
-						//Subscribe the datapoint		
-						//Construct name (if only "", then use the local agent)
-						String agentName = subscriptionConfig.getAgentid(this.caller.getLocalName());
-						String key = agentName + ":" + subscriptionConfig.getAddress();
-						if (this.datapointActivationMap.containsKey(key) == false) {
-							List<Datapoint> initialValue = this.caller.getCommunicator().subscribe(agentName, Arrays.asList(subscriptionConfig.getAddress()));
-							log.debug("Subscription request sent to agent={}, address={} and acknowledge received", agentName, subscriptionConfig.getAddress());
-						} else {
-							log.debug("Key={} already exists in the function mapping. Therefore no additional subscription is necessary", key);
-						}
-						//Add subscription to the function handler
-						this.addSubscription(cellFunctionInstance, subscriptionConfig);
-					} catch (Exception e) {
-						log.error("Cannot subscribe address={}", subscriptionConfig.getAddress());
-						throw new Exception(e.getMessage());
+			// Go through each address and add the activator to this address
+			for (DatapointConfig subscriptionConfig : activatorAddresses) {
+				try {
+					//Adds the subscription to the handler
+					//Subscribe the datapoint		
+					//Construct name (if only "", then use the local agent)
+					String agentName = subscriptionConfig.getAgentid(this.caller.getLocalName());
+					String key = agentName + ":" + subscriptionConfig.getAddress();
+					if (this.datapointActivationMap.containsKey(key) == false) {
+						List<Datapoint> initialValue = this.caller.getCommunicator().subscribe(agentName, Arrays.asList(subscriptionConfig.getAddress()));
+						log.debug("Subscription request sent to agent={}, address={} and acknowledge received", agentName, subscriptionConfig.getAddress());
+					} else {
+						log.debug("Key={} already exists in the function mapping. Therefore no additional subscription is necessary", key);
 					}
+
+					//Add subscription to the function handler
+
+					this.addSubscription(cellFunctionInstance.getFunctionName(), subscriptionConfig);
+				} catch (Exception e) {
+					log.error("Cannot subscribe address={}", subscriptionConfig.getAddress());
+					throw new Exception(e.getMessage());
 				}
 			}
 		} catch (Exception e) {
@@ -110,7 +112,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	}
 
 	@Override
-	public void deregisterActivatorInstance(CellFunction activatorInstance) throws Exception {
+	public synchronized void deregisterActivatorInstance(CellFunction activatorInstance) throws Exception {
 		// Deregister activator -> deregister all datapoints in the datastorage
 		// itself
 		try {
@@ -121,16 +123,16 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 				// Go through each address and remove the activator to this address
 				activatorAddresses.forEach(subscriptionsConfig -> {
 					try {
-						//this.removeSubscription(activatorInstance.getFunctionName(), subscriptionsConfig.getAgentid(), subscriptionsConfig.getAddress());
-						this.removeSubscription(activatorInstance, subscriptionsConfig);
-
 						String key = subscriptionsConfig.getAgentid(this.caller.getLocalName()) + ":" + subscriptionsConfig.getAddress();
 						if (this.datapointActivationMap.containsKey(key) == false) {
 							this.caller.getCommunicator().unsubscribe(subscriptionsConfig.getAgentid(this.caller.getLocalName()), Arrays.asList(subscriptionsConfig.getAddress()));
-							log.debug("Datapoint {}:{} was deregistered as no functions subscribes it", key);
+							log.debug("Datapoint {}:{} was deregistered as no functions subscribes it", this.caller.getLocalName(), key, activatorInstance.getFunctionName());
 						} else {
-							log.debug("Datapoint {}:{} was deregistered for the function {}. It is still subscribed by the agent.", key);
+							log.debug("Datapoint {}:{} was deregistered for the function {}. It is still subscribed by the agent.", this.caller.getLocalName(), key, activatorInstance.getFunctionName());
 						}
+
+						//this.removeSubscription(activatorInstance.getFunctionName(), subscriptionsConfig.getAgentid(), subscriptionsConfig.getAddress());
+						this.removeSubscription(activatorInstance.getFunctionName(), subscriptionsConfig);
 
 					} catch (Exception e) {
 						log.error("Cannot unsubscribe address={}", subscriptionsConfig.getAddress(), e);
@@ -157,12 +159,12 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	}
 
 	@Override
-	public Map<String, List<CellFunction>> getCellFunctionDatapointMapping() {
+	public Map<String, List<String>> getCellFunctionDatapointMapping() {
 		return Collections.unmodifiableMap(datapointActivationMap);
 	}
 
 	@Override
-	public void init(Cell caller) {
+	public synchronized void init(Cell caller) {
 		this.caller = caller;
 
 	}
@@ -173,7 +175,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	}
 
 	@Override
-	public void addSubscription(CellFunction cellFunctionInstance, DatapointConfig subscriptionConfig) throws Exception {
+	public synchronized void addSubscription(final String cellFunctionInstance, final DatapointConfig subscriptionConfig) throws Exception {
 		//Tasks:
 		//1. Check if the destination agent name is this agent or nor
 		//2. Subscribe the value and receive the current value of the datapoint
@@ -205,28 +207,31 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 		//Generate key for the internal activator
 		String key = agentName + ":" + address;
 
-		if (this.datapointActivationMap.containsKey(key) == false) {
-			// Add new entry
-			List<CellFunction> activators = new LinkedList<>();
-			activators.add(cellFunctionInstance);
-			this.datapointActivationMap.put(key, activators);
+		synchronized (this.datapointActivationMap) {
+			if (this.datapointActivationMap.containsKey(key) == false) {
+				// Add new entry
+				List<String> activators = new LinkedList<>();
+				activators.add(cellFunctionInstance);
+				this.datapointActivationMap.put(key, activators);
 
-			log.info("Address={}, registered activator={} in agent{}", key, cellFunctionInstance, this.caller.getLocalName());
-		} else if (this.datapointActivationMap.get(key).contains(cellFunctionInstance) == false) {
-			this.datapointActivationMap.get(key).add(cellFunctionInstance);
-			log.info("Address={}, added activator={}", key, cellFunctionInstance);
-		} else {
-			log.warn("Address={}: Cannot register activator={}. Instance already exists", key, cellFunctionInstance);
+				log.info("Address={}, registered activator={} in agent{}", key, cellFunctionInstance, this.caller.getLocalName());
+			} else if (this.datapointActivationMap.get(key).contains(cellFunctionInstance) == false) {
+				this.datapointActivationMap.get(key).add(cellFunctionInstance);
+				log.info("Address={}, added activator={}", key, cellFunctionInstance);
+			} else {
+				log.warn("Address={}: Cannot register activator={}. Instance already exists", key, cellFunctionInstance);
+			}
 		}
+
 	}
 
 	@Override
-	public void removeSubscription(CellFunction cellFunctionInstance, String address, String agentid) throws Exception {
+	public synchronized void removeSubscription(String cellFunctionInstance, String address, String agentid) throws Exception {
 		this.removeSubscription(cellFunctionInstance, DatapointConfig.newConfig("unsubscribe", address, agentid, SyncMode.SUBSCRIBEONLY));
 	}
 
 	@Override
-	public void removeSubscription(CellFunction cellFunctionInstance, DatapointConfig subscription) throws Exception {
+	public synchronized void removeSubscription(String cellFunctionInstance, DatapointConfig subscription) throws Exception {
 		//CellFunction cellFunctionInstance = this.getCellFunction(functionName);
 
 		if (cellFunctionInstance == null) {
@@ -238,25 +243,28 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 
 		String key = agentName + ":" + subscription.getAddress();
 
-		try {
-			if (this.datapointActivationMap.containsKey(key) == true) {
-				if (this.datapointActivationMap.get(key).contains(cellFunctionInstance)) {
-					this.datapointActivationMap.get(key).remove(cellFunctionInstance);
+		synchronized (this.datapointActivationMap) {
+			try {
+				if (this.datapointActivationMap.containsKey(key) == true) {
+					if (this.datapointActivationMap.get(key).contains(cellFunctionInstance)) {
+						this.datapointActivationMap.get(key).remove(cellFunctionInstance);
+
+						log.info("unsubscribed datapoint address={} for function={}, ", key, cellFunctionInstance);
+					}
+
+					if (this.datapointActivationMap.get(key).isEmpty() == true) {
+						log.warn("Empty key found in the activator of datapoints but no function. Key={}. Entry={}, cell function={}", key, this.datapointActivationMap.get(key), cellFunctionInstance);
+						this.datapointActivationMap.remove(key);
+					}
+
+				} else {
+					throw new Exception("The datapoint activatormap does not contain the address " + key);
 				}
 
-				if (this.datapointActivationMap.get(key).isEmpty() == true) {
-					this.datapointActivationMap.remove(key);
-					log.warn("Empty key found in the activator of datapoints. Key={}, cell function={}", key, cellFunctionInstance);
-				}
-
-				log.info("unsubscribed datapoint address={} for function={}, ", key, cellFunctionInstance);
-			} else {
-				throw new Exception("The datapoint activatormap does not contain the address " + key);
+			} catch (Exception e) {
+				log.error("Address={}: Cannot deregister activator={}", key, cellFunctionInstance, e);
+				throw new Exception(e.getMessage());
 			}
-
-		} catch (Exception e) {
-			log.error("Address={}: Cannot deregister activator={}", key, cellFunctionInstance, e);
-			throw new Exception(e.getMessage());
 		}
 	}
 

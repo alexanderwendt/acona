@@ -23,35 +23,36 @@ public class CFSubscribeLock extends CellFunctionImpl {
 
 	private String resultAddress = "";
 
-	public static Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+	public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+		//public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
 		Datapoint result = null;
 
-		CFSubscribeLock instance = new CFSubscribeLock();
+		//CFSubscribeLock instance = new CFSubscribeLock();
 		try {
 			//create and register instance
 			String name = "CFSubscribeLock_" + resultAgentName + ":" + resultAddress;
 			log.trace("Service {}>Initialize with result={}:{}", name, resultAgentName, resultAddress);
-			instance.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
+			this.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
-			JsonRpcResponse functionResult = instance.executeService(agentName, serviceName, serviceParameter, timeout);
+			JsonRpcResponse functionResult = this.executeService(agentName, serviceName, serviceParameter, timeout);
 
 			if (functionResult.getError() != null) {
 				throw new Exception("Cannot execute the service=" + serviceName + " with the parameter=" + serviceParameter + " in the agent=" + agentName);
 			}
 
 			//Wait for subscribed value
-			result = instance.waitForSubscription(resultAgentName, resultAddress, timeout);
+			result = this.waitForSubscription(resultAgentName, resultAddress, timeout);
 
 			//Deregister
 			//instance.shutDown();
 
 		} catch (Exception e) {
-			log.error("Query error", e);
-			throw new Exception(e);
+			log.error("Query error={}", e.getMessage(), e);
+			throw new Exception(e.getMessage());
 		} finally {
 			//Deregister
-			instance.shutDown();
+			this.shutDown();
 		}
 
 		return result;
@@ -107,11 +108,10 @@ public class CFSubscribeLock extends CellFunctionImpl {
 
 			log.trace("Service {}>Result recieved={}", this.getFunctionConfig().getName(), result);
 			if (result == null) {
-				log.error("Service {}>Timeouterror", this.getFunctionConfig().getName());
-				throw new Exception("Timeout on service " + this.getFunctionConfig().getName());
+				throw new Exception("Service " + this.getFunctionConfig().getName() + ">Timeouterror. Waiting to hear from address=" + resultAgentName + ":" + resultAddress);
 			}
 		} catch (Exception e) {
-			log.error("Service {}>Error on receiving data", this.getFunctionConfig().getName());
+			//log.error("Service {}>Error on receiving data", this.getFunctionConfig().getName());
 			throw new Exception(e);
 		} finally {
 			// If deregister has not been executed yet, do it

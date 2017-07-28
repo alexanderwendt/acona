@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -50,15 +49,15 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private String resultDatapointAddress = "";
 
 	private final static int METHODTIMEOUT = 10000;
-	private final static int CODELETHANDLERTIMEOUT = 10000;
+	//private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
-	private final Map<Integer, List<String>> executionOrderMap = new TreeMap<>();
+	private final Map<Integer, List<String>> executionOrderMap = new ConcurrentHashMap<>();
 
 	private int currentRunOrder = -1; //-1 for starting mode
 
 	@Override
-	protected void cellFunctionThreadInit() throws Exception {
+	protected synchronized void cellFunctionThreadInit() throws Exception {
 		this.resultDatapointAddress = this.getFunctionName() + "." + "result";
 		this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
@@ -73,26 +72,21 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			String callerAddress = "";
 			switch (parameter.getMethod()) {
 			case EXECUTECODELETEHANDLER:
-				boolean isBlocking = parameter.getParameter(0, Boolean.class); //.get(KEYISBLOCKING).getValue().getAsBoolean();
+				boolean isBlocking = parameter.getParameter(0, Boolean.class);
 				log.debug("Execute the codelet handler");
 				this.startCodeletHandler(isBlocking);
 				result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 
 				break;
 			case REGISTERCODELETSERVICENAME:
-				callerAddress = parameter.getParameter(0, String.class); //.get(KEYCALLERADDRESS).getValueAsString();
-				int executionOrder = parameter.getParameter(1, Integer.class); //.get(KEYEXECUTIONORDERNAME).getValue().getAsInt();
+				callerAddress = parameter.getParameter(0, String.class);
+				int executionOrder = parameter.getParameter(1, Integer.class);
 				log.debug("Execute the to register a codelet with parameter caller address={} and execution order={}", callerAddress, executionOrder);
 				this.registerCodelet(callerAddress, executionOrder);
 
 				JsonObject obj = new JsonObject();
 				obj.addProperty(ATTRIBUTEWORKINGMEMORYADDRESS, this.workingMemoryAddress);
 				obj.addProperty(ATTRIBUTEINTERNALMEMORYADDRESS, this.internalStateMemoryAddress);
-
-				//					result.add(Datapoints.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-				//					result.add(Datapoints.newDatapoint(ATTRIBUTEWORKINGMEMORYADDRESS).setValue(this.workingMemoryAddress));
-				//					result.add(Datapoints.newDatapoint(ATTRIBUTEINTERNALMEMORYADDRESS).setValue(this.internalStateMemoryAddress));
-
 				result = new JsonRpcResponse(parameter, obj);
 
 				break;
@@ -104,7 +98,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 				break;
 			case SETSTATESERVICENAME:
-				callerAddress = parameter.getParameter(0, String.class); //.get(KEYCALLERADDRESS).getValueAsString();
+				callerAddress = parameter.getParameter(0, String.class);
 				ServiceState state = ServiceState.valueOf(parameter.getParameter(1, String.class));
 				log.debug("Set new service caller address={}, state={}.", callerAddress, state);
 				this.setCodeletState(state, callerAddress);
@@ -116,39 +110,6 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 			}
 
-			//			if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(EXECUTECODELETEHANDLER)) {
-			//				boolean isBlocking = parameterdata.get(KEYISBLOCKING).getValue().getAsBoolean();
-			//				log.debug("Execute the codelet handler");
-			//				this.startCodeletHandler(isBlocking);
-			//				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-			//
-			//			} else if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(REGISTERCODELETSERVICENAME)) {
-			//				String callerAddress = parameterdata.get(KEYCALLERADDRESS).getValueAsString();
-			//				int executionOrder = parameterdata.get(KEYEXECUTIONORDERNAME).getValue().getAsInt();
-			//				log.debug("Execute the to register a codelet with parameter caller address={} and execution order={}", callerAddress, executionOrder);
-			//				this.registerCodelet(callerAddress, executionOrder);
-			//				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-			//				result.add(Datapoint.newDatapoint(ATTRIBUTEWORKINGMEMORYADDRESS).setValue(this.workingMemoryAddress));
-			//				result.add(Datapoint.newDatapoint(ATTRIBUTEINTERNALMEMORYADDRESS).setValue(this.internalStateMemoryAddress));
-			//
-			//			} else if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(DEREGISTERCODELETSERVICENAME)) {
-			//				String callerAddress = parameterdata.get(KEYCALLERADDRESS).getValueAsString();
-			//				log.debug("Deregister a codelet with parameter caller address={}.", callerAddress);
-			//				this.deregisterCodelet(callerAddress);
-			//				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-			//
-			//			} else if (parameterdata.containsKey(KEYMETHOD) && parameterdata.get(KEYMETHOD).getValueAsString().equals(SETSTATESERVICENAME)) {
-			//				String callerAddress = parameterdata.get(KEYCALLERADDRESS).getValueAsString();
-			//				ServiceState state = ServiceState.valueOf(parameterdata.get(KEYSTATE).getValueAsString());
-			//				log.debug("Set new service caller address={}, state={}.", callerAddress, state);
-			//				this.setCodeletState(state, callerAddress);
-			//				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-			//
-			//			} else {
-			//				log.warn("No valid method. Method sent={}", parameterdata.get(KEYMETHOD));
-			//				result.add(Datapoint.newDatapoint(CommVocabulary.PARAMETERRESULTADDRESS).setValue(CommVocabulary.ERRORVALUE));
-			//			}
-
 		} catch (Exception e) {
 			log.error("Cannot execute a method for parameterdata " + parameter, e);
 			result = new JsonRpcResponse(parameter, new JsonRpcError("CodeletHandlerError", -1, e.getMessage(), e.getLocalizedMessage()));
@@ -158,7 +119,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public void registerCodelet(String callerAddress, int executionOrder) {
+	public synchronized void registerCodelet(String callerAddress, int executionOrder) {
 		this.getCodeletMap().put(callerAddress, ServiceState.INITIALIZING);
 		this.putCodeletExecutionOrder(callerAddress, executionOrder);
 
@@ -166,7 +127,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public void deregisterCodelet(String codeletName) {
+	public synchronized void deregisterCodelet(String codeletName) {
 		this.getCodeletMap().remove(codeletName);
 		this.removeCodeletExecutionOrder(codeletName);
 		log.debug("Codelet={} deregistered", codeletName);
@@ -200,8 +161,11 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 					isCurrentRunOrderLast = true;
 
 					//Write finish notification
+					log.debug("write finished codelet");
 					this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 					log.debug("Codelet handler finished and has written ACK to datapoint address={}", this.resultDatapointAddress);
+					this.setServiceState(ServiceState.FINISHED);
+					this.setServiceState(ServiceState.IDLE);
 				} else {
 					log.debug("The next codelet run can start");
 					this.setStart();
@@ -210,6 +174,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 			//Write the current state of the system
 			Datapoint handlerState = writeStateOfTheSystemAsDatapoint();
+			log.debug("write handerstate={}", handlerState);
 			this.writeLocal(handlerState);
 
 		} else {
@@ -381,7 +346,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public boolean startCodeletHandler(boolean isBlocking) throws Exception {
+	public synchronized boolean startCodeletHandler(boolean isBlocking) throws Exception {
 		boolean isAllowedToRun = false;
 
 		//Check if the whole system is ready
@@ -437,16 +402,16 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private void putCodeletExecutionOrder(String name, int order) {
 		if (this.getExecutionOrderMap().containsKey(order)) {
 			//Add to existing list
-			synchronized (this.executionOrderMap) {
-				this.executionOrderMap.get(order).add(name);
-			}
+			//synchronized (this.executionOrderMap) {
+			this.executionOrderMap.get(order).add(name);
+			//}
 
 			log.debug("Add codelet={} to existing order={}", name, order);
 		} else {
 			//Create new list
-			synchronized (this.executionOrderMap) {
-				this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
-			}
+			//synchronized (this.executionOrderMap) {
+			this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
+			//}
 			log.debug("Create new order for codelet={} with order={}", name, order);
 		}
 	}

@@ -732,7 +732,8 @@ public class CellBasicServiceTester {
 				}
 			}
 			log.info("=== All agents initialized ===");
-			Datapoint resultDP = CFQuery.newQuery(agentName, destinationAddress, new JsonPrimitive(value), agentName, resultAddress, 100000, agent.getCell());
+			CFQuery q = new CFQuery();
+			Datapoint resultDP = q.newQuery(agentName, destinationAddress, new JsonPrimitive(value), agentName, resultAddress, 100000, agent.getCell());
 
 			String result = resultDP.getValue().getAsString();
 			log.debug("correct value={}, actual value={}", expectedResult, result);

@@ -28,7 +28,7 @@ public class DatapointConfig {
 		return new DatapointConfig(name, address, LOCALAGENTNAME, syncmode);
 	}
 
-	public static DatapointConfig newConfig(String name, String address, String agentid, SyncMode syncmode) {
+	public static synchronized DatapointConfig newConfig(String name, String address, String agentid, SyncMode syncmode) {
 		return new DatapointConfig(name, address, agentid, syncmode);
 	}
 

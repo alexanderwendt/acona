@@ -103,9 +103,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 		if (agentName.equals(this.cell.getLocalName()) == true) {
 			// Execute local function
-			//Map<String, Datapoint> parametermap = new HashMap<>();
-			//methodParameters.forEach(dp -> parametermap.put(dp.getAddress(), dp));
-
+			log.debug("Execute local function={}, parameters={}, agent={}. Hashcode={}.", serviceName, methodParameters, this.getLocalAgentName(), this.hashCode());
 			result = this.getCellFunctionHandler().getCellFunction(serviceName).performOperation(methodParameters, this.getLocalAgentName());
 		} else {
 			// Create a InitiatorBehaviour to write the datapoints to the target
@@ -136,7 +134,10 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 				try {
 					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
 					if (writeBehaviourFinished == null) {
-						throw new Exception("No answer. Operation timed out after " + timeout + "ms.");
+						throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
+								+ "Possible causes: 1: target address agent+service does not exist. "
+								+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
+								+ "2: Error at the receiver site so that no message is returned.");
 					}
 
 					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {

@@ -45,25 +45,31 @@ public class SingleNotificationReceiver extends CellFunctionImpl {
 
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		//Write datapoint into database
-		if (data.containsKey(DATAPOINTID)) {
-			try {
-				this.writeLocal(data.get(DATAPOINTID));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		//Unsubscribe datapoint
 		try {
-			this.getCommunicator().unsubscribeDatapoint(this.agent, this.address, this);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			//Write datapoint into database
+			if (data.containsKey(DATAPOINTID)) {
+				try {
+					this.writeLocal(data.get(DATAPOINTID));
+				} catch (Exception e) {
+					log.error("Cannot write datapoint locally={}", data);
+					throw e;
+				}
+			} else {
 
-		//Shutdown function
+			}
+
+			//Unsubscribe datapoint
+			try {
+				this.getCommunicator().unsubscribeDatapoint(this.agent, this.address, this);
+			} catch (Exception e) {
+				log.error("Unsubscription error");
+				throw e;
+			}
+
+			//Shutdown function
+		} catch (Exception e) {
+			log.error("Cannot update datapoint", e);
+		}
 
 	}
 

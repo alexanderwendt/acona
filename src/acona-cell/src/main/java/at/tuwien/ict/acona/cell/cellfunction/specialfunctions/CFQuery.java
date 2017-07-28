@@ -29,18 +29,18 @@ public class CFQuery extends CellFunctionImpl {
 	private String resultAddress = "";
 	private boolean isExitSet = false;
 
-	public static Datapoint newQuery(String destinationAgentName, String destinationAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+	public Datapoint newQuery(String destinationAgentName, String destinationAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
 		Datapoint result = null;
 
-		CFQuery instance = new CFQuery();
+		//CFQuery instance = new CFQuery();
 		try {
 			//create and register instance
 			String name = "CFQuery_" + destinationAddress + "_" + resultAddress;
 			log.trace("Service {}>Initialize with dest={}:{}, result={}:{}", name, destinationAgentName, destinationAddress, resultAgentName, resultAddress);
-			instance.init(CellFunctionConfig.newConfig(name, CFQuery.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
+			this.init(CellFunctionConfig.newConfig(name, CFQuery.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
-			result = instance.query(destinationAgentName, destinationAddress, content, resultAgentName, resultAddress, timeout);
+			result = this.query(destinationAgentName, destinationAddress, content, resultAgentName, resultAddress, timeout);
 
 			//Deregister
 			//instance.shutDown();
@@ -50,7 +50,7 @@ public class CFQuery extends CellFunctionImpl {
 			throw new Exception(e);
 		} finally {
 			//Deregister
-			instance.shutDown();
+			this.shutDown();
 		}
 
 		return result;

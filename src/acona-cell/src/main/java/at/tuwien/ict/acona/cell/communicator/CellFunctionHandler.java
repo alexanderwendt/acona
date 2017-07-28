@@ -39,13 +39,13 @@ public interface CellFunctionHandler {
 	 */
 	public void deregisterActivatorInstance(CellFunction activatorInstanceName) throws Exception;
 
-	public void addSubscription(CellFunction cellFunctionInstance, DatapointConfig subscriptionConfig) throws Exception;
+	public void addSubscription(String cellFunctionInstance, DatapointConfig subscriptionConfig) throws Exception;
 
-	public void removeSubscription(CellFunction activatorInstance, DatapointConfig subscriptionConfig) throws Exception;
+	public void removeSubscription(String activatorInstance, DatapointConfig subscriptionConfig) throws Exception;
 
-	public void removeSubscription(CellFunction cellFunctionInstance, String address, String agentid) throws Exception;
+	public void removeSubscription(String cellFunctionInstance, String address, String agentid) throws Exception;
 
-	public Map<String, List<CellFunction>> getCellFunctionDatapointMapping();
+	public Map<String, List<String>> getCellFunctionDatapointMapping();
 
 	public CellFunction getCellFunction(String functionName);
 
