@@ -77,4 +77,11 @@ public interface CellFunction {
 	 * @return
 	 */
 	public ServiceState getCurrentState();
+
+	/**
+	 * Get the name of the agent, which is holding the function
+	 * 
+	 * @return
+	 */
+	public String getAgentName();
 }

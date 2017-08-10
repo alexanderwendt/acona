@@ -92,7 +92,7 @@ public class AconaServiceTester {
 	public void externalControllerWithDatabaseCellsAndAdditionCellTest() {
 		try {
 			String COMMANDDATAPOINTNAME = "command";
-			String STATUSDATAPOINTNAME = "status";
+			//String STATUSDATAPOINTNAME = "status";
 			String INCREMENTATIONDATAPOINTNAME = "increment";
 
 			String controllerFunctionName = "controller";
@@ -119,9 +119,11 @@ public class AconaServiceTester {
 
 			// Controller
 			CellConfig controllerAgentConfig = CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(SequenceController.class)
-							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
-							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
+							.setProperty("agent1", agentName1)
+							.setProperty("agent2", agentName2)
+							.setProperty("agent3", agentName3)
+							.setProperty("servicename", ServiceName)
 							.setProperty("delay", "1000")
 							.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
@@ -157,7 +159,8 @@ public class AconaServiceTester {
 			log.info("Datapoints on the way");
 			memoryAgent.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().queryDatapoints(controller.getCell().getLocalName(), COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", 1000000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(controller.getCell().getLocalName(), COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), controllerFunctionName + ".state",
+					new JsonPrimitive(ServiceState.FINISHED.toString()), 10000);
 
 			double result = memoryAgent.getCommunicator().read(processDatapoint).getValue().getAsDouble();
 
@@ -231,64 +234,6 @@ public class AconaServiceTester {
 			// this.launcher.createDebugUserInterface();
 
 			this.launcher.init(totalConfig);
-
-			// // Memory
-			// CellGatewayImpl memoryAgent =
-			// this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
-			//
-			// // Controller
-			// CellConfig controllerAgentConfig =
-			// CellConfig.newConfig(controllerAgentName)
-			// .addCellfunction(CellFunctionConfig.newConfig(SequenceController.class)
-			// .setProperty("agent1", agentName1).setProperty("agent2",
-			// agentName2)
-			// .setProperty("agent3", agentName3).setProperty("servicename",
-			// ServiceName)
-			// .setProperty("delay", "1").addSyncDatapoint(
-			// DatapointConfig.newConfig(COMMANDDATAPOINTNAME,
-			// COMMANDDATAPOINTNAME, SyncMode.push)));
-			// CellGatewayImpl controller =
-			// this.launcher.createAgent(controllerAgentConfig);
-			//
-			// controller.getCommunicator().write(Datapoint.newDatapoint("Test"),
-			// memoryAgentName);
-			// // controller.subscribeForeignDatapoint(processDatapoint,
-			// // memoryAgentName);
-			//
-			// // Create services
-			// CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
-			// .addCellfunction(CellFunctionConfig.newConfig(ServiceName,
-			// CFIncrementService.class)
-			// .addSyncDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint,
-			// memoryAgentName, SyncMode.pull));
-			// CellGatewayImpl service1 =
-			// this.launcher.createAgent(serviceAgent1);
-			//
-			// CellConfig serviceAgent2 = CellConfig.newConfig(agentName2)
-			// .addCellfunction(CellFunctionConfig.newConfig(ServiceName,
-			// CFIncrementService.class)
-			// .addSyncDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
-			// processDatapoint,
-			// memoryAgentName, SyncMode.pull)));
-			// CellGatewayImpl service2 =
-			// this.launcher.createAgent(serviceAgent2);
-			//
-			// CellConfig serviceAgent3 = CellConfig.newConfig(agentName3)
-			// .addCellfunction(CellFunctionConfig.newConfig(ServiceName,
-			// CFIncrementService.class)
-			// .addSyncDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
-			// processDatapoint,
-			// memoryAgentName, SyncMode.pull)));
-			// CellGatewayImpl service3 =
-			// this.launcher.createAgent(serviceAgent3);
-
-			// synchronized (this) {
-			// try {
-			// this.wait(1000);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
 			log.info("=== All agents initialized ===");
 
 			launcher.getAgent(memoryAgentName).writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
@@ -302,7 +247,7 @@ public class AconaServiceTester {
 			// Test the wrapper for controllers too
 			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), "state", 100000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), "controllerservice.state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
@@ -418,7 +363,7 @@ public class AconaServiceTester {
 			log.info("=== System initialized ===");
 			// === System operation ===//
 
-			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", 100000);
+			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//

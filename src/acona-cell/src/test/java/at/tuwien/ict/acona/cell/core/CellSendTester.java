@@ -121,7 +121,7 @@ public class CellSendTester {
 			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(1000000);
 
-			String result = cellControlSubscriber.getCommunicator().queryDatapoints(serviceAgentName, queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, 1000000).getValueAsString();
+			String result = cellControlSubscriber.getCommunicator().queryDatapoints(serviceAgentName, queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, null, 1000000).getValueAsString();
 			log.debug("Received back from query={}", result);
 
 			// String result =
@@ -178,7 +178,7 @@ public class CellSendTester {
 					.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
 							.addManagedDatapoint(resultDatapointAddress, resultDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY)));
 
-			String result = cellControlSubscriber.getCommunicator().queryDatapoints(serviceAgentName, queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, 10000).getValueAsString();
+			String result = cellControlSubscriber.getCommunicator().queryDatapoints(serviceAgentName, queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, null, 10000).getValueAsString();
 			log.debug("Received back from query={}", result);
 
 			// String result =

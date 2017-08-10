@@ -87,7 +87,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		RESULTDATAPOINTNAME = serviceName + "." + "result";
 
 		command = Datapoints.newDatapoint(COMMANDDATAPOINTNAME).setValue(ControlCommand.STOP.toString());
-		state = Datapoints.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.IDLE.toString());
+		state = Datapoints.newDatapoint(STATEDATAPOINTNAME).setValue(ServiceState.FINISHED.toString());
 		description = Datapoints.newDatapoint(DESCRIPTIONDATAPOINTNAME).setValue("Service " + this.getFunctionName());
 		//parameter = Datapoint.newDatapoint(PARAMETERDATAPOINTNAME).setValue("");
 		config = Datapoints.newDatapoint(CONFIGDATAPOINTNAME).setValue("");
@@ -148,7 +148,7 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 		});
 
 		this.writeLocal(this.command.setValue(ControlCommand.PAUSE.toString()));
-		this.writeLocal(this.state.setValue(ServiceState.IDLE.toString()));
+		this.writeLocal(this.state.setValue(ServiceState.FINISHED.toString()));
 
 		log.info("{}>Service execution finished", this.getFunctionName());
 	}

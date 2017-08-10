@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFDataStorageUpdate;
 import at.tuwien.ict.acona.cell.config.CellConfig;
@@ -304,7 +305,7 @@ public class CellExecutorWithCellTester {
 			controlAgent.getCommunicator().setDefaultTimeout(100000);
 			log.debug("Execute query");
 			Datapoint resultState = controlAgent.getCommunicator()
-					.queryDatapoints(additionAgentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, 1000);
+					.queryDatapoints(additionAgentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, new JsonPrimitive(ServiceState.FINISHED.toString()), 1000);
 			//Datapoint resultState = CFQuery.newQuery(additionAgentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), additionAgentName, STATUSDATAPOINTNAME, 10000, controlAgent.getCell());
 			//			Datapoint resultState = controlAgent.getCommunicator()
 			//					.query(Datapoint.newDatapoint(commandDatapoint)

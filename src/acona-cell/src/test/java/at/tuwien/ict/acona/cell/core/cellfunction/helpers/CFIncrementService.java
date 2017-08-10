@@ -62,7 +62,7 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 	}
 
 	private Datapoint executeCommandStart() {
-		String message = ServiceState.IDLE.toString();
+		String message = ServiceState.FINISHED.toString();
 
 		try {
 			//Start the incrementor
@@ -102,7 +102,8 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		// TODO Auto-generated method stub
+		this.setServiceState(ServiceState.FINISHED);
+		//this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.getCurrentState().toString()));
 
 	}
 

@@ -142,7 +142,7 @@ public class CellCooperationTester {
 
 			// Controller
 			CellConfig controllerAgentConfig = CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(SequenceController.class)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
 							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
 							.setProperty("delay", "1000").addManagedDatapoint(DatapointConfig
@@ -187,10 +187,7 @@ public class CellCooperationTester {
 			memoryAgent.writeLocalDatapoint(
 					Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().queryDatapoints(
-					COMMANDDATAPOINTNAME, ControlCommand.START.toString(),
-					"state",
-					1000000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), controllerFunctionName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 10000);
 
 			// Write the numbers in the database agents
 			// client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
@@ -287,7 +284,7 @@ public class CellCooperationTester {
 			// Use a system config to init the whole system
 			SystemConfig totalConfig = SystemConfig.newConfig()
 					.addController(CellConfig.newConfig(controllerAgentName)
-							.addCellfunction(CellFunctionConfig.newConfig("controllerservice", SequenceController.class)
+							.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
 									.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 									.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
 									.setProperty("delay", "1")
@@ -383,7 +380,7 @@ public class CellCooperationTester {
 			// Test the wrapper for controllers too
 			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), "state", 100000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), controllerFunctionName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
@@ -502,7 +499,7 @@ public class CellCooperationTester {
 			// === System operation ===//
 
 			Datapoint resultState = topController.getCommunicator()
-					.queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", 100000);
+					.queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//

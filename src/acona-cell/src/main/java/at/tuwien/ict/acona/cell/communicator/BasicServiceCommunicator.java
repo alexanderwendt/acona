@@ -24,7 +24,7 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint subscribe(String agentName, String datapointName) throws Exception;
+	public Datapoint subscribe(String completeAddress) throws Exception;
 
 	/**
 	 * Unsubscribe a list of datapoints from an agent.
@@ -42,7 +42,7 @@ public interface BasicServiceCommunicator extends Communicator {
 	 * @param agentName
 	 * @throws Exception
 	 */
-	public void unsubscribe(String name, String datapointName) throws Exception;
+	public void unsubscribe(String completeAddress) throws Exception;
 
 	/**
 	 * Notify a subscriber that a datapoint has arrived. This service is

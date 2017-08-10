@@ -19,6 +19,7 @@ public class SingleNotificationReceiver extends CellFunctionImpl {
 	private final static String SUBSCRIBEDATAPOINT = "datapoint";
 	private final static String DATAPOINTID = "datapointid";
 
+	private String completeAddress = "";
 	private String agent = "";
 	private String address = "";
 
@@ -31,6 +32,7 @@ public class SingleNotificationReceiver extends CellFunctionImpl {
 	@Override
 	protected void cellFunctionInit() throws Exception {
 		//Subscription
+		completeAddress = this.getFunctionConfig().getProperty(SUBSCRIBEDATAPOINT);
 		agent = this.getFunctionConfig().getProperty(SUBSCRIBEDATAPOINT).split(":")[0];
 		address = this.getFunctionConfig().getProperty(SUBSCRIBEDATAPOINT).split(":")[1];
 
@@ -60,7 +62,7 @@ public class SingleNotificationReceiver extends CellFunctionImpl {
 
 			//Unsubscribe datapoint
 			try {
-				this.getCommunicator().unsubscribeDatapoint(this.agent, this.address, this);
+				this.getCommunicator().unsubscribeDatapoint(completeAddress, this.getFunctionName());
 			} catch (Exception e) {
 				log.error("Unsubscription error");
 				throw e;

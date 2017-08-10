@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 
@@ -38,6 +37,13 @@ public interface Communicator extends AgentCommunicator {
 	 */
 	public Datapoint read(String datapointName) throws Exception;
 
+	/**
+	 * Read a range of datapoints like data.data.* to get the whole branch
+	 * 
+	 * @param datapointName
+	 * @return
+	 * @throws Exception
+	 */
 	public List<Datapoint> readWildcard(String datapointName) throws Exception;
 
 	/**
@@ -61,10 +67,30 @@ public interface Communicator extends AgentCommunicator {
 	 */
 	public Datapoint read(String agentName, String datapoint, int timeout) throws Exception;
 
+	/**
+	 * Remove datapoint with address
+	 * 
+	 * @param datapoint
+	 * @throws Exception
+	 */
 	public void remove(String datapoint) throws Exception;
 
+	/**
+	 * Remove a list of datapoints
+	 * 
+	 * @param datapoint
+	 * @throws Exception
+	 */
 	public void remove(List<String> datapoint) throws Exception;
 
+	/**
+	 * Remove a list of datapoints for a specific agent
+	 * 
+	 * @param agentName
+	 * @param datapoint
+	 * @param timeout
+	 * @throws Exception
+	 */
 	public void remove(String agentName, List<String> datapoint, int timeout) throws Exception;
 
 	/**
@@ -118,7 +144,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception;
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement content, String resultAgentName, String resultAddress, JsonElement resultContent, int timeout) throws Exception;
 
 	/**
 	 * Query a datapoint, i.e. write content to an address and wait for an
@@ -133,7 +159,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, String content, String resultAgentName, String resultAddress, int timeout) throws Exception;
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, String content, String resultAgentName, String resultAddress, JsonElement resultContent, int timeout) throws Exception;
 
 	/**
 	 * Query a datapoint, i.e. write content to an address and wait for an
@@ -146,7 +172,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, int timeout) throws Exception;
+	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, JsonElement resultContent, int timeout) throws Exception;
 
 	/**
 	 * Query a datapoint, i.e. write content to an address and wait for an
@@ -159,7 +185,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception;
+	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, String resultContent, int timeout) throws Exception;
 
 	/**
 	 * Execute a service in an agent and wait for a value in a certain datapoint
@@ -173,7 +199,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception;
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, JsonElement expectedResult, int timeout) throws Exception;
 
 	/**
 	 * Subscribe a datapoint (also outside of the init function
@@ -184,7 +210,7 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint subscribeDatapoint(String agentid, String address, CellFunction callingCellfunctionName) throws Exception;
+	public Datapoint subscribeDatapoint(String key, String callingCellfunctionName) throws Exception;
 
 	/**
 	 * Unsubscribe a datapoint (also outside of the initfunction)
@@ -195,5 +221,5 @@ public interface Communicator extends AgentCommunicator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Datapoint unsubscribeDatapoint(String agentid, String address, CellFunction callingCellFunctionName) throws Exception;
+	public void unsubscribeDatapoint(String key, String callingCellFunctionName) throws Exception;
 }

@@ -5,6 +5,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 
@@ -42,7 +45,7 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 		JsonRpcRequest req = new JsonRpcRequest("executecodelethandler", 1);
 		req.setParameterAsValue(0, false);
 
-		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, req, codeletHandlerAgent, codeletHandlerAddress + ".result", 20000);
+		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, req, codeletHandlerAgent, codeletHandlerAddress + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
 	}
 

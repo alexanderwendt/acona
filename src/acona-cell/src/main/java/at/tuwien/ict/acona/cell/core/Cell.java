@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
+import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import jade.core.behaviours.Behaviour;
@@ -26,6 +27,14 @@ public interface Cell {
 	 * @return activation handler
 	 */
 	public CellFunctionHandler getFunctionHandler();
+
+	/**
+	 * Get subscription handler to register, deregister or activate subscribed
+	 * datapoints
+	 * 
+	 * @return
+	 */
+	public SubscriptionHandler getSubscriptionHandler();
 
 	/**
 	 * Get cell name (not the JADE local name)

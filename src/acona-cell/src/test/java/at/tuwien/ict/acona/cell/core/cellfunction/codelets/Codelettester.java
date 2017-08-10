@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet;
@@ -127,7 +128,7 @@ public class Codelettester {
 			request1.setParameterAsValue(0, false);
 
 			log.debug("Send request to codeletHandler={} and see that it fails because the condition does not match", request1);
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1, controllerAgentName, handlerName + ".result", 20000);
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1, controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -145,7 +146,7 @@ public class Codelettester {
 			request2.setParameterAsValue(0, false);
 
 			log.debug("Start codelet handler again");
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2, controllerAgentName, handlerName + ".result", 20000);
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2, controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -159,6 +160,8 @@ public class Codelettester {
 			int x = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
 			if (x == 2) {
 				log.debug("Value was incremented");
+			} else {
+				log.warn("Value is not 2 as expected");
 			}
 			log.info("Value is={}", x);
 
@@ -167,7 +170,7 @@ public class Codelettester {
 			request3.setParameterAsValue(0, false);
 
 			log.debug("See if value can be incremented again");
-			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request3, controllerAgentName, handlerName + ".result", 20000);
+			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request3, controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -247,7 +250,7 @@ public class Codelettester {
 			request1.setParameterAsValue(0, false);
 
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1,
-					controllerAgentName, handlerName + ".result", 20000);
+					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -270,7 +273,7 @@ public class Codelettester {
 			request2.setParameterAsValue(0, false);
 
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2,
-					controllerAgentName, handlerName + ".result", 20000);
+					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
 			//			synchronized (this) {
 			//				try {
@@ -362,7 +365,6 @@ public class Codelettester {
 
 			//Generate the configuration for the KORE system
 			log.info("Generate system configuration");
-			// Controller
 			// Controller
 			CellConfig cognitiveAgentConfig = CellConfig.newConfig(cognitiveAgentName)
 					//Main codelethandler
@@ -521,7 +523,7 @@ public class Codelettester {
 			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
 			request1.setParameterAsValue(0, false);
 
-			cogsys.getCommunicator().executeServiceQueryDatapoints(cognitiveAgentName, mainCodeletHandlerName, request1, cognitiveAgentName, mainCodeletHandlerName + ".result", 200000);
+			cogsys.getCommunicator().executeServiceQueryDatapoints(cognitiveAgentName, mainCodeletHandlerName, request1, cognitiveAgentName, mainCodeletHandlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 200000);
 
 			//			synchronized (this) {
 			//				try {

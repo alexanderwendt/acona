@@ -386,7 +386,7 @@ public class CellBasicServiceTester {
 			}
 
 			// Unsubscribe
-			cellControlSubscriber.getCell().getCommunicator().unsubscribe(publisherAgentName, datapointaddress);
+			cellControlSubscriber.getCell().getCommunicator().unsubscribe(publisherAgentName + ":" + datapointaddress);
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
@@ -733,7 +733,7 @@ public class CellBasicServiceTester {
 			}
 			log.info("=== All agents initialized ===");
 			CFQuery q = new CFQuery();
-			Datapoint resultDP = q.newQuery(agentName, destinationAddress, new JsonPrimitive(value), agentName, resultAddress, 100000, agent.getCell());
+			Datapoint resultDP = q.newQuery(agentName, destinationAddress, new JsonPrimitive(value), agentName, resultAddress, null, 100000, agent.getCell());
 
 			String result = resultDP.getValue().getAsString();
 			log.debug("correct value={}, actual value={}", expectedResult, result);

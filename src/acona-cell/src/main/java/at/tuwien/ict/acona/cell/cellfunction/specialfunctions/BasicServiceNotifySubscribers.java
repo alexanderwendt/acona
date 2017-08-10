@@ -34,7 +34,7 @@ public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 
 			log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.getParams());
 			//dp.forEach(d -> {
-			this.getCell().getFunctionHandler().activateNotifySubscribers(caller, dp);
+			this.getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
 			//});
 
 			result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));

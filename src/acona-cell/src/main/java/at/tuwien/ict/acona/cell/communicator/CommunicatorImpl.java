@@ -11,11 +11,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFSubscribeLock;
-import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
@@ -39,7 +36,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public List<Datapoint> read(List<String> datapoints) throws Exception {
-		return read(this.getLocalAgentName(), datapoints, defaultTimeout);
+		return read(this.getLocalAgentName(), datapoints, this.getDefaultTimeout());
 	}
 
 	@Override
@@ -92,14 +89,14 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		//	address = completeAddress[1];
 		//}
 
-		List<Datapoint> list = read(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()), defaultTimeout);
+		List<Datapoint> list = read(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()), this.getDefaultTimeout());
 
 		return list;
 	}
 
 	@Override
 	public Datapoint read(String agentName, String datapoint) throws Exception {
-		return read(agentName, datapoint, defaultTimeout);
+		return read(agentName, datapoint, this.getDefaultTimeout());
 	}
 
 	@Override
@@ -142,7 +139,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void remove(List<String> datapoints) throws Exception {
-		this.remove(this.getLocalAgentName(), datapoints, this.defaultTimeout);
+		this.remove(this.getLocalAgentName(), datapoints, this.getDefaultTimeout());
 
 	}
 
@@ -170,7 +167,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {
-		this.write(this.getLocalAgentName(), datapoints, defaultTimeout, true);
+		this.write(this.getLocalAgentName(), datapoints, this.getDefaultTimeout(), true);
 	}
 
 	@Override
@@ -211,7 +208,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void write(String agentName, Datapoint datapoint) throws Exception {
-		this.write(agentName, Arrays.asList(datapoint), defaultTimeout, true);
+		this.write(agentName, Arrays.asList(datapoint), this.getDefaultTimeout(), true);
 	}
 
 	@Override
@@ -224,7 +221,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			JsonRpcRequest request = new JsonRpcRequest(SUBSCRIBESERVICENAME, false, new Object[1]);
 			request.setParameterAsList(0, datapointaddress);
 
-			JsonRpcResponse response = this.execute(agentName, SUBSCRIBESERVICENAME, request, this.defaultTimeout, true);
+			JsonRpcResponse response = this.execute(agentName, SUBSCRIBESERVICENAME, request, this.getDefaultTimeout(), true);
 
 			if (response.getError() != null) {
 				throw new Exception("Cannot subscribe values. Error returned from destination. Error: " + response.getError());
@@ -243,13 +240,15 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public Datapoint subscribe(String agentName, String datapointName) throws Exception {
+	public Datapoint subscribe(String completeAddress) throws Exception {
 		Datapoint result = null;
-		List<Datapoint> datapoints = this.subscribe(agentName, Arrays.asList(datapointName));
+
+		Datapoint dp = Datapoints.newDatapoint(completeAddress);
+		List<Datapoint> datapoints = this.subscribe(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()));
 		if (datapoints.isEmpty() == false) {
 			result = datapoints.get(0);
 		} else {
-			throw new Exception("Datapoint " + datapointName + " could not be subscribed from agent " + agentName);
+			throw new Exception("Datapoint " + completeAddress);
 		}
 
 		return result;
@@ -267,7 +266,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			JsonRpcRequest request = new JsonRpcRequest(UNSUBSCRIBESERVICENAME, false, new Object[1]);
 			request.setParameterAsList(0, datapointaddress);
 
-			JsonRpcResponse result = this.execute(agentName, UNSUBSCRIBESERVICENAME, request, this.defaultTimeout);
+			JsonRpcResponse result = this.execute(agentName, UNSUBSCRIBESERVICENAME, request, this.getDefaultTimeout());
 
 			if (result.getError() != null) {
 				throw new Exception("Cannot unsubscribe values. Error returned from destination. Error: " + result.getError());
@@ -279,8 +278,9 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public void unsubscribe(String name, String datapointName) throws Exception {
-		this.unsubscribe(name, Arrays.asList(datapointName));
+	public void unsubscribe(String completeAddress) throws Exception {
+		Datapoint dp = Datapoints.newDatapoint(completeAddress);
+		this.unsubscribe(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()));
 
 	}
 
@@ -292,7 +292,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			JsonRpcRequest request = new JsonRpcRequest(NOTIFYSERVICENAME, true, new Object[1]);
 			request.setParameterAsValue(0, datapoint.toJsonObject());
 
-			JsonRpcResponse response = this.execute(agentName, NOTIFYSERVICENAME, request, this.defaultTimeout);
+			JsonRpcResponse response = this.execute(agentName, NOTIFYSERVICENAME, request, this.getDefaultTimeout());
 
 			if (response.getError() != null) {
 				throw new Exception("Cannot notify values. Error returned from destination. Error: " + response.getError());
@@ -304,37 +304,44 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public Datapoint subscribeDatapoint(String agentId, String datapointAddress, CellFunction callingCellfunctionName) throws Exception {
-		String id = "subsciption" + System.currentTimeMillis();
-		this.cellFunctionHandler.addSubscription(callingCellfunctionName.getFunctionName(), DatapointConfig.newConfig(id, datapointAddress, agentId, SyncMode.SUBSCRIBEONLY));
-		return null;
+	public Datapoint subscribeDatapoint(String key, String callingCellfunctionName) throws Exception {
+		//Create subscription from subscription config
+		//Subscribe the value
+		Datapoint result = this.subscribe(key);
+
+		//Add to subscription handler
+		this.getSubscriptionHandler().addSubscription(callingCellfunctionName, key);
+
+		//String id = "subscription" + System.currentTimeMillis();
+		//this.cellFunctionHandler.addSubscription(callingCellfunctionName, DatapointConfig.newConfig(id, datapointAddress, agentId, SyncMode.SUBSCRIBEONLY));
+		return result;
 	}
 
 	@Override
-	public Datapoint unsubscribeDatapoint(String agentid, String address, CellFunction callingCellFunctionName) throws Exception {
+	public void unsubscribeDatapoint(String key, String callingCellFunctionName) throws Exception {
+		this.unsubscribe(key);
 
-		this.cellFunctionHandler.removeSubscription(callingCellFunctionName.getFunctionName(), address, agentid);
-
-		return null;
+		this.getSubscriptionHandler().removeSubscription(callingCellFunctionName, key);
+		//this.cellFunctionHandler.removeSubscription(callingCellFunctionName.getFunctionName(), address, agentid);
 	}
 
 	@Override
-	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, int timeout) throws Exception {
-		return this.queryDatapoints(this.getLocalAgentName(), writeAddress, content, this.getLocalAgentName(), resultAddress, timeout);
+	public Datapoint queryDatapoints(String writeAddress, JsonElement content, String resultAddress, JsonElement resultContent, int timeout) throws Exception {
+		return this.queryDatapoints(this.getLocalAgentName(), writeAddress, content, this.getLocalAgentName(), resultAddress, resultContent, timeout);
 	}
 
 	@Override
-	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, int timeout) throws Exception {
-		return this.queryDatapoints(writeAddress, new JsonPrimitive(content), resultAddress, timeout);
+	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, String resultContent, int timeout) throws Exception {
+		return this.queryDatapoints(writeAddress, new JsonPrimitive(content), resultAddress, new JsonPrimitive(resultContent), timeout);
 	}
 
 	@Override
-	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, int timeout) throws Exception {
-		return this.queryDatapoints(writeAgentName, writeAddress, new JsonPrimitive(content), resultAgentName, resultAddress, timeout);
+	public Datapoint queryDatapoints(String writeAddress, String content, String writeAgentName, String resultAddress, String resultAgentName, JsonElement resultContent, int timeout) throws Exception {
+		return this.queryDatapoints(writeAgentName, writeAddress, new JsonPrimitive(content), resultAgentName, resultAddress, resultContent, timeout);
 	}
 
 	@Override
-	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception {
+	public Datapoint queryDatapoints(String writeAgentName, String writeAddress, JsonElement sendContent, String resultAgentName, String resultAddress, JsonElement resultContent, int timeout) throws Exception {
 		//TemporarySubscription subscription = null;
 		Datapoint result = null;
 
@@ -342,7 +349,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			//The write command always need a list of datapoints.
 
 			CFQuery query = new CFQuery();
-			result = query.newQuery(writeAgentName, writeAddress, content, resultAgentName, resultAddress, timeout, this.getCell());
+			result = query.newQuery(writeAgentName, writeAddress, sendContent, resultAgentName, resultAddress, resultContent, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 			throw new Exception(e.getMessage());
@@ -352,12 +359,12 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	}
 
 	@Override
-	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout) throws Exception {
+	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, JsonElement expectedResult, int timeout) throws Exception {
 		Datapoint result = null;
 
 		try {
 			CFSubscribeLock lock = new CFSubscribeLock();
-			result = lock.newServiceExecutionAndSubscribeLock(writeAgentName, serviceName, serviceParameter, resultAgentName, resultAddress, timeout, this.getCell());
+			result = lock.newServiceExecutionAndSubscribeLock(writeAgentName, serviceName, serviceParameter, resultAgentName, resultAddress, expectedResult, timeout, this.getCell());
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 		}

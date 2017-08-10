@@ -71,7 +71,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 				request.setParameterAsValue(1, this.exeutionOrder);
 
 				JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
-				updateServiceStateInCodeletHandler(ServiceState.IDLE);
+				updateServiceStateInCodeletHandler(ServiceState.FINISHED);
 
 				//Check the result
 				if (response.hasError()) {
@@ -150,8 +150,8 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		//				Datapoints.newDatapoint(KEYSTATE).setValue(ServiceState.IDLE.toString())));
 
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
-		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.IDLE.toString());
-		this.setServiceState(ServiceState.IDLE);
+		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.FINISHED.toString());
+		this.setServiceState(ServiceState.FINISHED);
 
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
 

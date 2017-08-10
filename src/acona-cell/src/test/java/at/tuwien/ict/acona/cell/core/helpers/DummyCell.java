@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
+import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
+import at.tuwien.ict.acona.cell.communicator.SubscriptionHandlerImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.core.CellInitialization;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
@@ -25,10 +27,12 @@ public class DummyCell implements CellInitialization {
 	private DataStorage data = new DataStorageImpl().init(new DataStorageSubscriberNotificatorMock());
 	private BasicServiceCommunicator comm = new CommunicatorMock(this);
 	private CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
+	private SubscriptionHandler subscriptionHandler = new SubscriptionHandlerImpl();
 
 	public DummyCell(CellConfig conf) throws Exception {
 		setupCellFunctions(conf);
 		activationHandler.init(this);
+		subscriptionHandler.init(activationHandler, getLocalName());
 	}
 
 	@Override
@@ -124,6 +128,11 @@ public class DummyCell implements CellInitialization {
 	public void takeDownCell() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public SubscriptionHandler getSubscriptionHandler() {
+		return subscriptionHandler;
 	}
 
 }

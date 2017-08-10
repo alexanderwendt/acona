@@ -12,6 +12,8 @@ import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
 import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
+import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
+import at.tuwien.ict.acona.cell.communicator.SubscriptionHandlerImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
@@ -27,7 +29,8 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	private final DataStorage dataStorage = new DataStorageImpl();
 	private CellNotificator notificator;
-	private final CellFunctionHandler activationHandler = new CellFunctionHandlerImpl();
+	private final CellFunctionHandler functionHandler = new CellFunctionHandlerImpl();
+	private final SubscriptionHandler subscriptionHandler = new SubscriptionHandlerImpl();
 	private CommunicatorImpl comm;
 	private CellGateway controller;
 	private DFAgentDescription dfDescriptionAgentDescription;
@@ -108,7 +111,11 @@ public class CellImpl extends Agent implements CellInitialization {
 			// Create communication
 			this.comm = new CommunicatorImpl(this);
 
-			this.activationHandler.init(this);
+			//Init function handler
+			this.functionHandler.init(this);
+
+			//Init subscription handler
+			this.subscriptionHandler.init(functionHandler, this.getLocalName());
 
 			// Create notifications
 			this.notificator = new CellNotificator(this);
@@ -291,7 +298,12 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	@Override
 	public CellFunctionHandler getFunctionHandler() {
-		return activationHandler;
+		return functionHandler;
+	}
+
+	@Override
+	public SubscriptionHandler getSubscriptionHandler() {
+		return subscriptionHandler;
 	}
 
 	// @Override

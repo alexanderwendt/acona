@@ -79,8 +79,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		// Set status that process is finished. Use it to release subscriptions
-		this.getCommunicator()
-				.write(Datapoints.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.IDLE.toString()));
+		this.getCommunicator().write(Datapoints.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.FINISHED.toString()));
 		log.info("Function end after setting status={}", this.getCommunicator().read(STATUSDATAPOINTNAME));
 	}
 

@@ -27,20 +27,21 @@ public class CFQuery extends CellFunctionImpl {
 	private final SynchronousQueue<Datapoint> queue = new SynchronousQueue<>();
 
 	private String resultAddress = "";
-	private boolean isExitSet = false;
+	private JsonElement resultContent = null;
+	//private boolean isExitSet = false;
 
-	public Datapoint newQuery(String destinationAgentName, String destinationAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+	public Datapoint newQuery(String destinationAgentName, String destinationAddress, JsonElement sendcontent, String resultAgentName, String resultAddress, JsonElement resultcontent, int timeout, Cell cell) throws Exception {
 		Datapoint result = null;
 
 		//CFQuery instance = new CFQuery();
 		try {
 			//create and register instance
 			String name = "CFQuery_" + destinationAddress + "_" + resultAddress;
-			log.trace("Service {}>Initialize with dest={}:{}, result={}:{}", name, destinationAgentName, destinationAddress, resultAgentName, resultAddress);
+			log.trace("Service {}>Initialize with dest={}:{} content={}, result={}:{}, content={}", name, destinationAgentName, destinationAddress, sendcontent, resultAgentName, resultAddress, resultcontent);
 			this.init(CellFunctionConfig.newConfig(name, CFQuery.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
-			result = this.query(destinationAgentName, destinationAddress, content, resultAgentName, resultAddress, timeout);
+			result = this.query(destinationAgentName, destinationAddress, sendcontent, resultAgentName, resultAddress, resultcontent, timeout);
 
 			//Deregister
 			//instance.shutDown();
@@ -79,16 +80,26 @@ public class CFQuery extends CellFunctionImpl {
 			log.debug("Service {}>Received update message for temp subscription={}", this.getFunctionConfig().getName(), data);
 			Datapoint dp = data.get(resultAddress);
 
-			this.queue.put(dp);
+			if ((resultContent != null) && (resultContent.isJsonNull() == false)) {
+				if (dp.getValue().equals(resultContent)) {
+					log.debug("Received trigger value={}", dp.getValue(), resultContent);
+					this.queue.put(dp);
+				} else {
+					log.debug("recieved a non-triggering value={}. Expected={}", dp.getValue(), resultContent);
+				}
+			} else {
+				this.queue.put(dp);
+			}
 
 		} catch (InterruptedException e) {
 			log.error("Service {}>Cannot receive data through subscription", this.getFunctionConfig().getName());
 		}
 	}
 
-	private Datapoint query(String destinationAgentName, String destinationAddress, JsonElement content, String resultAgentName, String resultAddress, int timeout) throws Exception {
+	private Datapoint query(String destinationAgentName, String destinationAddress, JsonElement sendContent, String resultAgentName, String resultAddress, JsonElement resultContent, int timeout) throws Exception {
 		Datapoint result = null;
 		this.resultAddress = resultAddress;
+		this.resultContent = resultContent;
 		//this.resultAgent = resultAgentName;
 
 		try {
@@ -96,7 +107,7 @@ public class CFQuery extends CellFunctionImpl {
 			//this.getCommunicator().subscribe(resultAddress, resultAgentName);
 
 			//write to destination
-			List<Datapoint> sendlist = Arrays.asList(Datapoints.newDatapoint(destinationAddress).setValue(content));
+			List<Datapoint> sendlist = Arrays.asList(Datapoints.newDatapoint(destinationAddress).setValue(sendContent));
 			this.getCommunicator().write(destinationAgentName, sendlist, timeout, false);
 
 			try {
@@ -109,7 +120,7 @@ public class CFQuery extends CellFunctionImpl {
 
 			log.trace("Service {}>Result recieved={}", this.getFunctionConfig().getName(), result);
 			if (result == null) {
-				log.error("Service {}>Timeouterror", this.getFunctionConfig().getName());
+				log.error("Service {}>Timeouterror after {}ms. Expected datapoint={}, value={}", this.getFunctionConfig().getName(), timeout, resultAgentName + ":" + resultAddress, resultContent);
 				throw new Exception("Timeout on service " + this.getFunctionConfig().getName());
 			}
 		} catch (Exception e) {

@@ -34,10 +34,11 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
-	protected int defaultTimeout = 10000;
+	private int defaultTimeout = 10000;
 
 	private final CellImpl cell;
-	protected final CellFunctionHandler cellFunctionHandler;
+	private final CellFunctionHandler cellFunctionHandler;
+	private final SubscriptionHandler subscriptionHandler;
 	//private final static Gson gson = new Gson();
 	private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
@@ -45,6 +46,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 		this.cell = cell;
 		//this.datastorage = this.cell.getDataStorage();
 		this.cellFunctionHandler = this.cell.getFunctionHandler();
+		this.subscriptionHandler = this.cell.getSubscriptionHandler();
 	}
 
 	protected String getLocalAgentName() {
@@ -229,6 +231,10 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	protected CellImpl getCell() {
 		return cell;
+	}
+
+	public SubscriptionHandler getSubscriptionHandler() {
+		return subscriptionHandler;
 	}
 
 }

@@ -86,7 +86,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	private void initServiceDatapoints() throws Exception {
 		Datapoint command = Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
-		Datapoint state = Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.IDLE.toString());
+		Datapoint state = Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.FINISHED.toString());
 		Datapoint description = Datapoints.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue("Service " + this.getFunctionName());
 		Datapoint config = Datapoints.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
 		Datapoint result = Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");

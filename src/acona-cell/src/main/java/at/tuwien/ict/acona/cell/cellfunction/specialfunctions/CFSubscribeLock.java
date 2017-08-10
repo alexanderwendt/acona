@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
@@ -22,17 +24,44 @@ public class CFSubscribeLock extends CellFunctionImpl {
 	private final SynchronousQueue<Datapoint> queue = new SynchronousQueue<>();
 
 	private String resultAddress = "";
+	private JsonElement expectedResult;
 
-	public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+	/**
+	 * Execute a function and subscribe the result from a certain datapoint.
+	 * 
+	 * Example: Execute function codelethandler and lock the executing function
+	 * until the state datapoint has the value finished.
+	 * 
+	 * @param agentName:
+	 *            target agent name, where the executing function is
+	 * @param serviceName:
+	 *            target service name
+	 * @param serviceParameter:
+	 *            Request for the function to be executed
+	 * @param resultAgentName:
+	 *            Resulting datapoint agent name
+	 * @param resultAddress:
+	 *            Resulting address in an agent
+	 * @param expectedResult:
+	 *            Filter for what results are accepted. "null" is any result
+	 * @param timeout:
+	 *            Timeout, when to interrupt the request
+	 * @param cell:
+	 *            Executing cell.
+	 * @return
+	 * @throws Exception
+	 */
+	public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, JsonElement expectedResult, int timeout, Cell cell) throws Exception {
 		//public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
 		Datapoint result = null;
 
-		//CFSubscribeLock instance = new CFSubscribeLock();
 		try {
+			this.resultAddress = resultAddress;
+			this.expectedResult = expectedResult;
 			//create and register instance
-			String name = "CFSubscribeLock_" + resultAgentName + ":" + resultAddress;
-			log.trace("Service {}>Initialize with result={}:{}", name, resultAgentName, resultAddress);
-			this.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(resultAddress, resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
+			String name = "CFSubscribeLock_" + resultAgentName + ":" + this.resultAddress;
+			log.trace("Service {}>Initialize with result={}:{}", name, resultAgentName, this.resultAddress);
+			this.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(this.resultAddress, this.resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
 			//Execute the function method
 			JsonRpcResponse functionResult = this.executeService(agentName, serviceName, serviceParameter, timeout);
@@ -42,7 +71,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 			}
 
 			//Wait for subscribed value
-			result = this.waitForSubscription(resultAgentName, resultAddress, timeout);
+			result = this.waitForSubscription(resultAgentName, this.resultAddress, timeout);
 
 			//Deregister
 			//instance.shutDown();
@@ -81,7 +110,16 @@ public class CFSubscribeLock extends CellFunctionImpl {
 			log.debug("Service {}>Received update message for temp subscription={}", this.getFunctionConfig().getName(), data);
 			Datapoint dp = data.get(resultAddress);
 
-			this.queue.put(dp);
+			if ((this.expectedResult != null) && (this.expectedResult.isJsonNull() == false)) {
+				if (dp.getValue().equals(this.expectedResult)) {
+					log.debug("Received trigger value={}", dp.getValue(), this.expectedResult);
+					this.queue.put(dp);
+				} else {
+					log.debug("recieved a non-triggering value={}. Expected={}", dp.getValue(), this.expectedResult);
+				}
+			} else {
+				this.queue.put(dp);
+			}
 
 		} catch (InterruptedException e) {
 			log.error("Service {}>Cannot receive data through subscription", this.getFunctionConfig().getName());

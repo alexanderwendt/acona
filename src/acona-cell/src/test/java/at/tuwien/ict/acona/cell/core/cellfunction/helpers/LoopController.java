@@ -36,7 +36,7 @@ public class LoopController extends CellFunctionThreadImpl {
 		int numberOfAgents = this.getFunctionConfig().getProperty("numberofagents", Integer.class);
 
 		for (int i = 1; i <= numberOfAgents; i++) {
-			ServiceState result = this.executeServiceById("servicename", "agentnameprefix", i, 1000);
+			ServiceState result = this.executeServiceById("servicename", "agentnameprefix", i, 5000);
 			log.debug("Result = {}", result);
 
 		}
@@ -65,7 +65,9 @@ public class LoopController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		// TODO Auto-generated method stub
+		//this.writeLocal(Datapoints.newDatapoint("state").setValue(ServiceState.FINISHED.toString()));
+		this.setServiceState(ServiceState.FINISHED);
+		log.debug("finished loop controller post processing");
 
 	}
 

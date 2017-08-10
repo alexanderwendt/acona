@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.cell.config;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
 public class DatapointConfig {
 	public final static String LOCALAGENTNAME = "";
@@ -126,6 +127,16 @@ public class DatapointConfig {
 		}
 
 		return result;
+	}
+	
+	public String getComposedAddress(String defaultAgentName) {
+		String destinationAgent = this.getAgentid(defaultAgentName);
+		String address = this.getAddress();
+
+		//Generate key for the internal activator
+		String key = destinationAgent + ":" + address;
+
+		return key;
 	}
 
 	@Override

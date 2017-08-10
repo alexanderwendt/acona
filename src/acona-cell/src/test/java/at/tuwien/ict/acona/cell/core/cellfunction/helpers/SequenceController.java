@@ -11,7 +11,6 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -31,8 +30,10 @@ public class SequenceController extends CellFunctionThreadImpl {
 	private ServiceState executeService(String serviceName, String agentName, int timeout) throws Exception {
 		String commandDatapoint = serviceName + ".command";
 		String resultDatapoint = serviceName + ".state";
-		Datapoint result1 = this.getCommunicator().queryDatapoints(agentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), agentName, resultDatapoint, timeout);
+		log.debug("Execute service={}", serviceName);
+		Datapoint result1 = this.getCommunicator().queryDatapoints(agentName, commandDatapoint, new JsonPrimitive(ControlCommand.START.toString()), agentName, resultDatapoint, new JsonPrimitive(ServiceState.FINISHED.toString()), timeout);
 
+		log.debug("Service={} executed.", serviceName);
 		return ServiceState.valueOf(result1.getValueAsString());
 	}
 
@@ -47,7 +48,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 		// String resultDatapoint = serviceName + ".state";
 		// log.debug("read the following values from the config={}, {}, {}",
 		// commandDatapoint, agent1, resultDatapoint);
-		ServiceState result1 = this.executeServiceById("servicename", "agent1", 100000);
+		ServiceState result1 = this.executeServiceById("servicename", "agent1", 1000);
 		// Datapoint result1 =
 		// this.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()),
 		// agent1, Datapoint.newDatapoint(resultDatapoint), agent1, 100000);
@@ -60,14 +61,14 @@ public class SequenceController extends CellFunctionThreadImpl {
 			}
 		}
 
-		log.debug("Result = {}", result1);
+		log.debug("Result1 = {}", result1);
 		// execute service 2
 		// this.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(ControlCommand.START.toString()),
 		// this.getConfig().getProperty("agent2"),
 		// Datapoint.newDatapoint(resultDatapoint),
 		// this.getConfig().getProperty("agent2"), 100000);
-		ServiceState result2 = this.executeServiceById("servicename", "agent2", 100000);
-
+		ServiceState result2 = this.executeServiceById("servicename", "agent2", 1000);
+		log.debug("Result2 = {}", result2);
 		synchronized (this) {
 			try {
 				this.wait(delay);
@@ -81,7 +82,8 @@ public class SequenceController extends CellFunctionThreadImpl {
 		// Datapoint.newDatapoint(resultDatapoint),
 		// this.getConfig().getProperty("agent3"), 100000);
 
-		ServiceState result3 = this.executeServiceById("servicename", "agent3", 100000);
+		ServiceState result3 = this.executeServiceById("servicename", "agent3", 1000);
+		log.debug("Result3 = {}", result3);
 		synchronized (this) {
 			try {
 				this.wait(delay);
@@ -89,6 +91,8 @@ public class SequenceController extends CellFunctionThreadImpl {
 
 			}
 		}
+
+		log.info("Function sequence controller finished");
 
 	}
 
@@ -112,7 +116,10 @@ public class SequenceController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		this.writeLocal(Datapoints.newDatapoint("state").setValue(ServiceState.IDLE.toString()));
+		//this.writeLocal(Datapoints.newDatapoint("state").setValue(ServiceState.FINISHED.toString()));
+		log.debug("Set finished state");
+		this.setServiceState(ServiceState.FINISHED);
+		log.debug("Finished state set");
 
 	}
 

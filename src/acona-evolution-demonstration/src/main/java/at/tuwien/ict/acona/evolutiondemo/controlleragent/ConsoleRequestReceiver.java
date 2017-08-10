@@ -50,7 +50,7 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 			//this.getCommunicator().write(Datapoint.newDatapoint(COMMANDADDRESS).setValue(command));
 			
 			//Execute a function that waits
-			this.getCommunicator().queryDatapoints(COMMANDADDRESS, command, RESULTADDRESS, 2000);
+			this.getCommunicator().queryDatapoints(COMMANDADDRESS, command, RESULTADDRESS, null, 2000);
 			
 			//Execute 
 			//this.getCommunicator().execute(this.getCell().getLocalName(), , methodParameters, timeout)

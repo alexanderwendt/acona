@@ -161,11 +161,11 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 					isCurrentRunOrderLast = true;
 
 					//Write finish notification
-					log.debug("write finished codelet");
-					this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-					log.debug("Codelet handler finished and has written ACK to datapoint address={}", this.resultDatapointAddress);
+					//log.debug("write finished codelet");
+					//this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 					this.setServiceState(ServiceState.FINISHED);
-					this.setServiceState(ServiceState.IDLE);
+					log.debug("Codelet handler finished and has written state finished to datapoint address={}", this.codeletStateDatapointAddress);
+					//this.setServiceState(ServiceState.IDLE);
 				} else {
 					log.debug("The next codelet run can start");
 					this.setStart();
@@ -268,7 +268,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			log.debug("Map:{}", this.getExecutionOrderMap());
 			List<String> names = this.getExecutionOrderMap().get(runOrder);
 			for (String codelet : names) {
-				if (this.getCodeletMap().get(codelet).equals(ServiceState.IDLE) == false) {
+				if (this.getCodeletMap().get(codelet).equals(ServiceState.FINISHED) == false) {
 					result = false;
 					break;
 				}
@@ -289,7 +289,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private boolean isRunOrderStateReady() {
 		boolean result = true;
 		for (ServiceState s : this.getCodeletMap().values()) {
-			if (s.equals(ServiceState.IDLE) == false) {
+			if (s.equals(ServiceState.FINISHED) == false) {
 				result = false;
 				break;
 			}
@@ -354,7 +354,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1 && this.executionOrderMap.isEmpty() == false; //if all codelets are idle and runorder is reset
 
 			if (isAllowedToRun == true) {
-				log.debug("All codelets are in state IDLE");
+				log.debug("All codelets are in state FINISHED");
 				//Clear the blocker
 
 				//Increment to start with the first run order

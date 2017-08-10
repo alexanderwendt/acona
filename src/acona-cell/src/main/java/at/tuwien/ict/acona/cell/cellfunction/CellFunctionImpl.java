@@ -80,7 +80,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 			// Get responder if it exists
 			if (this.getFunctionConfig().getGenerateReponder() == null) {
-				this.config.setGenerateReponder(false);
+				this.getFunctionConfig().setGenerateReponder(false);
 			}
 
 			if (this.getFunctionConfig().getResponderProtocol().equals("") == true) {
@@ -89,19 +89,23 @@ public abstract class CellFunctionImpl implements CellFunction {
 			}
 
 			// Get subscriptions from config and add to subscription list
-			this.config.getManagedDatapoints().forEach(s -> {
+			this.getFunctionConfig().getManagedDatapoints().forEach(s -> {
 				this.addManagedDatapoint(s);
 			});
 
 			// === Register in the function handler ===//
-			this.cell.getFunctionHandler().registerCellFunctionInstance(this); //Here are also the default subscriptions
+			this.getCell().getFunctionHandler().registerCellFunctionInstance(this); //Here are also the default subscriptions
+
+			// === Register subscriptions === //
+			this.subscribeDatapoints();
+
 		} catch (Exception e) {
 			log.error("Cannot init function with config={}", config);
 			//this.shutDown();
 			throw new Exception(e.getMessage());
 		}
 
-		this.setServiceState(ServiceState.IDLE);
+		this.setServiceState(ServiceState.FINISHED);
 
 		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.managedDatapoints);
 	}
@@ -139,16 +143,95 @@ public abstract class CellFunctionImpl implements CellFunction {
 		managedDatapoints.put(config.getId(), config);
 	}
 
+	private void subscribeDatapoints() throws Exception {
+		//List<DatapointConfig> activatorAddresses = new ArrayList<>(this.getSubscribedDatapoints().values());
+
+		// Go through each address and add the activator to this address
+		//for (DatapointConfig subscriptionConfig : activatorAddresses) {
+		this.getSubscribedDatapoints().values().forEach(subscriptionConfig -> {
+			try {
+				//Adds the subscription to the handler
+				//Subscribe the datapoint		
+				//Construct name (if only "", then use the local agent)
+				//				String agentName = subscriptionConfig.getAgentid(this.hostCell.getLocalName());
+				//				String key = agentName + ":" + subscriptionConfig.getAddress();
+
+				//Add subscription to the subscription handler
+				//Add it first. On subscription, the deafault value can be sent to the update function.
+				//this.getCell().getSubscriptionHandler().addSubscription(this.getFunctionName(), subscriptionConfig.getComposedAddress(this.getAgentName()));
+
+				//String key = this.generateKey(subscriptionConfig);
+				//Datapoint dp = Datapoints.newDatapoint(key);
+				//if (this.datapointActivationMap.containsKey(key) == false) {
+				Datapoint initialValue = this.getCommunicator().subscribeDatapoint(subscriptionConfig.getComposedAddress(this.getAgentName()), this.getFunctionName());
+				log.debug("Subscribed address={}.", subscriptionConfig.getComposedAddress(this.getAgentName()));
+				//} else {
+				//	log.debug("Key={} already exists in the function mapping. Therefore no additional subscription is necessary", key);
+				//}
+			} catch (Exception e) {
+				log.error("Cannot subscribe address={}", this.getAgentName() + ":" + subscriptionConfig.getAddress(), e);
+				//throw new Exception(e.getMessage());
+			}
+		});
+	}
+
+	public void removeSubscription() {
+		// Get all subscribed addresses
+		//List<DatapointConfig> activatorAddresses = new ArrayList<>(this.getSubscribedDatapoints().values());
+
+		// Go through each address and remove the activator to this address
+		this.getSubscribedDatapoints().values().forEach(subscriptionsConfig -> {
+			//activatorAddresses.forEach(subscriptionsConfig -> {
+			try {
+				this.getCell().getSubscriptionHandler().removeSubscription(this.getFunctionName(), subscriptionsConfig.getComposedAddress(this.getAgentName()));
+
+				//				//String key = subscriptionsConfig.getAgentid(this.hostCell.getLocalName()) + ":" + subscriptionsConfig.getAddress();
+				//				if (this.getCell().getSubscriptionHandler().removeSubscription(cellFunctionInstance, key);.datapointActivationMap.containsKey(key) == false) {
+				//					this.hostCell.getCommunicator().unsubscribe(subscriptionsConfig.getAgentid(this.hostCell.getLocalName()), Arrays.asList(subscriptionsConfig.getAddress()));
+				//					log.debug("Datapoint {}:{} was deregistered as no functions subscribes it", this.hostCell.getLocalName(), key, activatorInstance.getFunctionName());
+				//				} else {
+				//					log.debug("Datapoint {}:{} was deregistered for the function {}. It is still subscribed by the agent.", this.hostCell.getLocalName(), key, activatorInstance.getFunctionName());
+				//				}
+				//
+				//				//this.removeSubscription(activatorInstance.getFunctionName(), subscriptionsConfig.getAgentid(), subscriptionsConfig.getAddress());
+				//				this.removeSubscription(this.getFunctionName(), subscriptionsConfig.getComposedAddress(this.getAgentName()));
+
+			} catch (Exception e) {
+				log.error("Cannot unsubscribe address={}", subscriptionsConfig.getAddress(), e);
+			}
+
+		});
+	}
+
+	//	private String generateKey(DatapointConfig subscriptionConfig) {
+	//		String destinationAgent = subscriptionConfig.getAgentid(this.getCell().getLocalName());
+	//		String address = subscriptionConfig.getAddress();
+	//
+	//		//Construct name (if only "", then use the local agent)
+	//		String agentName = destinationAgent;
+	//		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
+	//			agentName = this.getCell().getLocalName();
+	//		}
+	//
+	//		//Generate key for the internal activator
+	//		String key = agentName + ":" + address;
+	//
+	//		return key;
+	//	}
+
 	@Override
 	public void shutDown() {
 		// Unsubscribe all datapoints
 		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
 		try {
-			// Execute specific functions
+			//Execute specific functions
 			this.shutDownImplementation();
 
+			//Remove all subscriptions
+			this.removeSubscription();
+
 			//Execute general deregister
-			this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
+			this.getCell().getFunctionHandler().deregisterActivatorInstance(this.getFunctionName());
 			//this.getCell().takeDownCell();
 			log.info("Agent {}> ==== shut down function={} ====", this.getCell().getLocalName(), this.getFunctionName());
 		} catch (Exception e) {
@@ -176,6 +259,11 @@ public abstract class CellFunctionImpl implements CellFunction {
 	@Override
 	public String getFunctionName() {
 		return this.cellFunctionName;
+	}
+
+	@Override
+	public String getAgentName() {
+		return this.getCell().getLocalName();
 	}
 
 	@Override
