@@ -374,8 +374,9 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			} else {
 				log.warn("Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getCodeletMap());
 				//Write finish notification
-				this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-				log.debug("Codelet handler finished and has written ACK to datapoint address={}", this.resultDatapointAddress);
+				//this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
+				//log.debug("Codelet handler finished and has written ACK to datapoint address={}", this.resultDatapointAddress);
+				this.setServiceState(ServiceState.FINISHED);
 
 			}
 		} catch (NullPointerException e) {

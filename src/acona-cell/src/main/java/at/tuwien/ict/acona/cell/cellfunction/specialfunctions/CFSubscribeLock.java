@@ -146,6 +146,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 
 			log.trace("Service {}>Result recieved={}", this.getFunctionConfig().getName(), result);
 			if (result == null) {
+				log.error("Service {}>Timeouterror after {}ms. Expected datapoint={}, value={}", this.getFunctionConfig().getName(), timeout, resultAgentName + ":" + this.resultAddress, this.expectedResult);
 				throw new Exception("Service " + this.getFunctionConfig().getName() + ">Timeouterror. Waiting to hear from address=" + resultAgentName + ":" + resultAddress);
 			}
 		} catch (Exception e) {
