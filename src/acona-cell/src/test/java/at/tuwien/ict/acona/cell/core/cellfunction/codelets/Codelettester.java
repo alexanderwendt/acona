@@ -92,7 +92,7 @@ public class Codelettester {
 			String processDatapoint = "workingmemory.changeme";
 			// values
 			double startValue = 1;
-			int expectedResult = 3;
+			int expectedResult = 4;
 
 			//Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
@@ -186,7 +186,7 @@ public class Codelettester {
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 
-			assertEquals(result, expectedResult, 0.0);
+			assertEquals(expectedResult, result, 0.0);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);
