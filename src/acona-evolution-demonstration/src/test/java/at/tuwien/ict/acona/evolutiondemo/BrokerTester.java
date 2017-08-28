@@ -33,9 +33,9 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
-public class brokerTester {
+public class BrokerTester {
 
-	private static final Logger log = LoggerFactory.getLogger(Codelettester.class);
+	private static final Logger log = LoggerFactory.getLogger(BrokerTester.class);
 	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
 
 	@Before
