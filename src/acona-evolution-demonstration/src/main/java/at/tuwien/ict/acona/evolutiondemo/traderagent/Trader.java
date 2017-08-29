@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
@@ -16,7 +17,7 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 
-public class Trader extends CellFunctionThreadImpl {
+public class Trader extends CellFunctionCodelet {
 	
 	private final static Logger log = LoggerFactory.getLogger(Trader.class);
 	
@@ -62,7 +63,7 @@ public class Trader extends CellFunctionThreadImpl {
 	
 	
 	@Override
-	protected void cellFunctionThreadInit() throws Exception {
+	protected void cellFunctionCodeletInit() throws Exception {
 		stockMarketAddress = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, initStockmarketAddress);
 		brokerAddress = this.getFunctionConfig().getProperty(ATTRIBUTEBROKERADDRESS, initBrokerAddress);
 		signalAddress = this.getFunctionConfig().getProperty(ATTRIBUTESIGNALADDRESS, initSignalAddress);
@@ -79,21 +80,25 @@ public class Trader extends CellFunctionThreadImpl {
 		
 		
 		//Add subscription to the stock market price
-		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, Datapoints.newDatapoint(stockMarketAddress).getAddress(), Datapoints.newDatapoint(stockMarketAddress).getAgent(), SyncMode.SUBSCRIBEONLY));
+		log.debug("Read from address={}", stockMarketAddress);
+		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, Datapoints.newDatapoint(stockMarketAddress).getAddress(), Datapoints.newDatapoint(stockMarketAddress).getAgent(), SyncMode.READONLY));
 		
 		
 		//Create a depot
 		this.createDepot();
+		
 	}
 
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	protected void executeFunction() throws Exception {
+		this.executeTraderPreProcessing();
+		
 		log.trace("Start agent caluclation");
 		//Program logic
 		//1. Split depot if necessary
@@ -107,19 +112,20 @@ public class Trader extends CellFunctionThreadImpl {
 		//5. Execute signal
 		this.executeTrade();
 		log.debug("Finished: Depot={}", this.depot);
+		
+		this.executeTraderPostProcessing();
 	}
 
-	@Override
-	protected void executeCustomPostProcessing() throws Exception {
+	private void executeTraderPostProcessing() throws Exception {
 		//Reset signals
 		this.buySignal = false;
 		this.sellSignal = false;
 		
 	}
 
-	@Override
-	protected void executeCustomPreProcessing() throws Exception {
+	private void executeTraderPreProcessing() throws Exception {
 		//Update prices
+		log.debug("Value map={}", this.getValueMap());
 		this.closePrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
 		this.highPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
 		this.lowPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
@@ -130,21 +136,29 @@ public class Trader extends CellFunctionThreadImpl {
 
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-		if (data.containsKey(IDPRICE)) {
-			this.setStart();
-		}
-		
+//		if (data.containsKey(IDPRICE)) {
+//			this.setStart();
+//		}
+//		
 	}
-
-	@Override
-	protected void shutDownExecutor() throws Exception {
+	
+	protected void shutDownCodelet() throws Exception {
 		//Delete the depot
 		this.deleteDepot();
 		
 		log.info("{}>Agent is killed", this.getCell().getLocalName());
 		//Then, agent is killed
-		
 	}
+
+//	@Override
+//	protected void shutDownExecutor() throws Exception {
+//		//Delete the depot
+//		this.deleteDepot();
+//		
+//		log.info("{}>Agent is killed", this.getCell().getLocalName());
+//		//Then, agent is killed
+//		
+//	}
 	
 	private void createDepot() throws Exception {
 		//Write to broker a new depot

@@ -40,7 +40,7 @@ public class RequestReceiverUserConsole extends UserConsoleFunction {
 		try {
 			client.shutDown();
 		} catch (Exception e) {
-			log.error("Cannot correctly exit tapchanger", e);
+			log.error("Cannot correctly exit the program", e);
 		}
 	}
 	

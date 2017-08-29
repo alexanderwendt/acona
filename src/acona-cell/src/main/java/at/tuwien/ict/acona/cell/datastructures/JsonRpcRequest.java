@@ -45,6 +45,39 @@ public class JsonRpcRequest {
 		this.params = new Object[numberOfParameter];
 	}
 
+	public JsonRpcRequest(String stringrpcRequest) throws Exception {
+		if (gson == null) {
+			gson = new Gson();
+		}
+
+		JsonRpcRequest rpcRequest2 = null;
+
+		try {
+			rpcRequest2 = gson.fromJson(stringrpcRequest, JsonRpcRequest.class);
+		} catch (Exception e) {
+			throw new Exception("Cannot convert string into request. String=" + stringrpcRequest, e);
+		}
+
+		this.method = rpcRequest2.getMethod();
+		this.id = rpcRequest2.getId();
+		this.jsonrpc = rpcRequest2.getJsonrpc();
+		this.params = rpcRequest2.getParams();
+	}
+
+	public JsonRpcRequest(JsonObject rpcRequest) {
+		if (gson == null) {
+			gson = new Gson();
+		}
+		this.method = rpcRequest.getAsJsonPrimitive("method").getAsString();
+		this.id = rpcRequest.getAsJsonPrimitive("id").getAsString();
+		this.jsonrpc = rpcRequest.getAsJsonPrimitive("jsonprc").getAsString();
+
+		JsonArray params = rpcRequest.getAsJsonArray("params");
+
+		Object[] objectArray = gson.fromJson(params, Object[].class);
+		this.params = objectArray;
+	}
+
 	public void setParameters(Object... obj) {
 		this.params = obj;
 	}
@@ -132,50 +165,6 @@ public class JsonRpcRequest {
 		}
 		T result = gson.fromJson(this.getParams()[index].toString(), clazz);
 		return result;
-	}
-
-	public JsonRpcRequest(String stringrpcRequest) throws Exception {
-		if (gson == null) {
-			gson = new Gson();
-		}
-
-		JsonObject rpcRequest = null;
-		JsonRpcRequest rpcRequest2 = null;
-
-		try {
-			rpcRequest = gson.fromJson(stringrpcRequest, JsonObject.class).getAsJsonObject();
-			rpcRequest2 = gson.fromJson(stringrpcRequest, JsonRpcRequest.class);
-		} catch (Exception e) {
-			throw new Exception("Cannot convert string into request. String=" + stringrpcRequest, e);
-		}
-
-		this.method = rpcRequest2.getMethod();
-		//if (rpcRequest2..has("id") && rpcRequest2.get("id").isJsonNull() == false) {
-		this.id = rpcRequest2.getId();
-		//} else {
-		//this.id = null;
-		//}
-
-		this.jsonrpc = rpcRequest2.getJsonrpc();
-
-		//JsonArray params = rpcRequest2.getAsJsonArray("params");
-
-		//Object[] objectArray = gson.fromJson(params, Object[].class);
-		this.params = rpcRequest2.getParams();
-	}
-
-	public JsonRpcRequest(JsonObject rpcRequest) {
-		if (gson == null) {
-			gson = new Gson();
-		}
-		this.method = rpcRequest.getAsJsonPrimitive("method").getAsString();
-		this.id = rpcRequest.getAsJsonPrimitive("id").getAsString();
-		this.jsonrpc = rpcRequest.getAsJsonPrimitive("jsonprc").getAsString();
-
-		JsonArray params = rpcRequest.getAsJsonArray("params");
-
-		Object[] objectArray = gson.fromJson(params, Object[].class);
-		this.params = objectArray;
 	}
 
 	public String getMethod() {

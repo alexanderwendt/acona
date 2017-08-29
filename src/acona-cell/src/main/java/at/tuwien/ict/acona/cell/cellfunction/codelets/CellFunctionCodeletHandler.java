@@ -219,21 +219,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		if (runAllowed == false) {
 			log.warn("Not all codelets are ready to run. States={}", this.getCodeletMap());
-		}
-		//Check their states. Only if all are idle, the process can start. It means that this process is still running and the
-		//system has to wait
-		//		for (Entry<String, ServiceState> e : this.codeletMap.entrySet()) {
-		//			if (e.getValue().equals(ServiceState.IDLE) == false) {
-		//				log.warn("All codelets are not finished yet. {} is still not idle", e);
-		//				runAllowed = false;
-		//			}
-		//		}
-
-		//Execute all codelets in a sequence.
-		//All codelets of an execution order have to be finished for the next order to start
-		//this.retrieveExecutionOrder()
-
-		if (runAllowed == true) {
+		} else {
 			//For each, send a message to start in parallel
 			this.getExecutionOrderMap().get(this.currentRunOrder).forEach((k) -> {
 				String agentName = k.split(":")[0];
@@ -374,8 +360,6 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			} else {
 				log.warn("Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getCodeletMap());
 				//Write finish notification
-				//this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
-				//log.debug("Codelet handler finished and has written ACK to datapoint address={}", this.resultDatapointAddress);
 				this.setServiceState(ServiceState.FINISHED);
 
 			}

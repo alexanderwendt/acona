@@ -57,8 +57,6 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 		} catch (Exception e) {
 			log.error("Cannot receive result", e.getMessage());
 		}
-		
-		
 	}
 
 	@Override
@@ -102,7 +100,13 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		// TODO Auto-generated method stub
+		//Methods: triggerStart
+		log.debug("Received method request={}", parameterdata.getMethod());
+		if (parameterdata.getMethod().equals("starttrigger")) {
+			this.setExternalCommand(ControlCommand.START.toString());
+			
+		}
+		
 		return null;
 	}
 	

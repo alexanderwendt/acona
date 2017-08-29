@@ -61,11 +61,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 			//Register codelet in the codelethandler
 			try {
-				//				List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
-				//						Datapoints.newDatapoint(KEYMETHOD).setValue(REGISTERCODELETSERVICENAME),
-				//						Datapoints.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress),
-				//						Datapoints.newDatapoint(ATTRIBUTEEXECUTIONORDER).setValue(new JsonPrimitive(this.exeutionOrder))));
-
 				JsonRpcRequest request = new JsonRpcRequest(REGISTERCODELETSERVICENAME, 2);
 				request.setParameterAsValue(0, callerAddress);
 				request.setParameterAsValue(1, this.exeutionOrder);
@@ -143,12 +138,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		//Set state of the codelet to finished
-		//Register codelet in the codelethandler
-		//		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
-		//				Datapoints.newDatapoint(KEYMETHOD).setValue(SETSTATESERVICENAME),
-		//				Datapoints.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress),
-		//				Datapoints.newDatapoint(KEYSTATE).setValue(ServiceState.IDLE.toString())));
-
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.FINISHED.toString());
 		this.setServiceState(ServiceState.FINISHED);
@@ -160,24 +149,13 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	@Override
 	protected void executeCustomPreProcessing() throws Exception {
 		//Set state to running
-		//		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
-		//				Datapoint.newDatapoint(KEYMETHOD).setValue(SETSTATESERVICENAME),
-		//				Datapoint.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress),
-		//				Datapoint.newDatapoint(KEYSTATE).setValue(ServiceState.RUNNING.toString())));
-
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
 		this.setServiceState(ServiceState.RUNNING);
-
 	}
 
 	private void updateServiceStateInCodeletHandler(ServiceState state) throws Exception {
-		//		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
-		//				Datapoint.newDatapoint(KEYMETHOD).setValue(SETSTATESERVICENAME),
-		//				Datapoint.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress),
-		//				Datapoint.newDatapoint(KEYSTATE).setValue(state.toString())));
-
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, state.toString());
 
@@ -190,10 +168,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	@Override
 	protected void shutDownExecutor() throws Exception {
-		//Deregister codelet
-		//		List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
-		//				Datapoints.newDatapoint(KEYMETHOD).setValue(DEREGISTERCODELETSERVICENAME),
-		//				Datapoints.newDatapoint(KEYCALLERADDRESS).setValue(callerAddress)));
+		this.shutDownCodelet();
 
 		JsonRpcRequest request = new JsonRpcRequest(DEREGISTERCODELETSERVICENAME, 1);
 		request.setParameterAsValue(0, callerAddress);
@@ -202,6 +177,10 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		if (response.hasError()) {
 			throw new Exception("Communication error. Error: " + response.getError());
 		}
+	}
+
+	protected void shutDownCodelet() throws Exception {
+
 	}
 
 	protected String getCodeletStateDatapointAddress() {

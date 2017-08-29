@@ -9,9 +9,9 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
-import at.tuwien.ict.acona.evolutiondemo.agents.PriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
+import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
@@ -75,7 +75,7 @@ public class Launcher {
 			log.info("Generate system configuration");
 			log.info("Generate stock market agent");
 			CellGatewayImpl stockmarket = this.controller.createAgent(CellConfig.newConfig(stockmarketagentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketPriceGeneratorServiceName, PriceGenerator.class)));
+					.addCellfunction(CellFunctionConfig.newConfig(stockmarketPriceGeneratorServiceName, DummyPriceGenerator.class)));
 			
 			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
