@@ -24,7 +24,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	public final static String KEYCALLERADDRESS = "calleraddress";
 	public final static String KEYEXECUTIONORDERNAME = "executionorder";
 	public final static String KEYSTATE = "state";
-	private final static int METHODTIMEOUT = 1000;
+	private final static int METHODTIMEOUT = 20000;
 
 	public final static String ATTRIBUTECODELETHANDLERADDRESS = "handleraddress";
 	public final static String ATTRIBUTEEXECUTIONORDER = "executionorder";
@@ -104,14 +104,19 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 		try {
 			log.debug("{}>Received execute request={}", this.getFunctionName(), parameterdata);
-			switch (parameterdata.getMethod()) {
-			case EXECUTECODELETMETHODNAME:
-				log.debug("Execute the codelet");
-				this.startCodelet();
-				result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
-				break;
-			default:
-				throw new Exception("Method name " + parameterdata.getMethod() + " unknown");
+
+			result = this.performCodeletOperation(parameterdata, caller);
+
+			if (result == null) {
+				switch (parameterdata.getMethod()) {
+				case EXECUTECODELETMETHODNAME:
+					log.debug("Execute the codelet");
+					this.startCodelet();
+					result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
+					break;
+				default:
+					throw new Exception("Method name " + parameterdata.getMethod() + " unknown");
+				}
 			}
 
 		} catch (Exception e) {
@@ -120,6 +125,10 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		}
 
 		return result;
+	}
+
+	protected JsonRpcResponse performCodeletOperation(JsonRpcRequest parameterdata, String caller) {
+		return null;
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
@@ -36,6 +37,8 @@ public class Trader extends CellFunctionCodelet {
 	private String initStockmarketAddress = "Stockmarket:Price";
 	private String initSignalAddress = "EmaSignalFunction";
 	private String initControllerAddress = "controller";
+	
+	private String localDepotAddress = "localdepot";
 	
 	private double initStartSize = 1000;
 	private String initType = "type1";
@@ -94,12 +97,21 @@ public class Trader extends CellFunctionCodelet {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}
+	
+	protected JsonRpcResponse performCodeletOperation(JsonRpcRequest parameterdata, String caller) {
+		
+		if (parameterdata.getMethod().equals("getdepot")) {
+			
+		}
+		
+		return null;
+	}
 
 	@Override
 	protected void executeFunction() throws Exception {
 		this.executeTraderPreProcessing();
 		
-		log.trace("Start agent caluclation");
+		log.info("{}>Start agent caluclation", this.getAgentName());
 		//Program logic
 		//1. Split depot if necessary
 		this.multiplyAgent();
@@ -111,7 +123,7 @@ public class Trader extends CellFunctionCodelet {
 		this.calculateSignal();
 		//5. Execute signal
 		this.executeTrade();
-		log.debug("Finished: Depot={}", this.depot);
+		log.info("{}:{}>Finished. Assets in the depot: {}", this.getAgentName(), this.agentType, this.depot.getAssets());
 		
 		this.executeTraderPostProcessing();
 	}
@@ -121,6 +133,10 @@ public class Trader extends CellFunctionCodelet {
 		this.buySignal = false;
 		this.sellSignal = false;
 		
+		//Write the local depot
+		Gson gson = new Gson();
+		JsonElement jsonDepot = gson.toJsonTree(depot);
+		this.writeLocal(Datapoints.newDatapoint(this.localDepotAddress).setValue(jsonDepot));
 	}
 
 	private void executeTraderPreProcessing() throws Exception {
@@ -185,7 +201,7 @@ public class Trader extends CellFunctionCodelet {
 	
 	private void deleteDepot() throws Exception {
 		//Sell everything
-		this.depot.getAsset().forEach(a->{
+		this.depot.getAssets().forEach(a->{
 			JsonRpcRequest req = new JsonRpcRequest("sell", 0);
 			req.setParameters(this.getCell().getLocalName(), a.getStockName(), this.closePrice, a.getVolume());
 			JsonRpcResponse result1 = null;
@@ -234,7 +250,7 @@ public class Trader extends CellFunctionCodelet {
 	}
 	
 	private void executeTrade() throws Exception {
-		log.debug("Buy signal={}); sell signal={}", this.buySignal, this.sellSignal);
+		log.info("Buy signal={}; sell signal={}", this.buySignal, this.sellSignal);
 		if (this.buySignal==true) {
 			if (depot.getLiquid()>this.closePrice * 1) {
 				JsonRpcRequest request1 = new JsonRpcRequest("buy", 0);
@@ -247,7 +263,7 @@ public class Trader extends CellFunctionCodelet {
 				}
 				
 				this.depot = (new Gson()).fromJson(result.getResult(), Depot.class);
-				log.debug("Stock bought={}. Depot change={}", request1.getParams(), this.depot);
+				log.info("Stock bought={}. Depot change={}", request1.getParams(), this.depot);
 			} else {
 				log.debug("No enough money, no buy signal");
 			}
@@ -255,8 +271,8 @@ public class Trader extends CellFunctionCodelet {
 		}
 		
 		if (this.sellSignal==true) {
-			if (this.depot.getAsset().stream().filter(a->a.getStockName().equals(this.stockName)).findFirst().isPresent() 
-					&& (this.depot.getAsset().stream().filter(a->a.getVolume()>=1)).findFirst().isPresent()) {
+			if (this.depot.getAssets().stream().filter(a->a.getStockName().equals(this.stockName)).findFirst().isPresent() 
+					&& (this.depot.getAssets().stream().filter(a->a.getVolume()>=1)).findFirst().isPresent()) {
 				
 				JsonRpcRequest request1 = new JsonRpcRequest("sell", 0);
 				request1.setParameters(this.getCell().getLocalName(), this.stockName, this.closePrice, 1);
@@ -266,7 +282,7 @@ public class Trader extends CellFunctionCodelet {
 				}
 				
 				this.depot = (new Gson()).fromJson(result.getResult(), Depot.class);
-				log.debug("Stock bought={}. Depot change={}", request1.getParams(), this.depot);
+				log.info("Stock sold={}. Depot change={}", request1.getParams(), this.depot);
 				
 			} else {
 				log.debug("No sell signal as the volume of stock is not enough");

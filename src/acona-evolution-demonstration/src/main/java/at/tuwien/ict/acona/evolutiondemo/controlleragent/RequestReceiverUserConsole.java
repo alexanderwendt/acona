@@ -28,8 +28,8 @@ public class RequestReceiverUserConsole extends UserConsoleFunction {
 		
 		this.register("exit", "exit program", "exitProgram");
 		this.register("restart", "restart tapchanger", "restart");
-		this.register("set", "Set command", "setExternalCommand");
-		this.register("s", "Set command", "startStockMarket");
+		this.register("start", "Start stock market [number of runs]", "startStockMarket");
+		this.register("stop", "interrupt simulator", "interruptStockMarket");
 		
 	}
 	
@@ -48,12 +48,12 @@ public class RequestReceiverUserConsole extends UserConsoleFunction {
 		client.restart();
 	}
 	
-	public void setExternalCommand(String[] command) {
-		this.client.setExternalCommand(command[0]);
+	public void startStockMarket(String[] parameter) throws Exception {
+		this.client.startStockMarket(Integer.valueOf(parameter[0]));
 	}
 	
-	public void startStockMarket() throws Exception {
-		this.client.startStockMarket();
+	public void interruptStockMarket() throws Exception {
+		this.client.interruptStockMarket();
 	}
 
 }

@@ -148,7 +148,7 @@ public class BrokerTester {
 			depot = result.getResult(new TypeToken<Depot>(){});
 			
 			log.info("Bought stock={}", depot);
-			assertEquals(stockName, depot.getAsset().get(0).getStockName());
+			assertEquals(stockName, depot.getAssets().get(0).getStockName());
 			
 			request1 = new JsonRpcRequest("sell", 0);
 			//request1.setParameterAsValue(0, traderAgentName);
@@ -158,7 +158,7 @@ public class BrokerTester {
 			depot = result.getResult(new TypeToken<Depot>(){});
 			
 			log.info("Sold stock={}", depot);
-			assertEquals(5, depot.getAsset().get(0).getVolume(), 0.0);
+			assertEquals(5, depot.getAssets().get(0).getVolume(), 0.0);
 			
 			request1 = new JsonRpcRequest("unregisterdepot", 0);
 			//request1.setParameterAsValue(0, traderAgentName);

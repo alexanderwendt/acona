@@ -2,6 +2,8 @@ package at.tuwien.ict.acona.evolutiondemo;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,8 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
@@ -86,13 +90,13 @@ public class TraderTester {
 	@Test
 	public void buyAndSellFunctionTestAgenttest() {
 		try {
-			//TODO TEST NOT FINISHED
 			String brokerAgentName = "BrokerAgent"; 
 			String traderAgentName = "TraderAgent";
 			String stockmarketAgentName = "StockMarketAgent";
 			String controllerAgentName = "ControllerAgent";
-			String traderType = "type1";
+			//String traderType = "type1";
 			String brokerServiceName = "BrokerService";
+			String statisticsService = "statisticsService";
 			String stockmarketServiceName = "StockMarketService";
 			String controllerService = "controllerservice";
 			String signalService = "signal";
@@ -113,7 +117,8 @@ public class TraderTester {
 			
 			CellGatewayImpl brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
-							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)));
+							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 			
 			synchronized (this) {
 				try {
@@ -131,19 +136,30 @@ public class TraderTester {
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
 							.setGenerateReponder(true)));	//Puts data on datapoint StockMarketAgent:data
 			
-			CellGatewayImpl traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(Trader.class)
-							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, traderAgentName + ":" + signalService)
-							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
-							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
-							.setGenerateReponder(true))
-					.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+			//Create 100 trading agents that first buy a stock, then sell it
+			for (int i=1;i<=500;i++) {
+				String traderType = "type";
+				if (i%2==0) {
+					traderType += "_even";
+				} else {
+					traderType += "_odd";
+				}
+				
+				CellGatewayImpl traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
+						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
+								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
+								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
+								.setGenerateReponder(true))
+						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+			}
 
 			synchronized (this) {
 				try {
-					this.wait(2000);
+					this.wait(10000);
 				} catch (InterruptedException e) {
 
 				}
@@ -160,32 +176,24 @@ public class TraderTester {
 			req.setParameterAsValue(0, false);
 			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 			
+			req = new JsonRpcRequest("gettypes", 0);
+			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
+			List<Types> list = result.getResult(new TypeToken<List<Types>>(){});
 			
+			log.info("Got types={}", list);
+			assertEquals(list.get(0).getNumber(), list.get(1).getNumber());
 			
+			//The test is to read the depot of agent 69, which shall be empty
+			Depot depot = controllerAgent.getCommunicator().read(traderAgentName + "_" + "69", "localdepot").getValue(Depot.class);
+			double money = depot.getLiquid();
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			assertEquals(true, false);
-			
+			log.info("Got money from agent 69={}. Correct answer={}", money, 1000);
+			assertEquals(1000, money, 0);
 			log.info("All tests passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
 		}
-
 	}
 	
-
-
 }

@@ -10,6 +10,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
@@ -50,107 +51,92 @@ public class Launcher {
 			log.info("Start JADE");
 			this.startJade();
 			
-			String controllerAgentName = "controlleragent";
-			
-			String stockmarketagentName = "stockmarketagent";
-			String stockmarketPriceGeneratorServiceName = "market";
-			String brokerAgentName = "Broker";
-			String brokerServiceName = "BrokerService";
+			//=== General variables ===//
 			String stockName = "Fingerprint";
-			String traderAgentName = "Trader1";
-			String traderFunction = "TraderFunction";
 			
-			//http-server
-			//Command in the web service: http://localhost:8001/korecogsys/getsatisfactoryruleset?simulationid=textfile1&ontologyid=usecase1varition1&breaksimulatorrun=100&breakevaluationco2=0.5&breakevaluationenergy=0.2&breakevaluationpenalty=0.1
-			//Command to get result: http://localhost:8001/korecogsys/readworkingmemoryresult
-			//Command to get state: http://localhost:8001/korecogsys/readstate
+			//=== Controller ===//
+			String controllerAgentName = "ControllerAgent";
+			String controllerService = "controllerservice";
 			
-			//Rest server
-			//http://128.131.80.12:8001/korecogsys/readstate
-			//http://128.131.80.12:8001/korecogsys/readworkingmemoryresult
-			//http://localhost:8001/kore/getsatisfactoryruleset?simulationid=textfile1&ontologyid=usecase1varition1&breaksimulatorrun=100&breakevaluationco2=0.5&breakevaluationenergy=0.2&breakevaluationpenalty=0.1
-			
-			
-			//Generate the configuration for the KORE system
-			log.info("Generate system configuration");
-			log.info("Generate stock market agent");
-			CellGatewayImpl stockmarket = this.controller.createAgent(CellConfig.newConfig(stockmarketagentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketPriceGeneratorServiceName, DummyPriceGenerator.class)));
-			
-			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
-							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)));
-			
-			log.info("Generate Controller agent configuration");
-			CellGatewayImpl controller = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
+			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
+							.setGenerateReponder(true))
 					.addCellfunction(CellFunctionConfig.newConfig("userconsole", ConsoleRequestReceiver.class)
-							.setProperty(ConsoleRequestReceiver.ATTRIBUTESTOCKMARKETADDRESS, stockmarketagentName + ":" + stockmarketPriceGeneratorServiceName)));
-			
-			CellGatewayImpl traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(traderFunction, Trader.class)
-							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketagentName + ":" + "data")
-							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, "Indicator"))
-					.addCellfunction(CellFunctionConfig.newConfig("Indicator", PermanentBuySellIndicator.class)));
+							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
 			
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(200);
 				} catch (InterruptedException e) {
-					
+
 				}
 			}
 			
-			//controller.getCommunicator().write(Datapoints.newDatapoint(stockmarketagentName + ":" + stockmarketPriceGeneratorServiceName + "." + "command").setValue(ControlCommand.START));
+			//=== Broker ===//
+			String brokerAgentName = "BrokerAgent"; 
 			
+			String brokerServiceName = "BrokerService";
+			String statisticsService = "statisticsService";
 			
-			log.info("Price generated");
-			// Controller
-			// Controller
-//			CellConfig fileloaderAgentConfig = CellConfig.newConfig(cognsysagentname)
-//					//Add the jetty server
-//					.addCellfunction(CellFunctionConfig.newConfig(httpServerName, JerseyRestServer.class)
-//							.setProperty(JettyHttpServer.attributeCommandAddress, userRequestAddress)
-//							.setProperty(JettyHttpServer.attributeResultAddress, resultAddress)
-//							.setProperty(JettyHttpServer.attributeSystemStateAddress, requestCodeletHandlerName + ".state")
-//							.setProperty(JettyHttpServer.attributeEpisodeLoaderStateAddress, loaderCodeletName + ".state")
-//							.setProperty(JettyHttpServer.attributerulegeneratorStateAddress, ruleGenerationCodeletName + ".state"))
-//					//Add a request handler that starts the codelet handler
-//					.addCellfunction(CellFunctionConfig.newConfig(requestHandlerName, RequestHandler.class)
-//							.setProperty("commandaddress", userRequestAddress)
-//							.setProperty("resultaddress", resultAddress)
-//							.setProperty(RequestHandler.codeletHandlerServiceUriName, cognsysagentname + ":" + requestCodeletHandlerName))
-//					//Add a codelet handler for the use request
-//					.addCellfunction(CellFunctionConfig.newConfig(requestCodeletHandlerName, CellFunctionCodeletHandler.class))
-//					.addCellfunction(CellFunctionConfig.newConfig(loaderCodeletName, EpisodeLoaderAsCodelet.class)
-//							.setProperty(EpisodeLoaderAsCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognsysagentname + ":" +requestCodeletHandlerName)
-//							.setProperty(EpisodeLoaderAsCodelet.ATTRIBUTEEXECUTIONORDER, "1")
-//							.setProperty(EpisodeLoaderAsCodelet.REQUESTADDRESSNAME, userRequestAddress)
-//							.setProperty(EpisodeLoaderAsCodelet.SYSTEMSTATEADDRESSNAME, systemStateAddress)
-//							.setProperty(EpisodeLoaderAsCodelet.LOADEDEPIODESADDRESSNAME, loadedEpisodesAddress))
-//					.addCellfunction(CellFunctionConfig.newConfig(ruleGenerationCodeletName, RuleStructureGeneratorDriverMock.class)
-//							.setProperty(RuleStructureGeneratorDriverMock.ATTRIBUTECODELETHANDLERADDRESS, cognsysagentname + ":" + requestCodeletHandlerName)
-//							.setProperty(RuleStructureGeneratorDriverMock.ATTRIBUTEEXECUTIONORDER, "2")
-//							.setProperty(RuleStructureGeneratorDriverMock.ATTRIBUTEREQUESTADDRESS, userRequestAddress)
-//							.setProperty(RuleStructureGeneratorDriverMock.ATTRIBUTERESULTADDRESS, resultAddress));
-								
-						
-						//log.debug("Start agent with config={}", fileloaderAgentConfig);
-						//CellGatewayImpl cogsys = this.launcher.createAgent(fileloaderAgentConfig);			
+			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
 			
-//			CellConfig fileloaderAgentConfig = CellConfig.newConfig("kore")
-//					.addCellfunction(CellFunctionConfig.newConfig("externalinterface", JettyHttpServer.class)
-//							.setProperty("commandAddress", "requestinterface.command")
-//							.setProperty("resultAddress", "requestinterface.result"))
-//					.addCellfunction(CellFunctionConfig.newConfig("requesthandler", RequestHandler.class)
-//							.setProperty("commandaddress", "requestinterface.command")
-//							.setProperty("resultaddress", "requestinterface.result"));
-						
-//			log.debug("Start agent with config={}", fileloaderAgentConfig);
-//			
-//			
-//			CellGatewayImpl cogsys = this.controller.createAgent(fileloaderAgentConfig);
+			//=== Stock market ===//
+			String stockmarketAgentName = "StockMarketAgent";
+			String stockmarketServiceName = "StockMarketService";
 			
+			CellGatewayImpl stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
+							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
+							.setGenerateReponder(true)));	//Puts data on datapoint StockMarketAgent:data
+
+			//=== Traders ===//
+			String traderAgentName = "TraderAgent";
+			String signalService = "signal";
+			
+			//Create 100 trading agents that first buy a stock, then sell it
+			for (int i=1;i<=10;i++) {
+				String traderType = "type";
+				if (i%2==0) {
+					traderType += "_even";
+				} else {
+					traderType += "_odd";
+				}
+				
+				CellGatewayImpl traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
+						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
+								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
+								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
+								.setGenerateReponder(true))
+						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+			}
+
+			synchronized (this) {
+				try {
+					this.wait(10000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			log.info("=== All agents initialized ===");
 			
 		} catch (Exception e) {
 			log.error("Cannot initialize the system", e);

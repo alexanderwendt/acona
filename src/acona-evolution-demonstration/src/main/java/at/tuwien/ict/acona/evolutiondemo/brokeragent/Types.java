@@ -25,4 +25,15 @@ public class Types {
 	public void setNumber(int number) {
 		this.number = number;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Types [type=");
+		builder.append(type);
+		builder.append(", number=");
+		builder.append(number);
+		builder.append("]");
+		return builder.toString();
+	}
 }

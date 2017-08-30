@@ -25,8 +25,13 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 	private final static Logger log = LoggerFactory.getLogger(DummyPriceGenerator.class);
 	
 	private double high, low, close;
-	private int sinusperiod=20;
+	
 	private int currentPeriod=0;
+	
+	//Fixed varibales for the calculation
+	private double periodlength = 20;
+	private double amplitude = 50;
+	private double offset= 100;
 	
 	private final String dataAddress = "data";
 	private JsonObject functionResult;
@@ -69,16 +74,22 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 		this.getValueMap().put(dataAddress, Datapoints.newDatapoint(dataAddress).setValue(functionResult));
 	}
 	
+	/**
+	 * The program shall create a sinus curve to test the system on
+	 */
 	private void executeSinusFunction() {
-		this.close = 2 + Math.sin((double)currentPeriod/(double)sinusperiod);
-		this.high = this.close + Math.random()*0.5;
-		this.low = this.close - Math.random()*0.5;
+		this.close = offset + amplitude * Math.sin((double)currentPeriod/(1/periodlength)*Math.PI);
+		this.high = this.close + 2;
+		this.low = this.close - 2;
 	}
 	
+	/**
+	 * Create a constant function that only produces one price
+	 */
 	private void executeConstantFunction() {
-		this.close = 2;
-		this.high = 2.1;
-		this.low = 1.9;
+		this.close = offset;
+		this.high = offset + 2;
+		this.low = offset - 2;
 	}
 
 //	@Override

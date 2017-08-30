@@ -48,7 +48,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	private String resultDatapointAddress = "";
 
-	private final static int METHODTIMEOUT = 10000;
+	private final static int METHODTIMEOUT = 20000;
 	//private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
@@ -358,6 +358,11 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				//					}
 				//				}
 			} else {
+				this.getCodeletMap().entrySet().forEach(entry -> {
+					if (entry.getValue().equals(ServiceState.RUNNING)) {
+						log.warn("Codelet={} is still running", entry.getKey());
+					}
+				});
 				log.warn("Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getCodeletMap());
 				//Write finish notification
 				this.setServiceState(ServiceState.FINISHED);

@@ -37,7 +37,7 @@ public class Depot {
 		this.addLiquid(amount*price);
 		
 		if (asset.get().getVolume()==0) {
-			this.getAsset().remove(asset);
+			this.getAssets().remove(asset.get());
 		}
 	}
 	
@@ -58,13 +58,13 @@ public class Depot {
 			asset.get().setAveragePrice(newAveragePrice);
 			asset.get().setVolume(newVolume);
 		} else {
-			this.getAsset().add(new Asset(stockName, amount, price));
+			this.getAssets().add(new Asset(stockName, amount, price));
 		}
 		
 		this.addLiquid(-amount*price);
 	}
 	
-	public List<Asset> getAsset() {
+	public List<Asset> getAssets() {
 		return asset;
 	}
 	

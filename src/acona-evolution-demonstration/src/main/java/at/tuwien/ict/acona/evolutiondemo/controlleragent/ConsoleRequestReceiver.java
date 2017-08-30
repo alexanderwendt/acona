@@ -4,8 +4,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
+import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
@@ -13,47 +17,46 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 	
-	private final static String COMMANDADDRESS = "command";
-	private final static String RESULTADDRESS = "result";
-	
 	private final RequestReceiverUserConsole console = new RequestReceiverUserConsole(log, this);
-	private String command = "";
 
 	private static Logger log = LoggerFactory.getLogger(ConsoleRequestReceiver.class);
 	//private Scanner scanner = new Scanner(System.in);
 	
-	public final static String ATTRIBUTESTOCKMARKETADDRESS = "stockmarketaddress";
-	//public final static String ATTRIBUTEGOALADDRESSSUFFIX  = "goaladdress";
+	public final static String ATTRIBUTECONTROLLERSERVICE = "controllerservice";
 	
-	private String address = "";
-
+	private String codeletHandlerAddress = "";
+	
+	private int count = 1;
+	private boolean runAllowed = true;
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
-		address = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, "");
+		codeletHandlerAddress = this.getFunctionConfig().getProperty(ATTRIBUTECONTROLLERSERVICE, "");
 		
 		this.setExecuteOnce(true);
 		//this.setExecuteRate(1000);
 		this.setCommand(ControlCommand.STOP);
 		console.init();
-		
 	}
 
 	@Override
 	protected void executeFunction() throws Exception {
 		try {
-			System.out.println("Provide a request: ");
-			//String command = scanner.next();
-			log.info("Received command {}. Now check the reaction of the system", command);
 			
-			//Write the answer to the working memory
-			//this.getCommunicator().write(Datapoint.newDatapoint(COMMANDADDRESS).setValue(command));
-			
-			//Execute a function that waits
-			this.getCommunicator().queryDatapoints(COMMANDADDRESS, command, RESULTADDRESS, null, 2000);
-			
-			//Execute 
-			//this.getCommunicator().execute(this.getCell().getLocalName(), , methodParameters, timeout)
+			for (int i=1;i<=count;i++) {
+				if (this.runAllowed == true) {
+					log.info("run {}/{}", i, count);
+					//Execute the codelet handler once
+					JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
+					req.setParameterAsValue(0, false);
+					Datapoint dp = Datapoints.newDatapoint(this.codeletHandlerAddress);
+					this.getCommunicator().executeServiceQueryDatapoints(dp.getAgent(), dp.getAddress(), req, dp.getAgent(), dp.getAddress() + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+				} else {
+					log.warn("Running of simulator interrupted after {} runs", i);
+					break;
+				}
+				
+			}
 		} catch (Exception e) {
 			log.error("Cannot receive result", e.getMessage());
 		}
@@ -61,7 +64,7 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		log.debug("Command value: {}", this.readLocal(COMMANDADDRESS));
+		//log.debug("Command value: {}", this.readLocal(COMMANDADDRESS));
 		log.debug("Processing finished");
 		
 	}
@@ -81,15 +84,23 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 		//TODO set a restart of the system
 	}
 	
-	protected void setExternalCommand(String command) {
-		log.debug("Set command {}", command);
-		this.command = command;
+//	protected void setExternalCommand(String command) {
+//		log.debug("Set command {}", command);
+//		this.command = command;
+//		this.setStart();
+//	}
+	
+	protected void startStockMarket(int count) throws Exception {
+		log.debug("Run stock market for {} runs", count);
+		
+		this.runAllowed = true;
+		this.count = count;
+		
 		this.setStart();
 	}
 	
-	protected void startStockMarket() throws Exception {
-		log.debug("Start stock market");
-		this.getCommunicator().write(Datapoints.newDatapoint(address + "." + "command").setValue(ControlCommand.START));
+	protected void interruptStockMarket() {
+		this.runAllowed = false;
 	}
 
 	@Override
@@ -101,11 +112,11 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		//Methods: triggerStart
-		log.debug("Received method request={}", parameterdata.getMethod());
-		if (parameterdata.getMethod().equals("starttrigger")) {
-			this.setExternalCommand(ControlCommand.START.toString());
-			
-		}
+//		log.debug("Received method request={}", parameterdata.getMethod());
+//		if (parameterdata.getMethod().equals("starttrigger")) {
+//			this.setExternalCommand(ControlCommand.START.toString());
+//			
+//		}
 		
 		return null;
 	}
