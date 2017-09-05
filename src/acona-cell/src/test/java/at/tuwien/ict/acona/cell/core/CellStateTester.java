@@ -17,6 +17,7 @@ import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
+import at.tuwien.ict.acona.cell.datastructures.Chunk;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
@@ -87,12 +88,13 @@ public class CellStateTester {
 
 	/**
 	 * Create a cell with some functions and a state collector function. Execute
-	 * one function in the cell, read the state of the state collector function
+	 * 4 function in the cell, read the state of one of the functions at the end
+	 * by the the state collector function
 	 * 
 	 * 
 	 */
 	@Test
-	public void CodeletHandlerWith2CodeletsTest() {
+	public void stateMonitorWith3CodeletsTest() {
 		try {
 			String codeletName1 = "CodeletIncrement1"; // The same name for all services
 			String codeletName2 = "CodeletIncrement2";
@@ -103,12 +105,22 @@ public class CellStateTester {
 			String processDatapoint = "workingmemory.changeme";
 			// values
 			double startValue = 1;
-			int expectedResult = 4;
+			ServiceState expectedResult = ServiceState.FINISHED;
 
 			//Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
 					.addCellfunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + handlerName)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
+							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
+					.addCellfunction(CellFunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + handlerName)
+							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
+							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
+					.addCellfunction(CellFunctionConfig.newConfig(codeletName3, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
@@ -158,14 +170,14 @@ public class CellStateTester {
 			//				}
 			//			}
 			//controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(3)));
-			log.debug("Read if the value has been incremented");
-			int x = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
-			if (x == 2) {
-				log.debug("Value was incremented");
-			} else {
-				log.warn("Value is not 2 as expected");
-			}
-			log.info("Value is={}", x);
+			//			log.debug("Read if the value has been incremented");
+			//			int x = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
+			//			if (x == 2) {
+			//				log.debug("Value was incremented");
+			//			} else {
+			//				log.warn("Value is not 2 as expected");
+			//			}
+			//			log.info("Value is={}", x);
 
 			//			//Execute codelets once again
 			JsonRpcRequest request3 = new JsonRpcRequest("executecodelethandler", 1);
@@ -182,13 +194,13 @@ public class CellStateTester {
 			//				}
 			//			}
 
-			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
+			//log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
-			double result = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
+			Chunk state = Chunk.newChunk(controller.getCommunicator().read(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject());
+			Chunk result = state.getFirstAssociatedContentFromAttribute("hasFunction", "hasName", codeletName2);
+			log.debug("correct value={}, actual value={}", expectedResult, result.getValue("hasState"));
 
-			log.debug("correct value={}, actual value={}", expectedResult, result);
-
-			assertEquals(expectedResult, result, 0.0);
+			assertEquals(expectedResult, ServiceState.valueOf(result.getValue("hasState")));
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);
