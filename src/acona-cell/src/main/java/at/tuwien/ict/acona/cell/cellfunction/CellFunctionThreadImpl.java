@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.cell.datastructures.Chunk;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
@@ -23,6 +24,7 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements Runnable {
 
 	public final static String STATESUFFIX = "state";
+	public final static String EXTENDEDSTATESUFFIX = "extendedstate";
 	public final static String RESULTSUFFIX = "result";
 	public final static String COMMANDSUFFIX = "command";
 	public final static String DESCRIPTIONSUFFIX = "description";
@@ -68,6 +70,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				this.getFunctionConfig().setExecuteOnce(executeOnce);
 			}
 
+			// Set state register
+			//			if (this.getFunctionConfig().getRegisterState() == null) {
+			//				this.getFunctionConfig().setRegisterState(true);
+			//			}
+
 			cellFunctionThreadInit();
 			// Create a thread from this class
 			t = new Thread(this, this.getCell().getLocalName() + "#" + this.getFunctionName());
@@ -85,11 +92,14 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	}
 
 	private void initServiceDatapoints() throws Exception {
+		String functionDescription = setFunctionDescription();
+
 		Datapoint command = Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
 		Datapoint state = Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.FINISHED.toString());
-		Datapoint description = Datapoints.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue("Service " + this.getFunctionName());
+		Datapoint description = Datapoints.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue(functionDescription);
 		Datapoint config = Datapoints.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
 		Datapoint result = Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");
+		Datapoint extendedState = Datapoints.newDatapoint(this.addServiceName(EXTENDEDSTATESUFFIX)).setValue(Chunk.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTENDEDSTATE"));
 
 		log.debug("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
 				command.getAddress(), state.getAddress(), description.getAddress(),
@@ -98,11 +108,15 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		//Add subscriptions
 		this.addManagedDatapoint(DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
 		this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
-		this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
+		//this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
 		this.addManagedDatapoint(DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
 		//Result will only be written
 
-		this.getCommunicator().write(Arrays.asList(command, state, description, config, result));
+		this.getCommunicator().write(Arrays.asList(command, state, description, config, result, extendedState));
+	}
+
+	protected String setFunctionDescription() {
+		return "Service " + this.getFunctionName() + ". Thread; external responder=" + this.getFunctionConfig().getGenerateReponder().getAsBoolean();
 	}
 
 	protected abstract void cellFunctionThreadInit() throws Exception;
@@ -394,6 +408,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	protected Map<String, Datapoint> getValueMap() {
 		return valueMap;
+	}
+
+	@Override
+	public CellFunctionType getFunctionType() {
+		return CellFunctionType.THREADFUNCTION;
 	}
 
 }

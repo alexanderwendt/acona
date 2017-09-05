@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionType;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
@@ -210,6 +211,11 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	protected void setInternalStateMemoryAddress(String internalStateMemoryAddress) {
 		this.internalStateMemoryAddress = internalStateMemoryAddress;
+	}
+
+	@Override
+	public CellFunctionType getFunctionType() {
+		return CellFunctionType.CODELET;
 	}
 
 }

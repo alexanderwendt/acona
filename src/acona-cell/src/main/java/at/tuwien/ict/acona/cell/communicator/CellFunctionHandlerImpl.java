@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionType;
 import at.tuwien.ict.acona.cell.core.Cell;
 
 public class CellFunctionHandlerImpl implements CellFunctionHandler {
@@ -20,6 +21,8 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 	 * Map with the name of the cellfunction and the actual instance.
 	 */
 	private final Map<String, CellFunction> cellFunctionsMap = new ConcurrentHashMap<>();
+	private final List<String> applicationFunctions = new ArrayList<>();
+	private final List<CellFunctionHandlerListener> listenerList = new ArrayList<>();
 	private Cell hostCell;
 
 	@Override
@@ -39,6 +42,18 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			}
 
 			this.cellFunctionsMap.put(cellFunctionInstance.getFunctionName(), cellFunctionInstance);
+
+			//Set init state
+			if ((this.applicationFunctions.contains(cellFunctionInstance.getFunctionName()) == false) && (cellFunctionInstance.getFunctionType().equals(CellFunctionType.BASEFUNCTION) == false)) {
+				this.applicationFunctions.add(cellFunctionInstance.getFunctionName());
+
+				//Notify all listeners that a new function has been registered
+				this.listenerList.forEach(l -> {
+					if (l.getListenerFunction().equals(cellFunctionInstance.getFunctionName()) == false) {
+						l.notifyAddedFunction(cellFunctionInstance.getFunctionName());
+					}
+				});
+			}
 
 			// Create a responder to the cellfunction if it is set in the
 			if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
@@ -62,6 +77,22 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 
 			// Remove the cellfunction itself
 			this.cellFunctionsMap.remove(activatorInstance);
+
+			//if (cellFunctionInstance.getFunctionConfig().getRegisterState().getAsBoolean()==true) {
+			if (this.applicationFunctions.contains(activatorInstance)) {
+				this.applicationFunctions.remove(activatorInstance);
+
+				this.listenerList.forEach(l -> {
+					if (l.getListenerFunction().equals(activatorInstance) == false) {
+						l.notifyRemovedFunction(activatorInstance);
+					}
+				});
+			}
+
+			//}
+
+			//Notify all listeners that an existing function has been unregistered
+
 		} catch (Exception e) {
 			log.error("Cannot deregister cell function " + activatorInstance, e);
 			throw new Exception(e.getMessage());
@@ -85,5 +116,34 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 		builder.append(this.cellFunctionsMap.keySet());
 		return builder.toString();
 	}
+
+	@Override
+	public List<String> registerLister(CellFunctionHandlerListener listener) {
+		synchronized (this.listenerList) {
+			this.listenerList.add(listener);
+		}
+
+		log.debug("A listener was registered for the cell functions");
+
+		return Collections.unmodifiableList(applicationFunctions);
+	}
+
+	@Override
+	public void unregisterListener(CellFunctionHandlerListener listener) {
+		synchronized (this.listenerList) {
+			this.listenerList.remove(listener);
+		}
+
+		log.debug("A listener was unregistered");
+
+	}
+
+	//	@Override
+	//	public void updateState(CellFunction function, ServiceState state) {
+	//		//Update this map
+	//		this.functionStateMap.put(function.getFunctionName(), state);
+	//		//Update all listeners
+	//		this.listenerList.forEach(l -> l.notifyStateUpdate(function.getFunctionName(), state));
+	//	}
 
 }

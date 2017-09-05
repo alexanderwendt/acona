@@ -19,21 +19,6 @@ public class BasicServiceSubscribe extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
 
-	//	private static Logger log = LoggerFactory.getLogger(BasicServiceSubscribe.class);
-	//
-	//	public static final String METHODNAME = "subscribe";
-	//
-	//	private static final String ACKNOWLEDGE = "OK";
-	//	private static final String ERROR = "ERROR";
-	//	private static final String PARAMETERRESULT = "result";
-	//	private static final String PARAMETERSENDER = "sender";
-	//	private static final String METHODPROPERTY = "method";
-	//	private static final String PARAMETERDATAPOINTS = "datapoints";
-
-	// Parameter
-	// SENDER: name,
-	// Datapoints as JsonArray with datapoints as Json objects
-
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameter, String caller) {
 		JsonRpcResponse result = null;

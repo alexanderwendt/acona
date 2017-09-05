@@ -19,7 +19,7 @@ public class Chunk {
 
 	public static final String NAMEPROPERTY = "hasName";
 	public static final String TYPEPROPERTY = "hasType";
-	public static final String IDPROPERTY = "hasID";
+	//public static final String IDPROPERTY = "hasID";
 
 	public synchronized static Chunk newChunk(String name, String type) throws Exception {
 		return new Chunk(name, type);
@@ -57,7 +57,7 @@ public class Chunk {
 	public synchronized static boolean isChunk(JsonObject object) {
 		boolean result = false;
 
-		if (object.get(NAMEPROPERTY) != null && object.get(TYPEPROPERTY) != null && object.get(IDPROPERTY) != null) {
+		if (object.get(NAMEPROPERTY) != null && object.get(TYPEPROPERTY) != null) {
 			result = true;
 		}
 
@@ -88,7 +88,7 @@ public class Chunk {
 
 	private void init(String name, String type) {
 		chunkObject = new JsonObject();
-		this.setId(name + this.hashCode());
+		//this.setId(name + this.hashCode());
 		this.setName(name);
 		this.setType(type);
 	}
@@ -98,10 +98,10 @@ public class Chunk {
 		return this;
 	}
 
-	public Chunk setId(String id) {
-		chunkObject.addProperty(IDPROPERTY, id);
-		return this;
-	}
+	//	public Chunk setId(String id) {
+	//		chunkObject.addProperty(IDPROPERTY, id);
+	//		return this;
+	//	}
 
 	public Chunk setType(String type) {
 		chunkObject.addProperty(TYPEPROPERTY, type);
@@ -152,9 +152,9 @@ public class Chunk {
 		return this.chunkObject.getAsJsonPrimitive(NAMEPROPERTY).getAsString();
 	}
 
-	public String getID() {
-		return this.chunkObject.getAsJsonPrimitive(IDPROPERTY).getAsString();
-	}
+	//	public String getID() {
+	//		return this.chunkObject.getAsJsonPrimitive(IDPROPERTY).getAsString();
+	//	}
 
 	public String getValue(String key) {
 		String result = "";

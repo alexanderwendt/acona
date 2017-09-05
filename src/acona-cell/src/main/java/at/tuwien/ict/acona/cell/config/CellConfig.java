@@ -15,6 +15,7 @@ import at.tuwien.ict.acona.cell.core.CellImpl;
 public class CellConfig {
 	public static final String CELLNAME = "cellname";
 	public static final String CELLCLASS = "cellclass";
+	public static final String CELLDESCRIPTION = "celldescription";
 	public static final String CELLFUNCTIONS = "cellfunctions";
 
 	// Keep the jsonobject in order to be able to add more settings. If only a
@@ -133,6 +134,11 @@ public class CellConfig {
 		return this;
 	}
 
+	public CellConfig setDescription(String description) {
+		this.configObject.addProperty(CELLDESCRIPTION, description);
+		return this;
+	}
+
 	/**
 	 * Get cell class as a class
 	 * 
@@ -203,6 +209,15 @@ public class CellConfig {
 	 */
 	public String getClassName() {
 		return this.configObject.getAsJsonPrimitive(CELLCLASS).getAsString();
+	}
+
+	/**
+	 * Get the decription of the cell
+	 * 
+	 * @return
+	 */
+	public String getDescription() {
+		return this.configObject.getAsJsonPrimitive(CELLDESCRIPTION).getAsString();
 	}
 
 	/**

@@ -307,10 +307,13 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public Datapoint subscribeDatapoint(String key, String callingCellfunctionName) throws Exception {
 		//Create subscription from subscription config
 		//Subscribe the value
-		Datapoint result = this.subscribe(key);
+		Datapoint completeKey = Datapoints.newDatapoint(key);
+		completeKey.setAgent(this.getLocalAgentName());
+
+		Datapoint result = this.subscribe(completeKey.getCompleteAddress());
 
 		//Add to subscription handler
-		this.getSubscriptionHandler().addSubscription(callingCellfunctionName, key);
+		this.getSubscriptionHandler().addSubscription(callingCellfunctionName, completeKey.getCompleteAddress());
 
 		//String id = "subscription" + System.currentTimeMillis();
 		//this.cellFunctionHandler.addSubscription(callingCellfunctionName, DatapointConfig.newConfig(id, datapointAddress, agentId, SyncMode.SUBSCRIBEONLY));

@@ -13,6 +13,11 @@ import at.tuwien.ict.acona.cell.core.Cell;
  */
 public interface CellFunctionHandler {
 
+	/**
+	 * Init the cell function handler with a cell.
+	 * 
+	 * @param caller
+	 */
 	public void init(Cell caller);
 
 	/**
@@ -33,8 +38,41 @@ public interface CellFunctionHandler {
 	 */
 	public void deregisterActivatorInstance(String activatorInstanceName) throws Exception;
 
+	/**
+	 * Get the actual cell function for a certain name
+	 * 
+	 * @param functionName
+	 * @return
+	 */
 	public CellFunction getCellFunction(String functionName);
 
+	/**
+	 * Get a list of all registered named
+	 * 
+	 * @return
+	 */
 	public List<String> getCellFunctionNames();
+
+	/**
+	 * Register a listener that gets activated every time a cell function has
+	 * been registered or deregistered
+	 * 
+	 * @param listener
+	 */
+	public List<String> registerLister(CellFunctionHandlerListener listener);
+
+	//	/**
+	//	 * 
+	//	 * 
+	//	 * @param function
+	//	 */
+	//	public void updateState(CellFunction function, ServiceState state);
+
+	/**
+	 * Unregister a listener for the cell function handler.
+	 * 
+	 * @param listener
+	 */
+	public void unregisterListener(CellFunctionHandlerListener listener);
 
 }

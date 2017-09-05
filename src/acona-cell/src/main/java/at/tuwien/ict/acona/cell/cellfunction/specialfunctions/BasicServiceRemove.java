@@ -16,7 +16,7 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 public class BasicServiceRemove extends CellFunctionBasicService {
 
-	private static Logger log = LoggerFactory.getLogger(BasicServiceRemove.class);
+	private static final Logger log = LoggerFactory.getLogger(BasicServiceRemove.class);
 
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {

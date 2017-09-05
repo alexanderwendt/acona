@@ -88,6 +88,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 				this.getFunctionConfig().setResponderProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 			}
 
+			//			if (this.getFunctionConfig().getRegisterState() == null) {
+			//				this.getFunctionConfig().setRegisterState(false);
+			//			}
+
 			// Get subscriptions from config and add to subscription list
 			this.getFunctionConfig().getManagedDatapoints().forEach(s -> {
 				this.addManagedDatapoint(s);
@@ -388,11 +392,19 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	protected void setServiceState(ServiceState serviceState) throws Exception {
 		this.currentServiceState = serviceState;
+		//		if (this.getFunctionConfig().getRegisterState().getAsBoolean() == true) {
+		//			this.getCell().getFunctionHandler().updateState(this, this.currentServiceState);
+		//		}
 		this.processServiceState();
 	}
 
 	protected void processServiceState() throws Exception {
 
+	}
+
+	@Override
+	public CellFunctionType getFunctionType() {
+		return CellFunctionType.BASEFUNCTION;
 	}
 
 }

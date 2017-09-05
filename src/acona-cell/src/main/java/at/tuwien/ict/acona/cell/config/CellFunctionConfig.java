@@ -23,6 +23,7 @@ public class CellFunctionConfig {
 	public static final String CELLEXECUTEONCE = "executeonce";
 	public static final String GENERATERESPONDER = "generateresponder";
 	public static final String RESPONDERPROTOCOL = "responderprotocol";
+	//public static final String REGISTERSTATE = "registerstate";
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
 
@@ -125,6 +126,17 @@ public class CellFunctionConfig {
 	public String getResponderProtocol() {
 		return this.getProperty(RESPONDERPROTOCOL, "");
 	}
+
+	//	public JsonPrimitive getRegisterState() {
+	//		return this.configObject.getAsJsonPrimitive(REGISTERSTATE);
+	//	}
+
+	//	public CellFunctionConfig setRegisterState(boolean registerState) {
+	//		this.configObject.addProperty(REGISTERSTATE, registerState);
+	//		return this;
+	//	}
+
+	//======================//
 
 	public CellFunctionConfig setProperty(String name, String value) {
 		this.configObject.addProperty(name, value);

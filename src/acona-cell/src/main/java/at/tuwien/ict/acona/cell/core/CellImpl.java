@@ -105,7 +105,7 @@ public class CellImpl extends Agent implements CellInitialization {
 				throw new NullPointerException("No arguments found although necessary. Add controller to argument 1");
 			}
 
-			controller.init(this);
+			this.controller.init(this);
 
 			// Create behaviors
 			// Create communication
@@ -188,77 +188,6 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	}
 
-	// /**
-	// * Helper method sets the interaction protocol to FIPA_REQUEST and
-	// provides unique ids (using {@link UID#toString()} of a newly created
-	// {@link UID}) to the {@link ACLMessage#setReplyWith(String)} and {@link
-	// ACLMessage#setConversationId(String)} methods
-	// * of the given {@code message}. Unique ids on these fields are neccessary
-	// for the message to be processable by the JADE implementations of FIPA
-	// complient protocol handlers.
-	// *
-	// * @param message
-	// */
-	// protected void prepareSyncMessage(ACLMessage message) {
-	// message.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-	// message.setReplyWith(new UID().toString());
-	// message.setConversationId(new UID().toString());
-	// message.setPerformative(ACLMessage.REQUEST);
-	// log.debug("ACL message after perpareSyncMessage:\n" +
-	// message.toString());
-	// }
-	//
-	// /**
-	// * Prepares a template than can be used to identify a response to the
-	// message provided as {@code message}. The template attempty to match the
-	// protocol, conversation id and in-reply-to id
-	// *
-	// * @param message The outgoing message that contains (at least) a protocol
-	// id, conversation id and reply-with id (which will turn into a in-reply-to
-	// id in the response)
-	// * @return A {@link MessageTemplate} that can be used to match replies to
-	// the provided {@code message}
-	// */
-	// protected MessageTemplate prepareMessageTemplate(ACLMessage message) {
-	// log.debug("Preparing message template for message with conversation id" +
-	// message.getConversationId());
-	// return MessageTemplate.and(MessageTemplate.and(
-	// MessageTemplate.MatchInReplyTo(message.getReplyWith()),
-	// MessageTemplate.MatchProtocol(message.getProtocol())),
-	// MessageTemplate.MatchConversationId(message.getConversationId()));
-	// }
-	//
-	// /**
-	// * Sends the given {@code message} synchroniously. The method waits for a
-	// response (identified by protocol, conversation id and reply id) or the
-	// passage of {@code timeout} milliseconds before returning.
-	// * This method tries to provide appliance to the FIPA Request protocol
-	// (but this is not thoroughly tested)
-	// *
-	// * @param message The ACL Message to send
-	// * @param timeout Maximum amount of miliseconds to wait for a reponse (use
-	// Integer.MAX_VALUE for almost-infinite waiting)
-	// * @return The response of the receiver or null if a timeout occured
-	// */
-	// public ACLMessage syncSend(ACLMessage message, int timeout) {
-	// log.info("Sending synchronious message\n" + message.toString());
-	//
-	// ACLMessage response = null;
-	//
-	// prepareSyncMessage(message);
-	//
-	// send(message);
-	//
-	// log.info("Waiting for response");
-	//
-	// response = blockingReceive(prepareMessageTemplate(message), timeout);
-	// log.debug("Response received or timeout");
-	//
-	// log.info("Waiting completed");
-	//
-	// return response;
-	// }
-
 	private ServiceDescription createServiceDescription() {
 		ServiceDescription sericeDescription = new ServiceDescription();
 		sericeDescription.setType("Cell");
@@ -305,52 +234,6 @@ public class CellImpl extends Agent implements CellInitialization {
 	public SubscriptionHandler getSubscriptionHandler() {
 		return subscriptionHandler;
 	}
-
-	// @Override
-	// public void notifySubscribers(List<String> subscribers, String caller,
-	// Datapoint subscribedData) {
-	// // Check inputs
-	//
-	// // Remove the caller from the subscibers to be notified. The system
-	// // shall not notify itself, except internal data exchange has happened
-	// // Notify local behaviours
-	// if (subscribers.contains(this.getLocalName())) {
-	// log.trace("activate local behaviors for agent {}", this.getLocalName());
-	// this.activationHandler.activateLocalFunctions(subscribedData); // Write
-	// // data
-	// // to
-	// // thread
-	// // +
-	// // activate
-	// // thread
-	// // after
-	// // that
-	//
-	// // Revove it from the list before sending to external application
-	// // because this agent does not subscribe through external
-	// // subscriptions
-	// subscribers.remove(this.getLocalName());
-	// }
-	//
-	// // Remove the caller itself because the caller is writing this datapoint
-	// if (subscribers.contains(caller)) {
-	// log.debug("caller is writing a subscribed datapoint. Remove the caller.
-	// No subscription necessary");
-	// subscribers.remove(caller);
-	// }
-	//
-	// // Notify external agents that subscribe a value from this data storage
-	// if (subscribers.isEmpty() == false) {
-	// subscribers.forEach(s -> {
-	// try {
-	// this.comm.write(subscribedData, s);
-	// } catch (Exception e) {
-	// log.error("Cannot notify datapoint={} to subscriber={}", subscribedData,
-	// s, e);
-	// }
-	// });
-	// }
-	// }
 
 	@Override
 	public String toString() {

@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionType;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
@@ -42,7 +43,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
 	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
-	private String codeletStateDatapointAddress;
+	//private String codeletStateDatapointAddress;
 	private String workingMemoryAddress = "workingmemory";
 	private String internalStateMemoryAddress = "internalmemoryaddress";
 
@@ -58,8 +59,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	@Override
 	protected synchronized void cellFunctionThreadInit() throws Exception {
-		this.resultDatapointAddress = this.getFunctionName() + "." + "result";
-		this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
+		//this.resultDatapointAddress = this.getFunctionName() + "." + "result";
+		//this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
 		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEINTERNALMEMORYADDRESS, internalStateMemoryAddress);
 	}
@@ -164,7 +165,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 					//log.debug("write finished codelet");
 					//this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 					this.setServiceState(ServiceState.FINISHED);
-					log.debug("Codelet handler finished and has written state finished to datapoint address={}", this.codeletStateDatapointAddress);
+					log.debug("Codelet handler finished and has written state finished to datapoint address={}", this.addServiceName(STATESUFFIX));
 					//this.setServiceState(ServiceState.IDLE);
 				} else {
 					log.debug("The next codelet run can start");
@@ -173,7 +174,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			}
 
 			//Write the current state of the system
-			Datapoint handlerState = writeStateOfTheSystemAsDatapoint();
+			Datapoint handlerState = getExtendedState();
 			log.debug("write handerstate={}", handlerState);
 			this.writeLocal(handlerState);
 
@@ -182,12 +183,13 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 	}
 
-	private Datapoint writeStateOfTheSystemAsDatapoint() throws Exception {
-		Datapoint result = Datapoints.newDatapoint(this.codeletStateDatapointAddress);
+	private Datapoint getExtendedState() throws Exception {
+		Datapoint result = Datapoints.newDatapoint(this.addServiceName(this.addServiceName(EXTENDEDSTATESUFFIX)));
 
 		Chunk systemState = null;
 		try {
-			systemState = Chunk.newChunk(this.getFunctionName() + "_State", "STATE");
+			systemState = Chunk.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTEDNEDSTATE");
+			systemState.setValue("hasState", this.getCurrentState().toString());
 			for (Entry<String, ServiceState> entry : this.getCodeletMap().entrySet()) {
 				try {
 					systemState.addAssociatedContent("hasCodelet", Chunk.newChunk(entry.getKey(), "CODELETSTATE").setValue("State", entry.getValue().toString()));
@@ -206,7 +208,6 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 
 		return result;
-
 	}
 
 	@Override
@@ -476,6 +477,11 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 
 		return state.toJsonObject();
+	}
+
+	@Override
+	public CellFunctionType getFunctionType() {
+		return CellFunctionType.CODELET;
 	}
 
 }

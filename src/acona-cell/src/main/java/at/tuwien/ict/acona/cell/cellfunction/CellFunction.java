@@ -43,6 +43,14 @@ public interface CellFunction {
 	public String getFunctionName();
 
 	/**
+	 * Get the defined type of function, e.g. base functions shall not be shown
+	 * in the monitoring of an application, only codelets and threads.
+	 * 
+	 * @return
+	 */
+	public CellFunctionType getFunctionType();
+
+	/**
 	 * Use these datapoints for the activatorhandler
 	 * 
 	 * @return Subscriptions
