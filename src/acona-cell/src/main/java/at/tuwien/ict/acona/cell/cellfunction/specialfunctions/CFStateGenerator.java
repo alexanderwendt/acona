@@ -30,6 +30,21 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	private Map<String, String> currentDescriptions = new HashMap<>();
 
 	@Override
+	protected void cellFunctionInit() throws Exception {
+
+		//Register this function to get notified if new functions are registered or deregistered.
+		this.currentlyRegisteredFunctions = this.getCell().getFunctionHandler().registerLister(this);
+		this.currentlyRegisteredFunctions.forEach((f) -> {
+			try {
+				this.initializeFunction(f);
+			} catch (Exception e) {
+				log.error("Cannot init state monitor function", e);
+			}
+
+		});
+	}
+
+	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		log.info("Functions={}", this.currentlyRegisteredFunctions);
 		return null;
@@ -70,20 +85,6 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 		this.writeLocal(Datapoints.newDatapoint(SYSTEMSTATEADDRESS).setValue(systemState.toJsonObject()));
 		log.debug("Current system state={}", systemState);
 
-	}
-
-	@Override
-	protected void cellFunctionInit() throws Exception {
-		//Register this function to get notified if new functions are registered or deregistered.
-		this.currentlyRegisteredFunctions = this.getCell().getFunctionHandler().registerLister(this);
-		this.currentlyRegisteredFunctions.forEach((f) -> {
-			try {
-				this.initializeFunction(f);
-			} catch (Exception e) {
-				log.error("Cannot init state monitor function", e);
-			}
-
-		});
 	}
 
 	private void initializeFunction(String name) throws Exception {

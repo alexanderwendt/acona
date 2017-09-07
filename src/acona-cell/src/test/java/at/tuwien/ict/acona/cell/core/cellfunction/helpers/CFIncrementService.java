@@ -32,14 +32,14 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 		// JsonObject rawdata = this.readLocalAsJson(R).getAsJsonObject();
 		String address = "";
 		try {
-			log.info("{}>Start execution. Local sync datapoints = {}", this.getFunctionName(), this.getSyncDatapoints().keySet());
+			log.info("{}>Start execution. Local sync datapoints = {}", this.getFunctionName(), this.getSyncDatapointConfigs().keySet());
 			//address = this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress();
 			double value = this.getValueMap().get(ATTRIBUTEINCREMENTDATAPOINT).getValue().getAsDouble();
 			log.info("Read value={}", value);
 			value++;
 			log.info("New value={}", value);
 			// write new value back to the same datapoint
-			this.getValueMap().put(this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress(), Datapoints.newDatapoint(this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress()).setValue(String.valueOf(value)));
+			this.getValueMap().put(this.getSyncDatapointConfigs().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress(), Datapoints.newDatapoint(this.getSyncDatapointConfigs().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress()).setValue(String.valueOf(value)));
 			log.debug("Function execution finished");
 		} catch (Exception e) {
 			log.error("Cannot execute incrementation service. Often the problem is that the value of the address {} has not been initialized yet", address, e);

@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.cell.config;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 
 public class DatapointConfig {
@@ -45,15 +46,6 @@ public class DatapointConfig {
 		this.setAgentId(agentid);
 		this.setSyncMode(syncmode);
 	}
-
-	// private DatapointConfig(String id, String address) {
-	// super();
-	// this.configObject = new JsonObject();
-	// this.setId(id);
-	// this.setAddress(address);
-	// this.setAgentId(LOCALAGENTNAME);
-	// this.setSyncMode(DEFAULTSYNCMODE);
-	// }
 
 	private DatapointConfig(JsonObject config) throws Exception {
 		super();
@@ -111,6 +103,18 @@ public class DatapointConfig {
 		return agentName;
 	}
 
+	//	private boolean hasAgentId() {
+	//		String agentName = this.configObject.get(AGENTID).getAsString();
+	//
+	//		boolean result = true;
+	//
+	//		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
+	//			result = false;
+	//		}
+	//
+	//		return result;
+	//	}
+
 	public SyncMode getSyncMode() {
 		return SyncMode.valueOf(this.configObject.get(SYNCMODE).getAsString());
 	}
@@ -128,7 +132,7 @@ public class DatapointConfig {
 
 		return result;
 	}
-	
+
 	public String getComposedAddress(String defaultAgentName) {
 		String destinationAgent = this.getAgentid(defaultAgentName);
 		String address = this.getAddress();
@@ -137,6 +141,10 @@ public class DatapointConfig {
 		String key = destinationAgent + ":" + address;
 
 		return key;
+	}
+
+	public Datapoint toDatapoint(String localAgentName) {
+		return Datapoints.newDatapoint(this.getAgentid(localAgentName) + ":" + this.getAddress());
 	}
 
 	@Override

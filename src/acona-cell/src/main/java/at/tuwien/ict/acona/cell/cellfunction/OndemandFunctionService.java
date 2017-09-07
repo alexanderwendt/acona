@@ -112,9 +112,9 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 	@Override
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
-		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+		log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapointConfigs());
 
-		this.getReadDatapoints().forEach((k, v) -> {
+		this.getReadDatapointConfigs().forEach((k, v) -> {
 			try {
 				// Read the remote datapoint
 				if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
@@ -133,10 +133,10 @@ public abstract class OndemandFunctionService extends CellFunctionThreadImpl {
 	@Override
 	protected void executePostProcessing() throws Exception {
 		// FIXME: The update here is not working well
-		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
+		log.debug("{}>Execute post processing for the datapoints={}", this.getFunctionName(), this.getWriteDatapointConfigs());
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
-		this.getWriteDatapoints().values().forEach(config -> {
+		this.getWriteDatapointConfigs().values().forEach(config -> {
 			try {
 				Datapoint dp = this.valueMap.get(config.getAddress());
 				String agentName = config.getAgentid(this.getCell().getLocalName());

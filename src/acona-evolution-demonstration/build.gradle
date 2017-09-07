@@ -87,7 +87,7 @@ task copyDependencies(type: Copy) {
 }
 
 test {
-    exclude 'at/tuwien/ict/**'
+    //exclude 'at/tuwien/ict/**'
 }
 
 //Build the jar file

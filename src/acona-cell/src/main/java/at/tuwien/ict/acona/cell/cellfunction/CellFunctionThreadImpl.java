@@ -40,8 +40,8 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	protected boolean runAllowed = false;
 
 	/**
-	 * In the value map all, subscribed values as well as read values are put.
-	 * Syntac: Key: Datapointid, value: Datapoint address
+	 * In the value map all, subscribed values, as well as read values and all
+	 * write values are put. Syntac: Key: Datapointid, value: Datapoint address
 	 */
 	private Map<String, Datapoint> valueMap = new ConcurrentHashMap<>();
 
@@ -91,6 +91,8 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		}
 	}
 
+	protected abstract void cellFunctionThreadInit() throws Exception;
+
 	private void initServiceDatapoints() throws Exception {
 		String functionDescription = setFunctionDescription();
 
@@ -118,8 +120,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	protected String setFunctionDescription() {
 		return "Service " + this.getFunctionName() + ". Thread; external responder=" + this.getFunctionConfig().getGenerateReponder().getAsBoolean();
 	}
-
-	protected abstract void cellFunctionThreadInit() throws Exception;
 
 	protected abstract void executeFunction() throws Exception;
 
@@ -193,11 +193,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	protected void executePreProcessing() throws Exception {
 		// Read all values from the store or other agent
 		this.setServiceState(ServiceState.RUNNING);
-		if (this.getReadDatapoints().isEmpty() == false) {
-			log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapoints());
+		if (this.getReadDatapointConfigs().isEmpty() == false) {
+			log.info("{}>Start preprocessing by reading function variables={}", this.getFunctionName(), this.getReadDatapointConfigs());
 		}
 
-		this.getReadDatapoints().forEach((k, v) -> {
+		this.getReadDatapointConfigs().forEach((k, v) -> {
 			try {
 
 				//FIXME: Make that also local datapoints are put in the table
@@ -214,21 +214,33 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			}
 		});
 
+		this.getWriteDatapointConfigs().forEach((k, v) -> {
+			try {
+
+				// Write local value to synchronize the datapoints
+				this.valueMap.putIfAbsent(k, v.toDatapoint(this.getAgentName()));
+				log.trace("{}> Preprocessing phase: Init write datapoint and write into value table={}", v);
+				//}
+			} catch (Exception e) {
+				log.error("{}>Cannot write init datapoint={}", this.getFunctionName(), v, e);
+			}
+		});
+
 		this.executeCustomPreProcessing();
 
 	}
 
 	protected void executePostProcessing() throws Exception {
 		// FIXME: The update here is not working well
-		if (this.getWriteDatapoints().isEmpty() == false) {
-			log.debug("{}>Execute post processing action write for the datapoints={}", this.getFunctionName(), this.getWriteDatapoints());
+		if (this.getWriteDatapointConfigs().isEmpty() == false) {
+			log.debug("{}>Execute post processing action write for the datapoints={}", this.getFunctionName(), this.getWriteDatapointConfigs());
 		}
 
 		// 6. At end, write subscribed datapoints to remote datapoints from
 		// local datapoints
-		this.getWriteDatapoints().values().forEach(config -> {
+		this.getWriteDatapointConfigs().values().forEach(config -> {
 			try {
-				Datapoint dp = this.valueMap.get(config.getAddress());
+				Datapoint dp = this.valueMap.get(config.getId());
 				if (dp != null) {
 					String agentName = config.getAgentid(this.getCell().getLocalName());
 					this.getCommunicator().write(agentName, dp);
@@ -244,9 +256,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		this.executeCustomPostProcessing();
 
-		//this.setServiceState(ServiceState.FINISHED);
-		//this.setServiceState(ServiceState.IDLE);
-		this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
+		if (this.isExecuteOnce() == true) {
+			this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
+		}
+
 		log.info("{}>Service execution run finished", this.getFunctionName());
 	}
 

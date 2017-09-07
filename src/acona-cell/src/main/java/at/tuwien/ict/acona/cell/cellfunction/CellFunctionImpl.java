@@ -36,10 +36,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 	/**
 	 * List of datapoints that shall be subscribed
 	 */
-	private final Map<String, DatapointConfig> subscriptions = new HashMap<>(); // Variable datapoint config id, datapoint
-	private final Map<String, DatapointConfig> readDatapoints = new HashMap<>(); // Variable, datapoint
-	private final Map<String, DatapointConfig> writeDatapoints = new HashMap<>();
-	private final Map<String, DatapointConfig> managedDatapoints = new HashMap<>();
+	private final Map<String, DatapointConfig> subscriptionConfigs = new HashMap<>(); // Variable datapoint config id, datapoint
+	private final Map<String, DatapointConfig> readDatapointConfigs = new HashMap<>(); // Variable, datapoint
+	private final Map<String, DatapointConfig> writeDatapointConfigs = new HashMap<>();
+	private final Map<String, DatapointConfig> managedDatapointConfigs = new HashMap<>();
 
 	/**
 	 * Current state of the service. Every time the service is set, a datapoint
@@ -111,7 +111,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 		this.setServiceState(ServiceState.FINISHED);
 
-		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.managedDatapoints);
+		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.managedDatapointConfigs);
 	}
 
 	protected abstract void cellFunctionInit() throws Exception;
@@ -124,17 +124,17 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	protected void addManagedDatapoint(DatapointConfig config) {
 		if (config.getSyncMode().equals(SyncMode.SUBSCRIBEONLY)) { //Subscribe only
-			this.subscriptions.put(config.getId(), config);
+			this.subscriptionConfigs.put(config.getId(), config);
 		} else if (config.getSyncMode().equals(SyncMode.SUBSCRIBEWRITEBACK)) { //Subscribe and write back to the source
-			this.subscriptions.put(config.getId(), config);
-			this.writeDatapoints.put(config.getId(), config);
+			this.subscriptionConfigs.put(config.getId(), config);
+			this.writeDatapointConfigs.put(config.getId(), config);
 		} else if (config.getSyncMode().equals(SyncMode.READONLY)) { //Read only the value (pull instead of push)
-			this.readDatapoints.put(config.getId(), config);
+			this.readDatapointConfigs.put(config.getId(), config);
 		} else if (config.getSyncMode().equals(SyncMode.READWRITEBACK)) { //Read and write back to the server
-			this.readDatapoints.put(config.getId(), config);
-			this.writeDatapoints.put(config.getId(), config);
+			this.readDatapointConfigs.put(config.getId(), config);
+			this.writeDatapointConfigs.put(config.getId(), config);
 		} else if (config.getSyncMode().equals(SyncMode.WRITEONLY)) {
-			this.writeDatapoints.put(config.getId(), config);
+			this.writeDatapointConfigs.put(config.getId(), config);
 		} else {
 			try {
 				throw new Exception("No syncmode=" + config.getSyncMode() + ". only pull and push available");
@@ -144,7 +144,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 		}
 
 		//All datapoints are put into the managed datapoints
-		managedDatapoints.put(config.getId(), config);
+		managedDatapointConfigs.put(config.getId(), config);
 	}
 
 	private void subscribeDatapoints() throws Exception {
@@ -272,7 +272,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	@Override
 	public Map<String, DatapointConfig> getSubscribedDatapoints() { // ID config
-		return subscriptions;
+		return subscriptionConfigs;
 	}
 
 	@Override
@@ -323,7 +323,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	}
 
 	protected Datapoint readLocalId(String id) throws Exception {
-		return this.readLocal(this.getSyncDatapoints().get(id).getAddress());
+		return this.readLocal(this.getSyncDatapointConfigs().get(id).getAddress());
 	}
 
 	protected <T> void writeLocalSyncDatapointById(String id, T value) throws Exception {
@@ -352,7 +352,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * @return
 	 */
 	protected Datapoint getDatapointFromId(Map<String, Datapoint> data, String id) {
-		return data.get(this.getSyncDatapoints().get(id).getAddress());
+		return data.get(this.getSyncDatapointConfigs().get(id).getAddress());
 	}
 
 	@Override
@@ -361,21 +361,21 @@ public abstract class CellFunctionImpl implements CellFunction {
 		builder.append("CellFunctionImpl [name=");
 		builder.append(cellFunctionName);
 		builder.append(", subscriptions=");
-		builder.append(subscriptions);
+		builder.append(subscriptionConfigs);
 		builder.append("]");
 		return builder.toString();
 	}
 
-	protected Map<String, DatapointConfig> getSyncDatapoints() {
-		return managedDatapoints;
+	protected Map<String, DatapointConfig> getSyncDatapointConfigs() {
+		return managedDatapointConfigs;
 	}
 
-	protected Map<String, DatapointConfig> getReadDatapoints() {
-		return readDatapoints;
+	protected Map<String, DatapointConfig> getReadDatapointConfigs() {
+		return readDatapointConfigs;
 	}
 
-	protected Map<String, DatapointConfig> getWriteDatapoints() {
-		return writeDatapoints;
+	protected Map<String, DatapointConfig> getWriteDatapointConfigs() {
+		return writeDatapointConfigs;
 	}
 
 	@Override
