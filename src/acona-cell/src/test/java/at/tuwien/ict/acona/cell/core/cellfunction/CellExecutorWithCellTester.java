@@ -87,11 +87,12 @@ public class CellExecutorWithCellTester {
 			String queryDatapoint = CFDurationThreadTester.queryDatapointID;
 			String executeonceDatapoint = "datapoint.executeonce";
 			String resultDatapointAddress = "datapoint.result";
+			String testAgentName = "testagent";
 
 			String expectedResult = "FINISHED";
 
 			// Create Database agents 1-2
-			CellConfig testagent = CellConfig.newConfig("testagent", CellImpl.class)
+			CellConfig testagent = CellConfig.newConfig(testAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("testExecutor", CFDurationThreadTester.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, CFDurationThreadTester.commandDatapointID, SyncMode.SUBSCRIBEONLY))
 							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapoint, SyncMode.SUBSCRIBEONLY))
@@ -104,8 +105,19 @@ public class CellExecutorWithCellTester {
 			// Create inspector or the new gateway
 			CellGatewayImpl cellControlSubscriber = this.launcher.createAgent(CellConfig.newConfig("subscriber", CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
-							.addManagedDatapoint(resultDatapointAddress, resultDatapointAddress, "testagent", SyncMode.SUBSCRIBEONLY)));
+							.addManagedDatapoint(resultDatapointAddress, resultDatapointAddress, testAgentName, SyncMode.SUBSCRIBEONLY)));
 			cellControlSubscriber.getCommunicator().setDefaultTimeout(100000);
+
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			//=== Test initialized ===//
+			log.info("=== Test initialized ===");
 
 			// Write the numbers in the database agents
 
@@ -126,7 +138,7 @@ public class CellExecutorWithCellTester {
 
 			log.debug("correct value={}, actual value={}", "FINISHED", result);
 
-			assertEquals(result, expectedResult);
+			assertEquals(expectedResult, result);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

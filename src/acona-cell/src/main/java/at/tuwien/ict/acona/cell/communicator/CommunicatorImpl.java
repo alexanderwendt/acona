@@ -308,7 +308,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		//Create subscription from subscription config
 		//Subscribe the value
 		Datapoint completeKey = Datapoints.newDatapoint(key);
-		completeKey.setAgent(this.getLocalAgentName());
+		completeKey.setAgentIfAbsent(this.getLocalAgentName());
 
 		Datapoint result = this.subscribe(completeKey.getCompleteAddress());
 
@@ -322,9 +322,12 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void unsubscribeDatapoint(String key, String callingCellFunctionName) throws Exception {
-		this.unsubscribe(key);
+		Datapoint completeKey = Datapoints.newDatapoint(key);
+		completeKey.setAgentIfAbsent(this.getLocalAgentName());
 
-		this.getSubscriptionHandler().removeSubscription(callingCellFunctionName, key);
+		this.unsubscribe(completeKey.getCompleteAddress());
+
+		this.getSubscriptionHandler().removeSubscription(callingCellFunctionName, completeKey.getCompleteAddress());
 		//this.cellFunctionHandler.removeSubscription(callingCellFunctionName.getFunctionName(), address, agentid);
 	}
 

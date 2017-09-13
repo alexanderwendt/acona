@@ -167,8 +167,9 @@ public abstract class CellFunctionImpl implements CellFunction {
 				//String key = this.generateKey(subscriptionConfig);
 				//Datapoint dp = Datapoints.newDatapoint(key);
 				//if (this.datapointActivationMap.containsKey(key) == false) {
-				Datapoint initialValue = this.getCommunicator().subscribeDatapoint(subscriptionConfig.getComposedAddress(this.getAgentName()), this.getFunctionName());
-				log.debug("Subscribed address={}.", subscriptionConfig.getComposedAddress(this.getAgentName()));
+				String completeAddress = subscriptionConfig.getComposedAddress(this.getAgentName());
+				Datapoint initialValue = this.getCommunicator().subscribeDatapoint(completeAddress, this.getFunctionName());
+				log.debug("{}>Subscribed address={}.", this.getAgentName(), subscriptionConfig.getComposedAddress(completeAddress));
 				//} else {
 				//	log.debug("Key={} already exists in the function mapping. Therefore no additional subscription is necessary", key);
 				//}
@@ -187,7 +188,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 		this.getSubscribedDatapoints().values().forEach(subscriptionsConfig -> {
 			//activatorAddresses.forEach(subscriptionsConfig -> {
 			try {
-				this.getCell().getSubscriptionHandler().removeSubscription(this.getFunctionName(), subscriptionsConfig.getComposedAddress(this.getAgentName()));
+				this.getCommunicator().unsubscribeDatapoint(subscriptionsConfig.getComposedAddress(this.getAgentName()), this.getFunctionName());
+				//this.getCell().getSubscriptionHandler().removeSubscription(this.getFunctionName(), subscriptionsConfig.getComposedAddress(this.getAgentName()));
 
 				//				//String key = subscriptionsConfig.getAgentid(this.hostCell.getLocalName()) + ":" + subscriptionsConfig.getAddress();
 				//				if (this.getCell().getSubscriptionHandler().removeSubscription(cellFunctionInstance, key);.datapointActivationMap.containsKey(key) == false) {

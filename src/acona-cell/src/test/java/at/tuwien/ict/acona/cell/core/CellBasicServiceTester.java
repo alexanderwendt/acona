@@ -344,6 +344,9 @@ public class CellBasicServiceTester {
 							.addCellfunction(CellFunctionConfig.newConfig(CFDataStorageUpdate.class)
 									.addManagedDatapoint(datapointaddress, datapointaddress, publisherAgentName, SyncMode.SUBSCRIBEONLY)));
 
+			cellControlSubscriber.getCommunicator().setDefaultTimeout(20000);
+			cellControlPublisher.getCommunicator().setDefaultTimeout(20000);
+
 			synchronized (this) {
 				try {
 					this.wait(100);
@@ -352,8 +355,7 @@ public class CellBasicServiceTester {
 				}
 			}
 
-			cellControlSubscriber.getCommunicator().setDefaultTimeout(20000);
-			cellControlPublisher.getCommunicator().setDefaultTimeout(20000);
+			log.info("Test initialized");
 
 			// Set init value
 			cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value1));

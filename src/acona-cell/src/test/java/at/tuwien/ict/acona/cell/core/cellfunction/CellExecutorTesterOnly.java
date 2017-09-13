@@ -44,6 +44,13 @@ public class CellExecutorTesterOnly {
 		executor.shutDown();
 	}
 
+	/**
+	 * Test a function without a cell
+	 * 
+	 * 
+	 * //FIXME: The dummy cell does not write into the real database
+	 * 
+	 */
 	@Test
 	public void executorExecuteOnceTest() {
 		log.debug("Start executorExecuteOnceTest");

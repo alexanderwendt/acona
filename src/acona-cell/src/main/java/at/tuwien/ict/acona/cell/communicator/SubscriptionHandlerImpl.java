@@ -86,7 +86,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 			activators.add(cellFunctionInstanceName);
 			this.datapointActivationMap.put(key, activators);
 
-			log.info("Agent={}, address={}>Registered activator={} in agent{}", key, cellFunctionInstanceName, this.cellName);
+			log.info("Agent={}>, address={}>Registered activator={} in agent{}", this.cellName, key, cellFunctionInstanceName, this.cellName);
 		} else if (this.datapointActivationMap.get(key).contains(cellFunctionInstanceName) == false) {
 			this.datapointActivationMap.get(key).add(cellFunctionInstanceName);
 			log.info("Agent={}, address={}>Added activator={}", this.cellName, key, cellFunctionInstanceName);

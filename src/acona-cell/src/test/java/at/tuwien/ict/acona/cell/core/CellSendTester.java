@@ -131,6 +131,14 @@ public class CellSendTester {
 
 			assertEquals(result, expectedResult);
 			log.info("Test passed");
+
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
@@ -170,13 +178,23 @@ public class CellSendTester {
 							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.commandDatapointID, commandDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY))
 							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.queryDatapointID, queryDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY))
 							.addManagedDatapoint(DatapointConfig.newConfig("executeonce", executeonceDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY))
-							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, SyncMode.WRITEONLY)));
+							.addManagedDatapoint(DatapointConfig.newConfig(CFDurationThreadTester.resultDatapointID, resultDatapointAddress, serviceAgentName, SyncMode.WRITEONLY)));
 			this.launchUtil.createAgent(testagent);
 
 			// Create inspector or the new gateway
 			CellGatewayImpl cellControlSubscriber = this.launchUtil.createAgent(CellConfig.newConfig(controllerAgentName, CellImpl.class)
 					.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
 							.addManagedDatapoint(resultDatapointAddress, resultDatapointAddress, serviceAgentName, SyncMode.SUBSCRIBEONLY)));
+
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			log.info("=== Test initialized ===");
 
 			String result = cellControlSubscriber.getCommunicator().queryDatapoints(serviceAgentName, queryDatapointAddress, new JsonPrimitive("SELECT * FILESERVER"), serviceAgentName, resultDatapointAddress, null, 10000).getValueAsString();
 			log.debug("Received back from query={}", result);
@@ -188,6 +206,14 @@ public class CellSendTester {
 
 			assertEquals(result, expectedResult);
 			log.info("Test passed");
+
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");

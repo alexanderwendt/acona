@@ -43,7 +43,6 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 
 	@Override
 	protected void cellFunctionInit() throws Exception {
-		log.debug("Datastorageupdate will happen for the following datapoints: {}", this.getSubscribedDatapoints());
 
 		for (DatapointConfig config : this.getFunctionConfig().getManagedDatapoints()) {
 
@@ -51,6 +50,8 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 				throw new Exception("Function " + this.getFunctionName() + " is not allowed to subscribe datapoints of the own agent, in order to avoid circular references. Erroneous subscription: " + config);
 			}
 		}
+
+		log.debug("Datastorageupdate will happen for the following datapoints: {}", this.getSubscribedDatapoints());
 	}
 
 	@Override
@@ -64,6 +65,7 @@ public class CFDataStorageUpdate extends CellFunctionImpl {
 		data.values().forEach(dp -> {
 			try {
 				log.debug("Update datapoint={}", dp);
+				dp.setAgent(this.getCell().getLocalName());
 				this.getCell().getCommunicator().write(dp);
 			} catch (Exception e) {
 				log.error("Cannot write {} to datastorage", dp);

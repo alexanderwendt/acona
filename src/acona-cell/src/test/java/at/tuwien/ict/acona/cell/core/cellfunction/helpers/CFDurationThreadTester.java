@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -44,12 +43,14 @@ public class CFDurationThreadTester extends CellFunctionThreadImpl {
 				log.debug("waited {}ms", i * 100);
 			}
 
-			this.writeLocal(Datapoints.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("FINISHED"));
+			//this.writeLocal(Datapoints.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("FINISHED"));
+			this.getValueMap().get(resultDatapointID).setValue("FINISHED");
 			log.info("Something was proceeded. Give back to tester");
 
 		} else {
 			log.warn("Query is empty");
-			this.writeLocal(Datapoints.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("NOT STARTED"));
+			//this.writeLocal(Datapoints.newDatapoint(this.getFunctionConfig().getManagedDatapointsAsMap().get(resultDatapointID).getAddress()).setValue("NOT STARTED"));
+			this.getValueMap().get(resultDatapointID).setValue("NOT STARTED");
 		}
 
 	}

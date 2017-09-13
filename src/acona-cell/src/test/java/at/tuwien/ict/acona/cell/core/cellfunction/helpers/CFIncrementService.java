@@ -39,7 +39,7 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 			value++;
 			log.info("New value={}", value);
 			// write new value back to the same datapoint
-			this.getValueMap().put(this.getSyncDatapointConfigs().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress(), Datapoints.newDatapoint(this.getSyncDatapointConfigs().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress()).setValue(String.valueOf(value)));
+			this.getValueMap().get(ATTRIBUTEINCREMENTDATAPOINT).setValue(String.valueOf(value));
 			log.debug("Function execution finished");
 		} catch (Exception e) {
 			log.error("Cannot execute incrementation service. Often the problem is that the value of the address {} has not been initialized yet", address, e);

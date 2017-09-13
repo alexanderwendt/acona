@@ -57,7 +57,9 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {
-		// TODO Auto-generated method stub
+		for (Datapoint d : datapoints) {
+			this.write(d);
+		}
 
 	}
 
@@ -111,13 +113,15 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	@Override
 	public void write(String agentName, List<Datapoint> datapoints, int timeout, boolean blocking) throws Exception {
-		// TODO Auto-generated method stub
+		for (Datapoint d : datapoints) {
+			this.cell.getDataStorage().write(d, this.cell.getLocalName());
+		}
 
 	}
 
 	@Override
 	public void write(String agentName, Datapoint datapoint) throws Exception {
-		// TODO Auto-generated method stub
+		this.cell.getDataStorage().write(datapoint, this.cell.getLocalName());
 
 	}
 

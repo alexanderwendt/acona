@@ -89,6 +89,17 @@ public class Datapoint {
 		this.AGENT = agent;
 	}
 
+	/**
+	 * Set an agent if no agent has been set
+	 * 
+	 * @param agent
+	 */
+	public void setAgentIfAbsent(String agent) {
+		if (this.hasLocalAgent() == true) {
+			this.AGENT = agent;
+		}
+	}
+
 	public boolean hasLocalAgent() {
 		boolean result = false;
 		if (this.AGENT == "") {
