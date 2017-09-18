@@ -14,3 +14,4 @@ log/*
 RemoteSystemsTempFiles
 .recommenders
 /src/acona-cell/dependencies
+/*/acona-demo-webservice/settings.gradle
