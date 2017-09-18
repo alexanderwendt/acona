@@ -109,7 +109,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		//Add subscriptions
 		this.addManagedDatapoint(DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
-		this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
+		//this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
 		//this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
 		this.addManagedDatapoint(DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
 		//Result will only be written
@@ -260,7 +260,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
 		}
 
-		log.info("{}>Service execution run finished", this.getFunctionName());
+		log.debug("{}>Service execution run finished", this.getFunctionName());
 	}
 
 	protected abstract void executeCustomPostProcessing() throws Exception;
@@ -316,7 +316,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		if (ControlCommand.isCommand(commandString)) {
 			this.setCurrentCommand(ControlCommand.valueOf(commandString));
 			setCommand(this.getCurrentCommand());
-			log.info("Codelet {}: command {} set", this.getFunctionName(), this.getCurrentCommand());
+			log.debug("Codelet {}: command {} set", this.getFunctionName(), this.getCurrentCommand());
 		} else {
 			log.warn("Command string is no command: {}", commandString);
 		}

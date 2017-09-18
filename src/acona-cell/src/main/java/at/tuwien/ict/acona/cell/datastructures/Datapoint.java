@@ -121,7 +121,13 @@ public class Datapoint {
 		if (gson == null) {
 			gson = new Gson();
 		}
-		return gson.fromJson(this.VALUE, clzz);
+
+		T result = null;
+		if (this.getValue().isJsonNull() == false) {
+			result = gson.fromJson(this.VALUE, clzz);
+		}
+
+		return result;
 	}
 
 	public String getValueAsString() {

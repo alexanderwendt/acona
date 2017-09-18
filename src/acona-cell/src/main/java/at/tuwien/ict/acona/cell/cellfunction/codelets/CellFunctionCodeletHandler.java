@@ -364,7 +364,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 						log.warn("Codelet={} is still running", entry.getKey());
 					}
 				});
-				log.warn("Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getCodeletMap());
+				log.warn("{}>Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getFunctionName(), this.getCodeletMap());
 				//Write finish notification
 				this.setServiceState(ServiceState.FINISHED);
 

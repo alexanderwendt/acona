@@ -70,6 +70,7 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	private void generateSystemState() throws Exception {
 		Chunk systemState = Chunk.newChunk("SystemState", "SYSTEMSTATE")
 				.setValue("agentname", this.getAgentName())
+				.setValue("hasState", ServiceState.RUNNING.toString())
 				.setValue("hasDescription", "ACONA Cell");
 
 		this.currentStates.forEach((k, v) -> {
