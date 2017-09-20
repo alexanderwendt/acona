@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -407,6 +408,21 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 */
 	protected String addServiceName(String suffix) {
 		return this.getFunctionName() + "." + suffix;
+	}
+
+	/**
+	 * @param testList
+	 * @return
+	 */
+	protected boolean isSystemDatapoint(List<String> testList) {
+		boolean result = false;
+
+		if (testList.contains(this.addServiceName(COMMANDSUFFIX))
+				|| testList.contains(this.addServiceName(CONFIGSUFFIX))) {
+			result = true;
+		}
+
+		return result;
 	}
 
 	@Override

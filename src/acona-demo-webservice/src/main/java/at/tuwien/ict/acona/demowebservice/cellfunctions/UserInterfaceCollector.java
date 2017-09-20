@@ -20,6 +20,8 @@ import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
 public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(UserInterfaceCollector.class);
+	
+	public static final String SYSTEMSTATEADDRESS = "systemstateaddress";
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
@@ -72,7 +74,13 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		// TODO Auto-generated method stub
-		log.info("Got data={}", data.get("ui1").getValue());
+		if (this.getValueMap().containsKey(SYSTEMSTATEADDRESS)) {
+			log.warn("System state={}", this.getValueMap().get(SYSTEMSTATEADDRESS).getValue());
+		} else if (this.getValueMap().containsKey("ui1")) {
+			log.info("Got data={}", data.get("ui1").getValue());
+		}
+		
+		
 		//@Lampros: Here, in data, you get all datapoints that you need if you are a subscriber. This information shall be presented in a user interface
 		
 	}

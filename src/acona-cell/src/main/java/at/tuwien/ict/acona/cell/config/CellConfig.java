@@ -185,6 +185,24 @@ public class CellConfig {
 	}
 
 	/**
+	 * @param functionName
+	 */
+	public void removeCellFunctionConfig(String functionName) {
+		JsonArray arr = this.configObject.getAsJsonArray(CELLFUNCTIONS).getAsJsonArray();
+		int index = 0;
+		for (int i = 0; i < arr.size(); i++) {
+			JsonObject function = arr.get(i).getAsJsonObject();
+			CellFunctionConfig config = CellFunctionConfig.newConfig(function);
+			if (config.getName().equals(functionName)) {
+				index = i;
+				break;
+			}
+		}
+
+		this.configObject.getAsJsonArray(CELLFUNCTIONS).remove(index);
+	}
+
+	/**
 	 * Get all cellfunctions
 	 * 
 	 * @return

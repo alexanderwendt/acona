@@ -23,6 +23,11 @@ public class JsonRpcRequest {
 	private final String id;
 	private Object[] params;
 
+	/**
+	 * @param method
+	 * @param isNotification
+	 * @param params
+	 */
 	public JsonRpcRequest(String method, boolean isNotification, Object[] params) {
 		super();
 		this.method = method;
@@ -36,6 +41,10 @@ public class JsonRpcRequest {
 		this.params = params;
 	}
 
+	/**
+	 * @param method
+	 * @param numberOfParameter
+	 */
 	public JsonRpcRequest(String method, int numberOfParameter) {
 		super();
 		this.method = method;
@@ -45,6 +54,10 @@ public class JsonRpcRequest {
 		this.params = new Object[numberOfParameter];
 	}
 
+	/**
+	 * @param stringrpcRequest
+	 * @throws Exception
+	 */
 	public JsonRpcRequest(String stringrpcRequest) throws Exception {
 		if (gson == null) {
 			gson = new Gson();
@@ -64,6 +77,9 @@ public class JsonRpcRequest {
 		this.params = rpcRequest2.getParams();
 	}
 
+	/**
+	 * @param rpcRequest
+	 */
 	public JsonRpcRequest(JsonObject rpcRequest) {
 		if (gson == null) {
 			gson = new Gson();
@@ -78,6 +94,9 @@ public class JsonRpcRequest {
 		this.params = objectArray;
 	}
 
+	/**
+	 * @param obj
+	 */
 	public void setParameters(Object... obj) {
 		this.params = obj;
 	}
@@ -108,6 +127,11 @@ public class JsonRpcRequest {
 		return result;
 	}
 
+	/**
+	 * @param index
+	 * @param obj
+	 * @throws Exception
+	 */
 	public void setParameterAsList(int index, List<?> obj) throws Exception {
 		if (util == null) {
 			util = new GsonUtils();
@@ -120,22 +144,52 @@ public class JsonRpcRequest {
 		}
 	}
 
+	/**
+	 * @param index
+	 * @param value
+	 * @return
+	 * @throws Exception
+	 */
 	public JsonRpcRequest setParameterAsValue(int index, String value) throws Exception {
 		return setParameterAsValue(index, new JsonPrimitive(value));
 	}
 
+	/**
+	 * @param index
+	 * @param value
+	 * @return
+	 * @throws Exception
+	 */
 	public JsonRpcRequest setParameterAsValue(int index, int value) throws Exception {
 		return setParameterAsValue(index, new JsonPrimitive(value));
 	}
 
+	/**
+	 * @param index
+	 * @param value
+	 * @return
+	 * @throws Exception
+	 */
 	public JsonRpcRequest setParameterAsValue(int index, double value) throws Exception {
 		return setParameterAsValue(index, new JsonPrimitive(value));
 	}
 
+	/**
+	 * @param index
+	 * @param value
+	 * @return
+	 * @throws Exception
+	 */
 	public JsonRpcRequest setParameterAsValue(int index, boolean value) throws Exception {
 		return setParameterAsValue(index, new JsonPrimitive(value));
 	}
 
+	/**
+	 * @param index
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
 	public JsonRpcRequest setParameterAsValue(int index, JsonElement obj) throws Exception {
 		if (gson == null) {
 			gson = new Gson();
@@ -167,26 +221,44 @@ public class JsonRpcRequest {
 		return result;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getMethod() {
 		return method;
 	}
 
+	/**
+	 * @param method
+	 */
 	public void setMethod(String method) {
 		this.method = method;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * @return
+	 */
 	public Object[] getParams() {
 		return params;
 	}
 
+	/**
+	 * @param params
+	 */
 	public void setParams(Object[] params) {
 		this.params = params;
 	}
 
+	/**
+	 * @return
+	 */
 	public JsonObject toJson() {
 		if (gson == null) {
 			gson = new Gson();

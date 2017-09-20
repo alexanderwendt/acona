@@ -72,7 +72,6 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-		// TODO Auto-generated method stub
 		
 	}
 

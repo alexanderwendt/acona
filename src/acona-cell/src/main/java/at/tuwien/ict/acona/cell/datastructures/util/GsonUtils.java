@@ -14,8 +14,8 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 
 public class GsonUtils {
 
-	private Gson gson = new Gson();
-	private Gson gsonExtended = new GsonBuilder().setPrettyPrinting().create();
+	private final Gson gson = new Gson();
+	private final Gson gsonExtended = new GsonBuilder().setPrettyPrinting().create();
 
 	public static enum ConflictStrategy {
 		THROW_EXCEPTION, PREFER_FIRST_OBJ, PREFER_SECOND_OBJ, PREFER_NON_NULL;
@@ -179,7 +179,16 @@ public class GsonUtils {
 		return jsonArray;
 	}
 
-	//	public String jsonPrettyPrint(Object obj) {
-	//		return gsonExtended.toJson(obj);
-	//	}
+	public String prettyPrint(final List<Datapoint> data) {
+		String result = "\n";
+		for (Datapoint dp : data) {
+			result += "address=" + dp.getCompleteAddress() + ", value=\n" + gsonExtended.toJson(dp.getValue()) + "\n";
+		}
+
+		return result;
+	}
+
+	public String prettyPrint(JsonElement e) {
+		return this.gsonExtended.toJson(e);
+	}
 }

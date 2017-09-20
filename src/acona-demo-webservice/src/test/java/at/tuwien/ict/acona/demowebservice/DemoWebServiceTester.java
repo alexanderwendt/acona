@@ -98,8 +98,10 @@ public class DemoWebServiceTester {
 			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
+					//.addCellfunction(CellFunctionConfig.newConfig(weatherservice + "d", WeatherService.class))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESS, "systemstate", weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
 			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
 			

@@ -126,10 +126,6 @@ public class DataStorageImpl implements DataStorage {
 			}
 		}
 
-		if (result.isEmpty()) {
-			result.add(Datapoints.newDatapoint(address));
-		}
-
 		return result;
 	}
 

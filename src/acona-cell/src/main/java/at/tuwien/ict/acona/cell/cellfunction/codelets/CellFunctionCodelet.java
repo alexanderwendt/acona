@@ -33,7 +33,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
 	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
-	private String codeletStateDatapointAddress;
+	//private String codeletStateDatapointAddress;
 
 	private String codeletHandlerAgentName = "";
 	private String codeletHandlerServiceName = "";
@@ -50,7 +50,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 			this.callerAddress = this.getCell().getLocalName() + ":" + this.getFunctionName();
 
 			//Set the system state datapoint
-			codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
+			//codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 
 			//Start internal init
 			this.cellFunctionCodeletInit();
@@ -193,9 +193,9 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	}
 
-	protected String getCodeletStateDatapointAddress() {
-		return codeletStateDatapointAddress;
-	}
+	//	protected String getCodeletStateDatapointAddress() {
+	//		return codeletStateDatapointAddress;
+	//	}
 
 	protected String getWorkingMemoryAddress() {
 		return workingMemoryAddress;
