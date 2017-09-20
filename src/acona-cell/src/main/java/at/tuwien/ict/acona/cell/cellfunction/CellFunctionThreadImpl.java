@@ -1,7 +1,7 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -414,8 +414,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 * @param testList
 	 * @return
 	 */
-	protected boolean isSystemDatapoint(List<String> testList) {
+	protected boolean isSystemDatapoint(Map<String, ?> map) {
 		boolean result = false;
+
+		ArrayList<String> testList = new ArrayList<>(map.keySet());
 
 		if (testList.contains(this.addServiceName(COMMANDSUFFIX))
 				|| testList.contains(this.addServiceName(CONFIGSUFFIX))) {
