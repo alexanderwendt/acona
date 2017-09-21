@@ -104,7 +104,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 			this.subscribeDatapoints();
 
 		} catch (Exception e) {
-			log.error("Cannot init function with config={}", config);
+			log.error("Cannot init function with config={}", config, e);
 			//this.shutDown();
 			throw new Exception(e.getMessage());
 		}
