@@ -10,7 +10,6 @@ import com.google.gson.JsonElement;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -29,7 +28,7 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		this.setExecuteOnce(false);
-		this.setExecuteRate(1000);
+		this.setExecuteRate(5000);
 		
 	}
 	
@@ -43,11 +42,13 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	protected void executeFunction() throws Exception {
 		try {
 			//Generate weather data
-			JsonElement result = Chunk.newChunk("Testresult", "tester").setValue("Anyvalue", 2.0).toJsonObject();
+			Chunk result = Chunk.newChunk(this.getFunctionName() + "_result", "WeatherData")
+					.setValue("City", "MockTown" + this.getFunctionName())
+					.setValue("Temperature", 24.5);
 			
 			//write it to the public datapoint
 			//Through the write map,
-			this.getValueMap().get(WEATHERADDRESSID).setValue(result);
+			this.getValueMap().get(WEATHERADDRESSID).setValue(result.toJsonObject());
 			
 			//this.getCommunicator().write(Datapoints.newDatapoint("blabla").setValue(result));
 			
@@ -72,7 +73,6 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-		// TODO Auto-generated method stub
 		
 	}
 

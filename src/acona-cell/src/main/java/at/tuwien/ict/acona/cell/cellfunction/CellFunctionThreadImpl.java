@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.cellfunction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,11 +34,30 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 	private static final int INITIALIZATIONPAUSE = 500;
 
+	/**
+	 * Deafult execute rate of the function
+	 */
 	private int executeRate = 1000;
+	/**
+	 * Execute the function only once
+	 */
 	private boolean executeOnce = true;
 
+	/**
+	 * Current control command
+	 */
 	protected ControlCommand currentCommand = ControlCommand.STOP;
+	/**
+	 * Current run state, if the system is allowed to run.
+	 */
 	protected boolean runAllowed = false;
+
+	/**
+	 * This command is reset as the start is triggered. It is used if a start
+	 * command is triggered, while the thread is already running. In that case,
+	 * the system shall run again to be up to date.
+	 */
+	protected boolean startCommandIsSet = false;
 
 	/**
 	 * In the value map all, subscribed values, as well as read values and all
@@ -45,8 +65,14 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 */
 	private Map<String, Datapoint> valueMap = new ConcurrentHashMap<>();
 
+	/**
+	 * This thread
+	 */
 	private Thread t;
 
+	/**
+	 * If the run function of the thread is active
+	 */
 	private boolean isActive = true;
 
 	public CellFunctionThreadImpl() {
@@ -231,6 +257,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	}
 
 	protected void executePostProcessing() throws Exception {
+
+		//Put the custom post processing before the values of the value map are written. In that way, values can be added in advance.
+		this.executeCustomPostProcessing();
+
 		// FIXME: The update here is not working well
 		if (this.getWriteDatapointConfigs().isEmpty() == false) {
 			log.debug("{}>Execute post processing action write for the datapoints={}", this.getFunctionName(), this.getWriteDatapointConfigs());
@@ -253,8 +283,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				log.error("{}>Cannot write datapoint {} to remote memory module", this.getFunctionName(), config, e);
 			}
 		});
-
-		this.executeCustomPostProcessing();
 
 		if (this.isExecuteOnce() == true) {
 			this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
@@ -301,15 +329,19 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 * Check, which command is valid and block until finished
 	 */
 	private synchronized void executeWait() {
-		while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
-			try {
-				// Block profile controller
-				this.setAllowedToRun(false);
-				this.wait();
-			} catch (InterruptedException e) {
-				log.trace("Wait interrupted client");
+		if (this.isStartCommandIsSet() == false) {
+			while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
+				try {
+					// Block profile controller
+					this.setAllowedToRun(false);
+					this.wait();
+				} catch (InterruptedException e) {
+					log.trace("Wait interrupted client");
+				}
 			}
 		}
+
+		this.setStartCommandIsSet(false);
 	}
 
 	protected synchronized void setCommand(String commandString) throws Exception {
@@ -326,6 +358,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		this.setCurrentCommand(command);
 		if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
 			this.setAllowedToRun(true);
+			this.setStartCommandIsSet(true);
 			this.notify();
 		} else if (this.getCurrentCommand().equals(ControlCommand.STOP) == true) {
 			this.setAllowedToRun(false);
@@ -390,6 +423,14 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		this.runAllowed = isAllowedToRun;
 	}
 
+	protected boolean isStartCommandIsSet() {
+		return startCommandIsSet;
+	}
+
+	protected void setStartCommandIsSet(boolean startCommandIsSet) {
+		this.startCommandIsSet = startCommandIsSet;
+	}
+
 	@Override
 	protected void shutDownImplementation() throws Exception {
 		this.setCommand(ControlCommand.EXIT);
@@ -407,6 +448,23 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 */
 	protected String addServiceName(String suffix) {
 		return this.getFunctionName() + "." + suffix;
+	}
+
+	/**
+	 * @param testList
+	 * @return
+	 */
+	protected boolean isSystemDatapoint(Map<String, ?> map) {
+		boolean result = false;
+
+		ArrayList<String> testList = new ArrayList<>(map.keySet());
+
+		if (testList.contains(this.addServiceName(COMMANDSUFFIX))
+				|| testList.contains(this.addServiceName(CONFIGSUFFIX))) {
+			result = true;
+		}
+
+		return result;
 	}
 
 	@Override

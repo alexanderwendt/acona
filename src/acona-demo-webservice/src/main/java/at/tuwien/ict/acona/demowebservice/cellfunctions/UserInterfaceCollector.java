@@ -6,20 +6,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
 import at.tuwien.ict.acona.demowebservice.launcher.GraphServer;
-import at.tuwien.ict.acona.demowebservice.launcher.GraphServerConnection;
-import at.tuwien.ict.acona.demowebservice.launcher.Launcher;
 
 
 
@@ -33,6 +27,8 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(UserInterfaceCollector.class);	
 	private GraphServer gserver;
+	
+	public static final String SYSTEMSTATEADDRESSID = "state";
 	
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {

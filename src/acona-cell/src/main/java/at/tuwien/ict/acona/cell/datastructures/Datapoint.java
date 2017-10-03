@@ -140,6 +140,15 @@ public class Datapoint {
 		return result;
 	}
 
+	public boolean hasEmptyValue() {
+		boolean result = false;
+		if (VALUE.toString().equals("{}") == true) {
+			result = true;
+		}
+
+		return result;
+	}
+
 	public Datapoint setValue(String value) {
 		this.VALUE = new JsonPrimitive(value);
 

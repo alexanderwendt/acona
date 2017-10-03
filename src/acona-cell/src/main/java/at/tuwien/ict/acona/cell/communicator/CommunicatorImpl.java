@@ -107,7 +107,9 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 		Datapoint result = null;
 		if (list.isEmpty()) {
-			throw new Exception("Cannot read datapoint" + datapoint);
+			//In case only one datapoint is read (without *) then an empty datapoint shall be returned
+			result = dp;
+			//throw new Exception("Cannot read datapoint" + datapoint);
 		} else {
 			result = list.get(0);
 		}

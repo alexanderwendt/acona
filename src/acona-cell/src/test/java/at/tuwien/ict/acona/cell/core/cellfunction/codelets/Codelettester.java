@@ -22,8 +22,6 @@ import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementNumb
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.framework.modules.ActionExecutorCodelet;
-import at.tuwien.ict.acona.framework.modules.OptionSelectorCodelet;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
@@ -415,14 +413,14 @@ public class Codelettester {
 					.addCellfunction(CellFunctionConfig.newConfig(evaluteOptionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "6")
-							.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName))
-					//Direct codelets
-					.addCellfunction(CellFunctionConfig.newConfig(selectOptionCodeletName, OptionSelectorCodelet.class)
-							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "7"))
-					.addCellfunction(CellFunctionConfig.newConfig(executeActionCodeletName, ActionExecutorCodelet.class)
-							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
-							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "8"));
+							.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName));
+			//Direct codelets
+			//					.addCellfunction(CellFunctionConfig.newConfig(selectOptionCodeletName, OptionSelectorCodelet.class)
+			//							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
+			//							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "7"))
+			//					.addCellfunction(CellFunctionConfig.newConfig(executeActionCodeletName, ActionExecutorCodelet.class)
+			//							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
+			//							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "8"));
 
 			//Add the specific codelets
 			String incrementServiceName = "incrementservice";

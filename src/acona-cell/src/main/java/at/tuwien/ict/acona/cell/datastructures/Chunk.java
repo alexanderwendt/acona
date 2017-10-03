@@ -129,6 +129,11 @@ public class Chunk {
 		return this;
 	}
 
+	/**
+	 * @param association
+	 * @param content
+	 * @return
+	 */
 	public Chunk addAssociatedContent(String association, List<Chunk> content) {
 		content.forEach(c -> {
 			this.addAssociatedContent(association, c);
@@ -136,6 +141,11 @@ public class Chunk {
 		return this;
 	}
 
+	/**
+	 * @param association
+	 * @param content
+	 * @return
+	 */
 	public Chunk addAssociatedContent(String association, Chunk content) {
 		if (this.chunkObject.getAsJsonArray(association) == null) {
 			this.chunkObject.add(association, new JsonArray());
@@ -148,8 +158,19 @@ public class Chunk {
 		return this;
 	}
 
+	public void removeAssociatedContent(String association, Chunk content) {
+		if (this.chunkObject.getAsJsonArray(association) != null) {
+			this.chunkObject.getAsJsonArray(association).remove(content.toJsonObject());
+		}
+	}
+
 	public String getName() {
-		return this.chunkObject.getAsJsonPrimitive(NAMEPROPERTY).getAsString();
+		String name = "";
+		if (this.chunkObject.has(NAMEPROPERTY)) {
+			name = this.chunkObject.getAsJsonPrimitive(NAMEPROPERTY).getAsString();
+		}
+
+		return name;
 	}
 
 	//	public String getID() {
@@ -165,20 +186,32 @@ public class Chunk {
 		return result;
 	}
 
+	/**
+	 * @param key
+	 * @return
+	 */
 	public double getDoubleValue(String key) {
 		return this.chunkObject.getAsJsonPrimitive(key).getAsDouble();
 	}
 
+	/**
+	 * @param key
+	 * @return
+	 */
 	public List<Chunk> getAssociatedContent(String key) {
-		JsonArray array = this.chunkObject.get(key).getAsJsonArray();
 		List<Chunk> result = new ArrayList<>();
-		array.forEach(element -> {
-			try {
-				result.add(new Chunk(element.getAsJsonObject()));
-			} catch (Exception e) {
-				log.error("Corrupted jsonobject. Cannot be converted into a chunk", element);
-			}
-		});
+
+		if (this.chunkObject.has(key)) {
+			JsonArray array = this.chunkObject.get(key).getAsJsonArray();
+
+			array.forEach(element -> {
+				try {
+					result.add(new Chunk(element.getAsJsonObject()));
+				} catch (Exception e) {
+					log.error("Corrupted jsonobject. Cannot be converted into a chunk", element);
+				}
+			});
+		}
 
 		return result;
 	}
@@ -209,6 +242,12 @@ public class Chunk {
 		return result;
 	}
 
+	/**
+	 * @param predicate
+	 * @param subchunkAttributeName
+	 * @param subChunkValue
+	 * @return
+	 */
 	public Chunk getFirstAssociatedContentFromAttribute(String predicate, String subchunkAttributeName, String subChunkValue) {
 		Chunk result = null;
 
@@ -220,6 +259,10 @@ public class Chunk {
 		return result;
 	}
 
+	/**
+	 * @param key
+	 * @return
+	 */
 	public JsonArray getAssociatedContentAsArray(String key) {
 		JsonArray array = this.chunkObject.get(key).getAsJsonArray();
 
@@ -233,6 +276,9 @@ public class Chunk {
 		return builder.toString();
 	}
 
+	/**
+	 * @return
+	 */
 	public String getType() {
 		return this.chunkObject.getAsJsonPrimitive(TYPEPROPERTY).getAsString();
 	}

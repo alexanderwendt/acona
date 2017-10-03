@@ -24,7 +24,6 @@ import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
@@ -99,11 +98,11 @@ public class DemoWebServiceTester {
 			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
+					//.addCellfunction(CellFunctionConfig.newConfig(weatherservice + "d", WeatherService.class))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
-							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint("state", CFStateGenerator.SYSTEMSTATEADDRESS, weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
-			
+							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, "systemstate", weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
 			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
 			
 			//=== Init finished ===//
@@ -139,6 +138,66 @@ public class DemoWebServiceTester {
 			log.info("current result={}, expected result={}", currentResult, expectedResult);
 			assertEquals(currentResult, expectedResult);
 			
+			log.info("Tests passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
+	
+	/**
+	 * Create a broker agent. Create a depot. Add money to depot, read state of depot, buy stock, sell stock, unregister depot
+	 * 
+	 */
+	@Test
+	public void functionWeatherServiceTest() {
+		try {
+			String weatherAgent1Name = "WeatherAgent1"; 
+			//String weatherAgent2Name = "WeatherAgent2"; 
+			String weatherservice = "Weather";
+			String publishAddress = "helloworld.currentweather";
+
+			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
+					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+							.setProperty(WeatherService.CITYNAME, "vienna")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY));
+			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
+			
+			//=== Init finished ===//
+
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.info("=== All agents initialized ===");
+			
+			weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			
+			//Wait while the system runs
+			synchronized (this) {
+				try {
+					this.wait(20000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			//Read the state of the system
+			//JsonObject systemState = weatherAgent.readLocalDatapoint(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject();
+			
+			//String currentResult = systemState.get("hasFunction").getAsJsonArray().get(0).getAsJsonObject().get("hasState").getAsString();
+			//String expectedResult = "RUNNING"; //As the system is still running, when the request is sent
+			
+			//weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
+			
+			//log.info("current result={}, expected result={}", currentResult, expectedResult);
+			//assertEquals(currentResult, expectedResult);
+			assert(false);
 			log.info("Tests passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

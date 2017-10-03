@@ -1,10 +1,10 @@
 package at.tuwien.ict.acona.demowebservice.webservice;
 
-public class FuckingSingletonHack {
+public class ServletSingleton {
 	private static JerseyRestServer function = null;
 	
 	public static void setFunction(JerseyRestServer function) {
-		FuckingSingletonHack.function = function;
+		ServletSingleton.function = function;
 	}
 	
 	public static JerseyRestServer getFunction() {
