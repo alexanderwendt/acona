@@ -24,6 +24,7 @@ import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
@@ -100,7 +101,9 @@ public class DemoWebServiceTester {
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
-							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
+							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("state", CFStateGenerator.SYSTEMSTATEADDRESS, weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
+			
 			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
 			
 			//=== Init finished ===//

@@ -1,5 +1,17 @@
 package at.tuwien.ict.acona.demowebservice.launcher;
 
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.servlet.ServletHandler;
+
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +23,7 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
@@ -21,6 +34,8 @@ import jade.core.Runtime;
  * @author wendt
  *
  */
+
+
 public class Launcher {
 	
 	private final static Logger log = LoggerFactory.getLogger(Launcher.class);
@@ -28,9 +43,18 @@ public class Launcher {
 	private static Launcher launcher;
 	
 	private KoreExternalControllerImpl controller = KoreExternalControllerImpl.getLauncher();
+	
+	private String outputString;
+	
+	public String getoutputString(){
+		return outputString;
+	}
 
-	public static void main(String[] args) {
-		log.info("Welcome to the ACONA Stock Market Evolution Demonstrator");
+	public void setoutputString(String newString) {
+		outputString = newString;
+	}
+	public static void main(String[] args) throws Exception {
+		log.info("Welcome to the ACONA Demonstrator");
 		
 		launcher = new Launcher();
 		try {
@@ -39,8 +63,9 @@ public class Launcher {
 			log.error("System initialization failed. Quit", e);
 			System.exit(-1);
 		}
-
+		log.info("---------------------------------END OF MAIN ---------------------------------------------------------------------------");
 	}
+		
 	
 	private void init() throws Exception {
 		try {
@@ -49,15 +74,30 @@ public class Launcher {
 			this.startJade();
 			
 			//=== General variables ===//
+//			String weatherAgent1Name = "WeatherAgent1"; 
+//			//String weatherAgent2Name = "WeatherAgent2"; 
+//			String weatherservice = "Weather";
+//			String publishAddress = "helloworld.currentweather";
+//			
+//			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
+//					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+//							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
+//					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+			
 			String weatherAgent1Name = "WeatherAgent1"; 
 			//String weatherAgent2Name = "WeatherAgent2"; 
 			String weatherservice = "Weather";
 			String publishAddress = "helloworld.currentweather";
-			
-			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
+
+			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class))
+					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("state", CFStateGenerator.SYSTEMSTATEADDRESS, weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
+			
+			CellGatewayImpl weatherAgent = this.controller.createAgent(cf);
 			
 			synchronized (this) {
 				try {
@@ -66,6 +106,8 @@ public class Launcher {
 
 				}
 			}
+			
+			weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
 			
 			//=== Broker ===//
 			String brokerAgentName = "BrokerAgent"; 
