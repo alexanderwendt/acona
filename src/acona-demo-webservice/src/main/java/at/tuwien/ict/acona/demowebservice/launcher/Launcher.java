@@ -5,12 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
+import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
@@ -49,14 +50,31 @@ public class Launcher {
 			this.startJade();
 			
 			//=== General variables ===//
-			String weatherAgent1Name = "WeatherAgent1"; 
-			//String weatherAgent2Name = "WeatherAgent2"; 
+			String weatherAgent1Name = "WeatherAgent1";
+			String weatherAgent2Name = "WeatherAgent2"; 
+			String weatherAgent3Name = "WeatherAgent3"; 
+			String algorithmAgentName = "AlgorithmAgent";
+			String algorithmService = "algorithm";
 			String weatherservice = "Weather";
 			String publishAddress = "helloworld.currentweather";
 			
-			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
+			CellGatewayImpl weatherAgent1 = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
+					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+			
+			CellGatewayImpl weatherAgent2 = this.controller.createAgent(CellConfig.newConfig(weatherAgent2Name)
+					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+							.setProperty(WeatherService.CITYNAME, "vienna")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent2Name, SyncMode.WRITEONLY))
+					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+			
+			CellGatewayImpl weatherAgent3 = this.controller.createAgent(CellConfig.newConfig(weatherAgent3Name)
+					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+							.setProperty(WeatherService.CITYNAME, "stockholm")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
 			synchronized (this) {
@@ -67,71 +85,26 @@ public class Launcher {
 				}
 			}
 			
-			//=== Broker ===//
-			String brokerAgentName = "BrokerAgent"; 
+			CellGatewayImpl calculator = this.controller.createAgent(CellConfig.newConfig(algorithmAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
+							.addManagedDatapoint("Vienna", publishAddress, weatherAgent2Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("Stockholm", publishAddress, weatherAgent3Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
+					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
-			String brokerServiceName = "BrokerService";
-			String statisticsService = "statisticsService";
-			
-//			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
-//					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
-//							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-//					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
-//			
-//			synchronized (this) {
-//				try {
-//					this.wait(200);
-//				} catch (InterruptedException e) {
-//
-//				}
-//			}
-			
-//			//=== Stock market ===//
-//			String stockmarketAgentName = "StockMarketAgent";
-//			String stockmarketServiceName = "StockMarketService";
-//			
-//			CellGatewayImpl stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
-//					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
-//							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-//							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
-//							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
-//							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
-//							.setGenerateReponder(true)));	//Puts data on datapoint StockMarketAgent:data
-//
-//			//=== Traders ===//
-//			String traderAgentName = "TraderAgent";
-//			String signalService = "signal";
-//			
-//			//Create 100 trading agents that first buy a stock, then sell it
-//			for (int i=1;i<=10;i++) {
-//				String traderType = "type";
-//				if (i%2==0) {
-//					traderType += "_even";
-//				} else {
-//					traderType += "_odd";
-//				}
-//				
-//				CellGatewayImpl traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
-//						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
-//								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-//								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-//								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
-//								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
-//								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
-//								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
-//								.setGenerateReponder(true))
-//						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-//			}
-
 			synchronized (this) {
 				try {
-					this.wait(10000);
+					this.wait(2000);
 				} catch (InterruptedException e) {
 
 				}
 			}
 			
 			log.info("=== All agents initialized ===");
+			
+			weatherAgent1.writeLocalDatapoint(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent2.writeLocalDatapoint(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent3.writeLocalDatapoint(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
 			
 		} catch (Exception e) {
 			log.error("Cannot initialize the system", e);

@@ -382,6 +382,17 @@ public class CellFunctionConfig {
 	}
 
 	/**
+	 * @param id
+	 * @param address
+	 * @param agentId
+	 * @param syncMode
+	 * @return
+	 */
+	public CellFunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
+		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, "", syncMode));
+	}
+
+	/**
 	 * @return
 	 */
 	public List<DatapointConfig> getManagedDatapoints() {

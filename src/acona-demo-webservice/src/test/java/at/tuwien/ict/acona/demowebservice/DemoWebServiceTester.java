@@ -145,4 +145,64 @@ public class DemoWebServiceTester {
 		}
 
 	}
+	
+	/**
+	 * Create a broker agent. Create a depot. Add money to depot, read state of depot, buy stock, sell stock, unregister depot
+	 * 
+	 */
+	@Test
+	public void functionWeatherServiceTest() {
+		try {
+			String weatherAgent1Name = "WeatherAgent1"; 
+			//String weatherAgent2Name = "WeatherAgent2"; 
+			String weatherservice = "Weather";
+			String publishAddress = "helloworld.currentweather";
+
+			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
+					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+							.setProperty(WeatherService.CITYNAME, "vienna")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY));
+			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
+			
+			//=== Init finished ===//
+
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.info("=== All agents initialized ===");
+			
+			weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			
+			//Wait while the system runs
+			synchronized (this) {
+				try {
+					this.wait(20000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			//Read the state of the system
+			//JsonObject systemState = weatherAgent.readLocalDatapoint(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject();
+			
+			//String currentResult = systemState.get("hasFunction").getAsJsonArray().get(0).getAsJsonObject().get("hasState").getAsString();
+			//String expectedResult = "RUNNING"; //As the system is still running, when the request is sent
+			
+			//weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
+			
+			//log.info("current result={}, expected result={}", currentResult, expectedResult);
+			//assertEquals(currentResult, expectedResult);
+			assert(false);
+			log.info("Tests passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
@@ -93,9 +92,8 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		// React on the start trigger
-		JsonElement value = data.get(COMMANDDATAPOINTNAME).getValue();
-		if (data.containsKey(COMMANDDATAPOINTNAME)
-				&& data.get(COMMANDDATAPOINTNAME).getValue().isJsonPrimitive() == true) {
+		//JsonElement value = data.get(COMMANDDATAPOINTNAME).getValue();
+		if (data.containsKey(COMMANDDATAPOINTNAME) && data.get(COMMANDDATAPOINTNAME).getValue().isJsonPrimitive() == true) {
 			try {
 				this.setCommand(data.get(COMMANDDATAPOINTNAME).getValue().getAsString());
 			} catch (Exception e) {

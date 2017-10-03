@@ -41,7 +41,7 @@ public class JerseyRestServer  extends CellFunctionImpl {
 
 			//ServletContextHandler handler = new ServletContextHandler(jettyServer, "/kore");
 			//handler.addServlet(new ServletHolder(new KoreRestService(this)), "/");
-		    FuckingSingletonHack.setFunction(this);
+		    ServletSingleton.setFunction(this);
 		    
 		    jettyServer.start();
 		    //jettyServer.join();

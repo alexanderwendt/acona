@@ -42,7 +42,7 @@ public class JerseyRestService {
 	private final static Logger log = LoggerFactory.getLogger(JerseyRestService.class);
 	
 	public JerseyRestService() throws Exception {
-		this.function = FuckingSingletonHack.getFunction();
+		this.function = ServletSingleton.getFunction();
 		
 		//this.commandAddress = this.function.getFunctionConfig().getProperty(attributeCommandAddress, Variables.Request.COMMANDADDRESS);
 		//this.resultAddress = this.function.getFunctionConfig().getProperty(attributeResultAddress, Variables.Request.RESULTADDRESS);

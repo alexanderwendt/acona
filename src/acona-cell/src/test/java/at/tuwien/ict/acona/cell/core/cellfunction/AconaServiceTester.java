@@ -21,6 +21,7 @@ import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.config.SystemConfig;
 import at.tuwien.ict.acona.cell.core.CellGateway;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.AdditionFunctionWithDuration;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFIncrementService;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.LoopController;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SequenceController;
@@ -471,6 +472,93 @@ public class AconaServiceTester {
 			log.debug("Received state={}", state);
 
 			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue().getAsDouble();
+
+			log.debug("correct value={}, actual value={}", expectedResult, result);
+
+			assertEquals(result, expectedResult, 0.0);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
+
+	/**
+	 * Idea: Start a function that calculates something with a delay. While it
+	 * is calculating, new subscribed values arrives. The system shall
+	 * automatically restart and process the newly arrived values. The test
+	 * tests the feature that new data retriggers the function. If multiple
+	 * subscribed data arrives, the system shall still only start once. In order
+	 * to trigger this type of function the setStart shall be executed.
+	 * 
+	 * There is a calculator function that calculates a result of operand A and
+	 * B within 5s. During the calculation, operand A changes.
+	 * 
+	 * 
+	 */
+	@Test
+	public void echoExecutionOfFunctionOnValueUpdate() {
+		try {
+			String additionServiceName = "AdditionService";
+			String agentName = "AdditionAgent";
+
+			String operand1Address = "operand1";
+			String operand2Address = "operand2";
+			String resultAddress = "result";
+
+			// values
+			double operand1 = 2;
+			double operand2 = 3;
+
+			double operand2new = 4;
+
+			double expectedResult = operand1 + operand2new;
+
+			// Use a system config to init the whole system
+			CellGatewayImpl cellAddition = this.launcher.createAgent(CellConfig.newConfig(agentName)
+					.addCellfunction(CellFunctionConfig.newConfig(additionServiceName, AdditionFunctionWithDuration.class)
+							.addManagedDatapoint(AdditionFunctionWithDuration.OPERANDID1, operand1Address, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint(AdditionFunctionWithDuration.OPERANDID2, operand2Address, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint(AdditionFunctionWithDuration.RESULT, resultAddress, SyncMode.WRITEONLY)));
+
+			synchronized (this) {
+				try {
+					this.wait(500);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			log.info("=== All agents initialized ===");
+
+			//Write values
+			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand1Address).setValue(new JsonPrimitive(operand1)));
+			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2)));
+
+			//The result should be there in 5s. Therefore wait 500ms
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+
+			//The result should be there in 5s. Therefore wait 500ms
+			synchronized (this) {
+				try {
+					this.wait(7000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			double result = cellAddition.readLocalDatapoint(resultAddress).getValue().getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 
