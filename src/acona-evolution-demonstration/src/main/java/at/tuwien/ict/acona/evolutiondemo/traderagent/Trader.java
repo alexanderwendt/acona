@@ -13,7 +13,7 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
@@ -84,7 +84,7 @@ public class Trader extends CellFunctionCodelet {
 		
 		//Add subscription to the stock market price
 		log.debug("Read from address={}", stockMarketAddress);
-		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, Datapoints.newDatapoint(stockMarketAddress).getAddress(), Datapoints.newDatapoint(stockMarketAddress).getAgent(), SyncMode.READONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, DatapointBuilder.newDatapoint(stockMarketAddress).getAddress(), DatapointBuilder.newDatapoint(stockMarketAddress).getAgent(), SyncMode.READONLY));
 		
 		
 		//Create a depot
@@ -136,7 +136,7 @@ public class Trader extends CellFunctionCodelet {
 		//Write the local depot
 		Gson gson = new Gson();
 		JsonElement jsonDepot = gson.toJsonTree(depot);
-		this.writeLocal(Datapoints.newDatapoint(this.localDepotAddress).setValue(jsonDepot));
+		this.writeLocal(DatapointBuilder.newDatapoint(this.localDepotAddress).setValue(jsonDepot));
 	}
 
 	private void executeTraderPreProcessing() throws Exception {

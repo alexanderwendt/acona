@@ -8,7 +8,7 @@ import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
@@ -58,7 +58,8 @@ public class Launcher {
 			String controllerAgentName = "ControllerAgent";
 			String controllerService = "controllerservice";
 			
-			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
+			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)	
+					//Here a codelethandler is used.The agents are codelets of the codelet handler
 					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
 							.setGenerateReponder(true))
 					.addCellfunction(CellFunctionConfig.newConfig("userconsole", ConsoleRequestReceiver.class)

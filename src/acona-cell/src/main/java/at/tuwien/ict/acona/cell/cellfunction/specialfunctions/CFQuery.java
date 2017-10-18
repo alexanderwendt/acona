@@ -16,7 +16,7 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -107,7 +107,7 @@ public class CFQuery extends CellFunctionImpl {
 			//this.getCommunicator().subscribe(resultAddress, resultAgentName);
 
 			//write to destination
-			List<Datapoint> sendlist = Arrays.asList(Datapoints.newDatapoint(destinationAddress).setValue(sendContent));
+			List<Datapoint> sendlist = Arrays.asList(DatapointBuilder.newDatapoint(destinationAddress).setValue(sendContent));
 			this.getCommunicator().write(destinationAgentName, sendlist, timeout, false);
 
 			try {

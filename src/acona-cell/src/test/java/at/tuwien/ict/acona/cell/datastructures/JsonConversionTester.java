@@ -68,7 +68,7 @@ public class JsonConversionTester {
 		log.info("Start datapoint tester");
 		try {
 
-			List<Datapoint> stringlist = Arrays.asList(Datapoints.newDatapoint("test1").setValue(new JsonPrimitive("SELECT * SERVER")), Datapoints.newDatapoint("test2").setValue("test2"), Datapoints.newDatapoint("test3"));
+			List<Datapoint> stringlist = Arrays.asList(DatapointBuilder.newDatapoint("test1").setValue(new JsonPrimitive("SELECT * SERVER")), DatapointBuilder.newDatapoint("test2").setValue("test2"), DatapointBuilder.newDatapoint("test3"));
 
 			//JsonArray array = util.convertListToJsonArray(stringlist);
 			//Object[] input = new Object[1];
@@ -99,7 +99,7 @@ public class JsonConversionTester {
 		log.info("Start datapoint tester");
 		try {
 
-			List<Datapoint> stringlist = Arrays.asList(Datapoints.newDatapoint("test1"), Datapoints.newDatapoint("test2"), Datapoints.newDatapoint("test3"));
+			List<Datapoint> stringlist = Arrays.asList(DatapointBuilder.newDatapoint("test1"), DatapointBuilder.newDatapoint("test2"), DatapointBuilder.newDatapoint("test3"));
 
 			//Convert to JsonArray
 			//JsonArray array = util.convertListToJsonArray(stringlist);

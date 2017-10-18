@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -84,7 +84,7 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 			message = ServiceState.ERROR.toString();
 		}
 
-		return Datapoints.newDatapoint("state").setValue(message);
+		return DatapointBuilder.newDatapoint("state").setValue(message);
 
 	}
 

@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
 import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils.ConflictStrategy;
 
@@ -43,7 +43,7 @@ public class DataStorageImpl implements DataStorage {
 			throw new Exception("* or : was part of the address: " + datapackage.getAddress() + "This is not allowed");
 		}
 
-		this.data.put(datapackage.getAddress(), Datapoints.newDatapoint(datapackage.getAddress()).setValue(datapackage.getValue()));
+		this.data.put(datapackage.getAddress(), DatapointBuilder.newDatapoint(datapackage.getAddress()).setValue(datapackage.getValue()));
 		log.debug("write datapoint={}", datapackage);
 		this.notifySubscribers(datapackage, caller);
 		// }
@@ -99,9 +99,9 @@ public class DataStorageImpl implements DataStorage {
 			result = list.get(0);
 		} else {
 			if (address.contains("*")) {
-				result = Datapoints.newNullDatapoint();
+				result = DatapointBuilder.newNullDatapoint();
 			} else {
-				result = Datapoints.newDatapoint(address);
+				result = DatapointBuilder.newDatapoint(address);
 			}
 
 		}
@@ -178,7 +178,7 @@ public class DataStorageImpl implements DataStorage {
 	@Override
 	public void remove(String address, String caller) {
 		this.data.remove(address);
-		this.notifySubscribers(Datapoints.newDatapoint(address), caller);
+		this.notifySubscribers(DatapointBuilder.newDatapoint(address), caller);
 
 	}
 

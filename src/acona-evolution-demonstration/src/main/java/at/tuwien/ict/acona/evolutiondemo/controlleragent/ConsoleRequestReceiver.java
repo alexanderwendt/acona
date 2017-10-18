@@ -11,7 +11,8 @@ import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -49,8 +50,19 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 					//Execute the codelet handler once
 					JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 					req.setParameterAsValue(0, false);
-					Datapoint dp = Datapoints.newDatapoint(this.codeletHandlerAddress);
+					Datapoint dp = DatapointBuilder.newDatapoint(this.codeletHandlerAddress);
 					this.getCommunicator().executeServiceQueryDatapoints(dp.getAgent(), dp.getAddress(), req, dp.getAgent(), dp.getAddress() + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+					
+					//FIXME: No delays should be necessary, look at the codelet handler, sync problems.
+					synchronized (this) {
+						try {
+							this.wait(5);
+						} catch (InterruptedException e) {
+							
+						}
+							
+					}
+					
 				} else {
 					log.warn("Running of simulator interrupted after {} runs", i);
 					break;
@@ -111,14 +123,31 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		//Methods: triggerStart
-//		log.debug("Received method request={}", parameterdata.getMethod());
-//		if (parameterdata.getMethod().equals("starttrigger")) {
-//			this.setExternalCommand(ControlCommand.START.toString());
-//			
-//		}
+		JsonRpcResponse result = null;
 		
-		return null;
+		try {
+			switch (parameterdata.getMethod()) {
+				case "startcontroller":
+					this.count = parameterdata.getParameter(0, Integer.class);
+					log.debug("Start stock market and run it {} times", this.count);
+					this.startStockMarket(this.count);
+					break;
+				default:
+					throw new UnsupportedOperationException();
+			}
+			
+			//In the method, there should be parameter requestaddress and resultaddress. Methodname is any
+			
+			//this.resultAddress = parameterdata.getParameter(1, String.class);
+			//No parameters necessary
+			
+			result = new JsonRpcResponse(parameterdata, new JsonPrimitive("OK"));
+			
+		} catch (Exception e) {
+			result = new JsonRpcResponse(parameterdata, new JsonRpcError("ERROR", -1, e.getMessage(), e.getMessage()));
+		}
+		
+		return result;
 	}
 	
 }

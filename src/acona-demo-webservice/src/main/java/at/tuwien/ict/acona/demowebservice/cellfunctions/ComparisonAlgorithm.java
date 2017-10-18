@@ -10,8 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -40,9 +41,9 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	}
 	
 	private Chunk generateResponse(final Chunk currentResult) throws Exception {
-		Chunk result = Chunk.newChunk("AlgorithmResponse", "Calculation");
+		Chunk result = ChunkBuilder.newChunk("AlgorithmResponse", "Calculation");
 		if (currentResult!=null && currentResult.getName()!=null && currentResult.getName().equals("AlgorithmResponse")) {
-			result = Chunk.newChunk(currentResult);
+			result = ChunkBuilder.newChunk(currentResult);
 		}
 		
 		List<Chunk> weatherdata = result.getAssociatedContent(DATAPREDICATE);
@@ -54,7 +55,7 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 		} else if (weatherdata.size() == 1) {
 			conclusio = "In " + weatherdata.get(0).getValue("City") + " the temperature is " + weatherdata.get(0).getValue("Temperature") + "°C.";
 		} else {
-			List<Chunk> sortedList = weatherdata.stream().sorted((o1, o2)->o1.getValue("Temperature").compareTo(o2.getValue("Temperature"))).collect(Collectors.toList());
+			List<Chunk> sortedList = weatherdata.stream().sorted((o1, o2)->Double.valueOf(o1.getValue("Temperature")).compareTo(Double.valueOf(o2.getValue("Temperature")))).collect(Collectors.toList());
 			conclusio = "In ";
 			for (int i=sortedList.size()-1;i>=0;i--) {
 				conclusio += sortedList.get(i).getValue("City") + " with temperature " + df.format(Double.valueOf(sortedList.get(i).getValue("Temperature"))) + "°C";
@@ -104,8 +105,14 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		//write conclusio to datapoint
-		Datapoint resultDatapoint = Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
-		this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(resultDatapoint));
+		
+		Datapoint resultDatapoint = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());;
+		synchronized (resultDatapoint) {
+			//resultDatapoint = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
+			this.getCommunicator().write(resultDatapoint);
+			log.debug("Written datapoint={}", resultDatapoint);
+		}
+		
 		
 	}
 
@@ -121,7 +128,7 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 			//Every datapoint that is not a system datapoint must be a subscribed weather datapoint
 			data.values().forEach(dp->{
 				try {
-					Chunk receivedChunk = Chunk.newChunk(dp.getValue().getAsJsonObject());
+					Chunk receivedChunk = ChunkBuilder.newChunk(dp.getValue().getAsJsonObject());
 					
 					//Update new values
 					Chunk existingChunk = this.algorithmResult.getFirstAssociatedContentFromAttribute(DATAPREDICATE, "City", receivedChunk.getValue("City"));

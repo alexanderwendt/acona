@@ -19,8 +19,9 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionType;
 import at.tuwien.ict.acona.cell.cellfunction.CommVocabulary;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -184,15 +185,15 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	private Datapoint getExtendedState() throws Exception {
-		Datapoint result = Datapoints.newDatapoint(this.addServiceName(this.addServiceName(EXTENDEDSTATESUFFIX)));
+		Datapoint result = DatapointBuilder.newDatapoint(this.addServiceName(this.addServiceName(EXTENDEDSTATESUFFIX)));
 
 		Chunk systemState = null;
 		try {
-			systemState = Chunk.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTEDNEDSTATE");
+			systemState = ChunkBuilder.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTEDNEDSTATE");
 			systemState.setValue("hasState", this.getCurrentState().toString());
 			for (Entry<String, ServiceState> entry : this.getCodeletMap().entrySet()) {
 				try {
-					systemState.addAssociatedContent("hasCodelet", Chunk.newChunk(entry.getKey(), "CODELETSTATE").setValue("State", entry.getValue().toString()));
+					systemState.addAssociatedContent("hasCodelet", ChunkBuilder.newChunk(entry.getKey(), "CODELETSTATE").setValue("State", entry.getValue().toString()));
 				} catch (Exception e) {
 					log.error("Cannot set the associated codelet={}", entry, e);
 				}
@@ -468,7 +469,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		Chunk state = null;
 		try {
-			state = Chunk.newChunk(this.getFunctionName() + "_State", "CODELETHANDLERSTATE");
+			state = ChunkBuilder.newChunk(this.getFunctionName() + "_State", "CODELETHANDLERSTATE");
 			state.setValue("RUNNINGCODELETS", runningCodelets);
 
 		} catch (Exception e) {

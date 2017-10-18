@@ -12,7 +12,7 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
@@ -55,7 +55,7 @@ public class EMAIndicator extends CellFunctionImpl {
 		
 		
 		//Subscribe price address but without trigger to start
-		Datapoint stockMarket = Datapoints.newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, ""));
+		Datapoint stockMarket = DatapointBuilder.newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, ""));
 		
 		//Add subscription to the stock market price
 		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, stockMarket.getAddress(), stockMarket.getAgent(), SyncMode.SUBSCRIBEONLY));

@@ -9,9 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
-import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 /**
  * @author wendt
@@ -122,12 +122,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	private void initServiceDatapoints() throws Exception {
 		String functionDescription = setFunctionDescription();
 
-		Datapoint command = Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
-		Datapoint state = Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.FINISHED.toString());
-		Datapoint description = Datapoints.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue(functionDescription);
-		Datapoint config = Datapoints.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
-		Datapoint result = Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");
-		Datapoint extendedState = Datapoints.newDatapoint(this.addServiceName(EXTENDEDSTATESUFFIX)).setValue(Chunk.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTENDEDSTATE"));
+		Datapoint command = DatapointBuilder.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.STOP.toString());
+		Datapoint state = DatapointBuilder.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(ServiceState.FINISHED.toString());
+		Datapoint description = DatapointBuilder.newDatapoint(this.addServiceName(DESCRIPTIONSUFFIX)).setValue(functionDescription);
+		Datapoint config = DatapointBuilder.newDatapoint(this.addServiceName(CONFIGSUFFIX)).setValue("");
+		Datapoint result = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue("");
+		Datapoint extendedState = DatapointBuilder.newDatapoint(this.addServiceName(EXTENDEDSTATESUFFIX)).setValue(ChunkBuilder.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTENDEDSTATE"));
 
 		log.debug("Subscribe the following datapoints:\ncommand: {}\nstate: {}\ndescription: {}\nparameter: {}\nconfig: {}",
 				command.getAddress(), state.getAddress(), description.getAddress(),
@@ -285,7 +285,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		});
 
 		if (this.isExecuteOnce() == true) {
-			this.writeLocal(Datapoints.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
+			this.writeLocal(DatapointBuilder.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
 		}
 
 		log.debug("{}>Service execution run finished", this.getFunctionName());
@@ -470,7 +470,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	@Override
 	protected void processServiceState() throws Exception {
 		try {
-			this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(this.getCurrentState().toString()));
+			this.getCommunicator().write(DatapointBuilder.newDatapoint(this.addServiceName(STATESUFFIX)).setValue(this.getCurrentState().toString()));
 		} catch (Exception e) {
 			log.error("Cannot write the state = {} to datapoint = {}", this.getCurrentState(), this.addServiceName(STATESUFFIX));
 			throw new Exception(e.getMessage());

@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -42,7 +43,7 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	protected void executeFunction() throws Exception {
 		try {
 			//Generate weather data
-			Chunk result = Chunk.newChunk(this.getFunctionName() + "_result", "WeatherData")
+			Chunk result = ChunkBuilder.newChunk(this.getFunctionName() + "_result", "WeatherData")
 					.setValue("City", "MockTown" + this.getFunctionName())
 					.setValue("Temperature", 24.5);
 			

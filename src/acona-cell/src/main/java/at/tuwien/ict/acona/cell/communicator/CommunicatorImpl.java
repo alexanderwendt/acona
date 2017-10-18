@@ -15,7 +15,7 @@ import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFSubscribeLock;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -77,7 +77,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public List<Datapoint> readWildcard(String datapointName) throws Exception {
-		Datapoint dp = Datapoints.newDatapoint(datapointName);
+		Datapoint dp = DatapointBuilder.newDatapoint(datapointName);
 
 		//String agentName = this.getLocalAgentName();
 		//String address = datapointName;
@@ -101,7 +101,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public Datapoint read(String agentName, String datapoint, int timeout) throws Exception {
-		Datapoint dp = Datapoints.newDatapoint(datapoint);
+		Datapoint dp = DatapointBuilder.newDatapoint(datapoint);
 
 		List<Datapoint> list = read(agentName, Arrays.asList(dp.getAddress()), timeout);
 
@@ -121,7 +121,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public Datapoint read(String datapointName) throws Exception {
 		Datapoint result = null;
 
-		Datapoint dp = Datapoints.newDatapoint(datapointName);
+		Datapoint dp = DatapointBuilder.newDatapoint(datapointName);
 		result = this.read(dp.getAgent(this.getLocalAgentName()), dp.getAddress());
 
 		//		//If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and read from an agent
@@ -245,7 +245,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public Datapoint subscribe(String completeAddress) throws Exception {
 		Datapoint result = null;
 
-		Datapoint dp = Datapoints.newDatapoint(completeAddress);
+		Datapoint dp = DatapointBuilder.newDatapoint(completeAddress);
 		List<Datapoint> datapoints = this.subscribe(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()));
 		if (datapoints.isEmpty() == false) {
 			result = datapoints.get(0);
@@ -281,7 +281,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void unsubscribe(String completeAddress) throws Exception {
-		Datapoint dp = Datapoints.newDatapoint(completeAddress);
+		Datapoint dp = DatapointBuilder.newDatapoint(completeAddress);
 		this.unsubscribe(dp.getAgent(this.getLocalAgentName()), Arrays.asList(dp.getAddress()));
 
 	}
@@ -309,7 +309,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 	public Datapoint subscribeDatapoint(String key, String callingCellfunctionName) throws Exception {
 		//Create subscription from subscription config
 		//Subscribe the value
-		Datapoint completeKey = Datapoints.newDatapoint(key);
+		Datapoint completeKey = DatapointBuilder.newDatapoint(key);
 		completeKey.setAgentIfAbsent(this.getLocalAgentName());
 
 		Datapoint result = this.subscribe(completeKey.getCompleteAddress());
@@ -324,7 +324,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public void unsubscribeDatapoint(String key, String callingCellFunctionName) throws Exception {
-		Datapoint completeKey = Datapoints.newDatapoint(key);
+		Datapoint completeKey = DatapointBuilder.newDatapoint(key);
 		completeKey.setAgentIfAbsent(this.getLocalAgentName());
 
 		this.unsubscribe(completeKey.getCompleteAddress());

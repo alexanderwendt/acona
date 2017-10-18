@@ -18,8 +18,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 @Path("korecogsys")
 public class JerseyRestService {
@@ -61,7 +62,7 @@ public class JerseyRestService {
 		
 		try {
 			String systemStateString = "State of all codelets in the system:\n";
-			Chunk systemState = Chunk.newChunk(this.function.getCommunicatorFromFunction().read(this.stateAddress).getValue().getAsJsonObject());
+			Chunk systemState = ChunkBuilder.newChunk(this.function.getCommunicatorFromFunction().read(this.stateAddress).getValue().getAsJsonObject());
 			for (Chunk c: systemState.getAssociatedContent("hasCodelet")) {
 				systemStateString += "Function name: " + c.getName() + ", state: " + c.getValue("State") + "\n";
 			}

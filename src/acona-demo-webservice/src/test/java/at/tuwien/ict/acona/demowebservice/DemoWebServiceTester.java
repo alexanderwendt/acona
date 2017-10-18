@@ -27,7 +27,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
@@ -116,7 +116,7 @@ public class DemoWebServiceTester {
 			}
 			log.info("=== All agents initialized ===");
 			
-			weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
 			
 			//Wait while the system runs
 			synchronized (this) {
@@ -133,7 +133,7 @@ public class DemoWebServiceTester {
 			String currentResult = systemState.get("hasFunction").getAsJsonArray().get(0).getAsJsonObject().get("hasState").getAsString();
 			String expectedResult = "RUNNING"; //As the system is still running, when the request is sent
 			
-			weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
+			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
 			
 			log.info("current result={}, expected result={}", currentResult, expectedResult);
 			assertEquals(currentResult, expectedResult);
@@ -176,7 +176,7 @@ public class DemoWebServiceTester {
 			}
 			log.info("=== All agents initialized ===");
 			
-			weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
 			
 			//Wait while the system runs
 			synchronized (this) {

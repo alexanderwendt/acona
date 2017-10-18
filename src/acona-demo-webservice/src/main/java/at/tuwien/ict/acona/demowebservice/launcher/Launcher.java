@@ -9,7 +9,7 @@ import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
@@ -53,6 +53,7 @@ public class Launcher {
 			String weatherAgent1Name = "WeatherAgent1";
 			String weatherAgent2Name = "WeatherAgent2"; 
 			String weatherAgent3Name = "WeatherAgent3"; 
+			String weatherAgent4Name = "WeatherAgent4"; 
 			String algorithmAgentName = "AlgorithmAgent";
 			String algorithmService = "algorithm";
 			String weatherservice = "Weather";
@@ -77,6 +78,13 @@ public class Launcher {
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
+			CellGatewayImpl weatherAgent4 = this.controller.createAgent(CellConfig.newConfig(weatherAgent4Name)
+					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+							.setProperty(WeatherService.CITYNAME, "innsbruck")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
+					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+			
 			synchronized (this) {
 				try {
 					this.wait(200);
@@ -89,7 +97,8 @@ public class Launcher {
 					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Vienna", publishAddress, weatherAgent2Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", publishAddress, weatherAgent3Name, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("Innsbruck", publishAddress, weatherAgent4Name, SyncMode.SUBSCRIBEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
 			synchronized (this) {
@@ -102,9 +111,10 @@ public class Launcher {
 			
 			log.info("=== All agents initialized ===");
 			
-			weatherAgent1.writeLocalDatapoint(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			weatherAgent2.writeLocalDatapoint(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			weatherAgent3.writeLocalDatapoint(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent1.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent2.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent3.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent4.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
 			
 		} catch (Exception e) {
 			log.error("Cannot initialize the system", e);

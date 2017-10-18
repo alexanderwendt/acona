@@ -23,7 +23,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
@@ -205,13 +205,13 @@ public class BrokerTester {
 			for (int i=0;i<50;i++) {
 				CellGatewayImpl a = this.launcher.createAgent(CellConfig.newConfig(traderType1 + i));
 				traderAgents.add(a);
-				a.writeLocalDatapoint(Datapoints.newDatapoint("type").setValue(traderType1));
+				a.writeLocalDatapoint(DatapointBuilder.newDatapoint("type").setValue(traderType1));
 			}
 			
 			for (int i=0;i<15;i++) {
 				CellGatewayImpl a = this.launcher.createAgent(CellConfig.newConfig(traderType2 + i));
 				traderAgents.add(a);
-				a.writeLocalDatapoint(Datapoints.newDatapoint("type").setValue(traderType2));
+				a.writeLocalDatapoint(DatapointBuilder.newDatapoint("type").setValue(traderType2));
 			}
 			
 			synchronized (this) {

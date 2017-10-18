@@ -13,7 +13,7 @@ import com.google.gson.JsonSyntaxException;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -117,7 +117,7 @@ public class Broker extends CellFunctionImpl {
 		//addAgentType(agentName, agentType);
 		
 		JsonElement jsonDepot = gson.toJsonTree(depot);
-		this.writeLocal(Datapoints.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
+		this.writeLocal(DatapointBuilder.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
 		log.debug("Registered agent={}, type={}", agentName, agentType);
 		return jsonDepot;
 	}
@@ -158,7 +158,7 @@ public class Broker extends CellFunctionImpl {
 		depot.buy(stockName, volume, price);
 		
 		JsonElement jsonDepot = gson.toJsonTree(depot);
-		this.writeLocal(Datapoints.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
+		this.writeLocal(DatapointBuilder.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
 		log.debug("Agent={}, Bought stock={}, volume={}, price={}. Depot={}", agentName, stockName, volume, price, jsonDepot);
 		
 		return jsonDepot;
@@ -173,7 +173,7 @@ public class Broker extends CellFunctionImpl {
 		depot.sell(stockName, volume, price);
 		
 		JsonElement jsonDepot = gson.toJsonTree(depot);
-		this.writeLocal(Datapoints.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
+		this.writeLocal(DatapointBuilder.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
 		log.debug("Agent={}, Sold stock={}, volume={}, price={}. Depot={}", agentName, stockName, volume, price, jsonDepot);
 		
 		return jsonDepot;
@@ -188,7 +188,7 @@ public class Broker extends CellFunctionImpl {
 		depot.addLiquid(amount);
 		
 		JsonElement jsonDepot = gson.toJsonTree(depot);
-		this.writeLocal(Datapoints.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
+		this.writeLocal(DatapointBuilder.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
 		log.debug("Agent={}>Added money={}. Total amount={}", agentName, amount, depot.getLiquid());
 		
 		return jsonDepot;

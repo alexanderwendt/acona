@@ -196,4 +196,128 @@ public class TraderTester {
 		}
 	}
 	
+	/**
+	 * Create a controller and one trader, the depot and a stock market. The trader agent shall use a moving average signal function 
+	 * to buy, when the faster moving average (use EMA) crosses from below and sell if the faster EMA crosses from above. The stock market 
+	 * shall use a sinus stock market function.
+	 * 
+	 * The test is finished, as the trader agent has bought once and sold the stock.
+	 * 
+	 */
+	@Test
+	public void buyAndSellMovingAvergeTester() {
+		try {
+			//=== Agent names and services ===//
+			String brokerAgentName = "BrokerAgent";
+			String brokerServiceName = "BrokerService";
+			String statisticsService = "statisticsService";
+			
+			String traderAgentName = "TraderAgent";
+			String signalService = "SignalService";
+			String indicatorEMALongService = "EMALongService";
+			String indicatorEMAShortService = "EMAShort";
+			String tradeService = "TradeService";
+			String traderTypePrefix = "EMATrader";
+			int EMALongPeriod = 10;
+			int EMAShortPeriod = 5;
+			
+			String stockmarketAgentName = "StockMarketAgent";
+			String stockmarketServiceName = "StockMarketService";
+			
+			String controllerAgentName = "ControllerAgent";
+			String controllerService = "controllerservice";
+
+			
+			String stockName = "Fingerprint";		
+			
+			//==========================================//
+			
+			//Controller agent
+			CellGatewayImpl controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
+							.setGenerateReponder(true)));
+			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			//Broker Agent
+			CellGatewayImpl brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			//Stock market Agent
+			CellGatewayImpl stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
+							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
+							.setGenerateReponder(true)));	//Puts data on datapoint StockMarketAgent:data
+			
+			
+			//Single Trader agent
+			CellGatewayImpl traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
+							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+							.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderTypePrefix + "-L" + EMALongPeriod + ":S" + EMAShortPeriod)
+							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
+							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
+							.setGenerateReponder(true))
+					.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+
+			synchronized (this) {
+				try {
+					this.wait(10000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			log.info("=== All agents initialized ===");
+			
+			//Start the agents by starting the codelet handler
+			JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
+			req.setParameterAsValue(0, false);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+			
+			req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
+			req.setParameterAsValue(0, false);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+			
+			req = new JsonRpcRequest("gettypes", 0);
+			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
+			List<Types> list = result.getResult(new TypeToken<List<Types>>(){});
+			
+			log.info("Got types={}", list);
+			assertEquals(list.get(0).getNumber(), list.get(1).getNumber());
+			
+			//The test is to read the depot of agent 69, which shall be empty
+			Depot depot = controllerAgent.getCommunicator().read(traderAgentName + "_" + "69", "localdepot").getValue(Depot.class);
+			double money = depot.getLiquid();
+			
+			log.info("Got money from agent 69={}. Correct answer={}", money, 1000);
+			assertEquals(1000, money, 0);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+	}
+	
 }
