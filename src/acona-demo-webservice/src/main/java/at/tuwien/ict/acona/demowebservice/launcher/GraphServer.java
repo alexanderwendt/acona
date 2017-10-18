@@ -13,7 +13,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
-public class GraphServer implements GraphServerConnection {
+public class GraphServer {
 
 	private int runningPort;
 	private String outputString = "TEST";
@@ -55,16 +55,6 @@ public class GraphServer implements GraphServerConnection {
 		        response.resetBuffer();
 		        writerA.println(outputString);
 		    }
-	}
-	@Override
-	public void put(String s) {
-		//Refresh server
-		this.outputString = s;
-	}
-	@Override
-	public void get(String s) {
-		// TODO Auto-generated method stub
-		
 	}
 }
 

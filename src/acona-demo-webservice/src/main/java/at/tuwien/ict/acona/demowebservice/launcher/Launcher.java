@@ -11,6 +11,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoints;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
+import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
@@ -90,7 +91,11 @@ public class Launcher {
 							.addManagedDatapoint("Vienna", publishAddress, weatherAgent2Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", publishAddress, weatherAgent3Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class))
+					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, "systemstate", algorithmAgentName, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("RESULT", algorithmService + ".result", algorithmAgentName, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY)));
 			
 			synchronized (this) {
 				try {

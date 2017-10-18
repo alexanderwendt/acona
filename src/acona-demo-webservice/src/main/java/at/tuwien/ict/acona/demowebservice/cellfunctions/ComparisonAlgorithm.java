@@ -67,7 +67,7 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 		}
 		
 		result.setValue("hasConclusio", conclusio);
-		log.debug("Conclusio={}", conclusio);
+		//log.debug("Conclusio={}", conclusio);
 		
 		return result;
 	}
@@ -93,17 +93,17 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	@Override
 	protected void executeFunction() throws Exception {
 		log.debug("Update algorithm result");
-		//Create new conclusio
+		//Create new conclusion
 		synchronized (this.algorithmResult) {
 			this.algorithmResult = this.generateResponse(this.algorithmResult);
 		}		
 		
-		log.debug("New algorithm result={}", this.algorithmResult);
+		//log.debug("New algorithm result={}", this.algorithmResult);
 	}
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		//write conclusio to datapoint
+		//write conclusion to datapoint
 		Datapoint resultDatapoint = Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
 		this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(resultDatapoint));
 		

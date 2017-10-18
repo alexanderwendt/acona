@@ -24,6 +24,8 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	private final static Logger log = LoggerFactory.getLogger(WeatherServiceClientMock.class);
 	
 	public final static String WEATHERADDRESSID = "weatheraddress";
+	
+	private boolean swap=false; 
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
@@ -43,8 +45,16 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 		try {
 			//Generate weather data
 			Chunk result = Chunk.newChunk(this.getFunctionName() + "_result", "WeatherData")
-					.setValue("City", "MockTown" + this.getFunctionName())
-					.setValue("Temperature", 24.5);
+					.setValue("City", "MockTown" + this.getFunctionName());
+			
+			if (this.swap==false) {
+				result.setValue("Temperature", 24.5);
+				this.swap = true;
+			} else {
+				result.setValue("Temperature", 2.5);
+				this.swap = false;
+			}
+					
 			
 			//write it to the public datapoint
 			//Through the write map,

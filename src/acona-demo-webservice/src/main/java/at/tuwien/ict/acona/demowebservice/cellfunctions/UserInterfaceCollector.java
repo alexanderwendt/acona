@@ -38,7 +38,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 		//this.setExecuteOnce(false);
 		//this.setExecuteRate(1000); //once 1s
 		
-		gserver = new GraphServer();
+		gserver = new GraphServer(8000);
 		
 		
 	}
@@ -118,6 +118,40 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 		return tmpColor;
 	}
 	 
+	 private String  calculateColor2(double inputState) {
+			String tmpColor = "#000000";
+			Map<String, String> palette = new HashMap<String, String>();
+			// This custom palette has the colors that are more distinguishable with each other
+			palette.put("black","#000000");
+			palette.put("silver","#c0c0c0");
+			palette.put("blue","#5DA5DA");
+			palette.put("orange","#FAA43A");
+			palette.put("green","#60BD68 ");
+			palette.put("pink","#F17CB0");
+			palette.put("brown","#B2912F");
+			palette.put("purple","#B276B2");
+			palette.put("yellow","#DECF3F");
+			palette.put("red","#F15854");
+
+			if (inputState>25) {
+				tmpColor = palette.get("red");
+			}
+					
+			else if (inputState<=25 && inputState>15) {
+				tmpColor = palette.get("orange");			
+			}
+			else if (inputState<=15 && inputState>5) {
+				tmpColor = palette.get("green");			
+			}
+			else if (inputState<=5) {
+				tmpColor = palette.get("blue");
+			}
+			else {
+				
+			}
+			return tmpColor;
+		}
+	 
 	 
 	Map<String, JsonArray> agentsList = new HashMap<String, JsonArray>();
 
@@ -131,10 +165,10 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 		int circleSize = 10;
 		JsonArray  outputJSON = new JsonArray();
 		
-		if (data.containsKey("state")) {
+		if (data.containsKey(UserInterfaceCollector.SYSTEMSTATEADDRESSID)) {
 			
-			log.info("Current state={}", data.get("state").getValue());
-			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+			//log.info("Current state={}", data.get(UserInterfaceCollector.SYSTEMSTATEADDRESSID).getValue());
+			//log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			
 	        // Create Agent JsonObject and store the JSON
 			JsonObject outAgent = new JsonObject();
@@ -214,20 +248,106 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        outputJSON.add(graphConfig);
 	        outputJSON.add(all_nodes);
 	        outputJSON.add(all_links);
+	        //log.info("Final JSON: "+outputJSON.toString());
+	        
+	        
+	        //log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+	        //gserver.put(outputJSON.toString());
+	       //gserver.setString(outputJSON.toString());
+		} else if (data.containsKey("RESULT")) {
+			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+			log.info("Current state={}", data.get("RESULT").getValue());
+			//Datapoint y = data.get("RESULT").getValue();
+			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+			//gserver.setString( data.get("RESULT").getValue().toString());
+			
+
+			// Create Agent JsonObject and store the JSON
+			JsonObject outAgent = new JsonObject();
+			
+			// Create JsonObject for the config 
+			JsonObject graphConfig = new JsonObject();
+			
+			//Parse JSON Input - THIS IS THE ADDRESS CONTAINER
+			JsonObject tmpAddress = data.get("RESULT").getValue().getAsJsonObject();
+			
+			//Get the VALUE 
+			JsonObject tmpAgent = tmpAddress.get("VALUE").getAsJsonObject();
+			
+			// getting Agent name
+			String agentName = tmpAgent.get("hasName").getAsString();
+        	//log.info("Agent Name: "+agentName);
+        	outAgent.addProperty("NodeID", agentName);
+
+        	// getting Agent Description
+        	String agentDesc = tmpAgent.get("hasConclusio").getAsString();
+        	outAgent.addProperty("NodeText", agentDesc);
+        	
+        	// getting Agent state
+        	String agentState = "";
+        	if (tmpAgent.has("hasType")) {
+        		agentState = tmpAgent.get("hasType").getAsString();
+            	outAgent.addProperty("Color", "green");
+        	}
+        	else {
+            	//outAgent.addProperty("Color", calculateColor("DoesnotExist"));
+        	}
+    	
+        	JsonArray all_nodes = new JsonArray();
+        	JsonArray all_links = new JsonArray();
+        	
+        	//log.info("NODE info   :"+ outAgent.toString());
+        	all_nodes.add(outAgent);
+
+        	//As a source is the Basic Node
+        	String tmpLinksource = agentName;
+
+
+			//get all the DATA
+	        JsonArray tmpDatas = tmpAgent.getAsJsonArray("hasData");
+	         	        	        		
+	        //Iterate through hasData and extract needed information
+	        for (JsonElement currentData : tmpDatas) {
+
+	        	//Create an object to place the output data structure
+		        JsonObject outData = new JsonObject();
+	        	//Create an object for the temporary Json link object
+		        JsonObject tmpLink = new JsonObject();
+
+	        	JsonObject tmpData = currentData.getAsJsonObject();
+	        	String dataCity = tmpData.get("City").getAsString();
+	        	String dataTemperature = tmpData.get("Temperature").getAsString();
+	          	
+	        	//output structure
+	        	outData.addProperty("NodeID", dataCity);
+	        	outData.addProperty("NodeText", dataCity+":"+dataTemperature);
+	        	outData.addProperty("Color", calculateColor2(Long.parseLong(dataTemperature)));				
+	        	tmpLink.addProperty("source",tmpLinksource);
+	        	tmpLink.addProperty("target",dataCity);
+	        	all_links.add(tmpLink);
+	        	all_nodes.add(outData);
+	        }
+	        log.info("TEST: "+all_nodes.toString());
+	        graphConfig.addProperty("graphWidth", graphWidth);
+	        graphConfig.addProperty("graphHeight", graphHeight);
+	        graphConfig.addProperty("circleSize", circleSize);
+	       
+	        
+	       //log.info("CONFIG             :"+ graphConfig.toString());
+	       //log.info("Nodes Json array   :"+  all_nodes.toString());
+	       //log.info("Links Json array   :"+  all_links.toString());
+	        
+	        outputJSON.add(graphConfig);
+	        outputJSON.add(all_nodes);
+	        outputJSON.add(all_links);
 	        log.info("Final JSON: "+outputJSON.toString());
 	        
 	        
-	        log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+	        //log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 	        //gserver.put(outputJSON.toString());
-	        gserver.setString(outputJSON.toString());
-		} else if (data.containsKey("ui1")) {
+	       gserver.setString(outputJSON.toString());
 
-//			log.info("Got data={}", data.get("ui1").getValue());
-//			log.info("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-			
 		}
-		
-		//@Lampros: Here, in data, you get all datapoints that you need if you are a subscriber. This information shall be presented in a user interface
 		
 	}
 
