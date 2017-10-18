@@ -206,18 +206,30 @@ public class JsonRpcRequest {
 	}
 
 	/**
-	 * Get a certain parameter from the parameter list if not an "inside" type
+	 * Get a certain parameter from the parameter list if not an "inside" type.
+	 * All parameters must be json format
 	 * 
 	 * @param index
 	 * @param clazz
 	 * @return
+	 * @throws Exception
 	 */
-	public <T> T getParameter(int index, Class<T> clazz) {
+	public <T> T getParameter(int index, Class<T> clazz) throws Exception {
 		//Get first parameter and convert it
 		if (gson == null) {
 			gson = new Gson();
 		}
-		T result = gson.fromJson(this.getParams()[index].toString(), clazz);
+
+		String parameterString = this.getParams()[index].toString();
+
+		T result = null;
+
+		try {
+			result = gson.fromJson(parameterString, clazz);
+		} catch (Exception e) {
+			throw new Exception("Parameter is not Json-Format. All parameters must be in Json format (e.g. JsonPrimitive().", e);
+		}
+
 		return result;
 	}
 

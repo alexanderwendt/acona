@@ -12,7 +12,7 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -60,7 +60,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 		log.info("result={}", result);
 
 		// Now send the result to a result datapoint
-		this.getCommunicator().write(this.trackedDatapoints.get(RESULT).getAgentid(this.getCell().getLocalName()), Datapoints.newDatapoint(this.trackedDatapoints.get(RESULT).getAddress())
+		this.getCommunicator().write(this.trackedDatapoints.get(RESULT).getAgentid(this.getCell().getLocalName()), DatapointBuilder.newDatapoint(this.trackedDatapoints.get(RESULT).getAddress())
 				.setValue(new JsonPrimitive(result)));
 	}
 
@@ -78,7 +78,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		// Set status that process is finished. Use it to release subscriptions
-		this.getCommunicator().write(Datapoints.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.FINISHED.toString()));
+		this.getCommunicator().write(DatapointBuilder.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.FINISHED.toString()));
 		log.info("Function end after setting status={}", this.getCommunicator().read(STATUSDATAPOINTNAME));
 	}
 

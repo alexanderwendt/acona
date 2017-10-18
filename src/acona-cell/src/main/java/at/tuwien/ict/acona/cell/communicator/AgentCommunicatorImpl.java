@@ -14,7 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -83,7 +83,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	@Override
 	public JsonRpcResponse execute(String agentNameAndService, JsonRpcRequest methodParameters) throws Exception {
-		Datapoint dp = Datapoints.newDatapoint(agentNameAndService);
+		Datapoint dp = DatapointBuilder.newDatapoint(agentNameAndService);
 		return this.execute(dp.getAgent(), dp.getAddress(), methodParameters, this.defaultTimeout, false);
 	}
 

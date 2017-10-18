@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 public class IncrementNumberCodelet extends CellFunctionCodelet {
 
@@ -36,7 +36,7 @@ public class IncrementNumberCodelet extends CellFunctionCodelet {
 		log.debug("Read value={} from working memory");
 		log.debug("Increment");
 		value++;
-		this.getCommunicator().write(Datapoints.newDatapoint(this.getWorkingMemoryAddress() + "." + subAddress).setValue(value));
+		this.getCommunicator().write(DatapointBuilder.newDatapoint(this.getWorkingMemoryAddress() + "." + subAddress).setValue(value));
 		log.debug("Value={} written to working memory", value);
 	}
 

@@ -21,69 +21,16 @@ public class Chunk {
 	public static final String TYPEPROPERTY = "hasType";
 	//public static final String IDPROPERTY = "hasID";
 
-	public synchronized static Chunk newChunk(String name, String type) throws Exception {
-		return new Chunk(name, type);
-	}
-
-	public synchronized static Chunk newChunk(JsonObject object) throws Exception {
-		Chunk result = null;
-
-		if (Chunk.isChunk(object) == true) {
-			result = new Chunk(object);
-		} else {
-			throw new ClassCastException("The object " + object + " is no chunk object");
-		}
-
-		return result;
-
-	}
-
-	public synchronized static Chunk newChunk(Chunk object) throws Exception {
-		return new Chunk(object.toJsonObject());
-	}
-
 	public Chunk(JsonObject object) throws Exception {
-		if (isChunk(object) == true) {
+		if (ChunkBuilder.isChunk(object) == true) {
 			this.chunkObject = object;
 		} else {
 			throw new Exception("This object is no chunk, " + object);
 		}
 	}
 
-	private Chunk(String name, String type) throws Exception {
+	protected Chunk(String name, String type) throws Exception {
 		this.init(name, type);
-	}
-
-	public synchronized static boolean isChunk(JsonObject object) {
-		boolean result = false;
-
-		if (object.get(NAMEPROPERTY) != null && object.get(TYPEPROPERTY) != null) {
-			result = true;
-		}
-
-		return result;
-	}
-
-	public static Chunk nullChunk() {
-		Chunk result = null;
-
-		try {
-			result = new Chunk("null", Chunk.class.getSimpleName());
-		} catch (Exception e) {
-			log.error("Cannot create the null chunk. The value is NULL", e);
-		}
-
-		return result;
-	}
-
-	public synchronized static boolean isNullChunk(Chunk chunk) {
-		boolean result = false;
-
-		if (chunk.getName().equals("null")) {
-			result = true;
-		}
-
-		return result;
 	}
 
 	private void init(String name, String type) {
@@ -151,7 +98,7 @@ public class Chunk {
 			this.chunkObject.add(association, new JsonArray());
 		}
 
-		if (Chunk.isNullChunk(content) == false) {
+		if (ChunkBuilder.isNullChunk(content) == false) {
 			this.chunkObject.getAsJsonArray(association).add(content.toJsonObject());
 		}
 

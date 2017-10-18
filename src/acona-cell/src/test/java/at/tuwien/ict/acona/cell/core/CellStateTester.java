@@ -18,7 +18,8 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
@@ -153,7 +154,7 @@ public class CellStateTester {
 			//			}
 
 			log.info("Datapoints on the way. Set datapoint value={} to 1.0", processDatapoint);
-			controller.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			controller.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 
 			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
@@ -196,7 +197,7 @@ public class CellStateTester {
 
 			//log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
-			Chunk state = Chunk.newChunk(controller.getCommunicator().read(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject());
+			Chunk state = ChunkBuilder.newChunk(controller.getCommunicator().read(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject());
 			Chunk result = state.getFirstAssociatedContentFromAttribute("hasFunction", "hasName", codeletName2);
 			log.debug("correct value={}, actual value={}", expectedResult, result.getValue("hasState"));
 

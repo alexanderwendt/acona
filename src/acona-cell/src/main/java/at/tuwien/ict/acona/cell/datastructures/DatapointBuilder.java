@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public class Datapoints {
+public class DatapointBuilder {
 
 	public final static String KEYADDRESS = "ADDRESS";
 	public final static String KEYAGENT = "AGENT";
@@ -17,18 +17,18 @@ public class Datapoints {
 	private static final Gson gson = new Gson();
 	// private final JsonObject jsondatapoint;
 
-	private final static Logger log = LoggerFactory.getLogger(Datapoints.class);
+	private final static Logger log = LoggerFactory.getLogger(DatapointBuilder.class);
 
 	public synchronized static Datapoint toDatapoint(String data) throws Exception {
 		log.debug("Datapoint to convert={}", data);
 		JsonObject jsonData = gson.fromJson(data, JsonObject.class);
-		return Datapoints.toDatapoint(jsonData);
+		return DatapointBuilder.toDatapoint(jsonData);
 	}
 
 	public synchronized static boolean isDatapoint(JsonObject data) {
 		boolean result = false;
 
-		if (data.has(Datapoints.KEYADDRESS) && data.has(Datapoints.KEYVALUE)) {
+		if (data.has(DatapointBuilder.KEYADDRESS) && data.has(DatapointBuilder.KEYVALUE)) {
 			result = true;
 		}
 
@@ -47,8 +47,8 @@ public class Datapoints {
 		Datapoint result = null;
 
 		try {
-			if (Datapoints.isDatapoint(data) == true) {
-				result = Datapoints.newDatapoint(data.get(KEYADDRESS).getAsString()).setValue(data.get(KEYVALUE));
+			if (DatapointBuilder.isDatapoint(data) == true) {
+				result = DatapointBuilder.newDatapoint(data.get(KEYADDRESS).getAsString()).setValue(data.get(KEYVALUE));
 				//.setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
 			} else {
 				throw new IllegalArgumentException("Cannot cast json data to datapoint " + data);

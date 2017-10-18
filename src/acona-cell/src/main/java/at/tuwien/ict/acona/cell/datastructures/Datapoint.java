@@ -161,6 +161,24 @@ public class Datapoint {
 		return this;
 	}
 
+	public Datapoint setValue(boolean value) {
+		this.VALUE = new JsonPrimitive(value);
+
+		return this;
+	}
+
+	public Datapoint setValue(double value) {
+		this.VALUE = new JsonPrimitive(value);
+
+		return this;
+	}
+
+	public Datapoint setValue(int value) {
+		this.VALUE = new JsonPrimitive(value);
+
+		return this;
+	}
+
 	public <T> Datapoint setValue(T value) {
 		if (gson == null) {
 			gson = new Gson();

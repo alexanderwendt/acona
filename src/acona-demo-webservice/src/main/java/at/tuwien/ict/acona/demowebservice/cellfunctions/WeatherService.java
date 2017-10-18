@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
@@ -101,7 +102,7 @@ public class WeatherService extends CellFunctionThreadImpl {
 		Weather object = (new Gson()).fromJson(s, Weather.class);
 		log.info("Got json= {}", object);
 		
-		Chunk result = Chunk.newChunk(this.getFunctionName() + "_result", "WeatherData")
+		Chunk result = ChunkBuilder.newChunk(this.getFunctionName() + "_result" + "_" + object.name, "WeatherData")
 				.setValue("City", object.name)
 				.setValue("Temperature", object.main.temp-273.15);
 		

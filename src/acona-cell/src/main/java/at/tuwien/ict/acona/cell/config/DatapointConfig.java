@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 public class DatapointConfig {
 	public final static String LOCALAGENTNAME = "";
@@ -144,7 +144,7 @@ public class DatapointConfig {
 	}
 
 	public Datapoint toDatapoint(String localAgentName) {
-		return Datapoints.newDatapoint(this.getAgentid(localAgentName) + ":" + this.getAddress());
+		return DatapointBuilder.newDatapoint(this.getAgentid(localAgentName) + ":" + this.getAddress());
 	}
 
 	@Override

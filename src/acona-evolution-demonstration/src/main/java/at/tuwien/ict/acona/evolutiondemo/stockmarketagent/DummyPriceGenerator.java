@@ -1,7 +1,12 @@
 package at.tuwien.ict.acona.evolutiondemo.stockmarketagent;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
+import org.jfree.data.time.Day;
+import org.jfree.ui.RefineryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +16,7 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 /**
  * This function generates a highest, lowest and close price for the system and writes it into the working memory of itself. On trigger, 
@@ -24,7 +29,7 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 	
 	private final static Logger log = LoggerFactory.getLogger(DummyPriceGenerator.class);
 	
-	private double high, low, close;
+	private double high, low, close, open;
 	
 	private int currentPeriod=0;
 	
@@ -42,12 +47,19 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 	private String stockName = "";
 	private int mode = 0;
 	
+	private OHLCGraph demo;
+	
 	@Override
 	protected void cellFunctionCodeletInit() throws Exception {
 		stockName = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKNAME, "");
 		this.mode = this.getFunctionConfig().getProperty(ATTRIBUTEMODE, Integer.class);
 		
 		this.addManagedDatapoint(DatapointConfig.newConfig(dataAddress, dataAddress, SyncMode.WRITEONLY));
+		
+		 //demo = new OHLCGraph("XY Series Demo");
+		 //demo.pack();
+		 //RefineryUtilities.centerFrameOnScreen(demo);
+		 //demo.setVisible(true);
 		
 	}
 
@@ -60,27 +72,41 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 			this.executeConstantFunction();
 		}
 		
+		String untildate="2000-01-01";//can take any date in current format    
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");   
+		Calendar cal = Calendar.getInstance();    
+		cal.setTime(dateFormat.parse(untildate));    
+		cal.add(Calendar.DATE, this.currentPeriod);
+		
 		functionResult = new JsonObject();
 		this.functionResult.addProperty("name", stockName);
 		this.functionResult.addProperty("run", this.currentPeriod);
+		this.functionResult.addProperty("date", cal.getTime().toString());
+		this.functionResult.addProperty("open", this.close);
 		this.functionResult.addProperty("close", this.close);
 		this.functionResult.addProperty("high", this.high);
 		this.functionResult.addProperty("low", this.low);
+
+		
+		//Day day = new Day(cal.getTime());
+		
+		//this.demo.updateDataset(day, open, high, low, close);
 		
 		this.currentPeriod++;
 		
-		log.debug("Generated price={}. Put it on address={}", functionResult, this.getAgentName() + ":" + dataAddress);
+		log.info("Generated price={}. Put it on address={}", functionResult, this.getAgentName() + ":" + dataAddress);
 		
-		this.getValueMap().put(dataAddress, Datapoints.newDatapoint(dataAddress).setValue(functionResult));
+		this.getValueMap().put(dataAddress, DatapointBuilder.newDatapoint(dataAddress).setValue(functionResult));
 	}
 	
 	/**
 	 * The program shall create a sinus curve to test the system on
 	 */
 	private void executeSinusFunction() {
-		this.close = offset + amplitude * Math.sin((double)currentPeriod/(1/periodlength)*Math.PI);
+		this.close = offset + amplitude * Math.sin((double)currentPeriod/periodlength*Math.PI);
 		this.high = this.close + 2;
 		this.low = this.close - 2;
+		this.open = close;
 	}
 	
 	/**

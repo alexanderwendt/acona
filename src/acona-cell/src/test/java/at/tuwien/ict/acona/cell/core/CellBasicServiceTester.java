@@ -23,7 +23,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SingleNotificationReceiver;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
@@ -135,7 +135,7 @@ public class CellBasicServiceTester {
 			//parameter.add(Datapoint.newDatapoint("method").setValue("write"));
 
 			List<Datapoint> sendList = new ArrayList<>();
-			sendList.add(Datapoints.newDatapoint(datapointaddress).setValue(value));
+			sendList.add(DatapointBuilder.newDatapoint(datapointaddress).setValue(value));
 			JsonRpcRequest req = new JsonRpcRequest("write", 1);
 			req.setParameterAsList(0, sendList);
 
@@ -208,7 +208,7 @@ public class CellBasicServiceTester {
 
 			client.getCommunicator().setDefaultTimeout(100000);
 			receivergw.getCommunicator().setDefaultTimeout(1000000);
-			client.getCommunicator().write(receiver, Datapoints.newDatapoint(datapointaddress).setValue(value));
+			client.getCommunicator().write(receiver, DatapointBuilder.newDatapoint(datapointaddress).setValue(value));
 			log.debug("Now read values");
 			Datapoint resultdp = client.getCommunicator().read(receiver, datapointaddress, 1000000);
 
@@ -270,7 +270,7 @@ public class CellBasicServiceTester {
 			cellControlPublisher.getCommunicator().setDefaultTimeout(200000);
 
 			// Set init value
-			cellControlPublisher.getCommunicator().write(Datapoints.newDatapoint(datapointaddress).setValue(value1));
+			cellControlPublisher.getCommunicator().write(DatapointBuilder.newDatapoint(datapointaddress).setValue(value1));
 			log.debug("Get database of publisher={}. Database of subscriber={}", cellControlPublisher.getDataStorage(), cellControlSubscriber.getDataStorage());
 
 			//List<Datapoint> originalValue = cellControlSubscriber.subscribeForeignDatapoint(address, agentName);
@@ -290,7 +290,7 @@ public class CellBasicServiceTester {
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
-			cellControlPublisher.getCommunicator().write(Datapoints.newDatapoint(datapointaddress).setValue(value2));
+			cellControlPublisher.getCommunicator().write(DatapointBuilder.newDatapoint(datapointaddress).setValue(value2));
 			log.debug("Get database of publisher={}, data storage of subscriber={}", cellControlPublisher.getDataStorage(), cellControlSubscriber.getDataStorage());
 
 			// Check if value was updated in subscribercell
@@ -358,7 +358,7 @@ public class CellBasicServiceTester {
 			log.info("Test initialized");
 
 			// Set init value
-			cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value1));
+			cellControlPublisher.writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value1));
 			//log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 
 			// Subscribe a datapoint of the publisher agent
@@ -372,7 +372,7 @@ public class CellBasicServiceTester {
 				}
 			}
 
-			cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value1));
+			cellControlPublisher.writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value1));
 			// Both shall have the same value
 			log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getDataStorage());
@@ -392,7 +392,7 @@ public class CellBasicServiceTester {
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
-			cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value2));
+			cellControlPublisher.writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value2));
 			log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getDataStorage());
 
@@ -478,7 +478,7 @@ public class CellBasicServiceTester {
 				}
 			}
 
-			cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value1));
+			cellControlPublisher.writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value1));
 			// Both shall have the same value
 			log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getDataStorage());
@@ -498,7 +498,7 @@ public class CellBasicServiceTester {
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
-			cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value2));
+			cellControlPublisher.writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value2));
 			log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getDataStorage());
 
@@ -682,7 +682,7 @@ public class CellBasicServiceTester {
 			//Start tic
 			long starttime = System.currentTimeMillis();
 			log.info("=================Start time measurement: {}=====================", starttime);
-			inspectors.get(0).writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value2));
+			inspectors.get(0).writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value2));
 			log.debug("Get database of publisher={}", inspectors.get(0).getDataStorage());
 
 			synchronized (this) {

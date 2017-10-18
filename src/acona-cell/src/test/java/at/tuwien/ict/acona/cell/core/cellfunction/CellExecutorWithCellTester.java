@@ -23,7 +23,7 @@ import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionCustomServiceSimple;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
 
@@ -124,7 +124,7 @@ public class CellExecutorWithCellTester {
 			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver("testagent").setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
 			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
 			//cellControlSubscriber.subscribeForeignDatapoint(resultDatapointAddress, "testagent");
-			cellControlSubscriber.getCommunicator().write("testagent", Datapoints.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"));
+			cellControlSubscriber.getCommunicator().write("testagent", DatapointBuilder.newDatapoint(queryDatapoint).setValue("SELECT * FILESERVER"));
 
 			synchronized (this) {
 				try {
@@ -309,8 +309,8 @@ public class CellExecutorWithCellTester {
 
 			log.info("=== All agents initialized ===");
 			// Write the numbers in the database agents
-			client1.writeLocalDatapoint(Datapoints.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
-			client2.writeLocalDatapoint(Datapoints.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
+			client1.writeLocalDatapoint(DatapointBuilder.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
+			client2.writeLocalDatapoint(DatapointBuilder.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
 
 			// Query the service with start and then get the status
 			// Set default timeout to a high number to be able to debug

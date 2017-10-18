@@ -32,13 +32,13 @@ public class DatapointTester {
 			String value = "value of datapoint";
 
 			//Create new datapoint
-			Datapoint dp = Datapoints.newDatapoint(address).setValue(value);
+			Datapoint dp = DatapointBuilder.newDatapoint(address).setValue(value);
 
 			//Convert to String
 			String dpString = dp.toJsonObject().toString();
 
 			//Convert back to datapoint
-			Datapoint resultDp = Datapoints.toDatapoint(dpString);
+			Datapoint resultDp = DatapointBuilder.toDatapoint(dpString);
 
 			assertEquals(value, resultDp.getValue().getAsJsonPrimitive().getAsString());
 			log.info("Test passed. Result={}", resultDp);
@@ -55,7 +55,7 @@ public class DatapointTester {
 			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"VALUE\":\"Wrong value\"}";
 			//String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"MuHaahAhaAaahAAHA\"}";
 
-			Datapoint dp = Datapoints.toDatapoint(input);
+			Datapoint dp = DatapointBuilder.toDatapoint(input);
 
 			assertEquals("Wrong value", dp.getValue().getAsJsonPrimitive().getAsString());
 			log.info("Test passed. Input={}", input);

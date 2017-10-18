@@ -15,8 +15,9 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerListener;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Chunk;
+import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
@@ -75,14 +76,14 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 			agentState = ServiceState.RUNNING;
 		}
 
-		Chunk systemState = Chunk.newChunk("SystemState", "SYSTEMSTATE")
+		Chunk systemState = ChunkBuilder.newChunk("SystemState", "SYSTEMSTATE")
 				.setValue("agentname", this.getAgentName())
 				.setValue("hasState", agentState.toString())
 				.setValue("hasDescription", "ACONA Cell");
 
 		this.currentStates.forEach((k, v) -> {
 			try {
-				systemState.addAssociatedContent("hasFunction", Chunk.newChunk(k, "STATE")
+				systemState.addAssociatedContent("hasFunction", ChunkBuilder.newChunk(k, "STATE")
 						.setValue("hasState", v.toString())
 						.setValue("hasDescription", this.currentDescriptions.get(k)));
 			} catch (Exception e) {
@@ -90,7 +91,7 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 			}
 		});
 
-		this.writeLocal(Datapoints.newDatapoint(SYSTEMSTATEADDRESS).setValue(systemState.toJsonObject()));
+		this.writeLocal(DatapointBuilder.newDatapoint(SYSTEMSTATEADDRESS).setValue(systemState.toJsonObject()));
 		log.debug("Current system state={}", systemState);
 
 	}

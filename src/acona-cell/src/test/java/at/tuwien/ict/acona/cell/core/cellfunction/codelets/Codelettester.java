@@ -20,7 +20,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementNumberCodelet;
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
 import jade.core.Runtime;
@@ -137,7 +137,7 @@ public class Codelettester {
 			//			}
 
 			log.info("Datapoints on the way. Set datapoint value={} to 1.0", processDatapoint);
-			controller.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			controller.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 
 			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
@@ -259,7 +259,7 @@ public class Codelettester {
 			//			}
 
 			log.info("Datapoints on the way. Set 1");
-			controller.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			controller.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
 
@@ -508,8 +508,8 @@ public class Codelettester {
 			}
 
 			//Write initial value on the incrementaddress
-			cogsys.getCommunicator().write(Datapoints.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint1).setValue(0));
-			cogsys.getCommunicator().write(Datapoints.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint2).setValue(0));
+			cogsys.getCommunicator().write(DatapointBuilder.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint1).setValue(0));
+			cogsys.getCommunicator().write(DatapointBuilder.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint2).setValue(0));
 
 			log.info("=== All agents initialized ===");
 

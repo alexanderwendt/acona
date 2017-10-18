@@ -27,7 +27,7 @@ import at.tuwien.ict.acona.cell.core.cellfunction.helpers.LoopController;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SequenceController;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SimpleControllerService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.Datapoints;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
 import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
 import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
@@ -129,7 +129,7 @@ public class AconaServiceTester {
 							.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
 
-			controller.getCommunicator().write(memoryAgentName, Datapoints.newDatapoint("Test"));
+			controller.getCommunicator().write(memoryAgentName, DatapointBuilder.newDatapoint("Test"));
 
 			// Create services
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
@@ -158,7 +158,7 @@ public class AconaServiceTester {
 
 			//memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			memoryAgent.writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			memoryAgent.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			Datapoint state = controller.getCommunicator().queryDatapoints(controller.getCell().getLocalName(), COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), controllerFunctionName + ".state",
 					new JsonPrimitive(ServiceState.FINISHED.toString()), 10000);
@@ -237,7 +237,7 @@ public class AconaServiceTester {
 			this.launcher.init(totalConfig);
 			log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
 			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
@@ -356,7 +356,7 @@ public class AconaServiceTester {
 			CellGateway topController = launcher.getTopController();
 			topController.getCommunicator().setDefaultTimeout(100000);
 			// Set start values
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 
 			// }
 			// log.info("=== All agents initialized ===");
@@ -448,7 +448,7 @@ public class AconaServiceTester {
 			// }
 			// log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(Datapoints.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way. Start system");
 			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
@@ -533,8 +533,8 @@ public class AconaServiceTester {
 			log.info("=== All agents initialized ===");
 
 			//Write values
-			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand1Address).setValue(new JsonPrimitive(operand1)));
-			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2)));
+			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand1Address).setValue(new JsonPrimitive(operand1)));
+			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2)));
 
 			//The result should be there in 5s. Therefore wait 500ms
 			synchronized (this) {
@@ -545,9 +545,9 @@ public class AconaServiceTester {
 				}
 			}
 
-			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
-			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
-			cellAddition.writeLocalDatapoint(Datapoints.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
 
 			//The result should be there in 5s. Therefore wait 500ms
 			synchronized (this) {
