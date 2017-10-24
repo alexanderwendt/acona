@@ -51,7 +51,7 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 					JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 					req.setParameterAsValue(0, false);
 					Datapoint dp = DatapointBuilder.newDatapoint(this.codeletHandlerAddress);
-					this.getCommunicator().executeServiceQueryDatapoints(dp.getAgent(), dp.getAddress(), req, dp.getAgent(), dp.getAddress() + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+					this.getCommunicator().executeServiceQueryDatapoints(dp.getAgent(), dp.getAddress(), req, dp.getAgent(), dp.getAddress() + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), this.getCommunicator().getDefaultTimeout());
 					
 					//FIXME: No delays should be necessary, look at the codelet handler, sync problems.
 					synchronized (this) {

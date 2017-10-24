@@ -3,7 +3,9 @@ package at.tuwien.ict.acona.cell.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -22,6 +24,7 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SingleNotificationReceiver;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.TimeRegisterFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
@@ -621,14 +624,15 @@ public class CellBasicServiceTester {
 	@Test
 	public void massOfSubscribersTest() {
 		// final int minWaitTime = 5;
-		final int numberOfAgents = 10; // If there are errors with nullpointers.
-										// Set the timeouts of the queues in the
-										// communication!!
+		final int numberOfAgents = 7000; // If there are errors with nullpointers.
+											// Set the timeouts of the queues in the
+											// communication!!
 
 		// Create 2 agents. One shall subscribe the other. One shall be written
 		// to. The subscribing agent shall be notified.
 
 		try {
+			long setupTimeStart = System.currentTimeMillis();
 			// create message for subscription. Fields: Address
 			String agentNameTemplate = "agent";
 			// String publisherAgentName = "PublisherAgent";
@@ -647,9 +651,16 @@ public class CellBasicServiceTester {
 								.addCellfunction(CellFunctionConfig.newConfig("updater", CFDataStorageUpdate.class)
 										.addManagedDatapoint(datapointaddress, datapointaddress, inspectors.get(i - 1).getCell().getLocalName(), SyncMode.SUBSCRIBEONLY))));
 				inspectors.add(cell);
-				cell.getCommunicator().setDefaultTimeout(10000);
+				cell.getCommunicator().setDefaultTimeout(60000);
 
 			}
+
+			//Add special time function
+			CellGatewayImpl timeRegister = this.launchUtil.createAgent(CellConfig.newConfig("TimeRegister")
+					.addCellfunction(CellFunctionConfig.newConfig("TimeRegisterFunction", TimeRegisterFunction.class)
+							.addManagedDatapoint("STOPTIME", datapointaddress, agentNameTemplate + (numberOfAgents - 1), SyncMode.SUBSCRIBEONLY)));
+
+			long setupStopTime = System.currentTimeMillis();
 
 			synchronized (this) {
 				try {
@@ -659,21 +670,21 @@ public class CellBasicServiceTester {
 				}
 			}
 
-			// Set subscriptions
-			for (int i = 1; i < numberOfAgents; i++) {
-				CellGatewayImpl thisController = inspectors.get(i);
-				CellGatewayImpl previousController = inspectors.get(i - 1);
+			//			// Set subscriptions
+			//			for (int i = 1; i < numberOfAgents; i++) {
+			//				CellGatewayImpl thisController = inspectors.get(i);
+			//				CellGatewayImpl previousController = inspectors.get(i - 1);
+			//
+			//				//thisController.subscribeForeignDatapoint(datapointaddress, previousController.getCell().getLocalName());
+			//			}
 
-				//thisController.subscribeForeignDatapoint(datapointaddress, previousController.getCell().getLocalName());
-			}
-
-			synchronized (this) {
-				try {
-					this.wait(10000);
-				} catch (InterruptedException e) {
-
-				}
-			}
+			//			synchronized (this) {
+			//				try {
+			//					this.wait(10000);
+			//				} catch (InterruptedException e) {
+			//
+			//				}
+			//			}
 
 			// Set the first value and let the chain update itself
 			// Update Datapoint in publisher. It is expected that the subscriber
@@ -687,7 +698,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(10000);
+					this.wait(80000);
 				} catch (InterruptedException e) {
 
 				}
@@ -698,6 +709,15 @@ public class CellBasicServiceTester {
 
 			log.info("=================End time measurement: {}=====================", System.currentTimeMillis() - starttime);
 			String answer = inspectors.get(numberOfAgents - 1).readLocalDatapoint(datapointaddress).getValue().getAsString();// JsonMessage.getBody(result).get(datapointaddress).getAsString();
+
+			long endTime = Long.valueOf(timeRegister.readLocalDatapoint("TimeRegisterFunction" + ".result").getValueAsString());
+
+			String setupStart = new Date(setupTimeStart).toString();
+			String setupStop = new Date(setupStopTime).toString();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			String startTime = sdf.format(new Date(starttime)).toString();
+
+			log.info("Duration setup={}, duration experiment={}", setupStopTime - setupTimeStart, endTime - starttime);
 
 			assertEquals(value2, answer);
 

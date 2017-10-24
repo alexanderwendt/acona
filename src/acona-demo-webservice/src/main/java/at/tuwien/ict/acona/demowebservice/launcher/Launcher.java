@@ -72,12 +72,17 @@ public class Launcher {
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent2Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
-			CellGatewayImpl weatherAgent3 = this.controller.createAgent(CellConfig.newConfig(weatherAgent3Name)
+			CellGatewayImpl weatherAgent3 = this.controller.createAgent(
+					CellConfig.newConfig(weatherAgent3Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
-							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
+							.setProperty(WeatherService.USERID, "tester")
+							.addManagedDatapoint(WeatherService.WEATHERADDRESSID, 
+									publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+			
+			weatherAgent3.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command")
+					.setValue(ControlCommand.START));
 			
 			CellGatewayImpl weatherAgent4 = this.controller.createAgent(CellConfig.newConfig(weatherAgent4Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)

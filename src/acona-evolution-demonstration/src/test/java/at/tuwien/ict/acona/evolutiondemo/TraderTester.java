@@ -100,12 +100,16 @@ public class TraderTester {
 			String stockmarketServiceName = "StockMarketService";
 			String controllerService = "controllerservice";
 			String signalService = "signal";
+			int numberOfAgents = 2000;
 			
 			String stockName = "Fingerprint";		
+			
+			long startTimeSetup = System.currentTimeMillis();
 			
 			CellGatewayImpl controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
 							.setGenerateReponder(true)));
+			controllerAgent.getCommunicator().setDefaultTimeout(60000);
 			
 			synchronized (this) {
 				try {
@@ -137,7 +141,7 @@ public class TraderTester {
 							.setGenerateReponder(true)));	//Puts data on datapoint StockMarketAgent:data
 			
 			//Create 100 trading agents that first buy a stock, then sell it
-			for (int i=1;i<=500;i++) {
+			for (int i=1;i<=numberOfAgents;i++) {
 				String traderType = "type";
 				if (i%2==0) {
 					traderType += "_even";
@@ -152,10 +156,14 @@ public class TraderTester {
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
 								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
+								.setProperty(Trader.ATTRIBUTETIMEOUT, 60000)
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
 								.setGenerateReponder(true))
 						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+				traderAgent.getCommunicator().setDefaultTimeout(60000);
 			}
+			
+			long stopTimeSetup = System.currentTimeMillis();
 
 			synchronized (this) {
 				try {
@@ -168,13 +176,18 @@ public class TraderTester {
 			log.info("=== All agents initialized ===");
 			
 			//Start the agents by starting the codelet handler
+			//Buy the current stock
+			long startTimeSystem = System.currentTimeMillis();
 			JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 			req.setParameterAsValue(0, false);
-			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 60000);
+			long stopTimeSystemTrade1 = System.currentTimeMillis();
 			
+			//Sell the current stock
 			req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 			req.setParameterAsValue(0, false);
-			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 60000);
+			long stopTimeSystemTrade2 = System.currentTimeMillis();
 			
 			req = new JsonRpcRequest("gettypes", 0);
 			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
@@ -186,6 +199,8 @@ public class TraderTester {
 			//The test is to read the depot of agent 69, which shall be empty
 			Depot depot = controllerAgent.getCommunicator().read(traderAgentName + "_" + "69", "localdepot").getValue(Depot.class);
 			double money = depot.getLiquid();
+			
+			log.info("Setup duration={}, system execution duration 1 trade={}, system execution duration 2 trades={}", stopTimeSetup - startTimeSetup, stopTimeSystemTrade1 - startTimeSystem, stopTimeSystemTrade2 - startTimeSystem);
 			
 			log.info("Got money from agent 69={}. Correct answer={}", money, 1000);
 			assertEquals(1000, money, 0);
@@ -283,7 +298,7 @@ public class TraderTester {
 
 			synchronized (this) {
 				try {
-					this.wait(10000);
+					this.wait(20000);
 				} catch (InterruptedException e) {
 
 				}

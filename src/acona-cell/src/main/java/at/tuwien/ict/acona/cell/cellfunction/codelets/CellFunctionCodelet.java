@@ -25,10 +25,11 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	public final static String KEYCALLERADDRESS = "calleraddress";
 	public final static String KEYEXECUTIONORDERNAME = "executionorder";
 	public final static String KEYSTATE = "state";
-	private final static int METHODTIMEOUT = 20000;
+	private final static int DEFAULTTIMEOUT = 20000;
 
 	public final static String ATTRIBUTECODELETHANDLERADDRESS = "handleraddress";
 	public final static String ATTRIBUTEEXECUTIONORDER = "executionorder";
+	public final static String ATTRIBUTETIMEOUT = "timeout";
 
 	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
 	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
@@ -39,6 +40,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	private String codeletHandlerServiceName = "";
 	private String callerAddress = "";
 	private int exeutionOrder = 0;
+	private int timeout = DEFAULTTIMEOUT;
 
 	private String workingMemoryAddress = "workingmemory";
 	private String internalStateMemoryAddress = "internalstatememory";
@@ -59,6 +61,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 			this.codeletHandlerAgentName = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS).split(":")[0];
 			this.codeletHandlerServiceName = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS).split(":")[1];
 			this.exeutionOrder = Integer.valueOf(this.getFunctionConfig().getProperty(KEYEXECUTIONORDERNAME, "0"));
+			this.timeout = Integer.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTETIMEOUT, String.valueOf(DEFAULTTIMEOUT)));
 
 			//Register codelet in the codelethandler
 			try {
@@ -66,7 +69,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 				request.setParameterAsValue(0, callerAddress);
 				request.setParameterAsValue(1, this.exeutionOrder);
 
-				JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
+				JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 				updateServiceStateInCodeletHandler(ServiceState.FINISHED);
 
 				//Check the result
@@ -152,7 +155,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.FINISHED.toString());
 		this.setServiceState(ServiceState.FINISHED);
 
-		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
+		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 
 	}
 
@@ -161,7 +164,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		//Set state to running
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
-		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
+		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 		this.setServiceState(ServiceState.RUNNING);
 	}
 
@@ -169,7 +172,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, state.toString());
 
-		JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
+		JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 
 		if (response.hasError()) {
 			throw new Exception("Communication error. Error: " + response.getError());
@@ -183,7 +186,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		JsonRpcRequest request = new JsonRpcRequest(DEREGISTERCODELETSERVICENAME, 1);
 		request.setParameterAsValue(0, callerAddress);
 
-		JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, METHODTIMEOUT);
+		JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 		if (response.hasError()) {
 			throw new Exception("Communication error. Error: " + response.getError());
 		}
