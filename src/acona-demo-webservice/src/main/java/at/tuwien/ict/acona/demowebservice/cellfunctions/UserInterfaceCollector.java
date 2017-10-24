@@ -133,17 +133,17 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 			palette.put("yellow","#DECF3F");
 			palette.put("red","#F15854");
 
-			if (inputState>25) {
+			if (inputState>35) {
 				tmpColor = palette.get("red");
 			}
 					
 			else if (inputState<=35 && inputState>25) {
 				tmpColor = palette.get("orange");			
 			}
-			else if (inputState<=25 && inputState>20) {
+			else if (inputState<=25 && inputState>10) {
 				tmpColor = palette.get("green");			
 			}
-			else if (inputState<=20) {
+			else if (inputState<=10) {
 				tmpColor = palette.get("blue");
 			}
 			else {
@@ -238,7 +238,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        
 	        graphConfig.addProperty("graphWidth", graphWidth);
 	        graphConfig.addProperty("graphHeight", graphHeight);
-	        graphConfig.addProperty("circleSize", circleSize);
+	        graphConfig.addProperty("circleSize", 10+circleSize);
 	       
 	        
 	       //log.info("CONFIG             :"+ graphConfig.toString());
@@ -315,15 +315,15 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        	//Custom structure Data 
 	        	String childDataNodeID = childData.get("hasName").getAsString();
 	        	String childDataCity = childData.get("City").getAsString();
-	        	String childDataTemperature = childData.get("Temperature").getAsString();
-	          	
+	        	Double childDataTemperature = Double.parseDouble(childData.get("Temperature").getAsString());
+	        	childDataTemperature = Math.round(100*childDataTemperature)/100. ;
+	         
 	        	//childData Output structure
 	        	outChildNode.addProperty("NodeID", childDataNodeID);
-	        	outChildNode.addProperty("NodeText", childDataCity+":"+childDataTemperature);
-	        	String a =Double.toString((Double.parseDouble(childDataTemperature)));
-	        	log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: "+a);
-	        	outChildNode.addProperty("NodeSize", a);
-	        	outChildNode.addProperty("NodeColor", calculateColor2(Double.parseDouble(childDataTemperature)));
+	        	outChildNode.addProperty("NodeText", childDataCity+":"+ childDataTemperature);
+	        	log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: "+ childDataTemperature);
+	        	outChildNode.addProperty("NodeSize", childDataTemperature);
+	        	outChildNode.addProperty("NodeColor", calculateColor2(childDataTemperature));
 	        	childLinks.addProperty("source",childLinksSource);
 	        	childLinks.addProperty("target",childDataNodeID);
 	        	allLinks.add(childLinks);
