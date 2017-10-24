@@ -137,13 +137,13 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 				tmpColor = palette.get("red");
 			}
 					
-			else if (inputState<=25 && inputState>15) {
+			else if (inputState<=35 && inputState>25) {
 				tmpColor = palette.get("orange");			
 			}
-			else if (inputState<=15 && inputState>5) {
+			else if (inputState<=25 && inputState>20) {
 				tmpColor = palette.get("green");			
 			}
-			else if (inputState<=5) {
+			else if (inputState<=20) {
 				tmpColor = palette.get("blue");
 			}
 			else {
@@ -250,7 +250,6 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        outputJSON.add(all_links);
 	        //log.info("Final JSON: "+outputJSON.toString());
 	        
-	        
 	        //log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 	        //gserver.put(outputJSON.toString());
 	       //gserver.setString(outputJSON.toString());
@@ -259,94 +258,83 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 			log.info("Current state={}", data.get("RESULT").getValue());
 			//Datapoint y = data.get("RESULT").getValue();
 			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-			//gserver.setString( data.get("RESULT").getValue().toString());
-			
+			//gserver.setString(data.get("RESULT").getValue().toString());
 
 			// Create Agent JsonObject and store the JSON
-			JsonObject outAgent = new JsonObject();
-			
-			// Create JsonObject for the config 
-			JsonObject graphConfig = new JsonObject();
-			
-			//Parse JSON Input - THIS IS THE ADDRESS CONTAINER
-			JsonObject tmpAddress = data.get("RESULT").getValue().getAsJsonObject();
-			
-			//Get the VALUE 
-			JsonObject tmpAgent = tmpAddress.get("VALUE").getAsJsonObject();
-			
-			// getting Agent name
-			String agentName = tmpAgent.get("hasName").getAsString();
-        	//log.info("Agent Name: "+agentName);
-        	outAgent.addProperty("NodeID", agentName);
 
-        	// getting Agent Description
-        	String agentDesc = tmpAgent.get("hasConclusio").getAsString();
-        	outAgent.addProperty("NodeText", agentDesc);
+			// Create Agent JsonObject and store the JSON
+			JsonObject outNode = new JsonObject();
+			
+			// Create JsonObject for the config  
+//			JsonObject graphConfig = new JsonObject();
+			
+//			//Parse JSON Input - THIS IS THE ADDRESS CONTAINER
+			JsonObject inDataJSON= data.get("RESULT").getValue().getAsJsonObject();
+
+			// 1ST LEVEL OF ARCHITECTURE			
+			
+			// getting Agent name, 1st level
+			String nodeID = inDataJSON.get("hasName").getAsString();
+			
+			// getting Agent Description, 1st level
+        	String nodeDesc = inDataJSON.get("hasConclusio").getAsString();
+
+        	// getting Agent Color, 1st level
+        	String nodeColor = "";			
         	
-        	// getting Agent state
-        	String agentState = "";
-        	if (tmpAgent.has("hasType")) {
-        		agentState = tmpAgent.get("hasType").getAsString();
-            	outAgent.addProperty("Color", "green");
-        	}
-        	else {
-            	//outAgent.addProperty("Color", calculateColor("DoesnotExist"));
-        	}
-    	
-        	JsonArray all_nodes = new JsonArray();
-        	JsonArray all_links = new JsonArray();
+        	// Add the 1st Level Node properties
+			outNode.addProperty("NodeID", nodeID);
+        	outNode.addProperty("NodeText", nodeDesc);
+        	outNode.addProperty("NodeColor", nodeColor);
+        	outNode.addProperty("NodeSize", Double.parseDouble("30"));
+
+        	// Create the Ouput JSONArrays
+        	JsonArray allNodes = new JsonArray();
+        	JsonArray allLinks = new JsonArray();
         	
-        	//log.info("NODE info   :"+ outAgent.toString());
-        	all_nodes.add(outAgent);
+        	allNodes.add(outNode);
+	        log.info("TEST Parent: "+ allNodes.toString());
 
-        	//As a source is the Basic Node
-        	String tmpLinksource = agentName;
+        	//Set as source of the childNodes the Parent node ID
+        	String childLinksSource = nodeID;
 
-
-			//get all the DATA
-	        JsonArray tmpDatas = tmpAgent.getAsJsonArray("hasData");
+			//get all the child nodes string; It is under hasData
+	        JsonArray childsData = inDataJSON.getAsJsonArray("hasData");
 	         	        	        		
 	        //Iterate through hasData and extract needed information
-	        for (JsonElement currentData : tmpDatas) {
+	        for (JsonElement currentData : childsData) {
 
-	        	//Create an object to place the output data structure
-		        JsonObject outData = new JsonObject();
+	        	//Create an object to place the output child Node
+		        JsonObject outChildNode = new JsonObject();
 	        	//Create an object for the temporary Json link object
-		        JsonObject tmpLink = new JsonObject();
+		        JsonObject childLinks = new JsonObject();
 
-	        	JsonObject tmpData = currentData.getAsJsonObject();
-	        	String dataCity = tmpData.get("City").getAsString();
-	        	String dataTemperature = tmpData.get("Temperature").getAsString();
+		        //Get the JSON object from the JSON element
+	        	JsonObject childData = currentData.getAsJsonObject();
+	        	
+	        	//Custom structure Data 
+	        	String childDataNodeID = childData.get("hasName").getAsString();
+	        	String childDataCity = childData.get("City").getAsString();
+	        	String childDataTemperature = childData.get("Temperature").getAsString();
 	          	
-	        	//output structure
-	        	outData.addProperty("NodeID", dataCity);
-	        	outData.addProperty("NodeText", dataCity+":"+dataTemperature);
-	        	outData.addProperty("Color", calculateColor2(Long.parseLong(dataTemperature)));				
-	        	tmpLink.addProperty("source",tmpLinksource);
-	        	tmpLink.addProperty("target",dataCity);
-	        	all_links.add(tmpLink);
-	        	all_nodes.add(outData);
+	        	//childData Output structure
+	        	outChildNode.addProperty("NodeID", childDataNodeID);
+	        	outChildNode.addProperty("NodeText", childDataCity+":"+childDataTemperature);
+	        	String a =Double.toString((Double.parseDouble(childDataTemperature)));
+	        	log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: "+a);
+	        	outChildNode.addProperty("NodeSize", a);
+	        	outChildNode.addProperty("NodeColor", calculateColor2(Double.parseDouble(childDataTemperature)));
+	        	childLinks.addProperty("source",childLinksSource);
+	        	childLinks.addProperty("target",childDataNodeID);
+	        	allLinks.add(childLinks);
+	        	allNodes.add(outChildNode);
 	        }
-	        log.info("TEST: "+all_nodes.toString());
-	        graphConfig.addProperty("graphWidth", graphWidth);
-	        graphConfig.addProperty("graphHeight", graphHeight);
-	        graphConfig.addProperty("circleSize", circleSize);
-	       
+	        //log.info("TEST: "+ allNodes.toString());	      // gserver.setString(outputJSON.toString());
+	        //log.info("TEST: "+ allLinks.toString());	      // gserver.setString(outputJSON.toString());
+	        outputJSON.add(allNodes);
+	        outputJSON.add(allLinks);
+	        gserver.setString(outputJSON.toString());
 	        
-	       //log.info("CONFIG             :"+ graphConfig.toString());
-	       //log.info("Nodes Json array   :"+  all_nodes.toString());
-	       //log.info("Links Json array   :"+  all_links.toString());
-	        
-	        outputJSON.add(graphConfig);
-	        outputJSON.add(all_nodes);
-	        outputJSON.add(all_links);
-	        log.info("Final JSON: "+outputJSON.toString());
-	        
-	        
-	        //log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-	        //gserver.put(outputJSON.toString());
-	       gserver.setString(outputJSON.toString());
-
 		}
 		
 	}

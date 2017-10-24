@@ -31,7 +31,7 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		this.setExecuteOnce(false);
-		this.setExecuteRate(5000);
+		this.setExecuteRate(10000);
 		
 	}
 	
