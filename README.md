@@ -31,6 +31,6 @@ Installation
 One you have downloaded the repository, there are two projects in the /src folder. The acona-cell is the framework and the acona-evolution-demonstration is a multi agent system created to demonstrate 
 evolutionary programming for a stock market trading example. 
 
-Use gradle to download all necessary libraries. For the acona-evolution-demonstration, a custom project with a user console can be downloaded here: https://github.com/icttuwien/commonutils 
+Use gradle to download all necessary libraries. For the acona-evolution-demonstration, a custom project with a user console can be downloaded here: https://github.com/aconaframework/commonutils 
 
 In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. in massOfSubscribersTest(), a chain of subscribing agents is demonstrated.
