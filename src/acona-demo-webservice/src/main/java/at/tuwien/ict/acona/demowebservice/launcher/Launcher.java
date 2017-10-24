@@ -78,9 +78,6 @@ public class Launcher {
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
-			weatherAgent3.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command")
-					.setValue(ControlCommand.START));
-			
 			CellGatewayImpl weatherAgent4 = this.controller.createAgent(CellConfig.newConfig(weatherAgent4Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "innsbruck")
