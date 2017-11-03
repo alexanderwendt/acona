@@ -159,6 +159,8 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	protected synchronized void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 	
 		
+		log.debug("Received data={}", data);
+		
 		// set default values
 		int graphWidth = 1200;
 		int graphHeight = 1000;
