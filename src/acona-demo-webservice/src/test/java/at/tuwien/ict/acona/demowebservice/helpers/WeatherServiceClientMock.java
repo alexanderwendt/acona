@@ -26,6 +26,9 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	
 	public final static String WEATHERADDRESSID = "weatheraddress";
 	
+	public final static String CITYNAME = "cityname";
+	public final static String USERID = "userid";
+	
 	private boolean swap=false; 
 
 	@Override

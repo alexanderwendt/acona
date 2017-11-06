@@ -11,6 +11,7 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
+import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithmAlternative;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
@@ -60,9 +61,16 @@ public class Launcher {
 			String weatherservice = "Weather";
 			String publishAddress = "helloworld.currentweather";
 			
+			//CellGatewayImpl weatherAgent1 = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
+			//		.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+			//				.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
+			//		.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
+			
 			CellGatewayImpl weatherAgent1 = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
+					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+							.setProperty(WeatherService.CITYNAME, "abudhabi")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent2Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
 			CellGatewayImpl weatherAgent2 = this.controller.createAgent(CellConfig.newConfig(weatherAgent2Name)
@@ -75,6 +83,7 @@ public class Launcher {
 			CellGatewayImpl weatherAgent3 = this.controller.createAgent(CellConfig.newConfig(weatherAgent3Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
+							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
@@ -94,6 +103,7 @@ public class Launcher {
 			}
 			
 			CellGatewayImpl calculator = this.controller.createAgent(CellConfig.newConfig(algorithmAgentName)
+					//.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
 					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Vienna", publishAddress, weatherAgent2Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", publishAddress, weatherAgent3Name, SyncMode.SUBSCRIBEONLY)
