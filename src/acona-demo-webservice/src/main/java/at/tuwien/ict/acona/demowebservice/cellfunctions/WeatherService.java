@@ -43,7 +43,6 @@ public class WeatherService extends CellFunctionThreadImpl {
 	private String cityName="";
 	private String userid="";
 	
-	//private static final String REST_URI = "http://api.openweathermap.org/data/2.5/weather?q=vienna&APPID=5bac1f7f2b67f3fb3452350c23401903";
 	private static final String REST_URI = "http://api.openweathermap.org/data/2.5/weather?";
 	private Client client = ClientBuilder.newClient();
 
@@ -51,12 +50,6 @@ public class WeatherService extends CellFunctionThreadImpl {
 	protected void cellFunctionThreadInit() throws Exception {
 		this.setExecuteOnce(false);
 		this.setExecuteRate(5000);
-		
-		//WebTarget webTarget = client.target("http://localhost:8082/spring-jersey");
-		//WebTarget employeeWebTarget  = webTarget.path("resources/employees");
-		//Invocation.Builder invocationBuilder = employeeWebTarget.request(MediaType.APPLICATION_JSON);
-		
-		//Call: http://api.openweathermap.org/data/2.5/weather?q=vienna&APPID=5bac1f7f2b67f3fb3452350c23401903
 		
 		this.cityName = this.getFunctionConfig().getProperty(CITYNAME);
 		this.userid = this.getFunctionConfig().getProperty(USERID);
@@ -81,10 +74,6 @@ public class WeatherService extends CellFunctionThreadImpl {
 	protected void executeFunction() throws Exception {
 		
 		Response resp = this.createJsonRequest();
-		//WebTarget webTarget = client.target(REST_URI);
-		//Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
-		//Response resp = invocationBuilder.get();
-		
 		
 		if (resp.getStatus() != 200) {
 			throw new RuntimeException("Failed : HTTP error code : " + resp.getStatus());
@@ -92,12 +81,7 @@ public class WeatherService extends CellFunctionThreadImpl {
 		
 		log.info("Received weather data={}", resp);
 		
-		//Weather w = resp.readEntity(Weather.class);
-		//double lat = w.coord.lat;
-		
-		//log.info("Received Json={}", resp.readEntity(String.class));
 		String s = resp.readEntity(String.class);
-		//Weather weather = resp.readEntity(Weather.class);
 		
 		Weather object = (new Gson()).fromJson(s, Weather.class);
 		log.info("Got json= {}", object);

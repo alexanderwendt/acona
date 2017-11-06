@@ -1,2 +1,0 @@
-1. Show how to write a service, weather service
-2. Show how to write

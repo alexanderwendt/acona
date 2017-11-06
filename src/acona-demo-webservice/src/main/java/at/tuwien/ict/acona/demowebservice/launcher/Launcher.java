@@ -103,11 +103,12 @@ public class Launcher {
 			}
 			
 			CellGatewayImpl calculator = this.controller.createAgent(CellConfig.newConfig(algorithmAgentName)
-					//.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
-					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
+					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
+					//.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Vienna", publishAddress, weatherAgent2Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", publishAddress, weatherAgent3Name, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint("Mocktown2", publishAddress, weatherAgent4Name, SyncMode.SUBSCRIBEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, CFStateGenerator.SYSTEMSTATEADDRESS, algorithmAgentName, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmService + ".result", algorithmAgentName, SyncMode.SUBSCRIBEONLY)

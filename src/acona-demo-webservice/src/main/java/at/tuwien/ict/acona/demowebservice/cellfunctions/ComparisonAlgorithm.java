@@ -53,14 +53,14 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 		if (weatherdata.isEmpty()) {
 			conclusio = "No weather data is available";
 		} else if (weatherdata.size() == 1) {
-			conclusio = "In " + weatherdata.get(0).getValue("City") + " the temperature is " + weatherdata.get(0).getValue("Temperature") + "°C.";
+			conclusio = weatherdata.get(0).getValue("City") + ", temp=" + weatherdata.get(0).getValue("Temperature") + "°C.";
 		} else {
 			List<Chunk> sortedList = weatherdata.stream().sorted((o1, o2)->Double.valueOf(o1.getValue("Temperature")).compareTo(Double.valueOf(o2.getValue("Temperature")))).collect(Collectors.toList());
-			conclusio = "In ";
+			//conclusio = "In ";
 			for (int i=sortedList.size()-1;i>=0;i--) {
-				conclusio += sortedList.get(i).getValue("City") + " with temperature " + df.format(Double.valueOf(sortedList.get(i).getValue("Temperature"))) + "°C";
+				conclusio += sortedList.get(i).getValue("City") + ", T=" + df.format(Double.valueOf(sortedList.get(i).getValue("Temperature"))) + "°C";
 				if (i>0) {
-					conclusio += ", it is warmer than in ";
+					conclusio += ", warmer than ";
 				} else {
 					conclusio += ".";
 				}
