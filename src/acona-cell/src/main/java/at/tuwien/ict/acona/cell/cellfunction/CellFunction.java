@@ -61,11 +61,11 @@ public interface CellFunction {
 	 * Perform an operation of this service. The actual method that is executed,
 	 * is defined in the parameter data.
 	 * 
-	 * @param parameterdata
+	 * @param param
 	 * @param caller
 	 * @return
 	 */
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller);
+	public JsonRpcResponse performOperation(JsonRpcRequest param, String caller);
 
 	/**
 	 * Shut down function
