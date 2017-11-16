@@ -16,6 +16,12 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * @author wendt
+ * 
+ *         Write data to the data storage.
+ *
+ */
 public class BasicServiceWrite extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);

@@ -21,6 +21,12 @@ import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * @author wendt
+ * 
+ *         Get the state of a functions that are threads in a cell.
+ *
+ */
 public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHandlerListener {
 
 	private static final Logger log = LoggerFactory.getLogger(CFStateGenerator.class);

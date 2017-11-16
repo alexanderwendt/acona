@@ -64,6 +64,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		//this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
 		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEINTERNALMEMORYADDRESS, internalStateMemoryAddress);
+
+		this.setFinishedAfterSingleRun(false);
 	}
 
 	@Override

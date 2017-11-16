@@ -14,6 +14,12 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * Remove a datapoint from the data storage.
+ * 
+ * @author wendt
+ *
+ */
 public class BasicServiceRemove extends CellFunctionBasicService {
 
 	private static final Logger log = LoggerFactory.getLogger(BasicServiceRemove.class);

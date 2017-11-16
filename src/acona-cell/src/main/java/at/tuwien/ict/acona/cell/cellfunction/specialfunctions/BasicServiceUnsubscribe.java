@@ -17,6 +17,12 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import jade.domain.FIPANames;
 
+/**
+ * @author wendt
+ * 
+ *         Unsubscribe data from the data storage.
+ *
+ */
 public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);

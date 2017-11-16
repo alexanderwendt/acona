@@ -8,36 +8,27 @@ import org.slf4j.LoggerFactory;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * @author wendt
+ * 
+ *         This function is used together with managed datapoints to subscribe
+ *         values in OTHER AGENTS and put them into the data storage of the
+ *         local agent. The address will be
+ *
+ */
 public class CFDataStorageUpdate extends CellFunctionImpl {
 
 	private static Logger log = LoggerFactory.getLogger(CFDataStorageUpdate.class);
 
-	protected static final String ACKNOWLEDGE = "OK";
-	protected static final String ERROR = "ERROR";
-	protected static final String PARAMETERRESULT = "result";
-
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		JsonRpcResponse result = null;
-		//
-		//		parameterdata.values().forEach(dp -> {
-		//			try {
-		//				this.getCell().getCommunicator().write(dp);
-		//			} catch (Exception e) {
-		//				log.error("Cannot write {} to datastorage", dp);
-		//			}
-		//		});
-		//		try {
-		//			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ACKNOWLEDGE));
-		//
-		//		} catch (Exception e) {
-		//			log.error("Cannot perform data storage update on parameter={}", parameterdata, e);
-		//			result.add(Datapoint.newDatapoint(PARAMETERRESULT).setValue(ERROR));
-		//		}
-		//
+
+		JsonRpcResponse result = new JsonRpcResponse(parameterdata, new JsonRpcError("No such method", -1, "No such method", "No such method"));
+
 		return result;
 	}
 

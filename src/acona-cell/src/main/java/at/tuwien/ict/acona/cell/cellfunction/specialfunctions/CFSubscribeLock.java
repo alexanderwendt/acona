@@ -17,6 +17,12 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * @author wendt
+ * 
+ *         Lock the thread while waiting for a subscribed value to arrive.
+ *
+ */
 public class CFSubscribeLock extends CellFunctionImpl {
 
 	protected static Logger log = LoggerFactory.getLogger(CFSubscribeLock.class);

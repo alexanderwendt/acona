@@ -15,6 +15,14 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import jade.domain.FIPANames;
 
+/**
+ * 
+ * 
+ * @author wendt
+ *
+ *         Subscribe data from the data storage.
+ *
+ */
 public class BasicServiceSubscribe extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);

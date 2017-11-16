@@ -227,7 +227,7 @@ public class JsonRpcRequest {
 		try {
 			result = gson.fromJson(parameterString, clazz);
 		} catch (Exception e) {
-			throw new Exception("Parameter is not Json-Format. All parameters must be in Json format (e.g. JsonPrimitive().", e);
+			throw new Exception("Parameter is not Json-Format. All parameters must be in Json format (e.g. JsonPrimitive()).", e);
 		}
 
 		return result;

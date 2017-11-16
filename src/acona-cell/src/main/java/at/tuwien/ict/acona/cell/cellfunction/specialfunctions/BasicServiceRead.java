@@ -21,7 +21,7 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
  *         name is not complete, all completing names
  *
  */
-public class BasicServiceRead extends CellFunctionBasicService implements ReadDatapoint {
+public class BasicServiceRead extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
 
@@ -69,8 +69,7 @@ public class BasicServiceRead extends CellFunctionBasicService implements ReadDa
 		return result;
 	}
 
-	@Override
-	public List<Datapoint> read(final List<String> datapointList) {
+	private List<Datapoint> read(final List<String> datapointList) {
 		List<Datapoint> result = new ArrayList<>();
 
 		datapointList.forEach(dp -> {
