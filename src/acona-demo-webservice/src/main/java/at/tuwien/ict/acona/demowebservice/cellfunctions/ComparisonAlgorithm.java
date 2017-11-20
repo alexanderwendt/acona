@@ -106,7 +106,9 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	protected void executeCustomPostProcessing() throws Exception {
 		//write conclusio to datapoint
 		
-		Datapoint resultDatapoint = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());;
+		Datapoint resultDatapoint = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
+		//this.getCommunicator().read("agent1:hugo").getValue(Episode.class)
+		//this.getCommunicator().execute(agentName, serviceName, methodParameters, timeout)
 		synchronized (resultDatapoint) {
 			//resultDatapoint = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
 			this.getCommunicator().write(resultDatapoint);

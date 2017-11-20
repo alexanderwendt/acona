@@ -200,8 +200,6 @@ public class DemoWebServiceTester {
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, CFStateGenerator.SYSTEMSTATEADDRESS, algorithmAgentName, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmService + ".result", algorithmAgentName, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
-//							.addManagedDatapoint("Mocktown", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
-//							.addManagedDatapoint("Innsbruck", publishAddress, weatherAgent4Name, SyncMode.SUBSCRIBEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 			
 			synchronized (this) {

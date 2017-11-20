@@ -58,6 +58,7 @@ public class WeatherService extends CellFunctionThreadImpl {
 	}
 	
 	private Response createJsonRequest() {
+		log.debug("Check weather at {}", this.cityName);
 	    return client
 	      .target(REST_URI).queryParam("q", this.cityName).queryParam("APPID" , this.userid)  
 	      .request(MediaType.APPLICATION_JSON)
@@ -76,7 +77,7 @@ public class WeatherService extends CellFunctionThreadImpl {
 		Response resp = this.createJsonRequest();
 		
 		if (resp.getStatus() != 200) {
-			throw new RuntimeException("Failed : HTTP error code : " + resp.getStatus());
+			throw new RuntimeException("Failed : HTTP error code : " + resp.getStatus() + " for weather request for city: " + this.cityName);
 		}
 		
 		log.info("Received weather data={}", resp);
