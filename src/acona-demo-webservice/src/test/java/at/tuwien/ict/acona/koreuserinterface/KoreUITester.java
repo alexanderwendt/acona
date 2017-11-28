@@ -98,7 +98,7 @@ public class KoreUITester {
 			CellConfig cf = CellConfig.newConfig(DataStructureAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(datageneratorservice, KoreDataStructureGeneratorMock.class))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
-							.addManagedDatapoint("ui1", datageneratorservice + ".result", SyncMode.SUBSCRIBEONLY));
+							.addManagedDatapoint("KORE", datageneratorservice + ".result", SyncMode.SUBSCRIBEONLY));
 			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
 			
 			//=== Init finished ===//
@@ -117,7 +117,7 @@ public class KoreUITester {
 			//Wait while the system runs
 			synchronized (this) {
 				try {
-					this.wait(20000);
+					this.wait(2000000000);
 				} catch (InterruptedException e) {
 
 				}

@@ -1,7 +1,10 @@
 package at.tuwien.ict.acona.demowebservice.cellfunctions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,7 +157,60 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	 
 	 
 	Map<String, JsonArray> agentsList = new HashMap<String, JsonArray>();
-
+	
+	private JsonObject setNode(String nodeID, String nodeDesc, String nodeColor, String NodeSize) {
+		JsonObject outNode = new JsonObject();
+		outNode.addProperty("NodeID", nodeID);
+    	outNode.addProperty("NodeText", nodeDesc);
+    	outNode.addProperty("NodeColor", nodeColor);
+    	outNode.addProperty("NodeSize", Double.parseDouble(NodeSize));		
+		return outNode;
+	}
+	private JsonObject setLink(String NodeIDSource, String NodeIDTarget) {
+		JsonObject outLink = new JsonObject();
+		outLink.addProperty("source", NodeIDSource);
+		outLink.addProperty("target", NodeIDTarget);
+		return outLink;
+	}
+	
+	private class KoreNode {
+		JsonArray allNodes;
+		JsonArray allLinks;
+		public JsonArray getNodes(){
+			return allNodes;
+		}
+		public JsonArray getLinks() {
+			return allLinks;
+		}
+	
+//	private KoreNode calcTree(KoreNode inputNode , JsonElement inputElement) {
+//		
+//		if (inputElement.isJsonObject()) {
+//			
+//		}
+//		//goal is a JsonObject
+//		JsonObject goalObject = goal.getAsJsonObject(); 
+//		
+//		//create unique nodeID
+//		nodeID = rootNodeID+ goalObject.get("name").getAsString();
+//		nodeDesc = goalObject.get("name").getAsString();
+//		nodeColor = "blue";
+//		nodeSize = "10";
+//		
+//		//add a node "goal" with the above properties
+//		allNodes.add(setNode(nodeID, nodeDesc, nodeColor, nodeSize));
+//		//create the "goal" node links
+//		allLinks.add(setLink(rootNodeID, nodeID));
+//		
+//		//loop through goal children
+//		
+//		for (Map.Entry<String, JsonElement> goalProperty: goalObject.entrySet()) {
+//			//if the name is "condition", it is a JsonArray
+//			if (goalProperty.getKey().equals("condition")){
+//					
+//		return inputNode;
+	}
+	
 	@Override
 	protected synchronized void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 	
@@ -250,11 +306,11 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        outputJSON.add(graphConfig);
 	        outputJSON.add(all_nodes);
 	        outputJSON.add(all_links);
-	        //log.info("Final JSON: "+outputJSON.toString());
+	        log.info("Final JSON: "+outputJSON.toString());
 	        
 	        //log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 	        //gserver.put(outputJSON.toString());
-	       //gserver.setString(outputJSON.toString());
+	        //gserver.setString(outputJSON.toString());
 		} else if (data.containsKey("RESULT")) {
 			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			log.info("Current state={}", data.get("RESULT").getValue());
@@ -337,10 +393,306 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        outputJSON.add(allLinks);
 	        gserver.setString(outputJSON.toString());
 	        
-		}
-		
-	}
+		} else if (data.containsKey("KORE")) {
+			log.info("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+			log.info("Current state={}", data.get("KORE").getValue());
+	        gserver.setString(data.get("KORE").getValue().toString());
+			log.info("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
 
+        	// Create the Ouput JSONArrays
+        	JsonArray allNodes = new JsonArray();
+        	JsonArray allLinks = new JsonArray();
+        	
+        	// Set the default Node Information
+        	String nodesizeLVL1 = "100";
+        	String nodesizeLVL2 = "50";
+        	String nodesizeLVL3 = "5";
+        	String defaultTextAlign = "middle";
+        	
+        	
+        	// Create JsonObject for the config  
+//			JsonObject graphConfig = new JsonObject();
+			
+//			//Parse JSON Input - THIS IS THE KORE CONTAINER
+			JsonObject inDataJSON= data.get("KORE").getValue().getAsJsonObject();
+			
+			//Create an entrySet to loop through root values (without knowing member names);In this case we have 9 JsonArray values
+			Set<Map.Entry<String, JsonElement>> entrySet = inDataJSON.entrySet();
+			
+			//Loop through entrySet 
+			for (Map.Entry<String, JsonElement> entry:entrySet){
+								
+				// get the identification value
+				String typeKORE = entry.getKey().toString();
+				
+				//KORE type is "Requests"
+				if (typeKORE.equals("Requests")) {
+					
+					//Get the data included in this type, we know it is an JsonArray
+					JsonArray dataKORE = entry.getValue().getAsJsonArray();
+					
+					//Prepare the output Node
+					JsonObject outNode = new JsonObject();
+					
+					//set the parent node; the root node
+					String rootNodeID = typeKORE;
+					
+					//root node
+					String nodeID = rootNodeID;
+					String nodeDesc = typeKORE;
+					String nodeColor = "red";
+					String nodeSize = nodesizeLVL1;
+
+					//set the node Properties
+					outNode = setNode(nodeID, nodeDesc, nodeColor, nodeSize);
+					
+					//add node
+					allNodes.add(outNode);
+		        	
+					
+					//loop through JsonArray "Requests"; each "request" is a JsonObject
+					
+					for (JsonElement request: dataKORE) {
+						JsonObject requestObject = request.getAsJsonObject(); 
+						
+						//request is a JsonObject
+						//create unique nodeID
+						nodeID = rootNodeID+ requestObject.get("name").getAsString();
+						nodeDesc = requestObject.get("name").getAsString();
+						nodeColor = "blue";
+						nodeSize = nodesizeLVL2;
+						
+						//add a node "request" with the above properties
+						allNodes.add(setNode(nodeID, nodeDesc, nodeColor, nodeSize));
+						
+						//create the "request" node links
+						allLinks.add(setLink(rootNodeID, nodeID));
+			
+						Set<Map.Entry<String, JsonElement>> requestProperties = requestObject.entrySet();
+
+						//Create nodes for all properties
+						for (Map.Entry<String, JsonElement> requestProperty :requestProperties){
+							//Set property values
+							String propertyID = nodeID+requestProperty.getKey().toString();
+							String propertyDesc = requestProperty.getKey().toString()+" : " + requestProperty.getValue().toString();
+							String propertyColor = "green";
+							String propertySize = nodesizeLVL3;
+
+							//add a node "property" with the above properties
+							allNodes.add(setNode(propertyID, propertyDesc, propertyColor, propertySize));
+							
+							//create the "property" node links
+							allLinks.add(setLink(nodeID,propertyID));										
+							}
+						}
+					}//end if "requests
+				//KORE type is "Episodes"
+				else if (typeKORE.equals("Episodes")) {
+					
+					//Get the data included in this type, we know it is an JsonArray
+					JsonArray dataKORE = entry.getValue().getAsJsonArray();
+					
+					//Prepare the output Node
+					JsonObject outNode = new JsonObject();
+					
+					//set the parent node; the root node
+					String rootNodeID = typeKORE;
+					
+					//root node
+					String nodeID = rootNodeID;
+					String nodeDesc = typeKORE;
+					String nodeColor = "red";
+					String nodeSize = nodesizeLVL1;
+					
+					//set the node Properties
+					outNode = setNode(nodeID, nodeDesc, nodeColor, nodeSize);
+					//add node
+					allNodes.add(outNode);
+       	
+					//loop through JsonArray "Episodes"; each "episode" is a JsonObject
+					for (JsonElement episode: dataKORE) {
+						
+						//episode is a JsonObject
+						JsonObject episodeObject = episode.getAsJsonObject(); 
+						
+						//create unique nodeID
+						nodeID = rootNodeID+ episodeObject.get("name").getAsString();
+						nodeDesc = episodeObject.get("name").getAsString();
+						nodeColor = "blue";
+						nodeSize = nodesizeLVL2;
+						
+						//add a node "episode" with the above properties
+						allNodes.add(setNode(nodeID, nodeDesc, nodeColor, nodeSize));
+						//create the "episode" node links
+						allLinks.add(setLink(rootNodeID, nodeID));
+						
+						//loop through episode children
+						
+						for (Map.Entry<String, JsonElement> episodeProperty: episodeObject.entrySet()) {
+							//if the name is "evaluation, it is a nested object
+							if (episodeProperty.getKey().equals("evaluation")){
+								
+								//get the object
+								JsonObject evaluationsObject = episodeProperty.getValue().getAsJsonObject();
+								
+								//create unique nodeID2
+								String node2ID =nodeID+ episodeProperty.getKey();
+								String node2Desc = episodeProperty.getKey();
+								String node2Color = "blue";
+								String node2Size = nodesizeLVL2;
+								//add a node "evaluation" with the above properties
+								allNodes.add(setNode(node2ID, node2Desc, node2Color, node2Size));
+								//create the "episode" node links
+								allLinks.add(setLink(nodeID, node2ID));
+								
+								for (Map.Entry<String, JsonElement> evaluationProperty: evaluationsObject.entrySet()) {
+									
+									//Set property values
+									String propertyID = node2ID+evaluationProperty.getKey().toString();
+									String propertyDesc = evaluationProperty.getKey().toString()+" : " + evaluationProperty.getValue().toString();
+									String propertyColor = "green";
+									String propertySize = nodesizeLVL3;
+
+									//add a node "property" with the above properties
+									allNodes.add(setNode(propertyID, propertyDesc, propertyColor, propertySize));
+									//create the "property" node links
+									allLinks.add(setLink(node2ID,propertyID));
+								}
+							}
+							else {
+								//Set property values
+								String propertyID = nodeID+episodeProperty.getKey().toString();
+								String propertyDesc = episodeProperty.getKey().toString()+" : " + episodeProperty.getValue().toString();
+								String propertyColor = "green";
+								String propertySize = nodesizeLVL3;
+
+								//add a node "property" with the above properties
+								allNodes.add(setNode(propertyID, propertyDesc, propertyColor, propertySize));
+								//create the "property" node links
+								allLinks.add(setLink(nodeID,propertyID));
+
+							}
+						}
+					}//End loop through episodes
+													
+				}//Endif episodes
+				else if (typeKORE.equals("Goals")) {
+					
+					//Get the data included in this type, we know it is an JsonArray
+					JsonArray dataKORE = entry.getValue().getAsJsonArray();
+					
+					//Prepare the output Node
+					JsonObject outNode = new JsonObject();
+					
+					//set the parent node; the root node
+					String rootNodeID = typeKORE;
+					
+					//root node
+					String nodeID = rootNodeID;
+					String nodeDesc = typeKORE;
+					String nodeColor = "red";
+					String nodeSize = nodesizeLVL1;
+					
+					//set the node Properties
+					outNode = setNode(nodeID, nodeDesc, nodeColor, nodeSize);
+					//add node
+					allNodes.add(outNode);
+       	
+					//loop through JsonArray "Goals"; each "goal" is a JsonObject
+					for (JsonElement goal: dataKORE) {
+						
+						//goal is a JsonObject
+						JsonObject goalObject = goal.getAsJsonObject(); 
+						
+						//create unique nodeID
+						nodeID = rootNodeID+ goalObject.get("name").getAsString();
+						nodeDesc = goalObject.get("name").getAsString();
+						nodeColor = "blue";
+						nodeSize = nodesizeLVL2;
+						
+						//add a node "goal" with the above properties
+						allNodes.add(setNode(nodeID, nodeDesc, nodeColor, nodeSize));
+						//create the "goal" node links
+						allLinks.add(setLink(rootNodeID, nodeID));
+						
+						//loop through goal children
+						
+						for (Map.Entry<String, JsonElement> goalProperty: goalObject.entrySet()) {
+							//if the name is "condition", it is a JsonArray
+							if (goalProperty.getKey().equals("condition")){
+								
+								//the goal-"condition" is a JsonArray
+								JsonArray conditionArray = goalProperty.getValue().getAsJsonArray();
+								
+								//create unique nodeID2
+								String node2ID =nodeID+ goalProperty.getKey();
+								String node2Desc = goalProperty.getKey();
+								String node2Color = "blue";
+								String node2Size = nodesizeLVL2;
+								//add a node "evaluation" with the above properties
+								allNodes.add(setNode(node2ID, node2Desc, node2Color, node2Size));
+								//create the "episode" node links
+								allLinks.add(setLink(nodeID, node2ID));
+
+
+
+								//loop through conditions of Goals
+								for (JsonElement condition: conditionArray) {
+									
+									//create unique nodeID3
+									String node3ID = node2ID+ condition.getAsJsonObject().get("name").getAsString();
+									String node3Desc = condition.getAsJsonObject().get("name").getAsString();
+									String node3Color = "green";
+									String node3Size = nodesizeLVL3;
+									
+									//add a node "name of condition" with the above properties
+									allNodes.add(setNode(node3ID, node3Desc, node3Color, node3Size));
+									//create the "episode" node links
+									allLinks.add(setLink(node2ID, node3ID));
+									
+									// loop through properties of GoalsConditions
+									for (Map.Entry<String, JsonElement> goalConditionProperty: condition.getAsJsonObject().entrySet()) {
+										String propertyID = node3ID+goalConditionProperty.getKey().toString();
+										String propertyDesc = goalConditionProperty.getKey().toString()+" : " + goalConditionProperty.getValue().toString();
+										String propertyColor = "green";
+										String propertySize = nodesizeLVL3;
+										
+										//add a node "property" with the above properties
+										allNodes.add(setNode(propertyID, propertyDesc, propertyColor, propertySize));
+										//create the "property" node links
+										allLinks.add(setLink(nodeID,propertyID));
+									}
+									
+								}
+
+							}
+							else {
+								//Set property values
+								String propertyID = nodeID+goalProperty.getKey().toString();
+								String propertyDesc = goalProperty.getKey().toString()+" : " + goalProperty.getValue().toString();
+								String propertyColor = "green";
+								String propertySize = nodesizeLVL3;
+
+								//add a node "property" with the above properties
+								allNodes.add(setNode(propertyID, propertyDesc, propertyColor, propertySize));
+								//create the "property" node links
+								allLinks.add(setLink(nodeID,propertyID));
+
+							}
+						}
+					}//End loop through goals
+													
+				}//Endif goals
+			}//End loop through all elements
+			log.info("OUTPUT={}", allNodes.toString());
+			log.info("OUTPUT2={}", allLinks.toString());
+			outputJSON.add(allNodes);
+			outputJSON.add(allLinks);
+	        gserver.setString(outputJSON.toString());
+		}//End if "KORE"
+		
+	}//End updateDatapointsbythread
+	
 	@Override
 	protected void shutDownExecutor() throws Exception {
 		// TODO Auto-generated method stub
