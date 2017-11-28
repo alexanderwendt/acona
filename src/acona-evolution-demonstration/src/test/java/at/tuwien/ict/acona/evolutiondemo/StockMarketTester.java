@@ -134,7 +134,7 @@ public class StockMarketTester {
 
 			synchronized (this) {
 				try {
-					this.wait(200000);
+					this.wait(2000000);
 				} catch (InterruptedException e) {
 
 				}

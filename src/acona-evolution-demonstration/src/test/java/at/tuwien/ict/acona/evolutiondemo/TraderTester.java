@@ -212,6 +212,139 @@ public class TraderTester {
 	}
 	
 	/**
+	 * Create a trader agent with a mock function that buys if nothing has been bought yet and sells if something has been sold. Trigger the
+	 * trader agent to execute 2 times. The first time, the amount of the stock and the price shall be defined. In the second run, everything
+	 * shall be sold.
+	 * 
+	 * Create the system with a controller that triggers the price generator. At new data from the price generator, the traders are triggered by
+	 * the subscription of the new values from the price generator. After calculation, each trader reports finished to the controller.
+	 * 
+	 */
+	@Test
+	public void buyAndSellFunctionTestAgenttest() {
+		try {
+			String brokerAgentName = "BrokerAgent"; 
+			String traderAgentName = "TraderAgent";
+			String stockmarketAgentName = "StockMarketAgent";
+			String controllerAgentName = "ControllerAgent";
+			//String traderType = "type1";
+			String brokerServiceName = "BrokerService";
+			String statisticsService = "statisticsService";
+			String stockmarketServiceName = "StockMarketService";
+			String controllerService = "controllerservice";
+			String signalService = "signal";
+			int numberOfAgents = 2000;
+			
+			String stockName = "Fingerprint";		
+			
+			long startTimeSetup = System.currentTimeMillis();
+			
+			CellGatewayImpl controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
+							.setGenerateReponder(true)));
+			controllerAgent.getCommunicator().setDefaultTimeout(60000);
+			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			CellGatewayImpl brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			CellGatewayImpl stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
+							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
+							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
+							.setGenerateReponder(true)));	//Puts data on datapoint StockMarketAgent:data
+			
+			//Create 100 trading agents that first buy a stock, then sell it
+			for (int i=1;i<=numberOfAgents;i++) {
+				String traderType = "type";
+				if (i%2==0) {
+					traderType += "_even";
+				} else {
+					traderType += "_odd";
+				}
+				
+				CellGatewayImpl traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
+						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
+								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
+								.setProperty(Trader.ATTRIBUTETIMEOUT, 60000)
+								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
+								.setGenerateReponder(true))
+						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+				traderAgent.getCommunicator().setDefaultTimeout(60000);
+			}
+			
+			long stopTimeSetup = System.currentTimeMillis();
+
+			synchronized (this) {
+				try {
+					this.wait(10000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			log.info("=== All agents initialized ===");
+			
+			//Start the agents by starting the codelet handler
+			//Buy the current stock
+			long startTimeSystem = System.currentTimeMillis();
+			JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
+			req.setParameterAsValue(0, false);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 60000);
+			long stopTimeSystemTrade1 = System.currentTimeMillis();
+			
+			//Sell the current stock
+			req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
+			req.setParameterAsValue(0, false);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 60000);
+			long stopTimeSystemTrade2 = System.currentTimeMillis();
+			
+			req = new JsonRpcRequest("gettypes", 0);
+			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
+			List<Types> list = result.getResult(new TypeToken<List<Types>>(){});
+			
+			log.info("Got types={}", list);
+			assertEquals(list.get(0).getNumber(), list.get(1).getNumber());
+			
+			//The test is to read the depot of agent 69, which shall be empty
+			Depot depot = controllerAgent.getCommunicator().read(traderAgentName + "_" + "69", "localdepot").getValue(Depot.class);
+			double money = depot.getLiquid();
+			
+			log.info("Setup duration={}, system execution duration 1 trade={}, system execution duration 2 trades={}", stopTimeSetup - startTimeSetup, stopTimeSystemTrade1 - startTimeSystem, stopTimeSystemTrade2 - startTimeSystem);
+			
+			log.info("Got money from agent 69={}. Correct answer={}", money, 1000);
+			assertEquals(1000, money, 0);
+			log.info("All tests passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+	}
+	
+	/**
 	 * Create a controller and one trader, the depot and a stock market. The trader agent shall use a moving average signal function 
 	 * to buy, when the faster moving average (use EMA) crosses from below and sell if the faster EMA crosses from above. The stock market 
 	 * shall use a sinus stock market function.

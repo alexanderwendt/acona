@@ -24,6 +24,7 @@ public class GraphToolFunction extends CellFunctionThreadImpl {
 	
 	private OHLCGraph graph;
 	
+	private String seriesName;
 	private double open;
 	private double close;
 	private double high;
@@ -50,7 +51,7 @@ public class GraphToolFunction extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		this.graph.updateDataset(day, open, high, low, close);
+		this.graph.updateDataset(seriesName, day, open, high, low, close);
 		
 		
 	}
@@ -79,6 +80,7 @@ public class GraphToolFunction extends CellFunctionThreadImpl {
 					//Check if OHLC data
 					if (object.has("open")) {
 						
+						seriesName=key;
 						open=object.get("open").getAsDouble();
 						close=object.get("close").getAsDouble();
 						high=object.get("high").getAsDouble();
@@ -100,8 +102,6 @@ public class GraphToolFunction extends CellFunctionThreadImpl {
 				} catch (Exception e) {
 					log.error("Cannot read value", e);
 				}
-				
-				
 				
 			}
 		

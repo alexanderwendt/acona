@@ -3,12 +3,10 @@ package at.tuwien.ict.acona.evolutiondemo.launcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;

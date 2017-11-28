@@ -309,7 +309,7 @@ public class CellFunctionConfig {
 		try {
 			result = this.configObject.getAsJsonPrimitive(key).getAsString();
 		} catch (Exception e) {
-			throw new Exception("Cannot read key " + key + ", " + e);
+			throw new Exception("Cannot find key=" + key + " in object=" + this.configObject + ". Please add the key to the configuration", e);
 		}
 
 		return result;

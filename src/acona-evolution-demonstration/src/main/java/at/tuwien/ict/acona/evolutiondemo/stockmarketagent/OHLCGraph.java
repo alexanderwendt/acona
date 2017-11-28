@@ -15,13 +15,18 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.chart.renderer.xy.HighLowRenderer;
+import org.jfree.data.general.Dataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.ohlc.OHLCSeries;
 import org.jfree.data.time.ohlc.OHLCSeriesCollection;
 import org.jfree.data.xy.OHLCDataset;
 import org.jfree.ui.ApplicationFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OHLCGraph extends ApplicationFrame {
+	
+	private final static Logger log = LoggerFactory.getLogger(OHLCGraph.class);
 
 	/**
 	 * 
@@ -29,16 +34,15 @@ public class OHLCGraph extends ApplicationFrame {
 	private static final long serialVersionUID = 1L;
 	
 	
-	private OHLCSeriesCollection dataset;
+	private OHLCSeriesCollection seriesCollection;
+	//private Dataset dataset;
 	private JPanel chartPanel;
 	
 	public OHLCGraph(String title) {
 		super(title);
 		
-	    //OHLCDataset dataset = this.createDataset1();
-	    //final JFreeChart chart = ChartFactory.createCandlestickChart(title, "Time", "Value", dataset, true);
-
-		this.chartPanel = this.generateGraph(this.createDataset1());
+		seriesCollection = this.initSeriesCollection();
+		this.chartPanel = this.generateGraph(seriesCollection);
 		
 	}
 	
@@ -93,57 +97,82 @@ public class OHLCGraph extends ApplicationFrame {
      *
      * @return a sample high low dataset.
      */
-    public OHLCDataset createDataset1() {
+    private OHLCSeriesCollection initSeriesCollection() {
 
-        OHLCSeries s1 = new OHLCSeries("Series 1");
-        s1.add(new Day(24, 9, 2007), 50.5, 53.2, 49.8, 50.1);
-        s1.add(new Day(25, 9, 2007), 50.2, 51.2, 47.8, 48.1);
-        s1.add(new Day(26, 9, 2007), 48.0, 49.2, 45.3, 47.4);
-        s1.add(new Day(27, 9, 2007), 47.5, 48.3, 46.8, 46.8);
-        s1.add(new Day(28, 9, 2007), 46.6, 47.0, 45.1, 46.0);
-        s1.add(new Day(1, 10, 2007), 46.6, 47.0, 45.1, 46.0);
-        s1.add(new Day(2, 10, 2007), 47.5, 48.3, 46.8, 46.8);
-        s1.add(new Day(3, 10, 2007), 48.0, 49.2, 45.3, 47.4);
-        s1.add(new Day(4, 10, 2007), 50.2, 51.2, 47.8, 48.1);
-        s1.add(new Day(5, 10, 2007), 50.5, 53.2, 49.8, 50.1);
-        OHLCSeriesCollection dataset = new OHLCSeriesCollection();
-        dataset.addSeries(s1);
-        return dataset;
+        OHLCSeries s1 = new OHLCSeries("S1");
+//        s1.add(new Day(24, 9, 2007), 50.5, 53.2, 49.8, 50.1);
+//        s1.add(new Day(25, 9, 2007), 50.2, 51.2, 47.8, 48.1);
+//        s1.add(new Day(26, 9, 2007), 48.0, 49.2, 45.3, 47.4);
+//        s1.add(new Day(27, 9, 2007), 47.5, 48.3, 46.8, 46.8);
+//        s1.add(new Day(28, 9, 2007), 46.6, 47.0, 45.1, 46.0);
+//        s1.add(new Day(1, 10, 2007), 46.6, 47.0, 45.1, 46.0);
+//        s1.add(new Day(2, 10, 2007), 47.5, 48.3, 46.8, 46.8);
+//        s1.add(new Day(3, 10, 2007), 48.0, 49.2, 45.3, 47.4);
+//        s1.add(new Day(4, 10, 2007), 50.2, 51.2, 47.8, 48.1);
+        //s1.add(new Day(5, 10, 2007), 50.5, 53.2, 49.8, 50.1);
+        OHLCSeriesCollection seriesCollection = new OHLCSeriesCollection();
+        
+        
+        return seriesCollection;
     }
     
-    public void updateDataset(Day time, double open, double high, double low, double close) {
-    	//Create a new dataset
-    	if (this.dataset==null) {
-    		OHLCSeries s1 = new OHLCSeries("S1");
-    		//s1.add(new Day(24, 9, 2007), 50.5, 53.2, 49.8, 50.1);
-    		this.dataset = new OHLCSeriesCollection();
-    		this.dataset.addSeries(s1);
-    		this.dataset.getSeries(0).setMaximumItemCount(100);
+    private OHLCSeries addOrGetSeries(String name) {
+    	OHLCSeries result;
+    	
+    	//Check if series exists
+    	int numberOfSeries = seriesCollection.getSeriesCount();
+    	int index = -1;
+    	//Find in series
+    	for (int i=0;i<numberOfSeries;i++) {
+    		Comparable<String> comparable = seriesCollection.getSeriesKey(i);
+    		if (comparable.compareTo(name)==0) {
+    			index = i;
+    			break;
+    		}
     	}
     	
+    	if (index==-1) {
+    		OHLCSeries s1 = new OHLCSeries(name);
+    		s1.setMaximumItemCount(200);
+        	seriesCollection.addSeries(s1);
+        	int newNumberOfSeries = seriesCollection.getSeriesCount();
+        	index = newNumberOfSeries - 1;
+        	log.debug("Number of series={}, name={}", newNumberOfSeries, name);
+    	}
     	
+    	result = seriesCollection.getSeries(index);
     	
-    	this.dataset.getSeries(0).add(time, open, high, low, close);
+    	return result;
+    }
+    
+    public void updateDataset(String timerowid, Day time, double open, double high, double low, double close) {
+    	
+    	OHLCSeries serie = this.addOrGetSeries(timerowid);
+    	
+    	serie.add(time, open, high, low, close);
+    	serie.fireSeriesChanged();
   
     	
     	//Remove old chart
-    	if (this.chartPanel!=null) {
-    	    this.chartPanel.removeAll();
-    	    this.chartPanel.revalidate(); // This removes the old chart 
-    	}
+    	//if (this.chartPanel!=null) {
+    	//    this.chartPanel.removeAll();
+    	//    this.chartPanel.revalidate(); // This removes the old chart 
+    	//}
 
 	    
 	    //Create a new chart
-	    JFreeChart updatedChart = this.createChart(dataset);
+	    //JFreeChart updatedChart = this.createChart(dataset);
 	    //updatedChart.removeLegend();
+    	
+    	this.chartPanel.repaint();
 	    
-	    this.chartPanel = new ChartPanel(updatedChart);
-	    this.chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
-	    if (this.chartPanel!=null) {
-	    	this.chartPanel.repaint();
-	    }
+	    //this.chartPanel = new ChartPanel(updatedChart);
+	    //this.chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+	    //if (this.chartPanel!=null) {
+	    //	this.chartPanel.repaint();
+	    //}
 	    
-		setContentPane(chartPanel);
+		//setContentPane(chartPanel);
     	
     }
 	
