@@ -21,6 +21,7 @@ public class CellFunctionConfig {
 	public static final String CELLMANAGEDDATAPOINTS = "syncdatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
+	public static final String CELLFINISHSTATEAFTERSINGLERUN = "finishstatftersinglerun"; //This variable can only be set in the code
 	public static final String GENERATERESPONDER = "generateresponder";
 	public static final String RESPONDERPROTOCOL = "responderprotocol";
 	//public static final String REGISTERSTATE = "registerstate";
@@ -157,6 +158,22 @@ public class CellFunctionConfig {
 	 */
 	public JsonPrimitive isExecuteOnce() {
 		return this.configObject.getAsJsonPrimitive(CELLEXECUTEONCE);
+	}
+
+	/**
+	 * @param isExecuteOnce
+	 * @return
+	 */
+	public CellFunctionConfig setFinishStateAfterSingleRun(boolean isFinishedAfterSingleRun) {
+		this.configObject.addProperty(CELLFINISHSTATEAFTERSINGLERUN, isFinishedAfterSingleRun);
+		return this;
+	}
+
+	/**
+	 * @return
+	 */
+	public JsonPrimitive isFinishStateAfterSingleRun() {
+		return this.configObject.getAsJsonPrimitive(CELLFINISHSTATEAFTERSINGLERUN);
 	}
 
 	/**

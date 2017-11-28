@@ -20,6 +20,15 @@ import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * @author wendt
+ * 
+ *         Set a certain value in a datapoint and wait for a subscribed value to
+ *         be returned.
+ * 
+ *
+ *
+ */
 public class CFQuery extends CellFunctionImpl {
 
 	protected static Logger log = LoggerFactory.getLogger(CFQuery.class);

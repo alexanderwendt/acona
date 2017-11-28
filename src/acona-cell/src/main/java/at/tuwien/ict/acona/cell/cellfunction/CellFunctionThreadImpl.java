@@ -43,6 +43,8 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 */
 	private boolean executeOnce = true;
 
+	private boolean finishedAfterSingleRun = true;
+
 	/**
 	 * Current control command
 	 */
@@ -95,6 +97,13 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			} else {
 				this.getFunctionConfig().setExecuteOnce(executeOnce);
 			}
+
+			// Get customized finished after single run
+			//			if (this.getFunctionConfig().isFinishStateAfterSingleRun() != null) {
+			//				this.setFinishedAfterSingleRun(this.getFunctionConfig().isFinishStateAfterSingleRun().getAsBoolean());
+			//			} else {
+			//				this.getFunctionConfig().setExecuteOnce(this.finishedAfterSingleRun);
+			//			}
 
 			// Set state register
 			//			if (this.getFunctionConfig().getRegisterState() == null) {
@@ -286,6 +295,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		if (this.isExecuteOnce() == true) {
 			this.writeLocal(DatapointBuilder.newDatapoint(this.addServiceName(COMMANDSUFFIX)).setValue(ControlCommand.PAUSE.toString()));
+		}
+
+		if (this.isFinishedAfterSingleRun() == true) {
+			this.setServiceState(ServiceState.FINISHED);
 		}
 
 		log.debug("{}>Service execution run finished", this.getFunctionName());
@@ -484,6 +497,14 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	@Override
 	public CellFunctionType getFunctionType() {
 		return CellFunctionType.THREADFUNCTION;
+	}
+
+	public boolean isFinishedAfterSingleRun() {
+		return finishedAfterSingleRun;
+	}
+
+	public void setFinishedAfterSingleRun(boolean finishedAfterSingleRun) {
+		this.finishedAfterSingleRun = finishedAfterSingleRun;
 	}
 
 }

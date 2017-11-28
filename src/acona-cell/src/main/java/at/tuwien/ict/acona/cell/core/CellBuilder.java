@@ -152,10 +152,11 @@ public class CellBuilder {
 			Object obj = constructor.newInstance();
 			if (obj instanceof CellFunction) {
 				result = (CellFunction) obj;
+				// Init the class, create the list of subscriptions
+				result.init(cellconfig, caller);
+			} else {
+				throw new InstantiationException("Cannot convert object to cellfunction class. The instantiated object is no cell function. " + obj);
 			}
-
-			// Init the class, create the list of subscriptions
-			result.init(cellconfig, caller);
 
 		} catch (ClassNotFoundException e) {
 			log.error("Cannot find a class with the name {}", className, e);

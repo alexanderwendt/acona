@@ -14,6 +14,12 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
+/**
+ * This service notifies subscribers about changes in the data storage.
+ * 
+ * @author wendt
+ *
+ */
 public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);

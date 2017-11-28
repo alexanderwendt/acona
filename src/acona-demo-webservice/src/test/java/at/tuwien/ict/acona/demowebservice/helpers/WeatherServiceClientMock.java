@@ -30,11 +30,17 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	public final static String USERID = "userid";
 	
 	private boolean swap=false; 
+	
+	String cityName = "";
+	String userid ="";
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		this.setExecuteOnce(false);
 		this.setExecuteRate(10000);
+		
+		this.cityName = this.getFunctionConfig().getProperty(CITYNAME);
+		this.userid = this.getFunctionConfig().getProperty(USERID);
 		
 	}
 	
@@ -48,22 +54,21 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	protected void executeFunction() throws Exception {
 		try {
 			//Generate weather data
-			Chunk result = ChunkBuilder.newChunk(this.getFunctionName() + "_result", "WeatherData")
-					.setValue("City", "MockTown" + this.getFunctionName());
+			Chunk result = ChunkBuilder.newChunk(this.getFunctionName() + "_result_" + cityName, "WeatherData")
+					.setValue("City", this.cityName + "_Mock");
 			
 			if (this.swap==false) {
-				result.setValue("Temperature", 24.5);
+				result.setValue("Temperature", 24.5 + Math.random()-0.5);
 				this.swap = true;
 			} else {
-				result.setValue("Temperature", 2.5);
+				result.setValue("Temperature", 2.5 + Math.random()-0.5);
 				this.swap = false;
 			}
+					
 			
 			//write it to the public datapoint
 			//Through the write map,
 			this.getValueMap().get(WEATHERADDRESSID).setValue(result.toJsonObject());
-			
-			//this.getCommunicator().write(Datapoints.newDatapoint("blabla").setValue(result));
 			
 			log.debug("wrote weather data={} to={}", result, this.getValueMap().get(WEATHERADDRESSID).getCompleteAddress());
 			
