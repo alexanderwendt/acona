@@ -117,6 +117,19 @@ public class Datapoint {
 		return VALUE;
 	}
 
+	public JsonElement getValue(JsonElement defaultValue) {
+
+		JsonElement result = null;
+
+		if (this.hasEmptyValue() == true) {
+			result = defaultValue;
+		} else {
+			result = VALUE;
+		}
+
+		return result;
+	}
+
 	public <T> T getValue(Class<T> clzz) {
 		if (gson == null) {
 			gson = new Gson();

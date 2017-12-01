@@ -15,6 +15,16 @@ public interface DataStorage {
 
 	public void add(Datapoint datapackage, String caller);
 
+	/**
+	 * Remove one or a whole branch of datapoints with wildcard.
+	 * 
+	 * @param address:
+	 *            Datappoint address. If * is put on the end, all sub addresses
+	 *            afterwards will be removed, e.g. datapoint1.* will remove
+	 *            datapoint1.test
+	 * @param caller:
+	 *            Caller agent
+	 */
 	public void remove(String address, String caller);
 
 	public Datapoint readFirst(String address);
@@ -25,7 +35,7 @@ public interface DataStorage {
 	 * will give all datapoints, which addresses start with datapoint1.
 	 * 
 	 * @param address
-	 * @return
+	 * @return List of datapoints
 	 */
 	public List<Datapoint> read(String address);
 

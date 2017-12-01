@@ -70,10 +70,10 @@ public interface Communicator extends AgentCommunicator {
 	/**
 	 * Remove datapoint with address
 	 * 
-	 * @param datapoint
+	 * @param datapointAddress
 	 * @throws Exception
 	 */
-	public void remove(String datapoint) throws Exception;
+	public void remove(String datapointAddress) throws Exception;
 
 	/**
 	 * Remove a list of datapoints

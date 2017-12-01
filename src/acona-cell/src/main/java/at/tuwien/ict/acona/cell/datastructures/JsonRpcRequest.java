@@ -220,7 +220,7 @@ public class JsonRpcRequest {
 			gson = new Gson();
 		}
 
-		String parameterString = this.getParams()[index].toString();
+		String parameterString = this.getParameter(index);
 
 		T result = null;
 
@@ -231,6 +231,12 @@ public class JsonRpcRequest {
 		}
 
 		return result;
+	}
+
+	private String getParameter(int index) {
+		String parameterString = this.getParams()[index].toString();
+
+		return parameterString;
 	}
 
 	/**
@@ -297,12 +303,12 @@ public class JsonRpcRequest {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("jsonrpc=");
-		builder.append(jsonrpc);
+		//builder.append("jsonrpc=");
+		//builder.append(jsonrpc);
 		builder.append(", method=");
 		builder.append(method);
-		builder.append(", id=");
-		builder.append(id);
+		//builder.append(", id=");
+		//builder.append(id);
 		builder.append(", params=");
 		builder.append(Arrays.toString(params));
 		return builder.toString();

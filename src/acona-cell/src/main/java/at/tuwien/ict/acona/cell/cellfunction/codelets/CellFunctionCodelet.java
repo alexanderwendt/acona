@@ -54,6 +54,8 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 			//Set the system state datapoint
 			//codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 
+			this.setFinishedAfterSingleRun(false); //The finish shall be set manually.
+
 			//Start internal init
 			this.cellFunctionCodeletInit();
 
@@ -88,11 +90,11 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 				}
 
 			} catch (Exception e) {
-				log.error("Cannot register codelet", e);
+				log.error("{}>Cannot register codelet", this.getFunctionName(), e);
 				throw new Exception(e.getMessage());
 			}
 		} catch (Exception e1) {
-			log.error("Cannot initialize codelet", e1);
+			log.error("{}>Cannot initialize codelet", this.getFunctionName(), e1);
 			throw new Exception(e1.getMessage());
 		}
 

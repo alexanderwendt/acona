@@ -177,9 +177,23 @@ public class DataStorageImpl implements DataStorage {
 
 	@Override
 	public void remove(String address, String caller) {
-		this.data.remove(address);
-		this.notifySubscribers(DatapointBuilder.newDatapoint(address), caller);
+		List<String> listToRemove = new ArrayList<>();
 
+		if (address.endsWith("*")) {
+			String startAddress = address.substring(0, address.length() - 1);
+			listToRemove = this.data.keySet()
+					.stream()
+					.filter(entry -> entry.startsWith(startAddress))
+					.collect(Collectors.toList());
+			listToRemove.forEach(a -> {
+				this.data.remove(a);
+				this.notifySubscribers(DatapointBuilder.newDatapoint(a), caller);
+			});
+
+		} else {
+			this.data.remove(address);
+			this.notifySubscribers(DatapointBuilder.newDatapoint(address), caller);
+		}
 	}
 
 	@Override
