@@ -32,7 +32,8 @@ public interface Communicator extends AgentCommunicator {
 	 * Read a datapoint
 	 * 
 	 * @param datapointName
-	 * @return
+	 * @return either a datapoint or an empty datapoint if nothing is found on
+	 *         that address.
 	 * @throws Exception
 	 */
 	public Datapoint read(String datapointName) throws Exception;

@@ -16,8 +16,9 @@ public interface CodeletHandler {
 	 * 
 	 * @param callerAddress
 	 * @param executionOrder
+	 * @throws Exception
 	 */
-	public void registerCodelet(String callerAddress, int executionOrder);
+	public void registerCodelet(String callerAddress, int executionOrder) throws Exception;
 
 	/**
 	 * Public deregisterCodelet(codeletname): void; blocking; deregister codelet

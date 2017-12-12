@@ -2,10 +2,12 @@ package at.tuwien.ict.acona.cell.cellfunction.codelets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -54,7 +56,13 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	//private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
-	private final Map<Integer, List<String>> executionOrderMap = new ConcurrentHashMap<>();
+	private final Map<Integer, List<String>> executionOrderMap = new TreeMap<>(new Comparator<Integer>() {
+
+		@Override
+		public int compare(Integer o1, Integer o2) {
+			return o1.compareTo(o2);
+		}
+	});
 
 	private int currentRunOrder = -1; //-1 for starting mode
 
@@ -123,7 +131,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public synchronized void registerCodelet(String callerAddress, int executionOrder) {
+	public synchronized void registerCodelet(String callerAddress, int executionOrder) throws Exception {
 		this.getCodeletMap().put(callerAddress, ServiceState.INITIALIZING);
 		this.putCodeletExecutionOrder(callerAddress, executionOrder);
 
@@ -257,6 +265,9 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		try {
 			log.debug("Map:{}", this.getExecutionOrderMap());
 			List<String> names = this.getExecutionOrderMap().get(runOrder);
+			if (names == null) {
+				log.warn("For runorder={}, names={}.", runOrder, names);
+			}
 			for (String codelet : names) {
 				if (this.getCodeletMap().get(codelet).equals(ServiceState.FINISHED) == false) {
 					result = false;
@@ -264,7 +275,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				}
 			}
 		} catch (Exception e) {
-			log.error("Cannot check if the states are ok for the run for runorder={}", runOrder, e);
+			log.error("Cannot check if the states are ok for the run for runorder={}. Execution order map={}.", runOrder, this.getExecutionOrderMap(), e);
 			throw new Exception(e.getMessage());
 		}
 
@@ -392,20 +403,25 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * 
 	 * @param name
 	 * @param order
+	 * @throws Exception
 	 */
-	private void putCodeletExecutionOrder(String name, int order) {
+	private void putCodeletExecutionOrder(String name, int order) throws Exception {
+		if (order < 0) {
+			throw new Exception("Execution order must be > 0. Current execution order=" + order);
+		}
+
 		if (this.getExecutionOrderMap().containsKey(order)) {
 			//Add to existing list
-			//synchronized (this.executionOrderMap) {
-			this.executionOrderMap.get(order).add(name);
-			//}
+			synchronized (this.executionOrderMap) {
+				this.executionOrderMap.get(order).add(name);
+			}
 
 			log.debug("Add codelet={} to existing order={}", name, order);
 		} else {
 			//Create new list
-			//synchronized (this.executionOrderMap) {
-			this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
-			//}
+			synchronized (this.executionOrderMap) {
+				this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
+			}
 			log.debug("Create new order for codelet={} with order={}", name, order);
 		}
 	}
@@ -415,7 +431,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * 
 	 * @param name
 	 */
-	private void removeCodeletExecutionOrder(String name) {
+	private synchronized void removeCodeletExecutionOrder(String name) {
 		Iterator<Entry<Integer, List<String>>> iter = this.getExecutionOrderMap().entrySet().iterator();
 
 		while (iter.hasNext()) {
@@ -435,6 +451,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 */
 	private List<Integer> retrieveExecutionOrder() {
 		List<Integer> result = new ArrayList<>(this.getExecutionOrderMap().keySet());
+
 		return result;
 	}
 
