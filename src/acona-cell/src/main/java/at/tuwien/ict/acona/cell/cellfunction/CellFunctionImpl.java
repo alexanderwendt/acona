@@ -239,7 +239,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 			//Execute general deregister
 			this.getCell().getFunctionHandler().deregisterActivatorInstance(this.getFunctionName());
 			//this.getCell().takeDownCell();
-			log.info("Agent {}> ==== shut down function={} ====", this.getCell().getLocalName(), this.getFunctionName());
+			log.debug("Agent {}> ==== shut down function={} ====", this.getCell().getLocalName(), this.getFunctionName());
 		} catch (Exception e) {
 			log.error("No clean shutdown possible", e);
 		}

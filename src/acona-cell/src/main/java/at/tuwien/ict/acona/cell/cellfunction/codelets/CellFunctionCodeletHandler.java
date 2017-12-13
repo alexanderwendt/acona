@@ -2,13 +2,14 @@ package at.tuwien.ict.acona.cell.cellfunction.codelets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	//private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
-	private final Map<Integer, List<String>> executionOrderMap = new TreeMap<>(new Comparator<Integer>() {
+	private final Map<Integer, List<String>> executionOrderMap = new ConcurrentSkipListMap<>(new Comparator<Integer>() {
 
 		@Override
 		public int compare(Integer o1, Integer o2) {
@@ -266,14 +267,16 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			log.debug("Map:{}", this.getExecutionOrderMap());
 			List<String> names = this.getExecutionOrderMap().get(runOrder);
 			if (names == null) {
-				log.warn("For runorder={}, names={}.", runOrder, names);
-			}
-			for (String codelet : names) {
-				if (this.getCodeletMap().get(codelet).equals(ServiceState.FINISHED) == false) {
-					result = false;
-					break;
+				log.error("For runorder={}, names={}, there are no codelets registered. This is a possible sync-bug.", runOrder, names);
+			} else {
+				for (String codelet : names) {
+					if (this.getCodeletMap().get(codelet).equals(ServiceState.FINISHED) == false) {
+						result = false;
+						break;
+					}
 				}
 			}
+
 		} catch (Exception e) {
 			log.error("Cannot check if the states are ok for the run for runorder={}. Execution order map={}.", runOrder, this.getExecutionOrderMap(), e);
 			throw new Exception(e.getMessage());
@@ -412,16 +415,16 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		if (this.getExecutionOrderMap().containsKey(order)) {
 			//Add to existing list
-			synchronized (this.executionOrderMap) {
-				this.executionOrderMap.get(order).add(name);
-			}
+			//synchronized (this.executionOrderMap) {
+			this.executionOrderMap.get(order).add(name);
+			//}
 
 			log.debug("Add codelet={} to existing order={}", name, order);
 		} else {
 			//Create new list
-			synchronized (this.executionOrderMap) {
-				this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
-			}
+			//synchronized (this.executionOrderMap) {
+			this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
+			//}
 			log.debug("Create new order for codelet={} with order={}", name, order);
 		}
 	}
@@ -460,8 +463,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * 
 	 * @return
 	 */
-	protected synchronized Map<Integer, List<String>> getExecutionOrderMap() {
-		return executionOrderMap;
+	protected Map<Integer, List<String>> getExecutionOrderMap() {
+		return Collections.unmodifiableMap(executionOrderMap);
 	}
 
 	/**

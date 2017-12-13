@@ -121,7 +121,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 					result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 					break;
 				default:
-					throw new Exception("Method name " + parameterdata.getMethod() + " unknown");
+					throw new Exception(this.getFunctionName() + ">Method name " + parameterdata.getMethod() + " unknown");
 				}
 			}
 
