@@ -117,7 +117,7 @@ public class Datapoint {
 		return VALUE;
 	}
 
-	public JsonElement getValue(JsonElement defaultValue) {
+	public JsonElement getValueOrDefault(JsonElement defaultValue) {
 
 		JsonElement result = null;
 
