@@ -47,14 +47,14 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
 	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
-	//private String codeletStateDatapointAddress;
+	// private String codeletStateDatapointAddress;
 	private String workingMemoryAddress = "workingmemory";
 	private String internalStateMemoryAddress = "internalmemoryaddress";
 
 	private String resultDatapointAddress = "";
 
 	private final static int METHODTIMEOUT = 20000;
-	//private final static int CODELETHANDLERTIMEOUT = 10000;
+	// private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
 	private final Map<Integer, List<String>> executionOrderMap = new ConcurrentSkipListMap<>(new Comparator<Integer>() {
@@ -65,12 +65,12 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 	});
 
-	private int currentRunOrder = -1; //-1 for starting mode
+	private int currentRunOrder = -1; // -1 for starting mode
 
 	@Override
 	protected synchronized void cellFunctionThreadInit() throws Exception {
-		//this.resultDatapointAddress = this.getFunctionName() + "." + "result";
-		//this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
+		// this.resultDatapointAddress = this.getFunctionName() + "." + "result";
+		// this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
 		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEINTERNALMEMORYADDRESS, internalStateMemoryAddress);
 
@@ -152,40 +152,40 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		if (this.getCodeletMap().containsKey(codeletID) == true) {
 			this.getCodeletMap().put(codeletID, state);
 
-			//Check if all codelets for a certain run order state are ready
+			// Check if all codelets for a certain run order state are ready
 			boolean isRunOrderStateReady = false;
 			if (this.getCurrentRunOrder() >= 0) {
 				isRunOrderStateReady = this.isRunOrderStateReady(this.getCurrentRunOrder());
 			}
 
 			boolean isCurrentRunOrderLast = false;
-			//			if (this.getNextRunOrderState(this.getCurrentRunOrder()) == -1) { //Run order has reached the end
-			//				isCurrentRunOrderLast = true;
-			//			}
+			// if (this.getNextRunOrderState(this.getCurrentRunOrder()) == -1) { //Run order has reached the end
+			// isCurrentRunOrderLast = true;
+			// }
 
 			log.debug("Codelet={} updated its state to state={}", codeletID, state);
 			log.debug("Current states of codelets={}. Current run execution={}", this.getCodeletMap(), this.getCurrentRunOrder());
 
-			//If the current run order state is ready, increment it
+			// If the current run order state is ready, increment it
 			if (isRunOrderStateReady == true) {
 				int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
 				this.setCurrentRunOrder(nextRunOrder);
-				if (this.getCurrentRunOrder() == -1) { //Run order has reached the end
+				if (this.getCurrentRunOrder() == -1) { // Run order has reached the end
 					isCurrentRunOrderLast = true;
 
-					//Write finish notification
-					//log.debug("write finished codelet");
-					//this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
+					// Write finish notification
+					// log.debug("write finished codelet");
+					// this.writeLocal(Datapoints.newDatapoint(this.resultDatapointAddress).setValue(CommVocabulary.ACKNOWLEDGEVALUE));
 					this.setServiceState(ServiceState.FINISHED);
 					log.debug("Codelet handler finished and has written state finished to datapoint address={}", this.addServiceName(STATESUFFIX));
-					//this.setServiceState(ServiceState.IDLE);
+					// this.setServiceState(ServiceState.IDLE);
 				} else {
 					log.debug("The next codelet run can start");
 					this.setStart();
 				}
 			}
 
-			//Write the current state of the system
+			// Write the current state of the system
 			Datapoint handlerState = getExtendedState();
 			log.debug("write handerstate={}", handlerState);
 			this.writeLocal(handlerState);
@@ -210,8 +210,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				}
 			}
 
-			//TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
-			//TODO: The nullpointer chunk shall not need any try-catch
+			// TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
+			// TODO: The nullpointer chunk shall not need any try-catch
 
 			result.setValue(systemState.toJsonObject());
 		} catch (Exception e) {
@@ -224,21 +224,21 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	@Override
 	protected void executeFunction() throws Exception {
-		//Load all codelets to execute, i.e. only the codelets that shall run in parallel, get the map
+		// Load all codelets to execute, i.e. only the codelets that shall run in parallel, get the map
 		log.debug("Start running the run order={} of total run orders={}", this.getCurrentRunOrder(), this.retrieveExecutionOrder());
 
-		//Check that all codelets are ready (it shall always be true, else there is an error)
+		// Check that all codelets are ready (it shall always be true, else there is an error)
 		boolean runAllowed = this.isRunOrderStateReady(this.getCurrentRunOrder());
 
 		if (runAllowed == false) {
 			log.warn("Not all codelets are ready to run. States={}", this.getCodeletMap());
 		} else {
-			//For each, send a message to start in parallel
+			// For each, send a message to start in parallel
 			this.getExecutionOrderMap().get(this.currentRunOrder).forEach((k) -> {
 				String agentName = k.split(":")[0];
 				String functionName = k.split(":")[1];
-				//				List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
-				//						Datapoints.newDatapoint(KEYMETHOD).setValue(EXECUTECODELETMETHODNAME)));
+				// List<Datapoint> methodParameters = new ArrayList<>(Arrays.asList(
+				// Datapoints.newDatapoint(KEYMETHOD).setValue(EXECUTECODELETMETHODNAME)));
 				try {
 					JsonRpcRequest request = new JsonRpcRequest(EXECUTECODELETMETHODNAME, 0);
 
@@ -254,8 +254,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	/**
-	 * The if the codelets for a certain run order are ready to execute. Return
-	 * true if all codelets are idle.
+	 * The if the codelets for a certain run order are ready to execute. Return true if all codelets are
+	 * idle.
 	 * 
 	 * @param runOrder
 	 * @return
@@ -267,7 +267,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			log.debug("Map:{}", this.getExecutionOrderMap());
 			List<String> names = this.getExecutionOrderMap().get(runOrder);
 			if (names == null) {
-				log.error("For runorder={}, names={}, there are no codelets registered. This is a possible sync-bug.", runOrder, names);
+				log.error("For runorder={}, names={}, there are no codelets registered. This is a possible sync-bug. Registered codelets={}", runOrder, names, this.codeletMap);
 			} else {
 				for (String codelet : names) {
 					if (this.getCodeletMap().get(codelet).equals(ServiceState.FINISHED) == false) {
@@ -311,7 +311,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private int getNextRunOrderState(int runOrder) {
 		int nextValue = -1;
 
-		if (runOrder < 0) { //Beginning
+		if (runOrder < 0) { // Beginning
 			nextValue = this.retrieveExecutionOrder().get(0);
 		} else {
 			int currentIndex = this.retrieveExecutionOrder().indexOf(runOrder);
@@ -353,28 +353,28 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	public synchronized boolean startCodeletHandler(boolean isBlocking) throws Exception {
 		boolean isAllowedToRun = false;
 
-		//Check if the whole system is ready
+		// Check if the whole system is ready
 		try {
-			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1 && this.executionOrderMap.isEmpty() == false; //if all codelets are idle and runorder is reset
+			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1 && this.executionOrderMap.isEmpty() == false; // if all codelets are idle and runorder is reset
 
 			if (isAllowedToRun == true) {
 				log.debug("All codelets are in state FINISHED");
-				//Clear the blocker
+				// Clear the blocker
 
-				//Increment to start with the first run order
+				// Increment to start with the first run order
 				int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
 				this.setCurrentRunOrder(nextRunOrder);
 
 				this.setStart();
 
-				//				if (isBlocking) {
-				//					try {
-				//						this.getBlocker().clear();
-				//						boolean runComplete = this.getBlocker().poll(CODELETHANDLERTIMEOUT, TimeUnit.MILLISECONDS);
-				//					} catch (InterruptedException e) {
+				// if (isBlocking) {
+				// try {
+				// this.getBlocker().clear();
+				// boolean runComplete = this.getBlocker().poll(CODELETHANDLERTIMEOUT, TimeUnit.MILLISECONDS);
+				// } catch (InterruptedException e) {
 				//
-				//					}
-				//				}
+				// }
+				// }
 			} else {
 				this.getCodeletMap().entrySet().forEach(entry -> {
 					if (entry.getValue().equals(ServiceState.RUNNING)) {
@@ -382,7 +382,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 					}
 				});
 				log.warn("{}>Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getFunctionName(), this.getCodeletMap());
-				//Write finish notification
+				// Write finish notification
 				this.setServiceState(ServiceState.FINISHED);
 
 			}
@@ -414,17 +414,17 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 
 		if (this.getExecutionOrderMap().containsKey(order)) {
-			//Add to existing list
-			//synchronized (this.executionOrderMap) {
+			// Add to existing list
+			// synchronized (this.executionOrderMap) {
 			this.executionOrderMap.get(order).add(name);
-			//}
+			// }
 
 			log.debug("Add codelet={} to existing order={}", name, order);
 		} else {
-			//Create new list
-			//synchronized (this.executionOrderMap) {
+			// Create new list
+			// synchronized (this.executionOrderMap) {
 			this.executionOrderMap.put(order, new ArrayList<>(Arrays.asList(name)));
-			//}
+			// }
 			log.debug("Create new order for codelet={} with order={}", name, order);
 		}
 	}
