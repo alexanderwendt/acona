@@ -2,6 +2,7 @@ package at.tuwien.ict.acona.jadelauncher.util;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,11 +22,9 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
 /**
- * This is a wrapper class for all types of jade initialization. it starts
- * agents and containers
+ * This is a wrapper class for all types of jade initialization. it starts agents and containers
  * 
  * @author wendt
- *
  */
 public class KoreExternalControllerImpl implements KoreExternalController {
 
@@ -37,18 +36,18 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	/**
 	 * Map with container name and ContainerController
 	 */
-	private final Map<String, ContainerController> agentContainerMap = new ConcurrentHashMap<String, ContainerController>();
+	private final Map<String, ContainerController> agentContainerMap = new ConcurrentHashMap<>();
 	/**
 	 * Map with all agent controllers from JADE
 	 */
-	private final Map<String, AgentController> agentControllerMap = new ConcurrentHashMap<String, AgentController>();
-	private final Map<String, CellGatewayImpl> externalAgentControllerMap = new ConcurrentHashMap<String, CellGatewayImpl>();
+	private final Map<String, AgentController> agentControllerMap = new ConcurrentHashMap<>();
+	private final Map<String, CellGatewayImpl> externalAgentControllerMap = new ConcurrentHashMap<>();
 
 	private String topController = "";
 
-	private final Map<String, CellGateway> controllerAgents = new ConcurrentHashMap<String, CellGateway>();
-	private final Map<String, CellGateway> serviceAgents = new ConcurrentHashMap<String, CellGateway>();
-	private final Map<String, CellGateway> memoryAgents = new ConcurrentHashMap<String, CellGateway>();
+	private final Map<String, CellGateway> controllerAgents = new ConcurrentHashMap<>();
+	private final Map<String, CellGateway> serviceAgents = new ConcurrentHashMap<>();
+	private final Map<String, CellGateway> memoryAgents = new ConcurrentHashMap<>();
 
 	private String defaultContainer = "";
 
@@ -126,8 +125,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 		args[0] = cellConfig;
 		args[1] = externalController;
 
-		AgentController agentController = this.communicatorUtil.createAgent(cellConfig.getName(),
-				cellConfig.getClassToInvoke(), args, this.getContainerController(defaultContainer));
+		AgentController agentController = this.communicatorUtil.createAgent(cellConfig.getName(), cellConfig.getClassToInvoke(), args, this.getContainerController(defaultContainer));
 		this.agentControllerMap.put(cellConfig.getName(), agentController);
 		this.externalAgentControllerMap.put(cellConfig.getName(), externalController);
 
@@ -233,5 +231,9 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	@Override
 	public CellGateway getControllerAgent(String localName) {
 		return this.controllerAgents.get(localName);
+	}
+
+	public Map<String, CellGatewayImpl> getExternalAgentControllerMap() {
+		return Collections.unmodifiableMap(externalAgentControllerMap);
 	}
 }

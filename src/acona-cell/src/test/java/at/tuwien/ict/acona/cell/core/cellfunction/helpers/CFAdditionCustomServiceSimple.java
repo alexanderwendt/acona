@@ -20,25 +20,28 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 
 	private static Logger log = LoggerFactory.getLogger(CFAdditionCustomServiceSimple.class);
 
-	private final String COMMANDDATAPOINTNAME = "command";
-	private final String STATUSDATAPOINTNAME = "status";
-	private final String OPERAND1 = "operand1";
-	private final String OPERAND2 = "operand2";
-	private final String RESULT = "result";
+	public final String COMMANDDATAPOINTNAME = "command";
+	public final String STATUSDATAPOINTNAME = "status";
+	public final String OPERAND1 = "operand1";
+	public final String OPERAND2 = "operand2";
+	public final String RESULT = "result";
 
 	private final Map<String, DatapointConfig> trackedDatapoints = new HashMap<>();
 
 	private double operand1;
 	private double operand2;
 
-	// private final String inputMemoryAgentName = "InputBufferAgent";
-	// private final String memorydatapoint1 = "inputmemory.variable1"; //put
-	// into memory mock agent
-	// private final String memorydatapoint2 = "inputmemory.variable2"; //put
-	// into memory mock agent
-
 	public CFAdditionCustomServiceSimple() {
 		this.setExecuteOnce(true); // Run only on demand from controller
+	}
+
+	@Override
+	protected void cellFunctionThreadInit() throws Exception {
+		// Add the datapoints from the config to the subscriptions
+		this.trackedDatapoints.put(OPERAND1, DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND1)));
+		this.trackedDatapoints.put(OPERAND2, DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND2)));
+		this.trackedDatapoints.put(RESULT, DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(RESULT)));
+
 	}
 
 	@Override
@@ -65,17 +68,6 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void cellFunctionThreadInit() throws Exception {
-		// Add the datapoints from the config to the subscriptions
-		this.trackedDatapoints.put(OPERAND1,
-				DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND1)));
-		this.trackedDatapoints.put(OPERAND2,
-				DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(OPERAND2)));
-		this.trackedDatapoints.put(RESULT, DatapointConfig.newConfig(this.getFunctionConfig().getPropertyAsJsonObject(RESULT)));
-
-	}
-
-	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		// Set status that process is finished. Use it to release subscriptions
 		this.getCommunicator().write(DatapointBuilder.newDatapoint(STATUSDATAPOINTNAME).setValue(ServiceState.FINISHED.toString()));
@@ -92,7 +84,7 @@ public class CFAdditionCustomServiceSimple extends CellFunctionThreadImpl {
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
 		// React on the start trigger
-		//JsonElement value = data.get(COMMANDDATAPOINTNAME).getValue();
+		// JsonElement value = data.get(COMMANDDATAPOINTNAME).getValue();
 		if (data.containsKey(COMMANDDATAPOINTNAME) && data.get(COMMANDDATAPOINTNAME).getValue().isJsonPrimitive() == true) {
 			try {
 				this.setCommand(data.get(COMMANDDATAPOINTNAME).getValue().getAsString());

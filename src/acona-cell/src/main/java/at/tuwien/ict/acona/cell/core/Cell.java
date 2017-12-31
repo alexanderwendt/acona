@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.cell.core;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
@@ -21,16 +19,14 @@ public interface Cell {
 	public DataStorage getDataStorage();
 
 	/**
-	 * Get activation handler for all activations, which control the cell
-	 * internal bahviours
+	 * Get activation handler for all activations, which control the cell internal bahviours
 	 * 
 	 * @return activation handler
 	 */
 	public CellFunctionHandler getFunctionHandler();
 
 	/**
-	 * Get subscription handler to register, deregister or activate subscribed
-	 * datapoints
+	 * Get subscription handler to register, deregister or activate subscribed datapoints
 	 * 
 	 * @return
 	 */
@@ -55,7 +51,7 @@ public interface Cell {
 	 * 
 	 * @return
 	 */
-	public JsonObject getConfiguration();
+	public CellConfig getConfiguration();
 
 	/**
 	 * Proxy from JADE agent to add a JADE behaviour
@@ -65,8 +61,8 @@ public interface Cell {
 	public void addBehaviour(Behaviour b);
 
 	/**
-	 * Reset current cellinternal behaviours and activators and setup new cell
-	 * behaviours. It is a reset with new cell behaviours
+	 * Reset current cellinternal behaviours and activators and setup new cell behaviours. It is a reset
+	 * with new cell behaviours
 	 * 
 	 * @param conf:
 	 *            Valid JsonObject for cells

@@ -8,7 +8,7 @@ import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 public class DatapointConfig {
 	public final static String LOCALAGENTNAME = "";
-	//public final static SyncMode DEFAULTSYNCMODE = SyncMode.READONLY;
+	// public final static SyncMode DEFAULTSYNCMODE = SyncMode.READONLY;
 
 	public static final String ID = "id";
 	public static final String ADDRESS = "address";
@@ -22,12 +22,13 @@ public class DatapointConfig {
 
 	private final JsonObject configObject;
 
-	//	public static DatapointConfig newConfig(String name, String address) {
-	//		return new DatapointConfig(name, address, LOCALAGENTNAME, DEFAULTSYNCMODE);
-	//	}
+	// public static DatapointConfig newConfig(String name, String address) {
+	// return new DatapointConfig(name, address, LOCALAGENTNAME, DEFAULTSYNCMODE);
+	// }
 
 	public static DatapointConfig newConfig(String name, String address, SyncMode syncmode) {
-		return new DatapointConfig(name, address, LOCALAGENTNAME, syncmode);
+		Datapoint dp = DatapointBuilder.newDatapoint(address);
+		return new DatapointConfig(name, dp.getAddress(), dp.getAgent(LOCALAGENTNAME), syncmode);
 	}
 
 	public static synchronized DatapointConfig newConfig(String name, String address, String agentid, SyncMode syncmode) {
@@ -86,9 +87,8 @@ public class DatapointConfig {
 	}
 
 	/**
-	 * Return the destination agentid. Compare the local agent id with the
-	 * destination id. If the default value "" is used, it means that the
-	 * destination should be the local agent
+	 * Return the destination agentid. Compare the local agent id with the destination id. If the
+	 * default value "" is used, it means that the destination should be the local agent
 	 * 
 	 * @param callerAgentName
 	 * @return
@@ -103,17 +103,17 @@ public class DatapointConfig {
 		return agentName;
 	}
 
-	//	private boolean hasAgentId() {
-	//		String agentName = this.configObject.get(AGENTID).getAsString();
+	// private boolean hasAgentId() {
+	// String agentName = this.configObject.get(AGENTID).getAsString();
 	//
-	//		boolean result = true;
+	// boolean result = true;
 	//
-	//		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
-	//			result = false;
-	//		}
+	// if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
+	// result = false;
+	// }
 	//
-	//		return result;
-	//	}
+	// return result;
+	// }
 
 	public SyncMode getSyncMode() {
 		return SyncMode.valueOf(this.configObject.get(SYNCMODE).getAsString());
@@ -137,7 +137,7 @@ public class DatapointConfig {
 		String destinationAgent = this.getAgentid(defaultAgentName);
 		String address = this.getAddress();
 
-		//Generate key for the internal activator
+		// Generate key for the internal activator
 		String key = destinationAgent + ":" + address;
 
 		return key;

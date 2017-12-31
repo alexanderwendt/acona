@@ -6,8 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
@@ -68,14 +66,13 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	@Override
-	public JsonObject getConfiguration() {
+	public CellConfig getConfiguration() {
 		// Deepcopy through serialization
-		return this.conf.toJsonObject();
+		return this.conf;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see jade.core.Agent#setup()
 	 */
 	@Override
@@ -111,10 +108,10 @@ public class CellImpl extends Agent implements CellInitialization {
 			// Create communication
 			this.comm = new CommunicatorImpl(this);
 
-			//Init function handler
+			// Init function handler
 			this.functionHandler.init(this);
 
-			//Init subscription handler
+			// Init subscription handler
 			this.subscriptionHandler.init(functionHandler, this.getLocalName());
 
 			// Create notifications
@@ -161,7 +158,7 @@ public class CellImpl extends Agent implements CellInitialization {
 				// controller = ((CellInspectorController)args[0]); //Mode=0:
 				// return message in return message, Mode=1: append
 				// returnmessage, mode=2: return incoming message
-				//log.debug("agent will use an inspector as controller");
+				// log.debug("agent will use an inspector as controller");
 
 				// Init internally with local variables
 				internalInit();
@@ -197,7 +194,6 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see jade.core.Agent#takeDown()
 	 */
 	@Override
@@ -248,16 +244,14 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	/**
 	 * Convenience function to access the arguments provided to the agent via
-	 * {@link Agent#getArguments()} in a typesafe manner. Note: the argument is
-	 * cast from the Object stored in the object array provided on agent
-	 * generation
+	 * {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast from the Object
+	 * stored in the object array provided on agent generation
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
 	 * @param type
 	 *            The type of the requested argument
-	 * @return The argument at the given {@code index}, cast to the given
-	 *         {@code type}
+	 * @return The argument at the given {@code index}, cast to the given {@code type}
 	 */
 	protected <TYPE> TYPE getArgument(int index, Class<TYPE> type) {
 		if (getArguments() == null) {
@@ -278,23 +272,20 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Convenience function to access a List provided to the agent via
-	 * {@link Agent#getArguments()} in a typesafe manner. The provided type is
-	 * the type of the objects contained in the list. For example: if argument
-	 * #1 is of type {@code List<ACLMessage>} then the call would look like
-	 * this: {@code List
-	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each
-	 * argument is cast from Object to the type stored in the list Also Note:
-	 * this method can not provide additional type checking for further
-	 * containers within the list and does not support other container types
-	 * than list
+	 * Convenience function to access a List provided to the agent via {@link Agent#getArguments()} in a
+	 * typesafe manner. The provided type is the type of the objects contained in the list. For example:
+	 * if argument #1 is of type {@code List<ACLMessage>} then the call would look like this:
+	 * {@code List
+	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each argument is cast from
+	 * Object to the type stored in the list Also Note: this method can not provide additional type
+	 * checking for further containers within the list and does not support other container types than
+	 * list
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
 	 * @param type
 	 *            The content type of the requested list
-	 * @return The argument at the given {@code index}, cast to a list of the
-	 *         given {@code type}
+	 * @return The argument at the given {@code index}, cast to a list of the given {@code type}
 	 */
 	protected <TYPE> List<TYPE> getArgumentList(int index, Class<TYPE> type) {
 		List<TYPE> result = new ArrayList<>();
@@ -311,8 +302,8 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Shortcut method used to access the argument at the given {@code index} as
-	 * string This method calls: {@code getArgument(index, String.class)}
+	 * Shortcut method used to access the argument at the given {@code index} as string This method
+	 * calls: {@code getArgument(index, String.class)}
 	 * 
 	 * @param index
 	 * @return
@@ -322,9 +313,8 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Shortcut method used to access the argument list at the given
-	 * {@code index} as list of strings This method calls:
-	 * {@code getArgumentList(index, String.class)}
+	 * Shortcut method used to access the argument list at the given {@code index} as list of strings
+	 * This method calls: {@code getArgumentList(index, String.class)}
 	 * 
 	 * @param index
 	 * @return

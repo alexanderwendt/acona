@@ -14,6 +14,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 
 public class CellFunctionConfig {
 	public static final String CELLFUNCTIONNAME = "functionname";
@@ -21,10 +23,10 @@ public class CellFunctionConfig {
 	public static final String CELLMANAGEDDATAPOINTS = "syncdatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
-	public static final String CELLFINISHSTATEAFTERSINGLERUN = "finishstatftersinglerun"; //This variable can only be set in the code
+	public static final String CELLFINISHSTATEAFTERSINGLERUN = "finishstatftersinglerun"; // This variable can only be set in the code
 	public static final String GENERATERESPONDER = "generateresponder";
 	public static final String RESPONDERPROTOCOL = "responderprotocol";
-	//public static final String REGISTERSTATE = "registerstate";
+	// public static final String REGISTERSTATE = "registerstate";
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
 
@@ -53,8 +55,7 @@ public class CellFunctionConfig {
 	}
 
 	/**
-	 * Config, where the function name is the class name for a simple class +
-	 * hashcode
+	 * Config, where the function name is the class name for a simple class + hashcode
 	 * 
 	 * @param clzz
 	 * @return
@@ -210,16 +211,16 @@ public class CellFunctionConfig {
 		return this.getProperty(RESPONDERPROTOCOL, "");
 	}
 
-	//	public JsonPrimitive getRegisterState() {
-	//		return this.configObject.getAsJsonPrimitive(REGISTERSTATE);
-	//	}
+	// public JsonPrimitive getRegisterState() {
+	// return this.configObject.getAsJsonPrimitive(REGISTERSTATE);
+	// }
 
-	//	public CellFunctionConfig setRegisterState(boolean registerState) {
-	//		this.configObject.addProperty(REGISTERSTATE, registerState);
-	//		return this;
-	//	}
+	// public CellFunctionConfig setRegisterState(boolean registerState) {
+	// this.configObject.addProperty(REGISTERSTATE, registerState);
+	// return this;
+	// }
 
-	//======================//
+	// ======================//
 
 	/**
 	 * @param name
@@ -406,7 +407,8 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public CellFunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
-		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, "", syncMode));
+		Datapoint dp = DatapointBuilder.newDatapoint(address);
+		return this.addManagedDatapoint(DatapointConfig.newConfig(id, dp.getAddress(), dp.getAgent(""), syncMode));
 	}
 
 	/**

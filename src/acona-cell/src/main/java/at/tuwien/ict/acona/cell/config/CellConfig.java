@@ -80,7 +80,7 @@ public class CellConfig {
 		this.setName(name).setClassName(className);
 		this.configObject.add(CELLFUNCTIONS, new JsonArray());
 
-		//Add basic cell functions. Then nothing has to be generated in the code
+		// Add basic cell functions. Then nothing has to be generated in the code
 		this.addBasicCellFunctions();
 	}
 
@@ -99,7 +99,7 @@ public class CellConfig {
 	 * @param name
 	 * @return
 	 */
-	private CellConfig setName(String name) {
+	public CellConfig setName(String name) {
 		this.configObject.addProperty(CELLNAME, name);
 		return this;
 	}
@@ -278,7 +278,6 @@ public class CellConfig {
 	 * Get cell config as Json object
 	 * 
 	 * @return
-	 * 
 	 */
 	public JsonObject toJsonObject() {
 		return this.configObject;

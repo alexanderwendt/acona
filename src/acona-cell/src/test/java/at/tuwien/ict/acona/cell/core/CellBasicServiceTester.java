@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,9 +22,11 @@ import com.google.gson.reflect.TypeToken;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFDataStorageUpdate;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFQuery;
+import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFSimpleReproduction;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
+import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFIncrementService;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SingleNotificationReceiver;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.TimeRegisterFunction;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -111,8 +115,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * First write a value, then read the same value. The test is passed if the
-	 * read value is equal to the original one.
+	 * First write a value, then read the same value. The test is passed if the read value is equal to
+	 * the original one.
 	 */
 	@Test
 	public void executeAsWriteTest() {
@@ -135,24 +139,24 @@ public class CellBasicServiceTester {
 			}
 
 			List<Datapoint> parameter = new ArrayList<>();
-			//parameter.add(Datapoint.newDatapoint("method").setValue("write"));
+			// parameter.add(Datapoint.newDatapoint("method").setValue("write"));
 
 			List<Datapoint> sendList = new ArrayList<>();
 			sendList.add(DatapointBuilder.newDatapoint(datapointaddress).setValue(value));
 			JsonRpcRequest req = new JsonRpcRequest("write", 1);
 			req.setParameterAsList(0, sendList);
 
-			//JsonArray array = GsonUtils.convertListToJsonArray(sendList);
-			//parameter.add(Datapoint.newDatapoint("datapoints").setValue(array));
+			// JsonArray array = GsonUtils.convertListToJsonArray(sendList);
+			// parameter.add(Datapoint.newDatapoint("datapoints").setValue(array));
 
-			//Execute read method
+			// Execute read method
 			client.getCommunicator().execute(receiver, "write", req, 100000);
 			client.getCommunicator().execute(receiver, "write", req, 100000);
 			client.getCommunicator().execute(receiver, "write", req, 100000);
 			client.getCommunicator().execute(receiver, "write", req, 100000);
 
-			//List<Datapoint> parameter2 = new ArrayList<>();
-			//parameter2.add(Datapoint.newDatapoint("method").setValue("read"));
+			// List<Datapoint> parameter2 = new ArrayList<>();
+			// parameter2.add(Datapoint.newDatapoint("method").setValue("read"));
 
 			List<String> sendList2 = new ArrayList<>();
 			sendList2.add(datapointaddress);
@@ -161,10 +165,10 @@ public class CellBasicServiceTester {
 
 			JsonRpcResponse resultdp = client.getCommunicator().execute(receiver, "read", req2, 100000);
 
-			//Datapoint resultdp = client.getCell().getCommunicator().read(datapointaddress, receiver, 10000000);
+			// Datapoint resultdp = client.getCell().getCommunicator().read(datapointaddress, receiver,
+			// 10000000);
 
-			String result = resultdp.getResult(new TypeToken<List<Datapoint>>() {
-			}).get(0).getValueAsString();
+			String result = resultdp.getResult(new TypeToken<List<Datapoint>>() {}).get(0).getValueAsString();
 			log.info("Received result={}. Expected result={}", result, value);
 
 			synchronized (this) {
@@ -184,8 +188,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * First write a value, then read the same value. The test is passed if the
-	 * read value is equal to the original one.
+	 * First write a value, then read the same value. The test is passed if the read value is equal to
+	 * the original one.
 	 */
 	@Test
 	public void writeAndReadTest() {
@@ -235,10 +239,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at the publisher. A value is injected
-	 * into the publisher and the subscriber gets notified.
-	 * 
-	 * Test is passed if the value written to the publisher is the same as the
+	 * A subscriber subscribes a value at the publisher. A value is injected into the publisher and the
+	 * subscriber gets notified. Test is passed if the value written to the publisher is the same as the
 	 * notified value at the subscriber.
 	 */
 	@Test
@@ -276,8 +278,9 @@ public class CellBasicServiceTester {
 			cellControlPublisher.getCommunicator().write(DatapointBuilder.newDatapoint(datapointaddress).setValue(value1));
 			log.debug("Get database of publisher={}. Database of subscriber={}", cellControlPublisher.getDataStorage(), cellControlSubscriber.getDataStorage());
 
-			//List<Datapoint> originalValue = cellControlSubscriber.subscribeForeignDatapoint(address, agentName);
-			//cellControlSubscriber.getCommunicator().write(originalValue);
+			// List<Datapoint> originalValue = cellControlSubscriber.subscribeForeignDatapoint(address,
+			// agentName);
+			// cellControlSubscriber.getCommunicator().write(originalValue);
 
 			log.debug("Get database of publisher={}, data storage of subscriber={}", cellControlPublisher.getDataStorage(), cellControlSubscriber.getDataStorage());
 			// log.debug("Registered subscribers = {}",
@@ -320,12 +323,9 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at a publisher. The value is changed at
-	 * the publisher. Then unsubscribe is executed. A secaond value is written
-	 * into the publisher.
-	 * 
-	 * The test is passed if the value of the subscriber is the first written
-	 * value into the publisher.
+	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then
+	 * unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the
+	 * value of the subscriber is the first written value into the publisher.
 	 */
 	@Test
 	public void externalUnsubscribeNotifyTest() {
@@ -362,10 +362,10 @@ public class CellBasicServiceTester {
 
 			// Set init value
 			cellControlPublisher.writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value1));
-			//log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
+			// log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 
 			// Subscribe a datapoint of the publisher agent
-			//cellControlSubscriber.subscribeForeignDatapoint(datapointaddress, publisherAgentName);
+			// cellControlSubscriber.subscribeForeignDatapoint(datapointaddress, publisherAgentName);
 
 			synchronized (this) {
 				try {
@@ -425,12 +425,9 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at a publisher. The value is changed at
-	 * the publisher. Then unsubscribe is executed. A secaond value is written
-	 * into the publisher.
-	 * 
-	 * The test is passed if the value of the subscriber is the first written
-	 * value into the publisher.
+	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then
+	 * unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the
+	 * value of the subscriber is the first written value into the publisher.
 	 */
 	@Test
 	public void internalsubscribeNotifyTest() {
@@ -465,13 +462,13 @@ public class CellBasicServiceTester {
 			cellControlPublisher.getCommunicator().setDefaultTimeout(20000);
 
 			// Set init value
-			//cellControlPublisher.writeLocalDatapoint(Datapoint.newDatapoint(datapointaddress).setValue(value1));
-			//log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
+			// cellControlPublisher.writeLocalDatapoint(Datapoint.newDatapoint(datapointaddress).setValue(value1));
+			// log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getDataStorage());
 
 			// Subscribe a datapoint of the publisher agent
-			//cellControlSubscriber.subscribeForeignDatapoint(datapointaddress, publisherAgentName);
+			// cellControlSubscriber.subscribeForeignDatapoint(datapointaddress, publisherAgentName);
 
 			synchronized (this) {
 				try {
@@ -497,7 +494,8 @@ public class CellBasicServiceTester {
 			}
 
 			// Unsubscribe
-			//cellControlSubscriber.getCell().getCommunicator().unsubscribe(datapointaddress, publisherAgentName);
+			// cellControlSubscriber.getCell().getCommunicator().unsubscribe(datapointaddress,
+			// publisherAgentName);
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
@@ -531,14 +529,11 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at a publisher. The value is changed at
-	 * the publisher. Then unsubscribe is executed. A secaond value is written
-	 * into the publisher.
-	 * 
-	 * The test is passed if the value of the subscriber is the first written
-	 * value into the publisher.
+	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then
+	 * unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the
+	 * value of the subscriber is the first written value into the publisher.
 	 */
-	//@Test
+	// @Test
 	public void internalfailedsubscribeTest() {
 		// int minWaitTime = 10;
 		// Create 2 agents. One shall subscribe the other. One shall be written
@@ -577,12 +572,13 @@ public class CellBasicServiceTester {
 			}
 
 			// Unsubscribe
-			//cellControlSubscriber.getCell().getCommunicator().unsubscribe(datapointaddress, publisherAgentName);
+			// cellControlSubscriber.getCell().getCommunicator().unsubscribe(datapointaddress,
+			// publisherAgentName);
 
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
-			//cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value2));
-			//log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
+			// cellControlPublisher.writeLocalDatapoint(Datapoints.newDatapoint(datapointaddress).setValue(value2));
+			// log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Get database of subscriber={}", cellControlSubscriber.getDataStorage());
 
 			synchronized (this) {
@@ -595,7 +591,7 @@ public class CellBasicServiceTester {
 
 			// Check if value was updated in subscribercell
 
-			//log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
+			// log.debug("Get database of publisher={}", cellControlPublisher.getDataStorage());
 			log.debug("Datastorage of subscribercell={}", cellControlSubscriber.getDataStorage());
 
 			String answer = cellControlSubscriber.readLocalDatapoint(datapointaddress).getValue().getAsString();// JsonMessage.getBody(result).get(datapointaddress).getAsString();
@@ -611,15 +607,10 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * Instantiate 3 or more agents. Agent n subscribes a datapoint from agent
-	 * n-1. In agent 0, a value is set and propagated through the system to
-	 * agent n.
-	 * 
-	 * This value is measured and checked if it is the input value.
-	 * 
-	 * The test is passed if input value of the system is equal to the value of
-	 * the last agent.
-	 * 
+	 * Instantiate 3 or more agents. Agent n subscribes a datapoint from agent n-1. In agent 0, a value
+	 * is set and propagated through the system to agent n. This value is measured and checked if it is
+	 * the input value. The test is passed if input value of the system is equal to the value of the
+	 * last agent.
 	 */
 	@Test
 	public void massOfSubscribersTest() {
@@ -655,7 +646,7 @@ public class CellBasicServiceTester {
 
 			}
 
-			//Add special time function
+			// Add special time function
 			CellGatewayImpl timeRegister = this.launchUtil.createAgent(CellConfig.newConfig("TimeRegister")
 					.addCellfunction(CellFunctionConfig.newConfig("TimeRegisterFunction", TimeRegisterFunction.class)
 							.addManagedDatapoint("STOPTIME", datapointaddress, agentNameTemplate + (numberOfAgents - 1), SyncMode.SUBSCRIBEONLY)));
@@ -670,27 +661,28 @@ public class CellBasicServiceTester {
 				}
 			}
 
-			//			// Set subscriptions
-			//			for (int i = 1; i < numberOfAgents; i++) {
-			//				CellGatewayImpl thisController = inspectors.get(i);
-			//				CellGatewayImpl previousController = inspectors.get(i - 1);
+			// // Set subscriptions
+			// for (int i = 1; i < numberOfAgents; i++) {
+			// CellGatewayImpl thisController = inspectors.get(i);
+			// CellGatewayImpl previousController = inspectors.get(i - 1);
 			//
-			//				//thisController.subscribeForeignDatapoint(datapointaddress, previousController.getCell().getLocalName());
-			//			}
+			// //thisController.subscribeForeignDatapoint(datapointaddress,
+			// previousController.getCell().getLocalName());
+			// }
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(10000);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(10000);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 
 			// Set the first value and let the chain update itself
 			// Update Datapoint in publisher. It is expected that the subscriber
 			// cell is updated too
 
-			//Start tic
+			// Start tic
 			long starttime = System.currentTimeMillis();
 			log.info("=================Start time measurement: {}=====================", starttime);
 			inspectors.get(0).writeLocalDatapoint(DatapointBuilder.newDatapoint(datapointaddress).setValue(value2));
@@ -729,7 +721,6 @@ public class CellBasicServiceTester {
 
 	/**
 	 * Idea: The agent shall write a datapoint
-	 * 
 	 */
 	@Test
 	public void CFQueryOnOneAgentTester() {
@@ -740,7 +731,7 @@ public class CellBasicServiceTester {
 			double value = 1.3;
 			double expectedResult = value;
 
-			//Create cell
+			// Create cell
 			CellGatewayImpl agent = this.launchUtil.createAgent(CellConfig.newConfig(agentName).addCellfunction(
 					CellFunctionConfig.newConfig(CFDurationThreadTester.class)
 							.addManagedDatapoint(CFDurationThreadTester.queryDatapointID, destinationAddress, "", SyncMode.SUBSCRIBEONLY)
@@ -761,6 +752,86 @@ public class CellBasicServiceTester {
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 
 			assertEquals(result, "FINISHED");
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
+
+	/**
+	 * The agent shall replicate itself. An agent is created. On trigger, the agent creates a copy of
+	 * itself. The test is passed if the second agent also contains a function from the first agent
+	 */
+	@Test
+	public void CFReproduceAgentTester() {
+		try {
+			String agentName = "parentagent";
+			String functionName = "increment";
+			String reproduceFunction = "reproduce";
+			String datapoint = agentName + ":" + "datapoint.test";
+			// String destinationAddress = CFDurationThreadTester.queryDatapointID;
+			// String resultAddress = CFDurationThreadTester.resultDatapointID;
+			// double value = 1.3;
+			// double expectedResult = value;
+
+			// Create cell
+			CellGatewayImpl agent = this.launchUtil.createAgent(CellConfig.newConfig(agentName)
+					.addCellfunction(CellFunctionConfig.newConfig(functionName, CFIncrementService.class)
+							.addManagedDatapoint(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, datapoint, SyncMode.SUBSCRIBEWRITEBACK))
+					.addCellfunction(CellFunctionConfig.newConfig("reproduce", CFSimpleReproduction.class)));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.info("=== All agents initialized ===");
+
+			// Run the first agent
+			agent.getCommunicator().write(DatapointBuilder.newDatapoint(functionName + ".command").setValue("START"));
+
+			// Reproduce the agent
+			agent.getCommunicator().write(DatapointBuilder.newDatapoint(reproduceFunction + ".command").setValue("START"));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			// Run the second agent
+			Map<String, CellGatewayImpl> map = this.launchUtil.getExternalAgentControllerMap();
+			CellGatewayImpl newAgent = null;
+			for (Entry<String, CellGatewayImpl> k : map.entrySet()) {
+				if (k.getKey().equals(agentName) == false) {
+					newAgent = k.getValue();
+					break;
+				}
+			}
+			newAgent.getCommunicator().write(DatapointBuilder.newDatapoint(agentName + ":" + functionName + ".command").setValue("START"));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			log.debug("Values={}", agent.getDataStorage());
+
+			// Read the datapoint value
+
+			double readValue = newAgent.getCommunicator().read(datapoint).getValue().getAsDouble();
+			log.debug("correct value={}, actual value={}", 2.0, readValue);
+
+			assertEquals(2.0, readValue, 0.0);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

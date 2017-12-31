@@ -5,6 +5,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -16,10 +18,16 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 
 	private static Logger log = LoggerFactory.getLogger(CFIncrementService.class);
 
-	//public final static String INCREMENTDATAPOINTATTRIBUTE = "incrementDatapointAddress";
-	public final static String ATTRIBUTEINCREMENTDATAPOINT = "increment"; //This is the key for the actual address
+	// public final static String INCREMENTDATAPOINTATTRIBUTE = "incrementDatapointAddress";
+	public final static String ATTRIBUTEINCREMENTDATAPOINT = "increment"; // This is the key for the actual address
 
 	// private static final String R = "rawdata";
+
+	@Override
+	protected void cellFunctionThreadInit() throws Exception {
+		log.info("Init service={}", this.getFunctionName());
+
+	}
 
 	@Override
 	protected void executeFunction() throws Exception {
@@ -33,8 +41,8 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 		String address = "";
 		try {
 			log.info("{}>Start execution. Local sync datapoints = {}", this.getFunctionName(), this.getSyncDatapointConfigs().keySet());
-			//address = this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress();
-			double value = this.getValueMap().get(ATTRIBUTEINCREMENTDATAPOINT).getValue().getAsDouble();
+			// address = this.getSyncDatapoints().get(ATTRIBUTEINCREMENTDATAPOINT).getAddress();
+			double value = this.getValueMap().get(ATTRIBUTEINCREMENTDATAPOINT).getValueOrDefault(new JsonPrimitive(0.0)).getAsDouble();
 			log.info("Read value={}", value);
 			value++;
 			log.info("New value={}", value);
@@ -50,13 +58,13 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 
-		//Syntax
-		//address: command, value START, STOP, EXIT
-		//get command
-		//if (parameterdata.containsKey("command")) {
+		// Syntax
+		// address: command, value START, STOP, EXIT
+		// get command
+		// if (parameterdata.containsKey("command")) {
 		log.debug("Execute method Setcommand with parameter {}", parameterdata);
 		JsonRpcResponse result = new JsonRpcResponse(parameterdata, this.executeCommandStart().toJsonObject());
-		//}
+		// }
 
 		return result;
 	}
@@ -65,20 +73,20 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 		String message = ServiceState.FINISHED.toString();
 
 		try {
-			//Start the incrementor
+			// Start the incrementor
 			this.setCommand("START");
 
-			//			//Get the blocker
-			//			boolean blockState = false;
-			//			try {
-			//				blockState = this.getBlocker().poll(10000, TimeUnit.MICROSECONDS);
-			//			} catch (InterruptedException e) {
-			//				log.error("Queue interrupted");
-			//			}
+			// //Get the blocker
+			// boolean blockState = false;
+			// try {
+			// blockState = this.getBlocker().poll(10000, TimeUnit.MICROSECONDS);
+			// } catch (InterruptedException e) {
+			// log.error("Queue interrupted");
+			// }
 			//
-			//			if (blockState == false) {
-			//				throw new Exception("Timeout");
-			//			}
+			// if (blockState == false) {
+			// throw new Exception("Timeout");
+			// }
 		} catch (Exception e) {
 			log.error("Error", e);
 			message = ServiceState.ERROR.toString();
@@ -95,15 +103,9 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void cellFunctionThreadInit() throws Exception {
-		log.info("Init service={}", this.getFunctionName());
-
-	}
-
-	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		this.setServiceState(ServiceState.FINISHED);
-		//this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.getCurrentState().toString()));
+		// this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.getCurrentState().toString()));
 
 	}
 

@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.cell.core.helpers;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
@@ -16,13 +14,14 @@ import jade.core.behaviours.Behaviour;
 
 public class DummyCell implements CellInitialization {
 
-	//Genotype configuration
+	// Genotype configuration
 	protected CellConfig conf;
 
-	//phenotype functions
-	//private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
-	//private final Map<String, CellFunction> cellFunctionBehaviourMap = new HashMap<String, CellFunction>();
-	//private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
+	// phenotype functions
+	// private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
+	// private final Map<String, CellFunction> cellFunctionBehaviourMap = new HashMap<String,
+	// CellFunction>();
+	// private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
 
 	private DataStorage data = new DataStorageImpl().init(new DataStorageSubscriberNotificatorMock());
 	private BasicServiceCommunicator comm = new CommunicatorMock(this);
@@ -65,41 +64,41 @@ public class DummyCell implements CellInitialization {
 		return builder.toString();
 	}
 
-	//	@Override
-	//	public void setConditionMap(Map<String, Condition> conditionMap) {
-	//		this.conditionMap.putAll(conditionMap);
-	//	}
-	//	
-	//	@Override
-	//	public void setCellFunctionMap(Map<String, CellFunction> cellFunctionBehaviourMap) {
-	//		this.cellFunctionBehaviourMap.putAll(cellFunctionBehaviourMap);
-	//		
-	//	}
+	// @Override
+	// public void setConditionMap(Map<String, Condition> conditionMap) {
+	// this.conditionMap.putAll(conditionMap);
+	// }
 	//
-	//	@Override
-	//	public void setActivatorMap(Map<String, Activator> activatorMap) {
-	//		this.activatorMap.putAll(activatorMap);
-	//	}
-	//	
-	//	@Override
-	//	public Map<String, Condition> getConditionMap() {
-	//		return this.conditionMap;
-	//	}
+	// @Override
+	// public void setCellFunctionMap(Map<String, CellFunction> cellFunctionBehaviourMap) {
+	// this.cellFunctionBehaviourMap.putAll(cellFunctionBehaviourMap);
 	//
-	//	@Override
-	//	public Map<String, CellFunction> getCellFunctionMap() {
-	//		return this.cellFunctionBehaviourMap;
-	//	}
+	// }
 	//
-	//	@Override
-	//	public Map<String, Activator> getActivatorMap() {
-	//		return this.activatorMap;
-	//	}
+	// @Override
+	// public void setActivatorMap(Map<String, Activator> activatorMap) {
+	// this.activatorMap.putAll(activatorMap);
+	// }
+	//
+	// @Override
+	// public Map<String, Condition> getConditionMap() {
+	// return this.conditionMap;
+	// }
+	//
+	// @Override
+	// public Map<String, CellFunction> getCellFunctionMap() {
+	// return this.cellFunctionBehaviourMap;
+	// }
+	//
+	// @Override
+	// public Map<String, Activator> getActivatorMap() {
+	// return this.activatorMap;
+	// }
 
 	@Override
-	public JsonObject getConfiguration() {
-		//Deepcopy through serialization
-		return this.conf.toJsonObject();
+	public CellConfig getConfiguration() {
+		// Deepcopy through serialization
+		return this.conf;
 	}
 
 	@Override
