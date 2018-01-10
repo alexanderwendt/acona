@@ -56,7 +56,15 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private final static int METHODTIMEOUT = 20000;
 	// private final static int CODELETHANDLERTIMEOUT = 10000;
 
+	// For your needs, use ConcurrentHashMap. It allows concurrent modification of the Map from several
+	// threads without the need to block them. Collections.synchronizedMap(map) creates a blocking Map
+	// which will degrade performance, albeit ensure consistency (if used properly).
+	// Use the second option if you need to ensure data consistency, and each thread needs to have an
+	// up-to-date view of the map. Use the first if performance is critical, and each thread only
+	// inserts data to the map, with reads happening less frequently.
+
 	private final Map<String, ServiceState> codeletMap = new ConcurrentHashMap<>();
+
 	private final Map<Integer, List<String>> executionOrderMap = new ConcurrentSkipListMap<>(new Comparator<Integer>() {
 
 		@Override
@@ -267,7 +275,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			log.debug("Map:{}", this.getExecutionOrderMap());
 			List<String> names = this.getExecutionOrderMap().get(runOrder);
 			if (names == null) {
-				log.error("For runorder={}, names={}, there are no codelets registered. This is a possible sync-bug. Registered codelets={}", runOrder, names, this.codeletMap);
+				log.error("For runorder={}, names={}, there are no codelets registered. This is a possible sync-bug. Registered codelets={}. ExecutionOrderMap={}", runOrder, names, this.codeletMap, this.getExecutionOrderMap());
+				result = false;
 			} else {
 				for (String codelet : names) {
 					if (this.getCodeletMap().get(codelet).equals(ServiceState.FINISHED) == false) {
@@ -355,7 +364,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		// Check if the whole system is ready
 		try {
-			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1 && this.executionOrderMap.isEmpty() == false; // if all codelets are idle and runorder is reset
+			isAllowedToRun = this.isRunOrderStateReady() && this.getCurrentRunOrder() == -1 && this.getExecutionOrderMap().isEmpty() == false; // if all codelets are idle and runorder is reset
 
 			if (isAllowedToRun == true) {
 				log.debug("All codelets are in state FINISHED");
@@ -381,7 +390,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 						log.warn("Codelet={} is still running", entry.getKey());
 					}
 				});
-				log.warn("{}>Not all codelets are ready or no codelets have been registered. Codelet states={}", this.getFunctionName(), this.getCodeletMap());
+				log.warn("{}>Not all codelets are ready or no codelets have been registered. Values: runOrderStateReady={}, currentRunOrder={}, Codelet execution orders={}, codelet states={}", this.getFunctionName(), this.isRunOrderStateReady(), this.getCurrentRunOrder(), this.getExecutionOrderMap(), this.getCodeletMap());
 				// Write finish notification
 				this.setServiceState(ServiceState.FINISHED);
 
@@ -416,7 +425,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		if (this.getExecutionOrderMap().containsKey(order)) {
 			// Add to existing list
 			// synchronized (this.executionOrderMap) {
-			this.executionOrderMap.get(order).add(name);
+			this.getExecutionOrderMap().get(order).add(name);
 			// }
 
 			log.debug("Add codelet={} to existing order={}", name, order);

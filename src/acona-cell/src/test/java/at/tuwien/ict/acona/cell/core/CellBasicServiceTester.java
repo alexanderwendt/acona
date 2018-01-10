@@ -818,7 +818,7 @@ public class CellBasicServiceTester {
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(5000);
 				} catch (InterruptedException e) {
 
 				}

@@ -15,7 +15,6 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
  * This is a codelet that executes codelet handlers.
  * 
  * @author wendt
- *
  */
 public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 
@@ -35,23 +34,24 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		log.info("Run codelet trigger for codelet handler={}", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
+		log.info("=== Codelet handler={} running.", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
 
-		//run the codelet handler
-		//		this.getCommunicator().execute(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
-		//				Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-		//				Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+		// run the codelet handler
+		// this.getCommunicator().execute(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
+		// Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+		// Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
 
 		JsonRpcRequest req = new JsonRpcRequest("executecodelethandler", 1);
 		req.setParameterAsValue(0, false);
 
 		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, req, codeletHandlerAgent, codeletHandlerAddress + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
+		log.info("=== Codelet handler={} finished.", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
 	}
 
 	@Override
 	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-		//No need to be executed as no datapoints are used. 
+		// No need to be executed as no datapoints are used.
 
 	}
 
