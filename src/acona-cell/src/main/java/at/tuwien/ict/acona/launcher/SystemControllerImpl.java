@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.jadelauncher.util;
+package at.tuwien.ict.acona.launcher;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -17,7 +17,6 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.SystemConfig;
 import at.tuwien.ict.acona.cell.core.CellGateway;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.framework.interfaces.KoreExternalController;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
@@ -28,9 +27,9 @@ import jade.wrapper.ContainerController;
  * 
  * @author wendt
  */
-public class KoreExternalControllerImpl implements KoreExternalController {
+public class SystemControllerImpl implements SystemController {
 
-	private static Logger log = LoggerFactory.getLogger(KoreExternalControllerImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SystemControllerImpl.class);
 	/**
 	 * Agent tools
 	 */
@@ -56,9 +55,9 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	private boolean mainContainerExists = false;
 
 	// Make singleton
-	private static KoreExternalControllerImpl instance = null;
+	private static SystemControllerImpl instance = null;
 
-	private KoreExternalControllerImpl() {
+	private SystemControllerImpl() {
 
 	}
 
@@ -67,9 +66,9 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	 * 
 	 * @return
 	 */
-	public static KoreExternalControllerImpl getLauncher() {
+	public static SystemControllerImpl getLauncher() {
 		if (instance == null) {
-			instance = new KoreExternalControllerImpl();
+			instance = new SystemControllerImpl();
 		}
 
 		return instance;
@@ -264,7 +263,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	 * google.gson.JsonObject)
 	 */
 	@Override
-	public KoreExternalController init(JsonObject config) throws Exception {
+	public SystemController init(JsonObject config) throws Exception {
 		return this.init(SystemConfig.newConfig(config));
 	}
 
@@ -276,7 +275,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	 * lang.String)
 	 */
 	@Override
-	public synchronized KoreExternalController init(String absolutefilePath) {
+	public synchronized SystemController init(String absolutefilePath) {
 		JsonReader reader;
 		try {
 			reader = new JsonReader(new FileReader(absolutefilePath));
@@ -322,7 +321,7 @@ public class KoreExternalControllerImpl implements KoreExternalController {
 	 * tuwien.ict.acona.cell.config.SystemConfig)
 	 */
 	@Override
-	public synchronized KoreExternalController init(SystemConfig config) {
+	public synchronized SystemController init(SystemConfig config) {
 
 		// Set top controller
 		this.setTopController(config.getTopController());

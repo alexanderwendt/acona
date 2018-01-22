@@ -21,13 +21,13 @@ import at.tuwien.ict.acona.cell.datastructures.Chunk;
 import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class CellStateTester {
 	private static Logger log = LoggerFactory.getLogger(CellStateTester.class);
 	// private final JadeContainerUtil util = new JadeContainerUtil();
-	private KoreExternalControllerImpl launchUtil = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launchUtil = SystemControllerImpl.getLauncher();
 
 	/**
 	 * Setup the JADE communication. No Jade Gateway necessary

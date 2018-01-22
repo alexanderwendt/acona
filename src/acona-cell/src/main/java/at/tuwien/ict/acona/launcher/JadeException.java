@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.jadelauncher.util;
+package at.tuwien.ict.acona.launcher;
 
 public class JadeException extends Exception {
 

@@ -1,11 +1,11 @@
-package at.tuwien.ict.acona.framework.interfaces;
+package at.tuwien.ict.acona.launcher;
 
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.config.SystemConfig;
 import at.tuwien.ict.acona.cell.core.CellGateway;
 
-public interface KoreExternalController {
+public interface SystemController {
 	/**
 	 * Interface between the external inputs to the system and the KORE system.
 	 * Through the parameters, all user input is passed.
@@ -21,7 +21,7 @@ public interface KoreExternalController {
 	 * @param config
 	 * @return
 	 */
-	public KoreExternalController init(SystemConfig config);
+	public SystemController init(SystemConfig config);
 
 	/**
 	 * Initialize the whole system from JSON config
@@ -30,7 +30,7 @@ public interface KoreExternalController {
 	 * @return
 	 * @throws Exception
 	 */
-	public KoreExternalController init(JsonObject config) throws Exception;
+	public SystemController init(JsonObject config) throws Exception;
 
 	/**
 	 * Initialize the whole system from a configuration file
@@ -38,7 +38,7 @@ public interface KoreExternalController {
 	 * @param filePath
 	 * @return
 	 */
-	public KoreExternalController init(String filePath);
+	public SystemController init(String filePath);
 
 	/**
 	 * Get the controller for an agent with a certain name

@@ -22,12 +22,12 @@ import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementNumb
 import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class Codelettester {
 	private static Logger log = LoggerFactory.getLogger(Codelettester.class);
-	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {

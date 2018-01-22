@@ -28,13 +28,13 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class TraderTester {
 
 	private static final Logger log = LoggerFactory.getLogger(TraderTester.class);
-	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {

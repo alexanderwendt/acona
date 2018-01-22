@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.framework.modules.visualization;
+package at.tuwien.ict.acona.visualization;
 
 public class Position {
 

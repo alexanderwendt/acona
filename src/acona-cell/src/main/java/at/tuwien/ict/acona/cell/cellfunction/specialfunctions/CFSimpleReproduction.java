@@ -10,7 +10,7 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 
 /**
  * Replicate the cell by making a copy of the cellfunctionconfig and use it to generate a new cell.
@@ -47,7 +47,7 @@ public class CFSimpleReproduction extends CellFunctionThreadImpl {
 		String newName = oldName + "Repl" + reproductionCount;
 		newConfig.setName(newName);
 
-		KoreExternalControllerImpl controller = KoreExternalControllerImpl.getLauncher();
+		SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 		controller.createAgent(newConfig);
 
 		log.info("{}>Reproduced and created new agent={}", this.getCell().getName(), newName);

@@ -32,19 +32,19 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	protected static Logger log = LoggerFactory.getLogger(AgentCommunicatorImpl.class);
 
-	//ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+	// ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
 	private int defaultTimeout = 10000;
 
 	private final CellImpl cell;
 	private final CellFunctionHandler cellFunctionHandler;
 	private final SubscriptionHandler subscriptionHandler;
-	//private final static Gson gson = new Gson();
+	// private final static Gson gson = new Gson();
 	private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
 
 	public AgentCommunicatorImpl(CellImpl cell) {
 		this.cell = cell;
-		//this.datastorage = this.cell.getDataStorage();
+		// this.datastorage = this.cell.getDataStorage();
 		this.cellFunctionHandler = this.cell.getFunctionHandler();
 		this.subscriptionHandler = this.cell.getSubscriptionHandler();
 	}
@@ -72,7 +72,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	@Override
 	public void removeResponderForFunction(CellFunction function) {
-		//TODO: Remove a behaviour responder too.
+		// TODO: Remove a behaviour responder too.
 
 	}
 
@@ -89,14 +89,14 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	@Override
 	public void executeAsynchronous(String agentName, String serviceName, JsonRpcRequest methodParameters) throws Exception {
-		//TODO Implement this
+		// TODO Implement this
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception {
 
-		JsonRpcResponse result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); //= new ArrayList<>();
+		JsonRpcResponse result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); // = new ArrayList<>();
 		// If a local data storage is meant, then write it there, else a foreign
 		// data storage is meant.
 		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
@@ -123,7 +123,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 			requestMsg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
 			requestMsg.setOntology(serviceName);
 
-			//JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
+			// JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
 
 			requestMsg.setContent(methodParameters.toJson().toString());
 
@@ -137,13 +137,12 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
 					if (writeBehaviourFinished == null) {
 						throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
-								+ "Possible causes: 1: target address agent+service does not exist. "
+								+ "Possible causes: 1: target address agent " + agentName + " + service " + serviceName + " does not exist. "
 								+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
 								+ "2: Error at the receiver site so that no message is returned.");
 					}
 
-					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {
-					}.getType());
+					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {}.getType());
 				} catch (InterruptedException e) {
 					log.warn("Queue interrupted");
 				} catch (JsonSyntaxException e) {
@@ -168,7 +167,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 		public ServiceExecuteBehaviour(Agent a, ACLMessage msg, SynchronousQueue<String> queue) {
 			super(a, msg);
-			//msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+			// msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 			this.serviceName = msg.getOntology();
 			this.queue = queue;
 			log.trace("Service {}>Ready to send execute request to agent={}, message={}", this.serviceName, Lists.newArrayList(msg.getAllReceiver()), msg.getContent());
@@ -187,7 +186,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 		@Override
 		protected void handleInform(ACLMessage msg) {
-			//log.info("Write operation successfully completed");
+			// log.info("Write operation successfully completed");
 
 			log.info("Service {}>Received result={}", this.serviceName, msg.getContent());
 			releseQueue(msg.getContent());

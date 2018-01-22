@@ -17,14 +17,14 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class CellSendTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellSendTester.class);
 	// private final JadeContainerUtil util = new JadeContainerUtil();
-	private KoreExternalControllerImpl launchUtil = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launchUtil = SystemControllerImpl.getLauncher();
 
 	/**
 	 * Setup the JADE communication. No Jade Gateway necessary

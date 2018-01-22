@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
@@ -27,14 +26,12 @@ import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SequenceController;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SimpleControllerService;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
-import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class CellCooperationTester {
 	private static Logger log = LoggerFactory.getLogger(CellCooperationTester.class);
-	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {
@@ -246,13 +243,9 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A
-	 * controller runs every 5s. It starts a getDataFunction. When the data has
-	 * been received, the publish data function is executed. Data is read from
-	 * another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2
-	 * values are read from a memory agent, added and published within the
-	 * agent. The result is subscribed by an output agent The Outbuffer is only
-	 * an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
+	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
+	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
 	 * 
 	 */
 	@Test
@@ -378,7 +371,7 @@ public class CellCooperationTester {
 			CellGateway controller = launcher.getTopController();
 
 			// Test the wrapper for controllers too
-			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
+			// ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
 
 			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), controllerFunctionName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
@@ -432,13 +425,9 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A
-	 * controller runs every 5s. It starts a getDataFunction. When the data has
-	 * been received, the publish data function is executed. Data is read from
-	 * another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2
-	 * values are read from a memory agent, added and published within the
-	 * agent. The result is subscribed by an output agent The Outbuffer is only
-	 * an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
+	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
+	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
 	 * 
 	 */
 	@Test
@@ -521,10 +510,8 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * In this test, one controller will start 100 increment services in a
-	 * sequence. The incrementservices increases the number in the memory with
-	 * +1. At the end the number in the memory shall be the same as the number
-	 * of services in the system.
+	 * In this test, one controller will start 100 increment services in a sequence. The incrementservices increases the number in the memory with +1. At the end the number in the memory shall be the same
+	 * as the number of services in the system.
 	 * 
 	 */
 	@Test
@@ -604,8 +591,8 @@ public class CellCooperationTester {
 			// Datapoint.newDatapoint(controllerServiceName + ".state"), 10000);
 
 			// Test the wrapper for controllers too
-			ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
-			ServiceState state = controllerCellGateway.executeService(controllerServiceName, new JsonObject(), 1000000);
+			// ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
+			ServiceState state = controller.getCommunicator().executeServiceBlocking(controllerServiceName);
 
 			log.debug("Received state={}", state);
 

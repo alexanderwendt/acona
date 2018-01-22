@@ -15,7 +15,7 @@ import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithmAlter
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 /**
@@ -30,7 +30,7 @@ public class Launcher {
 	
 	private static Launcher launcher;
 	
-	private KoreExternalControllerImpl controller = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 
 	public static void main(String[] args) {
 		log.info("Welcome to the ACONA Stock Market Evolution Demonstrator");

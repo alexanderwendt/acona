@@ -5,15 +5,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
-
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-import at.tuwien.ict.acona.framework.interfaces.ControllerCellGateway;
-import at.tuwien.ict.acona.framework.interfaces.ControllerWrapper;
 
 public class LoopController extends CellFunctionThreadImpl {
 
@@ -24,8 +20,8 @@ public class LoopController extends CellFunctionThreadImpl {
 	// execute service 1
 
 	private ServiceState executeServiceById(String serviceNameId, String agentNameId, int number, int timeout) throws Exception {
-		ControllerCellGateway controllerMethods = new ControllerWrapper(this.getCommunicator());
-		ServiceState result = controllerMethods.executeService(this.getFunctionConfig().getProperty(agentNameId) + number, this.getFunctionConfig().getProperty(serviceNameId), new JsonObject(), timeout);
+		// ControllerCellGateway controllerMethods = new ControllerWrapper(this.getCommunicator());
+		ServiceState result = this.getCommunicator().executeServiceBlocking(this.getFunctionConfig().getProperty(agentNameId) + number + ":" + this.getFunctionConfig().getProperty(serviceNameId), timeout);
 
 		return result;
 	}
@@ -65,7 +61,7 @@ public class LoopController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		//this.writeLocal(Datapoints.newDatapoint("state").setValue(ServiceState.FINISHED.toString()));
+		// this.writeLocal(Datapoints.newDatapoint("state").setValue(ServiceState.FINISHED.toString()));
 		this.setServiceState(ServiceState.FINISHED);
 		log.debug("finished loop controller post processing");
 

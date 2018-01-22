@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -217,6 +218,18 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	@Override
 	public Datapoint executeServiceQueryDatapoints(String writeAgentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, JsonElement expectedResult, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceState executeServiceBlocking(String agentAndService, int timeout) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceState executeServiceBlocking(String agentAndService) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -35,13 +35,13 @@ import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.GraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.OHLCGraph;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class StockMarketTester {
 
 	private static final Logger log = LoggerFactory.getLogger(StockMarketTester.class);
-	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {

@@ -34,13 +34,13 @@ import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class DemoWebServiceTester {
 
 	private static final Logger log = LoggerFactory.getLogger(DemoWebServiceTester.class);
-	private KoreExternalControllerImpl controller = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {

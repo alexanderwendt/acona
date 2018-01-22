@@ -1,0 +1,94 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    
+    //Jade repo
+    maven {
+        url "http://jade.tilab.com/maven/"
+    }
+}
+
+dependencies {
+	//Gson
+	compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+
+	//JADE
+	compile group: 'com.tilab.jade', name: 'jade', version: '4.5.0'
+
+	//Jersey server for REST
+   	//compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.26'
+    //compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.26'
+    //compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.26'
+    //compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
+    //compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.7'
+ 	//compile 'com.sun.jersey.contribs:jersey-contribs:1.19'
+ 	//compile 'javax.servlet:servlet-api:2.5'
+ 	
+   	// Dependency needed for interceptors and filters.
+   	
+   	//Jetty server
+	//compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.3.0.M1'
+
+	// https://mvnrepository.com/artifact/commons-collections/commons-collections
+	//compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+
+    
+    //Jersey client
+    //compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.26'
+    //compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
+    
+    //Logger
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'ch.qos.logback:logback-core:1.2.3'											//Use logback for this driver
+  	compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'org.codehaus.janino:janino:2.7.8'	//For color
+    compile 'org.codehaus.janino:commons-compiler:2.7.8'
+    //compile 'org.fusesource.jansi:jansi:1.11'
+    
+    // https://mvnrepository.com/artifact/org.apache.jena/jena-core
+	//compile group: 'org.apache.jena', name: 'jena-core', version: '3.5.0'
+	// https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs
+	//compile group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.5.0', ext: 'pom'
+	
+    
+    
+    compile project(':acona-cell')
+    //compile project(':ConfigurationManager')
+	//compile project(':CommonTools')
+	//compile project(':UserConsole')
+	//compile project(':cognitive-interface')
+	//compile project(':kore-rsg-core')
+	
+	//compile project(':OntologyConnector')
+    
+    
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+test {
+    //systemProperties 'property': 'value'
+    exclude 'at/tuwien/ict/**'
+}
+
+//Build jar
+jar {
+	
+ }
+ 
+ task copyDependencies(type: Copy) {
+   from configurations.compile
+   into 'dependencies'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}

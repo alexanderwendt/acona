@@ -30,13 +30,13 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class BrokerTester {
 
 	private static final Logger log = LoggerFactory.getLogger(BrokerTester.class);
-	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {

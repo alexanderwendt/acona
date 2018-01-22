@@ -13,7 +13,7 @@ import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 /**
@@ -28,7 +28,7 @@ public class Launcher {
 	
 	private static Launcher launcher;
 	
-	private KoreExternalControllerImpl controller = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 
 	public static void main(String[] args) {
 		log.info("Welcome to the ACONA Stock Market Evolution Demonstrator");

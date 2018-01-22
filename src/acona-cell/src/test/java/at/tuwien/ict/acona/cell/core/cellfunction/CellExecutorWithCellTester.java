@@ -24,13 +24,13 @@ import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFAdditionCustomServic
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class CellExecutorWithCellTester {
 	private static Logger log = LoggerFactory.getLogger(CellExecutorWithCellTester.class);
 	// private final JadeContainerUtil util = new JadeContainerUtil();
-	private KoreExternalControllerImpl launcher = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 	// private Gateway comm = commUtil.getJadeGateway();
 
 	@Before

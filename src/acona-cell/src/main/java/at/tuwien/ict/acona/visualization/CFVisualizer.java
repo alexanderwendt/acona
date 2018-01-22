@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.framework.modules;
+package at.tuwien.ict.acona.visualization;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,9 +12,6 @@ import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-import at.tuwien.ict.acona.framework.modules.visualization.Position;
-import at.tuwien.ict.acona.framework.modules.visualization.Visualization2D;
-import at.tuwien.ict.acona.framework.modules.visualization.VisualizationData;
 
 public class CFVisualizer extends CellFunctionThreadImpl implements VisualizationData {
 

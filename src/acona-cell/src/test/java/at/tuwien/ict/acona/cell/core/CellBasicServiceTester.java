@@ -33,14 +33,14 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-import at.tuwien.ict.acona.jadelauncher.util.KoreExternalControllerImpl;
+import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
 public class CellBasicServiceTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellBasicServiceTester.class);
 	// private final JadeContainerUtil util = new JadeContainerUtil();
-	private KoreExternalControllerImpl launchUtil = KoreExternalControllerImpl.getLauncher();
+	private SystemControllerImpl launchUtil = SystemControllerImpl.getLauncher();
 	// private Gateway comm = launchUtil.getJadeGateway();
 
 	// private ContainerController agentContainer;

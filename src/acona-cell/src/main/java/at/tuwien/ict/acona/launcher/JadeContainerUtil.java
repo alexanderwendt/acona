@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.jadelauncher.util;
+package at.tuwien.ict.acona.launcher;
 
 import jade.core.Profile;
 import jade.core.ProfileImpl;

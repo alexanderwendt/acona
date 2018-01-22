@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.framework.interfaces.SystemConfigExternal;
+import at.tuwien.ict.acona.launcher.SystemConfigExternal;
 
 public class SystemConfig implements SystemConfigExternal {
 	public static final String TOPCONTROLLERNAME = "topcontrollername";
