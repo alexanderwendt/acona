@@ -82,20 +82,7 @@ public class CognitiveProcess {
 
 	public final static String MANUALTRIGGERADDRESS = INPUTSPREFIXADDRESS + ".trigger";
 
-	public final static String RECEIVEDSIMULATIONRUNADDRESS = INPUTSPREFIXADDRESS + ".currentsimulationrun";
-	public final static String CURRENTSOLUTIONADDRESS = RESULTPREFIXADDRESS + ".currentsolution";
-	public final static String CURRENTVARIANTADDRESS = RESULTPREFIXADDRESS + ".currentvariant";
-	public final static String CURRENTUSECASEADDRESS = RESULTPREFIXADDRESS + ".currentusecase";
-	public final static String CURRENTSCENARIOADDRESS = RESULTPREFIXADDRESS + ".currentscenario";
-	public final static String FINALRESULTADDRESS = RESULTPREFIXADDRESS + ".result";
-
-	public final static String REQUESTSPREFIXADDRESS = namespaceWorkingMemory + ".inputs." + "requests";
-	public final static String EPISODESPREFIXADDRESS = namespaceWorkingMemory + ".episodes";
-	public final static String PREVIOUSPREFIXEPISODEADDRESS = namespaceWorkingMemory + ".previousepisode";
-
-	public final static String SOLUTIONPOTENTIALADDRESS = INTERNALSTATEPREFIXADDRESS + ".solutionpotential";
 	public final static String CYCLECOUNTADDRESS = INTERNALSTATEPREFIXADDRESS + ".cyclecount";
-	public final static String SIMULATIONCOUNTADDRESS = INTERNALSTATEPREFIXADDRESS + ".simulationcount";
 
 	/**
 	 * Generate a complete cognitive process with handlers and executors.
