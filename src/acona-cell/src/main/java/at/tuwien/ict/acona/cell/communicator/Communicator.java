@@ -243,4 +243,5 @@ public interface Communicator extends AgentCommunicator {
 	 * @throws Exception
 	 */
 	public void unsubscribeDatapoint(String key, String callingCellFunctionName) throws Exception;
+
 }

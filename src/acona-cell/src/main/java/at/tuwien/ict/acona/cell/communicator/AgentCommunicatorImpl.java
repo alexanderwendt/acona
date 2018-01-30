@@ -1,5 +1,7 @@
 package at.tuwien.ict.acona.cell.communicator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +25,7 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
@@ -32,8 +35,6 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 	protected static Logger log = LoggerFactory.getLogger(AgentCommunicatorImpl.class);
 
-	// ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
-
 	private int defaultTimeout = 10000;
 
 	private final CellImpl cell;
@@ -41,6 +42,11 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	private final SubscriptionHandler subscriptionHandler;
 	// private final static Gson gson = new Gson();
 	private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+
+	/**
+	 * Keeps the behaviours that have been implemented as threads in the communicator because they have to be explicitely killed.
+	 */
+	private final List<Behaviour> threadedBehaviours = new ArrayList<>();
 
 	public AgentCommunicatorImpl(CellImpl cell) {
 		this.cell = cell;
@@ -68,11 +74,23 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 		ExternalServiceBehaviour responder = new ExternalServiceBehaviour(this.cell, function);
 
 		cell.addBehaviour(tbf.wrap(responder));
+		// These threaded behaviours have to be delected explicitely
+		this.threadedBehaviours.add(responder);
 	}
 
 	@Override
 	public void removeResponderForFunction(CellFunction function) {
 		// TODO: Remove a behaviour responder too.
+
+	}
+
+	@Override
+	public void shutDown() {
+		log.info("Shut down communicator");
+		this.threadedBehaviours.forEach(b -> {
+			log.debug("Interrupting behaviour={}. Behaviour done={}", b.getBehaviourName(), b.done());
+			tbf.getThread(b).interrupt();
+		});
 
 	}
 

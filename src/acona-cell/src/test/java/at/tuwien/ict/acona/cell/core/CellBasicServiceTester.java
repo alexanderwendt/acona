@@ -34,7 +34,6 @@ import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 public class CellBasicServiceTester {
 
@@ -94,29 +93,30 @@ public class CellBasicServiceTester {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		synchronized (this) {
-			try {
-				this.wait(1000);
-			} catch (InterruptedException e) {
+		this.launchUtil.stopSystem();
 
-			}
-		}
-
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
-		synchronized (this) {
-			try {
-				this.wait(1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
+		// synchronized (this) {
+		// try {
+		// this.wait(1000);
+		// } catch (InterruptedException e) {
+		//
+		// }
+		// }
+		//
+		// Runtime runtime = Runtime.instance();
+		// runtime.shutDown();
+		// synchronized (this) {
+		// try {
+		// this.wait(1000);
+		// } catch (InterruptedException e) {
+		//
+		// }
+		// }
 		// this.launchUtil.shutDownJadeGateway();
 	}
 
 	/**
-	 * First write a value, then read the same value. The test is passed if the read value is equal to
-	 * the original one.
+	 * First write a value, then read the same value. The test is passed if the read value is equal to the original one.
 	 */
 	@Test
 	public void executeAsWriteTest() {
@@ -188,8 +188,7 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * First write a value, then read the same value. The test is passed if the read value is equal to
-	 * the original one.
+	 * First write a value, then read the same value. The test is passed if the read value is equal to the original one.
 	 */
 	@Test
 	public void writeAndReadTest() {
@@ -239,8 +238,7 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at the publisher. A value is injected into the publisher and the
-	 * subscriber gets notified. Test is passed if the value written to the publisher is the same as the
+	 * A subscriber subscribes a value at the publisher. A value is injected into the publisher and the subscriber gets notified. Test is passed if the value written to the publisher is the same as the
 	 * notified value at the subscriber.
 	 */
 	@Test
@@ -323,9 +321,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then
-	 * unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the
-	 * value of the subscriber is the first written value into the publisher.
+	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the value
+	 * of the subscriber is the first written value into the publisher.
 	 */
 	@Test
 	public void externalUnsubscribeNotifyTest() {
@@ -425,9 +422,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then
-	 * unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the
-	 * value of the subscriber is the first written value into the publisher.
+	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the value
+	 * of the subscriber is the first written value into the publisher.
 	 */
 	@Test
 	public void internalsubscribeNotifyTest() {
@@ -529,9 +525,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then
-	 * unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the
-	 * value of the subscriber is the first written value into the publisher.
+	 * A subscriber subscribes a value at a publisher. The value is changed at the publisher. Then unsubscribe is executed. A secaond value is written into the publisher. The test is passed if the value
+	 * of the subscriber is the first written value into the publisher.
 	 */
 	// @Test
 	public void internalfailedsubscribeTest() {
@@ -607,10 +602,8 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * Instantiate 3 or more agents. Agent n subscribes a datapoint from agent n-1. In agent 0, a value
-	 * is set and propagated through the system to agent n. This value is measured and checked if it is
-	 * the input value. The test is passed if input value of the system is equal to the value of the
-	 * last agent.
+	 * Instantiate 3 or more agents. Agent n subscribes a datapoint from agent n-1. In agent 0, a value is set and propagated through the system to agent n. This value is measured and checked if it is the
+	 * input value. The test is passed if input value of the system is equal to the value of the last agent.
 	 */
 	@Test
 	public void massOfSubscribersTest() {
@@ -761,8 +754,7 @@ public class CellBasicServiceTester {
 	}
 
 	/**
-	 * The agent shall replicate itself. An agent is created. On trigger, the agent creates a copy of
-	 * itself. The test is passed if the second agent also contains a function from the first agent
+	 * The agent shall replicate itself. An agent is created. On trigger, the agent creates a copy of itself. The test is passed if the second agent also contains a function from the first agent
 	 */
 	@Test
 	public void CFReproduceAgentTester() {

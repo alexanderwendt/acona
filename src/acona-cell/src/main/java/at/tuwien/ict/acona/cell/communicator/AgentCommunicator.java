@@ -5,8 +5,7 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
 /**
- * The basic class for communication between functions, services in or within
- * other agents
+ * The basic class for communication between functions, services in or within other agents
  * 
  * @author wendt
  *
@@ -62,8 +61,7 @@ public interface AgentCommunicator {
 	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception;
 
 	/**
-	 * Execute a service, where the whole address is written in one string, i.e.
-	 * agent:service
+	 * Execute a service, where the whole address is written in one string, i.e. agent:service
 	 * 
 	 * @param agentNameAndService
 	 * @param methodParameters
@@ -96,4 +94,9 @@ public interface AgentCommunicator {
 	 * @param function
 	 */
 	public void removeResponderForFunction(CellFunction function);
+
+	/**
+	 * Shut down communicator of the agent
+	 */
+	public void shutDown();
 }

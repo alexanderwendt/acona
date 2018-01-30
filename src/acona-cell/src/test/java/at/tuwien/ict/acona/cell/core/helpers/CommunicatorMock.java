@@ -234,4 +234,10 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 		return null;
 	}
 
+	@Override
+	public void shutDown() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

@@ -20,10 +20,10 @@ import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
 
 /**
- * This is a wrapper class for all types of jade initialization. it starts
- * agents and containers
+ * This is a wrapper class for all types of jade initialization. it starts agents and containers
  * 
  * @author wendt
  */
@@ -204,8 +204,40 @@ public class SystemControllerImpl implements SystemController {
 			}
 		}
 
+		// Get all agents
+		this.agentControllerMap.values().forEach(a -> {
+			try {
+				log.debug("Kill agent={}", a.getName());
+				a.kill();
+			} catch (StaleProxyException e1) {
+				log.error("Cannot kill agent={}", a);
+			}
+		});
+
+		this.agentControllerMap.clear();
+
+		this.agentContainerMap.values().forEach(c -> {
+			try {
+				log.debug("Kill container={}", c.getPlatformName());
+				c.kill();
+			} catch (StaleProxyException e1) {
+				log.error("Cannot kill container={}", c);
+			}
+		});
+
+		this.agentContainerMap.clear();
+
+		synchronized (this) {
+			try {
+				this.wait(2000);
+			} catch (InterruptedException e) {
+
+			}
+		}
+
 		Runtime runtime = Runtime.instance();
 		runtime.shutDown();
+
 		synchronized (this) {
 			try {
 				this.wait(2000);
@@ -246,8 +278,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * executeUserInput(java.lang.String, java.lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# executeUserInput(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public synchronized void executeUserInput(String command, String parameter) {
@@ -258,9 +289,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(com.
-	 * google.gson.JsonObject)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(com. google.gson.JsonObject)
 	 */
 	@Override
 	public SystemController init(JsonObject config) throws Exception {
@@ -270,9 +299,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(java.
-	 * lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(java. lang.String)
 	 */
 	@Override
 	public synchronized SystemController init(String absolutefilePath) {
@@ -294,9 +321,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * at.tuwien.ict.acona.framework.interfaces.KoreExternalController#getAgent(java
-	 * .lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#getAgent(java .lang.String)
 	 */
 	@Override
 	public synchronized CellGateway getAgent(String localName) {
@@ -306,8 +331,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * getTopController()
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# getTopController()
 	 */
 	@Override
 	public CellGateway getTopController() {
@@ -317,8 +341,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(at.
-	 * tuwien.ict.acona.cell.config.SystemConfig)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(at. tuwien.ict.acona.cell.config.SystemConfig)
 	 */
 	@Override
 	public synchronized SystemController init(SystemConfig config) {
@@ -374,8 +397,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * setTopController(java.lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# setTopController(java.lang.String)
 	 */
 	@Override
 	public void setTopController(String agentName) {
@@ -385,8 +407,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * getControllerAgent(java.lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# getControllerAgent(java.lang.String)
 	 */
 	@Override
 	public CellGateway getControllerAgent(String localName) {

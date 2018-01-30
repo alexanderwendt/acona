@@ -16,6 +16,7 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.DFService;
@@ -73,6 +74,7 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see jade.core.Agent#setup()
 	 */
 	@Override
@@ -133,7 +135,8 @@ public class CellImpl extends Agent implements CellInitialization {
 			// However, as long as initAsBehaviour is running no new behaviours
 			// can be added
 			ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
-			this.addBehaviour(tbf.wrap(new initAsBehaviour()));
+			Behaviour initBehaviour = new initAsBehaviour();
+			this.addBehaviour(tbf.wrap(initBehaviour));
 			// FIXME: nonthreaded behaviours an optional celloption. There is a
 			// problem with the blocking behaviours. They block each other
 			// and then first end at timeout.
@@ -194,16 +197,20 @@ public class CellImpl extends Agent implements CellInitialization {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see jade.core.Agent#takeDown()
 	 */
 	@Override
 	protected void takeDown() {
 		this.notificator.shutDown();
+
+		this.getCommunicator().shutDown();
+
 		// Deregister from the yellow pages
 		try {
 			DFService.deregister(this);
 		} catch (FIPAException fe) {
-			fe.printStackTrace();
+			log.error("Cannot deregister agent", fe);
 		}
 
 		this.doDelete();
@@ -243,9 +250,8 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Convenience function to access the arguments provided to the agent via
-	 * {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast from the Object
-	 * stored in the object array provided on agent generation
+	 * Convenience function to access the arguments provided to the agent via {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast from the Object stored in the object array
+	 * provided on agent generation
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
@@ -272,14 +278,10 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Convenience function to access a List provided to the agent via {@link Agent#getArguments()} in a
-	 * typesafe manner. The provided type is the type of the objects contained in the list. For example:
-	 * if argument #1 is of type {@code List<ACLMessage>} then the call would look like this:
-	 * {@code List
-	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each argument is cast from
-	 * Object to the type stored in the list Also Note: this method can not provide additional type
-	 * checking for further containers within the list and does not support other container types than
-	 * list
+	 * Convenience function to access a List provided to the agent via {@link Agent#getArguments()} in a typesafe manner. The provided type is the type of the objects contained in the list. For example:
+	 * if argument #1 is of type {@code List<ACLMessage>} then the call would look like this: {@code List
+	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each argument is cast from Object to the type stored in the list Also Note: this method can not provide additional type checking
+	 * for further containers within the list and does not support other container types than list
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
@@ -302,8 +304,7 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Shortcut method used to access the argument at the given {@code index} as string This method
-	 * calls: {@code getArgument(index, String.class)}
+	 * Shortcut method used to access the argument at the given {@code index} as string This method calls: {@code getArgument(index, String.class)}
 	 * 
 	 * @param index
 	 * @return
@@ -313,8 +314,7 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Shortcut method used to access the argument list at the given {@code index} as list of strings
-	 * This method calls: {@code getArgumentList(index, String.class)}
+	 * Shortcut method used to access the argument list at the given {@code index} as list of strings This method calls: {@code getArgumentList(index, String.class)}
 	 * 
 	 * @param index
 	 * @return
