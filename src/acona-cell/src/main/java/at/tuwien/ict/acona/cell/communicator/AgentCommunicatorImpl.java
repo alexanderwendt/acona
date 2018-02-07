@@ -112,19 +112,24 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	}
 
 	@Override
-	public JsonRpcResponse execute(String agentName, String serviceName, JsonRpcRequest methodParameters, int timeout, boolean useSubscribeProtocol) throws Exception {
+	public JsonRpcResponse execute(final String agentName, final String serviceName, final JsonRpcRequest methodParameters, final int timeout, final boolean useSubscribeProtocol) throws Exception {
 
 		JsonRpcResponse result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); // = new ArrayList<>();
 		// If a local data storage is meant, then write it there, else a foreign
 		// data storage is meant.
+		String newAgentName = agentName;
 		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
-			agentName = this.cell.getLocalName();
+			newAgentName = this.cell.getLocalName();
 		}
 
-		if (agentName.equals(this.cell.getLocalName()) == true) {
+		if (newAgentName.equals(this.cell.getLocalName()) == true) {
 			// Execute local function
 			log.debug("Execute local function={}, parameters={}, agent={}. Hashcode={}.", serviceName, methodParameters, this.getLocalAgentName(), this.hashCode());
-			result = this.getCellFunctionHandler().getCellFunction(serviceName).performOperation(methodParameters, this.getLocalAgentName());
+			CellFunction cf = this.getCellFunctionHandler().getCellFunction(serviceName);
+			// synchronized (cf) {
+			result = cf.performOperation(methodParameters, this.getLocalAgentName());
+			// }
+
 		} else {
 			// Create a InitiatorBehaviour to write the datapoints to the target
 			// agent if that agent is external
@@ -137,7 +142,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 				requestMsg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 			}
 
-			requestMsg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
+			requestMsg.addReceiver(new AID(newAgentName, AID.ISLOCALNAME));
 			requestMsg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
 			requestMsg.setOntology(serviceName);
 
@@ -155,7 +160,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
 					if (writeBehaviourFinished == null) {
 						throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
-								+ "Possible causes: 1: target address agent " + agentName + " + service " + serviceName + " does not exist. "
+								+ "Possible causes: 1: target address agent " + newAgentName + " + service " + serviceName + " does not exist. "
 								+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
 								+ "2: Error at the receiver site so that no message is returned.");
 					}

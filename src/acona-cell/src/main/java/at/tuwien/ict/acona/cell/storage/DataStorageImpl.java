@@ -50,12 +50,12 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public void append(Datapoint datapackage, String caller) throws Exception {
+	public synchronized void append(Datapoint datapackage, String caller) throws Exception {
 		if (datapackage.getAddress().contains("*") || datapackage.getAddress().contains(":")) {
 			throw new Exception("* or : was part of the address: " + datapackage.getAddress() + "This is not allowed");
 		}
 
-		//Lock data
+		// Lock data
 		synchronized (this.data) {
 			GsonUtils util = new GsonUtils();
 			Datapoint source = this.data.get(datapackage.getAddress());
@@ -66,18 +66,18 @@ public class DataStorageImpl implements DataStorage {
 
 				util.extendJsonObject(source.getValue().getAsJsonObject(), ConflictStrategy.PREFER_SECOND_OBJ, datapackage.getValue().getAsJsonObject());
 
-				//write appended message
+				// write appended message
 				this.write(source, caller);
 
 			} else {
-				//write only new message
+				// write only new message
 				this.write(datapackage, caller);
 			}
 		}
 
-		//this.data.put(datapackage.getAddress(), datapackage);
-		//log.debug("write datapoint={}", datapackage);
-		//this.notifySubscribers(datapackage, caller);
+		// this.data.put(datapackage.getAddress(), datapackage);
+		// log.debug("write datapoint={}", datapackage);
+		// this.notifySubscribers(datapackage, caller);
 		// }
 
 	}
@@ -176,7 +176,7 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public void remove(String address, String caller) {
+	public synchronized void remove(String address, String caller) {
 		List<String> listToRemove = new ArrayList<>();
 
 		if (address.endsWith("*")) {

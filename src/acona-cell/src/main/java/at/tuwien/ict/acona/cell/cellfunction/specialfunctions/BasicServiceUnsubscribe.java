@@ -36,8 +36,7 @@ public class BasicServiceUnsubscribe extends CellFunctionBasicService {
 		JsonRpcResponse result = null;
 		try {
 
-			List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {
-			});
+			List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {});
 			this.unsubscribe(addresses, caller);
 
 			result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));

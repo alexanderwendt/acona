@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -35,8 +36,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 	/**
 	 * Execute a function and subscribe the result from a certain datapoint.
 	 * 
-	 * Example: Execute function codelethandler and lock the executing function
-	 * until the state datapoint has the value finished.
+	 * Example: Execute function codelethandler and lock the executing function until the state datapoint has the value finished.
 	 * 
 	 * @param agentName:
 	 *            target agent name, where the executing function is
@@ -58,35 +58,34 @@ public class CFSubscribeLock extends CellFunctionImpl {
 	 * @throws Exception
 	 */
 	public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, JsonElement expectedResult, int timeout, Cell cell) throws Exception {
-		//public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell) throws Exception {
+		// public Datapoint newServiceExecutionAndSubscribeLock(String agentName, String serviceName, JsonRpcRequest serviceParameter, String resultAgentName, String resultAddress, int timeout, Cell cell)
+		// throws Exception {
 		Datapoint result = null;
 
 		try {
 			this.resultAddress = resultAddress;
 			this.expectedResult = expectedResult;
-			//create and register instance
+			// create and register instance
 			String name = "CFSubscribeLock_" + resultAgentName + ":" + this.resultAddress;
 			log.trace("Service {}>Initialize with result={}:{}", name, resultAgentName, this.resultAddress);
 			this.init(CellFunctionConfig.newConfig(name, CFSubscribeLock.class).addManagedDatapoint(this.resultAddress, this.resultAddress, resultAgentName, SyncMode.SUBSCRIBEONLY), cell);
 
-			//Execute the function method
+			// Execute the function method
 			JsonRpcResponse functionResult = this.executeService(agentName, serviceName, serviceParameter, timeout);
 
 			if (functionResult.getError() != null) {
 				throw new Exception("Cannot execute the service=" + serviceName + " with the parameter=" + serviceParameter + " in the agent=" + agentName);
 			}
 
-			//Wait for subscribed value
+			// Wait for subscribed value
 			result = this.waitForSubscription(resultAgentName, this.resultAddress, timeout);
 
-			//Deregister
-			//instance.shutDown();
-
 		} catch (Exception e) {
-			log.error("Query error={}", e.getMessage(), e);
+			String extendedState = this.getCommunicator().read(agentName + ":" + serviceName + "." + CellFunctionCodelet.EXTENDEDSTATESUFFIX).getValueAsString();
+			log.error("Query error={}. Extended state of the called service={}", extendedState, e.getMessage(), e);
 			throw new Exception(e.getMessage());
 		} finally {
-			//Deregister
+			// Deregister
 			this.shutDown();
 		}
 
@@ -139,7 +138,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 	private Datapoint waitForSubscription(String resultAgentName, String resultAddress, int timeout) throws Exception {
 		Datapoint result = null;
 		this.resultAddress = resultAddress;
-		//this.resultAgent = resultAgentName;
+		// this.resultAgent = resultAgentName;
 
 		try {
 			try {
@@ -152,18 +151,36 @@ public class CFSubscribeLock extends CellFunctionImpl {
 
 			log.trace("Service {}>Result recieved={}", this.getFunctionConfig().getName(), result);
 			if (result == null) {
-				log.error("Service {}>Timeouterror after {}ms. Expected datapoint={}, value={}", this.getFunctionConfig().getName(), timeout, resultAgentName + ":" + this.resultAddress, this.expectedResult);
-				throw new Exception("Service " + this.getFunctionConfig().getName() + ">Timeouterror. Waiting to hear from address=" + resultAgentName + ":" + resultAddress);
+				// If no value received, read the value instead and test it that way
+
+				// Read the value directly
+				Datapoint dp = this.getCommunicator().read(resultAgentName + ":" + resultAddress);
+				if ((this.expectedResult != null) && (this.expectedResult.isJsonNull() == false)) {
+					if (dp.getValue().equals(this.expectedResult)) {
+						log.warn("Read matching trigger value={}", dp.getValue(), this.expectedResult);
+						// result = dp;
+					} else {
+						log.warn("read a non-matching trigger value={}. Expected={}", dp.getValue(), this.expectedResult);
+					}
+				} else {
+					// result = dp;
+					log.warn("Read value={}", dp);
+				}
+
+				if (result == null) {
+					log.error("Service {}>Timeouterror after {}ms. Expected datapoint={}, value={}", this.getFunctionConfig().getName(), timeout, resultAgentName + ":" + this.resultAddress, this.expectedResult);
+					throw new Exception("Service " + this.getFunctionConfig().getName() + ">Timeouterror. Waiting to hear from address=" + resultAgentName + ":" + resultAddress);
+				}
 			}
 		} catch (Exception e) {
-			//log.error("Service {}>Error on receiving data", this.getFunctionConfig().getName());
+			// log.error("Service {}>Error on receiving data", this.getFunctionConfig().getName());
 			throw new Exception(e);
 		} finally {
 			// If deregister has not been executed yet, do it
-			//			if (isExitSet == false) {
-			//				this.shutDown();
-			//				this.isExitSet = true;
-			//			}
+			// if (isExitSet == false) {
+			// this.shutDown();
+			// this.isExitSet = true;
+			// }
 		}
 
 		return result;

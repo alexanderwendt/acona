@@ -67,6 +67,8 @@ public class CognitiveProcess {
 	// Memories
 	public static final String namespaceWorkingMemory = "workingmemory";
 	public static final String namespaceInternalStateMemory = "internalstatememory";
+	public static final String namespaceInputBuffer = "inputbuffer";
+	public static final String namespaceOutputBuffer = "outputbuffer";
 
 	public static final String stateCollectorName = "statecollector";
 

@@ -32,8 +32,7 @@ public class BasicServiceSubscribe extends CellFunctionBasicService {
 		JsonRpcResponse result = null;
 		try {
 
-			List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {
-			});
+			List<String> addresses = parameter.getParameter(0, new TypeToken<List<String>>() {});
 			List<Datapoint> readValues = this.subscribe(addresses, caller);
 
 			result = new JsonRpcResponse(parameter, readValues);

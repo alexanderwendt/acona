@@ -34,7 +34,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
 	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
-	//private String codeletStateDatapointAddress;
+	// private String codeletStateDatapointAddress;
 
 	private String codeletHandlerAgentName = "";
 	private String codeletHandlerServiceName = "";
@@ -48,24 +48,24 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		try {
-			//Set the caller address
+			// Set the caller address
 			this.callerAddress = this.getCell().getLocalName() + ":" + this.getFunctionName();
 
-			//Set the system state datapoint
-			//codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
+			// Set the system state datapoint
+			// codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
 
-			this.setFinishedAfterSingleRun(false); //The finish shall be set manually.
+			this.setFinishedAfterSingleRun(false); // The finish shall be set manually.
 
-			//Start internal init
+			// Start internal init
 			this.cellFunctionCodeletInit();
 
-			//Get the codelethandler data
+			// Get the codelethandler data
 			this.codeletHandlerAgentName = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS).split(":")[0];
 			this.codeletHandlerServiceName = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS).split(":")[1];
 			this.exeutionOrder = Integer.valueOf(this.getFunctionConfig().getProperty(KEYEXECUTIONORDERNAME, "0"));
 			this.timeout = Integer.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTETIMEOUT, String.valueOf(DEFAULTTIMEOUT)));
 
-			//Register codelet in the codelethandler
+			// Register codelet in the codelethandler
 			try {
 				JsonRpcRequest request = new JsonRpcRequest(REGISTERCODELETSERVICENAME, 2);
 				request.setParameterAsValue(0, callerAddress);
@@ -74,17 +74,17 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 				JsonRpcResponse response = this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 				updateServiceStateInCodeletHandler(ServiceState.FINISHED);
 
-				//Check the result
+				// Check the result
 				if (response.hasError()) {
 					throw new Exception("Cannot register the codelet. Maybe the codelet handler has not been started yet");
 				}
 
-				//Get the working memory addresses
+				// Get the working memory addresses
 				if (response.getResult().getAsJsonObject().has(ATTRIBUTEWORKINGMEMORYADDRESS)) {
 					this.setWorkingMemoryAddress(response.getResult().getAsJsonObject().get(ATTRIBUTEWORKINGMEMORYADDRESS).getAsString());
 				}
 
-				//Get the internal state memory address
+				// Get the internal state memory address
 				if (response.getResult().getAsJsonObject().has(ATTRIBUTEINTERNALMEMORYADDRESS)) {
 					this.setInternalStateMemoryAddress(response.getResult().getAsJsonObject().get(ATTRIBUTEINTERNALMEMORYADDRESS).getAsString());
 				}
@@ -103,10 +103,10 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	protected abstract void cellFunctionCodeletInit() throws Exception;
 
 	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+	public synchronized JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
 		JsonRpcResponse result = null;
-		//React on the following inputs
-		//Attributes: method=startcodelet
+		// React on the following inputs
+		// Attributes: method=startcodelet
 
 		try {
 			log.debug("{}>Received execute request={}", this.getFunctionName(), parameterdata);
@@ -139,20 +139,20 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	@Override
 	public void startCodelet() {
-		//Run thread
+		// Run thread
 		this.setStart();
 
 	}
 
-	//	@Override
-	//	protected void executeFunction() throws Exception {
-	//		// TODO Auto-generated method stub
+	// @Override
+	// protected void executeFunction() throws Exception {
+	// // TODO Auto-generated method stub
 	//
-	//	}
+	// }
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		//Set state of the codelet to finished
+		// Set state of the codelet to finished
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.FINISHED.toString());
 		this.setServiceState(ServiceState.FINISHED);
@@ -163,7 +163,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	@Override
 	protected void executeCustomPreProcessing() throws Exception {
-		//Set state to running
+		// Set state to running
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
@@ -198,9 +198,9 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	}
 
-	//	protected String getCodeletStateDatapointAddress() {
-	//		return codeletStateDatapointAddress;
-	//	}
+	// protected String getCodeletStateDatapointAddress() {
+	// return codeletStateDatapointAddress;
+	// }
 
 	protected String getWorkingMemoryAddress() {
 		return workingMemoryAddress;

@@ -6,26 +6,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class Datapoint {
-	//public final static String KEYADDRESS = "ADDRESS";
-	//public final static String KEYAGENT = "AGENT";
-	//public final static String KEYVALUE = "VALUE";
+	// public final static String KEYADDRESS = "ADDRESS";
+	// public final static String KEYAGENT = "AGENT";
+	// public final static String KEYVALUE = "VALUE";
 
-	//TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
+	// TODO: Create datapoints that can take Chunks and Chunk arrays and Json arrays
 
 	private String ADDRESS = "";
 	private String AGENT = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
 
-	private transient Gson gson = new Gson(); //Add transient not to serialize this
+	private transient Gson gson = new Gson(); // Add transient not to serialize this
 
-	//private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
+	// private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
 
 	/**
 	 * Create a datapoint from an address
 	 * 
 	 * @param address:
-	 *            The following syntax can be used: x.x for local datapoints,
-	 *            [agent]:[localaddress] for global datapoints
+	 *            The following syntax can be used: x.x for local datapoints, [agent]:[localaddress] for global datapoints
 	 */
 	public Datapoint(String address) {
 		this.ADDRESS = this.getLocalAddressFromString(address);
@@ -221,14 +220,14 @@ public class Datapoint {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.ADDRESS);
 		builder.append(":");
-		//		if (this.getType().equals("") == false) {
-		//			builder.append(this.TYPE);
-		//			builder.append(":");
-		//		}
+		// if (this.getType().equals("") == false) {
+		// builder.append(this.TYPE);
+		// builder.append(":");
+		// }
 
 		// Check size of object
-		if (this.VALUE.toString().length() > 1000) {
-			builder.append(this.VALUE.toString().substring(0, 1000));
+		if (this.VALUE.toString().length() > 1500) {
+			builder.append(this.VALUE.toString().substring(0, 1500));
 			builder.append("...");
 		} else {
 			builder.append(this.VALUE);

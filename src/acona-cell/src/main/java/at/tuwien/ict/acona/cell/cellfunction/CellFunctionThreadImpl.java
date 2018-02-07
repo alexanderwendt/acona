@@ -16,10 +16,8 @@ import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 /**
  * @author wendt
  * 
- *         The blocking executor does not use any thread and is a combination of
- *         some conditions with activate on any change of a datapoint that is
- *         subscribed and the behaviour itself. The blocking executor can only
- *         be executed if a subscribed datapoint is received
+ *         The blocking executor does not use any thread and is a combination of some conditions with activate on any change of a datapoint that is subscribed and the behaviour itself. The blocking
+ *         executor can only be executed if a subscribed datapoint is received
  *
  */
 public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements Runnable {
@@ -33,6 +31,8 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 	private static final int INITIALIZATIONPAUSE = 500;
+
+	private final MonitoringObject monitoringObject = new MonitoringObject();
 
 	/**
 	 * Deafult execute rate of the function
@@ -55,15 +55,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	protected boolean runAllowed = false;
 
 	/**
-	 * This command is reset as the start is triggered. It is used if a start
-	 * command is triggered, while the thread is already running. In that case,
-	 * the system shall run again to be up to date.
+	 * This command is reset as the start is triggered. It is used if a start command is triggered, while the thread is already running. In that case, the system shall run again to be up to date.
 	 */
 	protected boolean startCommandIsSet = false;
 
 	/**
-	 * In the value map all, subscribed values, as well as read values and all
-	 * write values are put. Syntac: Key: Datapointid, value: Datapoint address
+	 * In the value map all, subscribed values, as well as read values and all write values are put. Syntac: Key: Datapointid, value: Datapoint address
 	 */
 	private Map<String, Datapoint> valueMap = new ConcurrentHashMap<>();
 
@@ -99,26 +96,26 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			}
 
 			// Get customized finished after single run
-			//			if (this.getFunctionConfig().isFinishStateAfterSingleRun() != null) {
-			//				this.setFinishedAfterSingleRun(this.getFunctionConfig().isFinishStateAfterSingleRun().getAsBoolean());
-			//			} else {
-			//				this.getFunctionConfig().setExecuteOnce(this.finishedAfterSingleRun);
-			//			}
+			// if (this.getFunctionConfig().isFinishStateAfterSingleRun() != null) {
+			// this.setFinishedAfterSingleRun(this.getFunctionConfig().isFinishStateAfterSingleRun().getAsBoolean());
+			// } else {
+			// this.getFunctionConfig().setExecuteOnce(this.finishedAfterSingleRun);
+			// }
 
 			// Set state register
-			//			if (this.getFunctionConfig().getRegisterState() == null) {
-			//				this.getFunctionConfig().setRegisterState(true);
-			//			}
+			// if (this.getFunctionConfig().getRegisterState() == null) {
+			// this.getFunctionConfig().setRegisterState(true);
+			// }
 
 			cellFunctionThreadInit();
 			// Create a thread from this class
 			t = new Thread(this, this.getCell().getLocalName() + "#" + this.getFunctionName());
-			//Start the thread as well as the internal initialization
+			// Start the thread as well as the internal initialization
 			t.start();
 
-			//Init all service datapoints, which present the system
+			// Init all service datapoints, which present the system
 			this.initServiceDatapoints();
-			//log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
+			// log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 
 		} catch (Exception e) {
 			log.error("CellFunction {} could not be initialized", this.getFunctionName(), e);
@@ -142,12 +139,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				command.getAddress(), state.getAddress(), description.getAddress(),
 				config.getAddress(), result.getAddress());
 
-		//Add subscriptions
+		// Add subscriptions
 		this.addManagedDatapoint(DatapointConfig.newConfig(command.getAddress(), command.getAddress(), SyncMode.SUBSCRIBEONLY));
-		//this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
-		//this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
+		// this.addManagedDatapoint(DatapointConfig.newConfig(state.getAddress(), state.getAddress(), SyncMode.SUBSCRIBEONLY));
+		// this.addManagedDatapoint(DatapointConfig.newConfig(description.getAddress(), description.getAddress(), SyncMode.SUBSCRIBEONLY));
 		this.addManagedDatapoint(DatapointConfig.newConfig(config.getAddress(), config.getAddress(), SyncMode.SUBSCRIBEONLY));
-		//Result will only be written
+		// Result will only be written
 
 		this.getCommunicator().write(Arrays.asList(command, state, description, config, result, extendedState));
 	}
@@ -162,24 +159,24 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	public void run() {
 		log.debug("Start cell function {}", this.getFunctionName());
 
-		//		log.debug("Start internal initialization");
-		//		boolean initFinished = false;
-		//		do {
-		//			try {
-		//				cellFunctionThreadInit();
-		//				initFinished = true;
-		//			} catch (Exception e2) {
-		//				log.error("Cannot initialize cell function={}. Try again in {}ms", this.getFunctionName(), INITIALIZATIONPAUSE, e2);
-		//				synchronized (this) {
-		//					try {
-		//						this.wait(INITIALIZATIONPAUSE);
-		//					} catch (InterruptedException e3) {
+		// log.debug("Start internal initialization");
+		// boolean initFinished = false;
+		// do {
+		// try {
+		// cellFunctionThreadInit();
+		// initFinished = true;
+		// } catch (Exception e2) {
+		// log.error("Cannot initialize cell function={}. Try again in {}ms", this.getFunctionName(), INITIALIZATIONPAUSE, e2);
+		// synchronized (this) {
+		// try {
+		// this.wait(INITIALIZATIONPAUSE);
+		// } catch (InterruptedException e3) {
 		//
-		//					}
-		//				}
-		//			}
-		//		} while (initFinished == false);
-		//		log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
+		// }
+		// }
+		// }
+		// } while (initFinished == false);
+		// log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 
 		while (isActive == true) {
 			// Stop the system at the end of the turn, if STOP command has been
@@ -188,26 +185,34 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 			try {
 				if (this.isAllowedToRun() == true) {
-					//Clear the blocker queue
-					//blocker.clear();
+					// Clear the blocker queue
+					// blocker.clear();
 					executePreProcessing();
 
 					executeFunction();
 
 					executePostProcessing();
 
-					//Add true to release the queue
-					//blocker.(true);
+					// Add true to release the queue
+					// blocker.(true);
 				}
 			} catch (Exception e1) {
+				try {
+					this.setServiceState(ServiceState.ERROR);
+					this.setServiceState(ServiceState.FINISHED);
+				} catch (Exception e) {
+					log.error("Cannot write service state ERROR", e);
+				}
 				log.error("Error in program execution", e1);
 			}
 
 			if (this.isExecuteOnce() == false) {
-				try {
-					Thread.sleep(this.getExecuteRate());
-				} catch (InterruptedException e) {
-					log.warn("Sleep was interrupted", e);
+				synchronized (this.monitoringObject) {
+					try {
+						this.monitoringObject.wait(this.getExecuteRate());
+					} catch (InterruptedException e) {
+						log.warn("Sleep was interrupted", e);
+					}
 				}
 			} else {
 				// Set datapoint as pause and set pause command here
@@ -235,15 +240,15 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		this.getReadDatapointConfigs().forEach((k, v) -> {
 			try {
 
-				//FIXME: Make that also local datapoints are put in the table
+				// FIXME: Make that also local datapoints are put in the table
 
 				// Read the remote datapoint
-				//if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
+				// if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
 				Datapoint temp = this.getCommunicator().read(v.getAgentid(this.getCell().getLocalName()), v.getAddress());
 				// Write local value to synchronize the datapoints
 				this.valueMap.put(k, temp);
 				log.trace("{}> Preprocessing phase: Read datapoint and write into value table={}", temp);
-				//}
+				// }
 			} catch (Exception e) {
 				log.error("{}>Cannot read datapoint={}", this.getFunctionName(), v, e);
 			}
@@ -255,7 +260,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				// Write local value to synchronize the datapoints
 				this.valueMap.putIfAbsent(k, v.toDatapoint(this.getAgentName()));
 				log.trace("{}> Preprocessing phase: Init write datapoint and write into value table={}", v);
-				//}
+				// }
 			} catch (Exception e) {
 				log.error("{}>Cannot write init datapoint={}", this.getFunctionName(), v, e);
 			}
@@ -267,7 +272,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	protected void executePostProcessing() throws Exception {
 
-		//Put the custom post processing before the values of the value map are written. In that way, values can be added in advance.
+		// Put the custom post processing before the values of the value map are written. In that way, values can be added in advance.
 		this.executeCustomPostProcessing();
 
 		// FIXME: The update here is not working well
@@ -341,15 +346,18 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	/**
 	 * Check, which command is valid and block until finished
 	 */
-	private synchronized void executeWait() {
+	private void executeWait() {
 		if (this.isStartCommandIsSet() == false) {
-			while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
-				try {
-					// Block profile controller
-					this.setAllowedToRun(false);
-					this.wait();
-				} catch (InterruptedException e) {
-					log.trace("Wait interrupted client");
+			synchronized (this.monitoringObject) {
+				while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
+					try {
+						// Block profile controller
+						this.setAllowedToRun(false);
+						// this.wait();
+						monitoringObject.wait();
+					} catch (InterruptedException e) {
+						log.trace("Wait interrupted client");
+					}
 				}
 			}
 		}
@@ -357,7 +365,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		this.setStartCommandIsSet(false);
 	}
 
-	protected synchronized void setCommand(String commandString) throws Exception {
+	protected void setCommand(String commandString) throws Exception {
 		if (ControlCommand.isCommand(commandString)) {
 			this.setCurrentCommand(ControlCommand.valueOf(commandString));
 			setCommand(this.getCurrentCommand());
@@ -367,19 +375,23 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		}
 	}
 
-	public synchronized void setCommand(ControlCommand command) {
-		this.setCurrentCommand(command);
-		if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
-			this.setAllowedToRun(true);
-			this.setStartCommandIsSet(true);
-			this.notify();
-		} else if (this.getCurrentCommand().equals(ControlCommand.STOP) == true) {
-			this.setAllowedToRun(false);
-			this.notify();
-		} else if (this.getCurrentCommand().equals(ControlCommand.EXIT) == true) {
-			this.setAllowedToRun(false);
-			this.setActive(false);
-			this.notify();
+	public void setCommand(final ControlCommand command) {
+		synchronized (this.monitoringObject) {
+			this.setCurrentCommand(command);
+			if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
+				this.setAllowedToRun(true);
+				this.setStartCommandIsSet(true);
+				// log.warn("Start thread, interrupted={}, alive={}, state={}", Thread.currentThread().isInterrupted(), Thread.currentThread().isAlive(), Thread.currentThread().getState());
+				this.monitoringObject.notify();
+				// log.warn("Thread started");
+			} else if (this.getCurrentCommand().equals(ControlCommand.STOP) == true) {
+				this.setAllowedToRun(false);
+				this.monitoringObject.notify();
+			} else if (this.getCurrentCommand().equals(ControlCommand.EXIT) == true) {
+				this.setAllowedToRun(false);
+				this.setActive(false);
+				this.monitoringObject.notify();
+			}
 		}
 	}
 
@@ -453,8 +465,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	protected abstract void shutDownExecutor() throws Exception;
 
 	/**
-	 * For a certain datapoint suffix, add the service name and a . to the
-	 * suffix.
+	 * For a certain datapoint suffix, add the service name and a . to the suffix.
 	 * 
 	 * @param suffix
 	 * @return

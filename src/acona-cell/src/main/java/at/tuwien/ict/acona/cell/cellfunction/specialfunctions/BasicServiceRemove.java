@@ -30,8 +30,7 @@ public class BasicServiceRemove extends CellFunctionBasicService {
 
 		try {
 
-			List<String> datapoints = parameterdata.getParameter(0, new TypeToken<List<String>>() {
-			});
+			List<String> datapoints = parameterdata.getParameter(0, new TypeToken<List<String>>() {});
 
 			datapoints.forEach(dp -> this.getCell().getDataStorage().remove(dp, caller));
 

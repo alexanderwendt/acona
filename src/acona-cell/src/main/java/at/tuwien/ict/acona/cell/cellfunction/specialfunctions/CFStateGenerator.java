@@ -24,7 +24,8 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 /**
  * @author wendt
  * 
- *         Get the state of a functions that are threads in a cell.
+ *         Get the state of all functions that are threads in a cell. This functions puts its results in the system state datapoint. At the execution a Json is returned, where each registered function
+ *         exists, as well as description and current state [RUNNING, FINISHED, ERROR, INITIALZING]
  *
  */
 public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHandlerListener {
@@ -39,7 +40,7 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	@Override
 	protected void cellFunctionInit() throws Exception {
 
-		//Register this function to get notified if new functions are registered or deregistered.
+		// Register this function to get notified if new functions are registered or deregistered.
 		this.currentlyRegisteredFunctions = this.getCell().getFunctionHandler().registerLister(this);
 		this.currentlyRegisteredFunctions.forEach((f) -> {
 			try {
@@ -59,7 +60,7 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		//log.info("============ Message update =============");
+		// log.info("============ Message update =============");
 		try {
 			data.forEach((k, v) -> {
 				ServiceState state = ServiceState.valueOf(v.getValue().getAsString());
@@ -68,10 +69,9 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 
 			this.generateSystemState();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Cannot add new system state", e);
 		}
-		//log.warn("State update={}", data);
+		// log.warn("State update={}", data);
 	}
 
 	private void generateSystemState() throws Exception {
@@ -87,23 +87,32 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 				.setValue("hasState", agentState.toString())
 				.setValue("hasDescription", "ACONA Cell");
 
+		StringBuilder runningFunctions = new StringBuilder();
 		this.currentStates.forEach((k, v) -> {
 			try {
 				systemState.addAssociatedContent("hasFunction", ChunkBuilder.newChunk(k, "STATE")
 						.setValue("hasState", v.toString())
 						.setValue("hasDescription", this.currentDescriptions.get(k)));
+				if (v.equals(ServiceState.RUNNING)) {
+					runningFunctions.append(k + ",");
+				}
 			} catch (Exception e) {
 				log.error("Cannot add state to system state", e);
 			}
 		});
 
+		systemState.setValue("runningFunctions", runningFunctions.toString());
 		this.writeLocal(DatapointBuilder.newDatapoint(SYSTEMSTATEADDRESS).setValue(systemState.toJsonObject()));
 		log.debug("Current system state={}", systemState);
 
 	}
 
 	private void initializeFunction(String name) throws Exception {
+		// Add datapoint to managed datapoints
 		this.addManagedDatapoint(DatapointConfig.newConfig(name, name + ".state", SyncMode.SUBSCRIBEONLY));
+		// Subscribe the datapoint manually from the function to always get the state
+		this.getCommunicator().subscribeDatapoint(name + ".state", this.getFunctionName());
+
 		String state = this.getCommunicator().read(name + ".state").getValue().getAsString();
 
 		this.currentStates.put(name, ServiceState.valueOf(state));
@@ -112,8 +121,8 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 		this.currentDescriptions.put(name, description);
 
 		this.generateSystemState();
-		log.info("subscriptions={}", this.getCell().getSubscriptionHandler().getCellFunctionDatapointMapping());
-		log.debug("Available functions={}, service state={}", name, state);
+		// log.info("subscriptions={}", this.getCell().getSubscriptionHandler().getCellFunctionDatapointMapping());
+		log.debug("Function={}, state={}", name, state);
 	}
 
 	private void removeFunction(String name) throws Exception {
@@ -122,13 +131,13 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 		this.currentStates.remove(name);
 
 		this.generateSystemState();
-		//TODO: Add unsubscribe
+		// TODO: Add unsubscribe
 
 	}
 
 	@Override
 	protected void shutDownImplementation() throws Exception {
-		//Unregister this function from the function handler listeners
+		// Unregister this function from the function handler listeners
 		this.getCell().getFunctionHandler().unregisterListener(this);
 
 	}

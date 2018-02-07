@@ -37,6 +37,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	public final static String REGISTERCODELETSERVICENAME = "registercodelet";
 	public final static String DEREGISTERCODELETSERVICENAME = "deregistercodelet";
 	public final static String EXECUTECODELETMETHODNAME = "execute";
+	public final static String RESET = "reset";
 	public final static String EXECUTECODELETEHANDLER = "executecodelethandler";
 	public final static String KEYMETHOD = "method";
 	public final static String KEYCALLERADDRESS = "calleraddress";
@@ -86,7 +87,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	public synchronized JsonRpcResponse performOperation(JsonRpcRequest parameter, String caller) {
+	public synchronized JsonRpcResponse performOperation(final JsonRpcRequest parameter, final String caller) {
 		JsonRpcResponse result = null;
 
 		try {
@@ -126,6 +127,10 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 
 				break;
+			case RESET:
+				log.debug("Reset codelet handler from caller={}", caller);
+				this.resetCodeletHandler();
+				result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 			default:
 				throw new Exception("No such method: " + parameter.getMethod());
 
@@ -188,17 +193,19 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 					log.debug("Codelet handler finished and has written state finished to datapoint address={}", this.addServiceName(STATESUFFIX));
 					// this.setServiceState(ServiceState.IDLE);
 				} else {
-					log.debug("The next codelet run can start");
+					log.debug("The next codelet run={} can start. Current command={}", nextRunOrder, this.currentCommand);
 					this.setStart();
+
 				}
 			}
 
 			// Write the current state of the system
 			Datapoint handlerState = getExtendedState();
-			log.debug("write handerstate={}", handlerState);
+			log.debug("Current command={}, write handerstate={}, isActive={}, allowedToRun={}, startCommandSet={}.", this.currentCommand, handlerState, this.isActive(), this.isAllowedToRun(), this.isStartCommandIsSet());
 			this.writeLocal(handlerState);
 
 		} else {
+			log.error("Codelet={} that reported state={} is not registered in this codelet handler", codeletID, state);
 			throw new Exception("Codelet not registered");
 		}
 	}
@@ -208,11 +215,11 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		Chunk systemState = null;
 		try {
-			systemState = ChunkBuilder.newChunk(this.getFunctionName() + "_EXTSTATE", "EXTEDNEDSTATE");
+			systemState = ChunkBuilder.newChunk(this.getFunctionName() + "_EXTSTATE", "CODELETHANDLER");
 			systemState.setValue("hasState", this.getCurrentState().toString());
 			for (Entry<String, ServiceState> entry : this.getCodeletMap().entrySet()) {
 				try {
-					systemState.addAssociatedContent("hasCodelet", ChunkBuilder.newChunk(entry.getKey(), "CODELETSTATE").setValue("State", entry.getValue().toString()));
+					systemState.addAssociatedContent("hasCodelet", ChunkBuilder.newChunk(entry.getKey(), "CODELET").setValue("hasState", entry.getValue().toString()));
 				} catch (Exception e) {
 					log.error("Cannot set the associated codelet={}", entry, e);
 				}
@@ -262,14 +269,13 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	/**
-	 * The if the codelets for a certain run order are ready to execute. Return true if all codelets are
-	 * idle.
+	 * The if the codelets for a certain run order are ready to execute. Return true if all codelets are idle.
 	 * 
 	 * @param runOrder
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean isRunOrderStateReady(int runOrder) throws Exception {
+	private synchronized boolean isRunOrderStateReady(int runOrder) throws Exception {
 		boolean result = true;
 		try {
 			log.debug("Map:{}", this.getExecutionOrderMap());
@@ -317,7 +323,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * @param runOrder
 	 * @return
 	 */
-	private int getNextRunOrderState(int runOrder) {
+	private synchronized int getNextRunOrderState(int runOrder) {
 		int nextValue = -1;
 
 		if (runOrder < 0) { // Beginning
@@ -332,6 +338,10 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		}
 
 		return nextValue;
+	}
+
+	private void resetCodeletHandler() {
+		log.warn("Codelet handler reset. Current states of codelets={}", this.codeletMap);
 	}
 
 	@Override
@@ -417,7 +427,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * @param order
 	 * @throws Exception
 	 */
-	private void putCodeletExecutionOrder(String name, int order) throws Exception {
+	private synchronized void putCodeletExecutionOrder(String name, int order) throws Exception {
 		if (order < 0) {
 			throw new Exception("Execution order must be > 0. Current execution order=" + order);
 		}

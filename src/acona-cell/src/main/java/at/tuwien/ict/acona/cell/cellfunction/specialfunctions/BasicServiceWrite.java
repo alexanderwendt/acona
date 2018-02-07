@@ -33,10 +33,9 @@ public class BasicServiceWrite extends CellFunctionBasicService {
 		try {
 			switch (parameter.getMethod()) {
 			case "write":
-				//All datapoints are in the first parameter of the method call
-				List<Datapoint> datapoints = parameter.getParameter(0, new TypeToken<List<Datapoint>>() {
-				});
-				//List<Datapoint> datapoints = Lists.newArrayList(parameter.values());
+				// All datapoints are in the first parameter of the method call
+				List<Datapoint> datapoints = parameter.getParameter(0, new TypeToken<List<Datapoint>>() {});
+				// List<Datapoint> datapoints = Lists.newArrayList(parameter.values());
 				this.write(datapoints, caller);
 				result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 				break;

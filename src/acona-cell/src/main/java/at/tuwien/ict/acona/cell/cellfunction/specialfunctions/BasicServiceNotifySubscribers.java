@@ -30,18 +30,17 @@ public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 		JsonRpcResponse result = null;
 
 		try {
-			String s = parameterdata.getParameter(0, new TypeToken<String>() {
-			});
+			String s = parameterdata.getParameter(0, new TypeToken<String>() {});
 
 			Datapoint dp = (new Gson()).fromJson(s, Datapoint.class);
 
-			//Datapoint dp = parameterdata.getParameter(0, new TypeToken<Datapoint>() {
-			//});
+			// Datapoint dp = parameterdata.getParameter(0, new TypeToken<Datapoint>() {
+			// });
 
 			log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.getParams());
-			//dp.forEach(d -> {
+			// dp.forEach(d -> {
 			this.getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
-			//});
+			// });
 
 			result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 
