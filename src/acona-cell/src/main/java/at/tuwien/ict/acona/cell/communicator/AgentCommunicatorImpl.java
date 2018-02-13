@@ -75,7 +75,10 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 
 		cell.addBehaviour(tbf.wrap(responder));
 		// These threaded behaviours have to be delected explicitely
-		this.threadedBehaviours.add(responder);
+		synchronized (this.threadedBehaviours) {
+			this.threadedBehaviours.add(responder);
+		}
+
 	}
 
 	@Override
@@ -87,11 +90,12 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	@Override
 	public void shutDown() {
 		log.info("Shut down communicator");
-		this.threadedBehaviours.forEach(b -> {
-			log.debug("Interrupting behaviour={}. Behaviour done={}", b.getBehaviourName(), b.done());
-			tbf.getThread(b).interrupt();
-		});
-
+		synchronized (this.threadedBehaviours) {
+			this.threadedBehaviours.forEach(b -> {
+				log.debug("Interrupting behaviour={}. Behaviour done={}", b.getBehaviourName(), b.done());
+				tbf.getThread(b).interrupt();
+			});
+		}
 	}
 
 	@Override
@@ -112,7 +116,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	}
 
 	@Override
-	public JsonRpcResponse execute(final String agentName, final String serviceName, final JsonRpcRequest methodParameters, final int timeout, final boolean useSubscribeProtocol) throws Exception {
+	public synchronized JsonRpcResponse execute(final String agentName, final String serviceName, final JsonRpcRequest methodParameters, final int timeout, final boolean useSubscribeProtocol) throws Exception {
 
 		JsonRpcResponse result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); // = new ArrayList<>();
 		// If a local data storage is meant, then write it there, else a foreign
@@ -153,25 +157,25 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 			// Blocking read and write
 			SynchronousQueue<String> queue = new SynchronousQueue<>();
 
-			synchronized (this) {
-				this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
-				String writeBehaviourFinished = "";
-				try {
-					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
-					if (writeBehaviourFinished == null) {
-						throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
-								+ "Possible causes: 1: target address agent " + newAgentName + " + service " + serviceName + " does not exist. "
-								+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
-								+ "2: Error at the receiver site so that no message is returned.");
-					}
-
-					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {}.getType());
-				} catch (InterruptedException e) {
-					log.warn("Queue interrupted");
-				} catch (JsonSyntaxException e) {
-					log.error("Cannot read respond message={}", writeBehaviourFinished);
+			// synchronized (this) {
+			this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
+			String writeBehaviourFinished = "";
+			try {
+				writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
+				if (writeBehaviourFinished == null) {
+					throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
+							+ "Possible causes: 1: target address agent " + newAgentName + " + service " + serviceName + " does not exist. "
+							+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
+							+ "2: Error at the receiver site so that no message is returned.");
 				}
+
+				result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {}.getType());
+			} catch (InterruptedException e) {
+				log.warn("Queue interrupted");
+			} catch (JsonSyntaxException e) {
+				log.error("Cannot read respond message={}", writeBehaviourFinished);
 			}
+			// }
 		}
 
 		return result;

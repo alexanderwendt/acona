@@ -34,7 +34,7 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		log.info("=== Codelet handler={} running.", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
+		log.info("=== Codelet handler={} running.===", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
 
 		// run the codelet handler
 		// this.getCommunicator().execute(codeletHandlerAgent, codeletHandlerAddress, Arrays.asList(
@@ -46,7 +46,7 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 
 		this.getCommunicator().executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, req, codeletHandlerAgent, codeletHandlerAddress + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), this.getCommunicator().getDefaultTimeout());
 
-		log.info("=== Codelet handler={} finished.", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
+		log.info("=== Codelet handler={} finished. ===", this.codeletHandlerAgent + ":" + this.codeletHandlerAddress);
 	}
 
 	@Override

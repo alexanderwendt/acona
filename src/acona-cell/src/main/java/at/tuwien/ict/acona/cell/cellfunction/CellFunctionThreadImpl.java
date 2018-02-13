@@ -32,8 +32,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
 	private static final int INITIALIZATIONPAUSE = 500;
 
-	private final MonitoringObject monitoringObject = new MonitoringObject();
-
 	/**
 	 * Deafult execute rate of the function
 	 */
@@ -157,7 +155,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	@Override
 	public void run() {
-		log.debug("Start cell function {}", this.getFunctionName());
+		// log.warn("Start cell function {}", this.getFunctionName());
 
 		// log.debug("Start internal initialization");
 		// boolean initFinished = false;
@@ -187,14 +185,26 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				if (this.isAllowedToRun() == true) {
 					// Clear the blocker queue
 					// blocker.clear();
-					executePreProcessing();
+					try {
+						executePreProcessing();
+					} catch (Exception e) {
+						log.error("Error in the preprocessing", e);
+						throw new Exception("Error in the proprocessing", e);
+					}
 
-					executeFunction();
+					try {
+						executeFunction();
+					} catch (Exception e) {
+						log.error("Error in the function execution. Continue with post processing", e);
+					}
 
-					executePostProcessing();
+					try {
+						executePostProcessing();
+					} catch (Exception e) {
+						log.error("Error in the postprocessing", e);
+						throw new Exception("Error in the postprocessing", e);
+					}
 
-					// Add true to release the queue
-					// blocker.(true);
 				}
 			} catch (Exception e1) {
 				try {
@@ -287,6 +297,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				Datapoint dp = this.valueMap.get(config.getId());
 				if (dp != null) {
 					String agentName = config.getAgentid(this.getCell().getLocalName());
+					// log.trace("{}>Write datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 					this.getCommunicator().write(agentName, dp);
 					log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 				} else {
@@ -348,8 +359,8 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	 */
 	private void executeWait() {
 		if (this.isStartCommandIsSet() == false) {
-			synchronized (this.monitoringObject) {
-				while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
+			while (this.getCurrentCommand().equals(ControlCommand.STOP) == true || this.getCurrentCommand().equals(ControlCommand.PAUSE) == true) {
+				synchronized (this.monitoringObject) {
 					try {
 						// Block profile controller
 						this.setAllowedToRun(false);
@@ -381,9 +392,9 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			if (this.getCurrentCommand().equals(ControlCommand.START) == true) {
 				this.setAllowedToRun(true);
 				this.setStartCommandIsSet(true);
-				// log.warn("Start thread, interrupted={}, alive={}, state={}", Thread.currentThread().isInterrupted(), Thread.currentThread().isAlive(), Thread.currentThread().getState());
+				// log.warn("Start thread, interrupted={}, alive={}, state={}", t.isInterrupted(), t.isAlive(), t.getState());
 				this.monitoringObject.notify();
-				// log.warn("Thread started");
+				// log.warn("Thread started, state={}", t.getState());
 			} else if (this.getCurrentCommand().equals(ControlCommand.STOP) == true) {
 				this.setAllowedToRun(false);
 				this.monitoringObject.notify();

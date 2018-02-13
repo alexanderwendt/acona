@@ -32,7 +32,7 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public synchronized void write(Datapoint datapackage, String caller) throws Exception {
+	public void write(Datapoint datapackage, String caller) throws Exception {
 		// Get data
 		// Datapackage previousDatapackage = this.read(address);
 		// Only update subscribers if value has changed and one of them were
@@ -50,30 +50,30 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public synchronized void append(Datapoint datapackage, String caller) throws Exception {
+	public void append(Datapoint datapackage, String caller) throws Exception {
 		if (datapackage.getAddress().contains("*") || datapackage.getAddress().contains(":")) {
 			throw new Exception("* or : was part of the address: " + datapackage.getAddress() + "This is not allowed");
 		}
 
 		// Lock data
-		synchronized (this.data) {
-			GsonUtils util = new GsonUtils();
-			Datapoint source = this.data.get(datapackage.getAddress());
-			if (source != null) {
-				if (source.getValue().isJsonObject() == false || datapackage.getValue().isJsonObject() == false) {
-					throw new Exception(source + " is no json object or " + datapackage + " is no json object.");
-				}
-
-				util.extendJsonObject(source.getValue().getAsJsonObject(), ConflictStrategy.PREFER_SECOND_OBJ, datapackage.getValue().getAsJsonObject());
-
-				// write appended message
-				this.write(source, caller);
-
-			} else {
-				// write only new message
-				this.write(datapackage, caller);
+		// synchronized (this.data) {
+		GsonUtils util = new GsonUtils();
+		Datapoint source = this.data.get(datapackage.getAddress());
+		if (source != null) {
+			if (source.getValue().isJsonObject() == false || datapackage.getValue().isJsonObject() == false) {
+				throw new Exception(source + " is no json object or " + datapackage + " is no json object.");
 			}
+
+			util.extendJsonObject(source.getValue().getAsJsonObject(), ConflictStrategy.PREFER_SECOND_OBJ, datapackage.getValue().getAsJsonObject());
+
+			// write appended message
+			this.write(source, caller);
+
+		} else {
+			// write only new message
+			this.write(datapackage, caller);
 		}
+		// }
 
 		// this.data.put(datapackage.getAddress(), datapackage);
 		// log.debug("write datapoint={}", datapackage);
@@ -167,7 +167,7 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public synchronized void unsubscribeDatapoint(String address, String caller) {
+	public void unsubscribeDatapoint(String address, String caller) {
 		// If address exist
 		if (this.subscribers.containsKey(address) == true) {
 			this.subscribers.get(address).remove(caller);
@@ -176,7 +176,7 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public synchronized void remove(String address, String caller) {
+	public void remove(String address, String caller) {
 		List<String> listToRemove = new ArrayList<>();
 
 		if (address.endsWith("*")) {

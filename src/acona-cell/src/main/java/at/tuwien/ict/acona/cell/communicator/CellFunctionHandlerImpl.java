@@ -36,23 +36,27 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 		try {
 			// Get all subscribed addresses
 			// Add the cellfunction itself
-			//Check if this name is already registered
+			// Check if this name is already registered
 			if (this.cellFunctionsMap.containsKey(cellFunctionInstance.getFunctionName())) {
 				log.warn("Agent {}>Cell function={} is already registered. Cellfunction will be overwritten. Watch for errors.", this.hostCell.getLocalName(), cellFunctionInstance.getFunctionName());
 			}
 
 			this.cellFunctionsMap.put(cellFunctionInstance.getFunctionName(), cellFunctionInstance);
 
-			//Set init state
+			// Set init state
 			if ((this.applicationFunctions.contains(cellFunctionInstance.getFunctionName()) == false) && (cellFunctionInstance.getFunctionType().equals(CellFunctionType.BASEFUNCTION) == false)) {
-				this.applicationFunctions.add(cellFunctionInstance.getFunctionName());
+				synchronized (this.applicationFunctions) {
+					this.applicationFunctions.add(cellFunctionInstance.getFunctionName());
+				}
 
-				//Notify all listeners that a new function has been registered
-				this.listenerList.forEach(l -> {
-					if (l.getListenerFunction().equals(cellFunctionInstance.getFunctionName()) == false) {
-						l.notifyAddedFunction(cellFunctionInstance.getFunctionName());
-					}
-				});
+				// Notify all listeners that a new function has been registered
+				synchronized (this.listenerList) {
+					this.listenerList.forEach(l -> {
+						if (l.getListenerFunction().equals(cellFunctionInstance.getFunctionName()) == false) {
+							l.notifyAddedFunction(cellFunctionInstance.getFunctionName());
+						}
+					});
+				}
 			}
 
 			// Create a responder to the cellfunction if it is set in the
@@ -78,20 +82,25 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			// Remove the cellfunction itself
 			this.cellFunctionsMap.remove(activatorInstance);
 
-			//if (cellFunctionInstance.getFunctionConfig().getRegisterState().getAsBoolean()==true) {
+			// if (cellFunctionInstance.getFunctionConfig().getRegisterState().getAsBoolean()==true) {
 			if (this.applicationFunctions.contains(activatorInstance)) {
-				this.applicationFunctions.remove(activatorInstance);
+				synchronized (this.applicationFunctions) {
+					this.applicationFunctions.remove(activatorInstance);
+				}
 
-				this.listenerList.forEach(l -> {
-					if (l.getListenerFunction().equals(activatorInstance) == false) {
-						l.notifyRemovedFunction(activatorInstance);
-					}
-				});
+				synchronized (this.listenerList) {
+					this.listenerList.forEach(l -> {
+						if (l.getListenerFunction().equals(activatorInstance) == false) {
+							l.notifyRemovedFunction(activatorInstance);
+						}
+					});
+				}
+
 			}
 
-			//}
+			// }
 
-			//Notify all listeners that an existing function has been unregistered
+			// Notify all listeners that an existing function has been unregistered
 
 		} catch (Exception e) {
 			log.error("Cannot deregister cell function " + activatorInstance, e);
@@ -138,12 +147,12 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 
 	}
 
-	//	@Override
-	//	public void updateState(CellFunction function, ServiceState state) {
-	//		//Update this map
-	//		this.functionStateMap.put(function.getFunctionName(), state);
-	//		//Update all listeners
-	//		this.listenerList.forEach(l -> l.notifyStateUpdate(function.getFunctionName(), state));
-	//	}
+	// @Override
+	// public void updateState(CellFunction function, ServiceState state) {
+	// //Update this map
+	// this.functionStateMap.put(function.getFunctionName(), state);
+	// //Update all listeners
+	// this.listenerList.forEach(l -> l.notifyStateUpdate(function.getFunctionName(), state));
+	// }
 
 }

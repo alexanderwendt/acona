@@ -72,10 +72,8 @@ public class Codelettester {
 	}
 
 	/**
-	 * 2 codelets register in the codelet handler. Both of them will increment a
-	 * number by 1 if a condition applies. The condition is the number. The
-	 * purpose is that the codelet handler is triggered 2 times and the codelets
-	 * are executed in serie.
+	 * 2 codelets register in the codelet handler. Both of them will increment a number by 1 if a condition applies. The condition is the number. The purpose is that the codelet handler is triggered 2
+	 * times and the codelets are executed in serie.
 	 * 
 	 */
 	@Test
@@ -92,7 +90,7 @@ public class Codelettester {
 			double startValue = 1;
 			int expectedResult = 4;
 
-			//Agent with handler and 2 codelets
+			// Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
 					.addCellfunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
@@ -128,13 +126,13 @@ public class Codelettester {
 			log.debug("Send request to codeletHandler={} and see that it fails because the condition does not match", request1);
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1, controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(500);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 
 			log.info("Datapoints on the way. Set datapoint value={} to 1.0", processDatapoint);
 			controller.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
@@ -146,14 +144,14 @@ public class Codelettester {
 			log.debug("Start codelet handler again");
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2, controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(500);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
-			//controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(3)));
+			// }
+			// }
+			// controller.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(3)));
 			log.debug("Read if the value has been incremented");
 			int x = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
 			if (x == 2) {
@@ -163,20 +161,20 @@ public class Codelettester {
 			}
 			log.info("Value is={}", x);
 
-			//			//Execute codelets once again
+			// //Execute codelets once again
 			JsonRpcRequest request3 = new JsonRpcRequest("executecodelethandler", 1);
 			request3.setParameterAsValue(0, false);
 
 			log.debug("See if value can be incremented again");
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request3, controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(500);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
@@ -194,10 +192,8 @@ public class Codelettester {
 	}
 
 	/**
-	 * 2 codelets register in the codelet handler. Both of them will increment a
-	 * number by 1 if a condition applies. The condition is the number. The
-	 * purpose is that the codelet handler is triggered 1 time but execute both
-	 * codelets in series because they have different execution order
+	 * 2 codelets register in the codelet handler. Both of them will increment a number by 1 if a condition applies. The condition is the number. The purpose is that the codelet handler is triggered 1
+	 * time but execute both codelets in series because they have different execution order
 	 * 
 	 */
 	@Test
@@ -209,12 +205,12 @@ public class Codelettester {
 			String controllerAgentName = "CodeletExecutorAgent";
 
 			String processDatapoint = "workingmemory.changeme";
-			//String notificationDatapoint = "workingmemory.notification";
+			// String notificationDatapoint = "workingmemory.notification";
 			// values
 			double startValue = 1;
 			int expectedResult = 3;
 
-			//Agent with handler and 2 codelets
+			// Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
 					.addCellfunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
@@ -239,10 +235,10 @@ public class Codelettester {
 			}
 			log.info("=== All agents initialized ===");
 
-			//memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
+			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			// controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			// Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			// Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(false))), 1000);
 
 			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
 			request1.setParameterAsValue(0, false);
@@ -250,22 +246,23 @@ public class Codelettester {
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request1,
 					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(500);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 
 			log.info("Datapoints on the way. Set 1");
 			controller.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			//Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state", controller.getCell().getLocalName(), 1000000);
+			// Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), "state",
+			// controller.getCell().getLocalName(), 1000000);
 
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 1000);
+			// controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			// Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			// Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 1000);
 
 			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
 			request2.setParameterAsValue(0, false);
@@ -273,30 +270,30 @@ public class Codelettester {
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request2,
 					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(500);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
-			//Execute codelets once again
-			//			controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
+			// Execute codelets once again
+			// controller.getCommunicator().execute(controllerAgentName, handlerName, Arrays.asList(
+			// Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			// Datapoint.newDatapoint("notificationaddress").setValue(notificationDatapoint)), 1000);
 			//
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(500);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(500);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 			//
-			//			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
+			// log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 
 			double result = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
 
@@ -312,64 +309,63 @@ public class Codelettester {
 	}
 
 	/**
-	 * Execute the full ACONA architecture with 2 codelets for each codelet
-	 * handler. They shall increment different addresses in parallel.
+	 * Execute the full ACONA architecture with 2 codelets for each codelet handler. They shall increment different addresses in parallel.
 	 * 
 	 */
 	@Test
 	public void cognitiveArchitectureStructureTest() {
 		try {
-			//Create the agent
+			// Create the agent
 			String cognitiveAgentName = "CognitiveAgent";
 
-			//Main codelet handler
+			// Main codelet handler
 			String mainCodeletHandlerName = "MainProcessCodeletHandler";
 			String mainCodeletHandlerServiceAddress = cognitiveAgentName + ":" + mainCodeletHandlerName;
 
-			//Codelethandler Activate Concepts
+			// Codelethandler Activate Concepts
 			String activateConceptsCodeletTriggerName = "ActivateConceptsCodeletHandlerTrigger";
 			String activateConceptsCodeletHandlerName = "ActivateConceptsCodeletHandler";
 
-			//Codelethandler Create goals
+			// Codelethandler Create goals
 			String createGoalsCodeletTriggerName = "CreateGoalsCodeletHandlerTrigger";
 			String createGoalsCodeletHandlerName = "CreateGoalsCodeletHandler";
 
-			//Codelethandler Activate beliefs
+			// Codelethandler Activate beliefs
 			String activateBeliefsCodeletTriggerName = "ActivateBeliefsCodeletHandlerTrigger";
 			String activateBeliefsCodeletHandlerName = "ActivateBeliefsCodeletHandler";
 
-			//CodeletHandler Propose Options
+			// CodeletHandler Propose Options
 			String proposeOptionsCodeletTriggerName = "ProposeOptionsCodeletHandlerTrigger";
 			String proposeOptionsCodeletHandlerName = "ProposeOptionsCodeletHandler";
 
-			//CodeletHandler Propose Actions
+			// CodeletHandler Propose Actions
 			String proposeActionsCodeletTriggerName = "ProposeActionsCodeletHandlerTrigger";
 			String proposeActionsCodeletHandlerName = "ProposeActionsCodeletHandler";
 
-			//CodeletHandler Evaluate Options
+			// CodeletHandler Evaluate Options
 			String evaluteOptionsCodeletTriggerName = "EvaluateOptionsCodeletHandlerTrigger";
 			String evaluteOptionsCodeletHandlerName = "EvaluateOptionsCodeletHandler";
 
-			//Codelet Select option (here, no codelethandler is executed, just a normal codelet)
+			// Codelet Select option (here, no codelethandler is executed, just a normal codelet)
 			String selectOptionCodeletName = "SelectOptionCodelet";
 
-			//Codelet Execute Action
+			// Codelet Execute Action
 			String executeActionCodeletName = "ExecuteActionCodelet";
 
-			//Memories
+			// Memories
 			String namespaceWorkingMemory = "workingmemory";
 			String namespaceInternalStateMemory = "internalstatememory";
 			String namespaceLongTermMemory = "longtermmemory";
 
-			//Generate the configuration for the KORE system
+			// Generate the configuration for the KORE system
 			log.info("Generate system configuration");
 			// Controller
 			CellConfig cognitiveAgentConfig = CellConfig.newConfig(cognitiveAgentName)
-					//Main codelethandler
+					// Main codelethandler
 					.addCellfunction(CellFunctionConfig.newConfig(mainCodeletHandlerName, CellFunctionCodeletHandler.class)
 							.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 							.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-					//Process codelethandlers
+					// Process codelethandlers
 					.addCellfunction(CellFunctionConfig.newConfig(activateConceptsCodeletHandlerName, CellFunctionCodeletHandler.class)
 							.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 							.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
@@ -388,8 +384,8 @@ public class Codelettester {
 					.addCellfunction(CellFunctionConfig.newConfig(evaluteOptionsCodeletHandlerName, CellFunctionCodeletHandler.class)
 							.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 							.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-					//Add main process codelets
-					//Add trigger codelets
+					// Add main process codelets
+					// Add trigger codelets
 					.addCellfunction(CellFunctionConfig.newConfig(activateConceptsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "1")
@@ -414,22 +410,22 @@ public class Codelettester {
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "6")
 							.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName));
-			//Direct codelets
-			//					.addCellfunction(CellFunctionConfig.newConfig(selectOptionCodeletName, OptionSelectorCodelet.class)
-			//							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
-			//							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "7"))
-			//					.addCellfunction(CellFunctionConfig.newConfig(executeActionCodeletName, ActionExecutorCodelet.class)
-			//							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
-			//							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "8"));
+			// Direct codelets
+			// .addCellfunction(CellFunctionConfig.newConfig(selectOptionCodeletName, OptionSelectorCodelet.class)
+			// .setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
+			// .setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "7"))
+			// .addCellfunction(CellFunctionConfig.newConfig(executeActionCodeletName, ActionExecutorCodelet.class)
+			// .setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
+			// .setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "8"));
 
-			//Add the specific codelets
+			// Add the specific codelets
 			String incrementServiceName = "incrementservice";
 			String incrementDatapoint1 = "incrementme1";
 			String incrementDatapoint2 = "incrementme2";
 
 			cognitiveAgentConfig
-					//.addCellfunction(CellFunctionConfig.newConfig(incrementServiceName, CFIncrementService.class)
-					//		.addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, namespaceWorkingMemory + "." + incrementDatapoint, SyncMode.SUBSCRIBEWRITEBACK)))
+					// .addCellfunction(CellFunctionConfig.newConfig(incrementServiceName, CFIncrementService.class)
+					// .addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, namespaceWorkingMemory + "." + incrementDatapoint, SyncMode.SUBSCRIBEWRITEBACK)))
 					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet11", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + activateConceptsCodeletHandlerName)
 							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
@@ -462,8 +458,8 @@ public class Codelettester {
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1));
 
 			cognitiveAgentConfig
-					//.addCellfunction(CellFunctionConfig.newConfig(incrementServiceName, CFIncrementService.class)
-					//		.addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, namespaceWorkingMemory + "." + incrementDatapoint, SyncMode.SUBSCRIBEWRITEBACK)))
+					// .addCellfunction(CellFunctionConfig.newConfig(incrementServiceName, CFIncrementService.class)
+					// .addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT, namespaceWorkingMemory + "." + incrementDatapoint, SyncMode.SUBSCRIBEWRITEBACK)))
 					.addCellfunction(CellFunctionConfig.newConfig("IncrementCodelet21", IncrementNumberCodelet.class)
 							.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, cognitiveAgentName + ":" + activateConceptsCodeletHandlerName)
 							.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
@@ -507,31 +503,31 @@ public class Codelettester {
 				}
 			}
 
-			//Write initial value on the incrementaddress
+			// Write initial value on the incrementaddress
 			cogsys.getCommunicator().write(DatapointBuilder.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint1).setValue(0));
 			cogsys.getCommunicator().write(DatapointBuilder.newDatapoint(namespaceWorkingMemory + "." + incrementDatapoint2).setValue(0));
 
 			log.info("=== All agents initialized ===");
 
-			//			memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
-			//			cogsys.getCommunicator().execute(cognitiveAgentName, mainCodeletHandlerName, Arrays.asList(
-			//					Datapoint.newDatapoint("method").setValue("executecodelethandler"),
-			//					Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 10000);
+			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			// cogsys.getCommunicator().execute(cognitiveAgentName, mainCodeletHandlerName, Arrays.asList(
+			// Datapoint.newDatapoint("method").setValue("executecodelethandler"),
+			// Datapoint.newDatapoint("blockingmethod").setValue(new JsonPrimitive(true))), 10000);
 
 			JsonRpcRequest request1 = new JsonRpcRequest("executecodelethandler", 1);
 			request1.setParameterAsValue(0, false);
 
 			cogsys.getCommunicator().executeServiceQueryDatapoints(cognitiveAgentName, mainCodeletHandlerName, request1, cognitiveAgentName, mainCodeletHandlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 200000);
 
-			//			synchronized (this) {
-			//				try {
-			//					this.wait(1000);
-			//				} catch (InterruptedException e) {
+			// synchronized (this) {
+			// try {
+			// this.wait(1000);
+			// } catch (InterruptedException e) {
 			//
-			//				}
-			//			}
+			// }
+			// }
 
-			log.info("Read working memory={}", cogsys.getDataStorage());
+			// log.info("Read working memory={}", cogsys.getDataStorage());
 
 			int result1 = (int) (cogsys.getCommunicator().read(namespaceWorkingMemory + "." + incrementDatapoint1).getValue().getAsDouble());
 			int result2 = (int) (cogsys.getCommunicator().read(namespaceWorkingMemory + "." + incrementDatapoint1).getValue().getAsDouble());

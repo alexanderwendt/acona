@@ -25,9 +25,9 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 	private final Cell cell;
 	protected static Logger log = LoggerFactory.getLogger(CellNotificator.class);
 
-	int corePoolSize = 1;
-	int maxPoolSize = 10;
-	long keepAliveTime = 5000;
+	private final int corePoolSize = 1;
+	private final int maxPoolSize = 10;
+	private final long keepAliveTime = 5000;
 
 	public CellNotificator(Cell cell) {
 		this.cell = cell;
@@ -36,7 +36,7 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 	private ExecutorService threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
 	@Override
-	public synchronized void notifySubscribers(List<String> subscribers, String caller, Datapoint subscribedData) {
+	public void notifySubscribers(List<String> subscribers, String caller, Datapoint subscribedData) {
 		threadPoolExecutor.execute(new WorkerThread(cell.getFunctionHandler(), cell.getCommunicator(), subscribers, caller, cell.getLocalName(), subscribedData));
 	}
 
@@ -64,6 +64,7 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 			this.caller = caller;
 			this.localName = localName;
 			this.subscribedData = subscribedData;
+			// Thread.currentThread().setName("Subscriberpool-localName-" + this.hashCode());
 		}
 
 		@Override

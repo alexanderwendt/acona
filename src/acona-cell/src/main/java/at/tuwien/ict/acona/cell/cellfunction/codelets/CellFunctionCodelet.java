@@ -116,7 +116,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 			if (result == null) {
 				switch (parameterdata.getMethod()) {
 				case EXECUTECODELETMETHODNAME:
-					log.debug("Execute the codelet");
+					log.debug("{}>Execute the codelet", this.getFunctionName());
 					this.startCodelet();
 					result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
 					break;
@@ -151,23 +151,25 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	// }
 
 	@Override
+	protected void executeCustomPreProcessing() throws Exception {
+		// Set state to running
+		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
+		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
+		log.debug("Set state running");
+		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
+		this.setServiceState(ServiceState.RUNNING);
+	}
+
+	@Override
 	protected void executeCustomPostProcessing() throws Exception {
 		// Set state of the codelet to finished
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
+		log.debug("Set state finished");
 		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.FINISHED.toString());
 		this.setServiceState(ServiceState.FINISHED);
 
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 
-	}
-
-	@Override
-	protected void executeCustomPreProcessing() throws Exception {
-		// Set state to running
-		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
-		request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
-		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
-		this.setServiceState(ServiceState.RUNNING);
 	}
 
 	private void updateServiceStateInCodeletHandler(ServiceState state) throws Exception {

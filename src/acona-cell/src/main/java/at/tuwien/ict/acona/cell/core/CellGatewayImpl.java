@@ -26,28 +26,28 @@ public class CellGatewayImpl implements CellGateway {
 		return this.getCommunicator().read(address);
 	}
 
-	//	@Override
-	//	public Datapoint subscribeForeignDatapoint(String address, String agentName) throws Exception {
-	//		//create a temporary function and add to the cell
-	//		//Check if 
-	//		
-	//		
-	//		List<Datapoint> list = this.getCommunicator().subscribe(Arrays.asList(address), agentName);
+	// @Override
+	// public Datapoint subscribeForeignDatapoint(String address, String agentName) throws Exception {
+	// //create a temporary function and add to the cell
+	// //Check if
 	//
-	//		Datapoint result = null;
-	//		if (list.isEmpty() == false) {
-	//			result = list.get(0);
-	//		} else {
-	//			throw new Exception("Nothing was read from the subscribption");
-	//		}
 	//
-	//		return result;
-	//	}
+	// List<Datapoint> list = this.getCommunicator().subscribe(Arrays.asList(address), agentName);
+	//
+	// Datapoint result = null;
+	// if (list.isEmpty() == false) {
+	// result = list.get(0);
+	// } else {
+	// throw new Exception("Nothing was read from the subscribption");
+	// }
+	//
+	// return result;
+	// }
 
-	//	@Override
-	//	public void unsubscribeLocalDatapoint(String address, String agentName) throws Exception {
-	//		this.getCell().getCommunicator().unsubscribe(Arrays.asList(address), agentName);
-	//	}
+	// @Override
+	// public void unsubscribeLocalDatapoint(String address, String agentName) throws Exception {
+	// this.getCell().getCommunicator().unsubscribe(Arrays.asList(address), agentName);
+	// }
 
 	@Override
 	public Communicator getCommunicator() {
@@ -63,5 +63,12 @@ public class CellGatewayImpl implements CellGateway {
 	@Override
 	public DataStorage getDataStorage() {
 		return this.getCell().getDataStorage();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(cell.getName());
+		return builder.toString();
 	}
 }

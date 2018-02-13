@@ -186,6 +186,7 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			if (result.getError() != null) {
 				throw new Exception("Cannot write values. Error returned from destination. Error:" + result.getError());
 			}
+
 		} catch (Exception e) {
 			log.error("Cannot write value for addresses={} of agent={}", datapoints, agentComplementedName);
 			throw new Exception(e.getMessage());
@@ -198,16 +199,6 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		// If the datapoint has the following addressformat: [Agent]:[Address], then replace the address and write to the agent
 
 		this.write(datapoint.getAgent(this.getLocalAgentName()), datapoint);
-
-		// if (datapoint.getAddress().contains(":") == true) {
-		// String agent = datapoint.getAddress().split(":")[0];
-		// String address = datapoint.getAddress().split(":")[1];
-		// Datapoint writeDatapoint = Datapoints.newDatapoint(address).setValue(datapoint.getValue());
-		//
-		// this.write(agent, Arrays.asList(writeDatapoint), defaultTimeout, true);
-		// } else {
-		// this.write(this.getLocalAgentName(), Arrays.asList(datapoint), defaultTimeout, true);
-		// }
 	}
 
 	@Override

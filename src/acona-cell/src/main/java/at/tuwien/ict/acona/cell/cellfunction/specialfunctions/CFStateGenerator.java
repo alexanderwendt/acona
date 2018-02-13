@@ -1,9 +1,9 @@
 package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +34,8 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	public final static String SYSTEMSTATEADDRESS = "systemstate";
 
 	private List<String> currentlyRegisteredFunctions = new ArrayList<>();
-	private Map<String, ServiceState> currentStates = new HashMap<>();
-	private Map<String, String> currentDescriptions = new HashMap<>();
+	private Map<String, ServiceState> currentStates = new ConcurrentHashMap<>();
+	private Map<String, String> currentDescriptions = new ConcurrentHashMap<>();
 
 	@Override
 	protected void cellFunctionInit() throws Exception {

@@ -786,12 +786,20 @@ public class CellBasicServiceTester {
 			// Run the first agent
 			agent.getCommunicator().write(DatapointBuilder.newDatapoint(functionName + ".command").setValue("START"));
 
+			synchronized (this) {
+				try {
+					this.wait(10000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
 			// Reproduce the agent
 			agent.getCommunicator().write(DatapointBuilder.newDatapoint(reproduceFunction + ".command").setValue("START"));
 
 			synchronized (this) {
 				try {
-					this.wait(1000);
+					this.wait(10000);
 				} catch (InterruptedException e) {
 
 				}
@@ -801,11 +809,15 @@ public class CellBasicServiceTester {
 			Map<String, CellGatewayImpl> map = this.launchUtil.getExternalAgentControllerMap();
 			CellGatewayImpl newAgent = null;
 			for (Entry<String, CellGatewayImpl> k : map.entrySet()) {
-				if (k.getKey().equals(agentName) == false) {
+				log.debug("Agents={}", k.getKey());
+				if (k.getKey().contains(agentName) == true && k.getKey().equals(agentName) == false) {
 					newAgent = k.getValue();
+					log.info("The replicaagent is={}", k);
 					break;
 				}
 			}
+
+			log.info("Available agents={}", this.launchUtil.getExternalAgentControllerMap());
 			newAgent.getCommunicator().write(DatapointBuilder.newDatapoint(agentName + ":" + functionName + ".command").setValue("START"));
 
 			synchronized (this) {
