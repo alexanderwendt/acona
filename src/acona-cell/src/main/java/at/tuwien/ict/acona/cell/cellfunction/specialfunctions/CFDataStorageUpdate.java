@@ -15,9 +15,8 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 /**
  * @author wendt
  * 
- *         This function is used together with managed datapoints to subscribe
- *         values in OTHER AGENTS and put them into the data storage of the
- *         local agent. The address will be
+ *         This function is used together with managed datapoints to subscribe values in OTHER AGENTS and put them into the data storage of the local agent. As soon as values are triggered, the agent
+ *         copies them to the own storage with the same address.
  *
  */
 public class CFDataStorageUpdate extends CellFunctionImpl {

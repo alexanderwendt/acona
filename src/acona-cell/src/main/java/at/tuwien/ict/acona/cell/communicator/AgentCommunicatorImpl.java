@@ -164,7 +164,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 				writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
 				if (writeBehaviourFinished == null) {
 					throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
-							+ "Possible causes: 1: target address agent " + newAgentName + " + service " + serviceName + " does not exist. "
+							+ "Possible causes: 1: target address " + newAgentName + ":" + serviceName + " does not exist. "
 							+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
 							+ "2: Error at the receiver site so that no message is returned.");
 				}

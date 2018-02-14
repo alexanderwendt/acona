@@ -49,7 +49,7 @@ public class DatapointBuilder {
 		try {
 			if (DatapointBuilder.isDatapoint(data) == true) {
 				result = DatapointBuilder.newDatapoint(data.get(KEYADDRESS).getAsString()).setValue(data.get(KEYVALUE));
-				//.setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
+				// .setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
 			} else {
 				throw new IllegalArgumentException("Cannot cast json data to datapoint " + data);
 			}
@@ -64,7 +64,7 @@ public class DatapointBuilder {
 	public synchronized static boolean isNullDatapoint(JsonObject data) {
 		boolean result = false;
 
-		if (data.has(KEYADDRESS) && data.get(KEYADDRESS).equals(NULLADDRESS)) {
+		if (data.has(KEYADDRESS) && data.get(KEYADDRESS).getAsString().equals(NULLADDRESS)) {
 			result = true;
 		}
 

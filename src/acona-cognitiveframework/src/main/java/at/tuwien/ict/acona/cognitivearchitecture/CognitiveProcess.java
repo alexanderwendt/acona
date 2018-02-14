@@ -103,7 +103,8 @@ public class CognitiveProcess {
 		// Controller
 		CellConfig cognitiveAgentConfig = CellConfig.newConfig(cognitiveAgentName)
 				// Cellfunctions
-				.addCellfunction(CellFunctionConfig.newConfig(stateCollectorName, CFStateGenerator.class))
+				.addCellfunction(CellFunctionConfig.newConfig(stateCollectorName, CFStateGenerator.class)
+						.setGenerateReponder(true)) // Responder active to be called
 				// Main codelethandler
 				.addCellfunction(CellFunctionConfig.newConfig(mainCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
