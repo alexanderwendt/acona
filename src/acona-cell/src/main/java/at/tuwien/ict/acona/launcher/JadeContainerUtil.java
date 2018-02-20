@@ -14,9 +14,7 @@ import jade.wrapper.StaleProxyException;
  *
  */
 public class JadeContainerUtil {
-	
-	
-	
+
 	/**
 	 * Create an agent within a container
 	 * 
@@ -26,10 +24,11 @@ public class JadeContainerUtil {
 	 * @return
 	 * @throws StaleProxyException
 	 */
-	public AgentController createAgent(String name, Class<?> clzz, ContainerController containerController) throws StaleProxyException {
+	public AgentController createAgent(String name, Class<?> clzz, ContainerController containerController)
+			throws StaleProxyException {
 		return createAgent(name, clzz, null, containerController);
 	}
-	
+
 	/**
 	 * Create an agent within a container
 	 * 
@@ -39,30 +38,31 @@ public class JadeContainerUtil {
 	 * @return
 	 * @throws StaleProxyException
 	 */
-	public AgentController createAgent(String name, Class<?> clzz, Object[] args, ContainerController containerController, boolean starAgent) throws StaleProxyException {
+	public AgentController createAgent(String name, Class<?> clzz, Object[] args,
+			ContainerController containerController, boolean starAgent) throws StaleProxyException {
 		AgentController agentController = null;
 		String className = clzz.getName();
-		
+
 		agentController = containerController.createNewAgent(name, className, args);
-		if(starAgent) {
+		if (starAgent) {
 			agentController.start();
-			
-			//Wait until the agent has been initialized
-			//FIXME: This is a unsaubere solution. Listener would be better
-			while (agentController.getState().getCode()!=3) {
+
+			// Wait until the agent has been initialized
+			// FIXME: This is a unsaubere solution. Listener would be better
+			while (agentController.getState().getCode() != 3) {
 				synchronized (this) {
 					try {
 						this.wait(10);
 					} catch (InterruptedException e) {
-						
+
 					}
 				}
 			}
 		}
-		
+
 		return agentController;
 	}
-	
+
 	/**
 	 * Create an agent within a container
 	 * 
@@ -72,10 +72,11 @@ public class JadeContainerUtil {
 	 * @return
 	 * @throws StaleProxyException
 	 */
-	public AgentController createAgent(String name, Class<?> clzz, Object[] args, ContainerController containerController) throws StaleProxyException {
+	public AgentController createAgent(String name, Class<?> clzz, Object[] args,
+			ContainerController containerController) throws StaleProxyException {
 		return createAgent(name, clzz, args, containerController, true);
 	}
-	
+
 	/**
 	 * Create an RMA agent
 	 * 
@@ -86,7 +87,7 @@ public class JadeContainerUtil {
 		AgentController rma = this.createAgent("rma", jade.tools.rma.rma.class, container);
 		rma.start();
 	}
-	
+
 	/**
 	 * Create the main JADE container
 	 * 
@@ -98,27 +99,29 @@ public class JadeContainerUtil {
 	 */
 	public ContainerController createMainJADEContainer(String host, int port, String name) throws JadeException {
 		ContainerController containerController = null;
-		
-		//String host = "localhost";
-		//String port = "-1"; //negative number for default port number
-		//String name = "agent1";
-		
-		//Get JADE runtime
+
+		// String host = "localhost";
+		// String port = "-1"; //negative number for default port number
+		// String name = "agent1";
+
+		// Get JADE runtime
 		Runtime runtime = Runtime.instance();
-		
+
 		Profile profile = new ProfileImpl();
 		profile.setParameter(Profile.MAIN_HOST, host);
 		profile.setParameter(Profile.MAIN_PORT, String.valueOf(port));
 		profile.setParameter(Profile.CONTAINER_NAME, name);
-		
+
+		// Check if main container already exists
+
 		containerController = runtime.createMainContainer(profile);
-		if (containerController==null) {
+		if (containerController == null) {
 			throw new JadeException("Cannot start Jade container");
-		} 
-		
+		}
+
 		return containerController;
 	}
-	
+
 	/**
 	 * Create a sub-container
 	 * 
@@ -130,51 +133,52 @@ public class JadeContainerUtil {
 	 */
 	public ContainerController createAgentContainer(String host, int port, String containerName) throws JadeException {
 		ContainerController containerController = null;
-		
-		//String host = "localhost";
-		//String port = "-1"; //negative number for default port number
-		//String name = "agent1";
-		
-		//Get JADE runtime
+
+		// String host = "localhost";
+		// String port = "-1"; //negative number for default port number
+		// String name = "agent1";
+
+		// Get JADE runtime
 		Runtime runtime = Runtime.instance();
-		
+
 		Profile profile = new ProfileImpl();
 		profile.setParameter(Profile.MAIN_HOST, host);
 		profile.setParameter(Profile.MAIN_PORT, String.valueOf(port));
 		profile.setParameter(Profile.CONTAINER_NAME, containerName);
-		
-		//profile.setParameter(Profile.MAIN_HOST, "localhost");
-		//profile.setParameter(Profile.MAIN_PORT, "1099");
-		
+
+		// profile.setParameter(Profile.MAIN_HOST, "localhost");
+		// profile.setParameter(Profile.MAIN_PORT, "1099");
+
 		containerController = runtime.createAgentContainer(profile);
-		if (containerController==null) {
+		if (containerController == null) {
 			throw new JadeException("Cannot start Jade container");
-		} 
-		
+		}
+
 		return containerController;
 	}
-	
-//	public AgentController startAgent() {
-//		AgentController agentController = null;
-//		String host = "localhost";
-//		String port = "-1"; //negative number for default port number
-//		String name = "agent1";
-//		
-//		//Get JADE runtime
-//		Runtime runtime = Runtime.instance();
-//		
-//		Profile profile = new ProfileImpl();
-//		profile.setParameter(Profile.MAIN_HOST, host);
-//		profile.setParameter(Profile.MAIN_PORT, port);
-//		
-//		ContainerController containerController = runtime.createAgentContainer(profile);
-//		if (containerController!=null) {
-//					
-//			
-//			
-//		}
-//		
-//		
-//		return agentController;
-//	}
+
+	// public AgentController startAgent() {
+	// AgentController agentController = null;
+	// String host = "localhost";
+	// String port = "-1"; //negative number for default port number
+	// String name = "agent1";
+	//
+	// //Get JADE runtime
+	// Runtime runtime = Runtime.instance();
+	//
+	// Profile profile = new ProfileImpl();
+	// profile.setParameter(Profile.MAIN_HOST, host);
+	// profile.setParameter(Profile.MAIN_PORT, port);
+	//
+	// ContainerController containerController =
+	// runtime.createAgentContainer(profile);
+	// if (containerController!=null) {
+	//
+	//
+	//
+	// }
+	//
+	//
+	// return agentController;
+	// }
 }
