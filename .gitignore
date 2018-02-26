@@ -15,3 +15,7 @@ RemoteSystemsTempFiles
 .recommenders
 /src/acona-cell/dependencies
 /*/acona-demo-webservice/settings.gradle
+/src/acona-cognitiveframework/.project
+/src/acona-cognitiveframework/gradlew
+/src/acona-cognitiveframework/gradlew.bat
+/src/acona-cognitiveframework/settings.gradle
