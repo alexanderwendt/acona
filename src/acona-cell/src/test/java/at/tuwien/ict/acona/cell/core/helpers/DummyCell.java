@@ -6,22 +6,26 @@ import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerImpl;
 import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
 import at.tuwien.ict.acona.cell.communicator.SubscriptionHandlerImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.core.CellInitialization;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.cell.core.Cell;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.cell.storage.helpers.DataStorageSubscriberNotificatorMock;
 import jade.core.behaviours.Behaviour;
 
-public class DummyCell implements CellInitialization {
+public class DummyCell implements Cell {
 
 	// Genotype configuration
 	protected CellConfig conf;
 
 	// phenotype functions
-	// private final Map<String, Condition> conditionMap = new HashMap<String, Condition>();
-	// private final Map<String, CellFunction> cellFunctionBehaviourMap = new HashMap<String,
+	// private final Map<String, Condition> conditionMap = new HashMap<String,
+	// Condition>();
+	// private final Map<String, CellFunction> cellFunctionBehaviourMap = new
+	// HashMap<String,
 	// CellFunction>();
-	// private final Map<String, Activator> activatorMap = new HashMap<String, Activator>();
+	// private final Map<String, Activator> activatorMap = new HashMap<String,
+	// Activator>();
 
 	private DataStorage data = new DataStorageImpl().init(new DataStorageSubscriberNotificatorMock());
 	private BasicServiceCommunicator comm = new CommunicatorMock(this);
@@ -70,7 +74,8 @@ public class DummyCell implements CellInitialization {
 	// }
 	//
 	// @Override
-	// public void setCellFunctionMap(Map<String, CellFunction> cellFunctionBehaviourMap) {
+	// public void setCellFunctionMap(Map<String, CellFunction>
+	// cellFunctionBehaviourMap) {
 	// this.cellFunctionBehaviourMap.putAll(cellFunctionBehaviourMap);
 	//
 	// }
@@ -132,6 +137,12 @@ public class DummyCell implements CellInitialization {
 	@Override
 	public SubscriptionHandler getSubscriptionHandler() {
 		return subscriptionHandler;
+	}
+
+	@Override
+	public void addCellFunction(CellFunctionConfig cellFunctionConfig) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 }

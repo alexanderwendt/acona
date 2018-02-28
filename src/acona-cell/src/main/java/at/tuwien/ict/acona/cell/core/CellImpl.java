@@ -13,6 +13,7 @@ import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
 import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
 import at.tuwien.ict.acona.cell.communicator.SubscriptionHandlerImpl;
 import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import at.tuwien.ict.acona.cell.storage.DataStorageImpl;
 import jade.core.Agent;
@@ -24,7 +25,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
-public class CellImpl extends Agent implements CellInitialization {
+public class CellImpl extends Agent implements Cell {
 
 	private final DataStorage dataStorage = new DataStorageImpl();
 	private CellNotificator notificator;
@@ -34,7 +35,7 @@ public class CellImpl extends Agent implements CellInitialization {
 	private CellGateway controller;
 	private DFAgentDescription dfDescriptionAgentDescription;
 	// Create the cellbuilder and apply activators
-	private CellBuilder builder = new CellBuilder();
+	private CellBuilder builder = new CellBuilder(this);
 
 	// Genotype configuration
 	protected CellConfig conf;
@@ -63,13 +64,17 @@ public class CellImpl extends Agent implements CellInitialization {
 		// Set configuration
 		this.conf = conf;
 
-		builder.initializeCellConfig(this.conf, this);
+		this.getBuilder().initializeCellConfig(this.conf);
 	}
 
 	@Override
 	public CellConfig getConfiguration() {
 		// Deepcopy through serialization
 		return this.conf;
+	}
+
+	private CellBuilder getBuilder() {
+		return builder;
 	}
 
 	/*
@@ -99,7 +104,8 @@ public class CellImpl extends Agent implements CellInitialization {
 																		// return
 																		// incoming
 																		// message
-																		// log.debug("agent will use an inspector as controller");
+																		// log.debug("agent will use an inspector as
+																		// controller");
 			} else {
 				throw new NullPointerException("No arguments found although necessary. Add controller to argument 1");
 			}
@@ -171,6 +177,17 @@ public class CellImpl extends Agent implements CellInitialization {
 				log.error("Cannot init cell", e);
 			}
 
+		}
+
+	}
+
+	@Override
+	public void addCellFunction(CellFunctionConfig cellFunctionConfig) throws Exception {
+		try {
+			this.getBuilder().createCellFunctionFromConfig(cellFunctionConfig.toJsonObject());
+		} catch (Exception e) {
+			log.error("Cannot create a cell function from the config", e);
+			throw new Exception(e.getMessage());
 		}
 
 	}
@@ -250,14 +267,16 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Convenience function to access the arguments provided to the agent via {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast from the Object stored in the object array
-	 * provided on agent generation
+	 * Convenience function to access the arguments provided to the agent via
+	 * {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast
+	 * from the Object stored in the object array provided on agent generation
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
 	 * @param type
 	 *            The type of the requested argument
-	 * @return The argument at the given {@code index}, cast to the given {@code type}
+	 * @return The argument at the given {@code index}, cast to the given
+	 *         {@code type}
 	 */
 	protected <TYPE> TYPE getArgument(int index, Class<TYPE> type) {
 		if (getArguments() == null) {
@@ -278,16 +297,21 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Convenience function to access a List provided to the agent via {@link Agent#getArguments()} in a typesafe manner. The provided type is the type of the objects contained in the list. For example:
-	 * if argument #1 is of type {@code List<ACLMessage>} then the call would look like this: {@code List
-	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each argument is cast from Object to the type stored in the list Also Note: this method can not provide additional type checking
-	 * for further containers within the list and does not support other container types than list
+	 * Convenience function to access a List provided to the agent via
+	 * {@link Agent#getArguments()} in a typesafe manner. The provided type is the
+	 * type of the objects contained in the list. For example: if argument #1 is of
+	 * type {@code List<ACLMessage>} then the call would look like this: {@code List
+	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each
+	 * argument is cast from Object to the type stored in the list Also Note: this
+	 * method can not provide additional type checking for further containers within
+	 * the list and does not support other container types than list
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
 	 * @param type
 	 *            The content type of the requested list
-	 * @return The argument at the given {@code index}, cast to a list of the given {@code type}
+	 * @return The argument at the given {@code index}, cast to a list of the given
+	 *         {@code type}
 	 */
 	protected <TYPE> List<TYPE> getArgumentList(int index, Class<TYPE> type) {
 		List<TYPE> result = new ArrayList<>();
@@ -304,7 +328,8 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Shortcut method used to access the argument at the given {@code index} as string This method calls: {@code getArgument(index, String.class)}
+	 * Shortcut method used to access the argument at the given {@code index} as
+	 * string This method calls: {@code getArgument(index, String.class)}
 	 * 
 	 * @param index
 	 * @return
@@ -314,7 +339,9 @@ public class CellImpl extends Agent implements CellInitialization {
 	}
 
 	/**
-	 * Shortcut method used to access the argument list at the given {@code index} as list of strings This method calls: {@code getArgumentList(index, String.class)}
+	 * Shortcut method used to access the argument list at the given {@code index}
+	 * as list of strings This method calls:
+	 * {@code getArgumentList(index, String.class)}
 	 * 
 	 * @param index
 	 * @return

@@ -77,9 +77,13 @@ public class AconaServiceTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
-	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
-	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller
+	 * runs every 5s. It starts a getDataFunction. When the data has been received,
+	 * the publish data function is executed. Data is read from another dummy agent,
+	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
+	 * memory agent, added and published within the agent. The result is subscribed
+	 * by an output agent The Outbuffer is only an empty mock, which is used as a
+	 * gateway
 	 * 
 	 */
 	@Test
@@ -114,12 +118,10 @@ public class AconaServiceTester {
 			// Controller
 			CellConfig controllerAgentConfig = CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
-							.setProperty("agent1", agentName1)
-							.setProperty("agent2", agentName2)
-							.setProperty("agent3", agentName3)
-							.setProperty("servicename", ServiceName)
-							.setProperty("delay", "1000")
-							.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
+							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
+							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
+							.setProperty("delay", "1000").addManagedDatapoint(DatapointConfig
+									.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY)));
 			CellGatewayImpl controller = this.launcher.createAgent(controllerAgentConfig);
 
 			controller.getCommunicator().write(memoryAgentName, DatapointBuilder.newDatapoint("Test"));
@@ -127,17 +129,20 @@ public class AconaServiceTester {
 			// Create services
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
+									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service1 = this.launcher.createAgent(serviceAgent1);
 
 			CellConfig serviceAgent2 = CellConfig.newConfig(agentName2)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
+									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service2 = this.launcher.createAgent(serviceAgent2);
 
 			CellConfig serviceAgent3 = CellConfig.newConfig(agentName3)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
+									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service3 = this.launcher.createAgent(serviceAgent3);
 
 			synchronized (this) {
@@ -149,11 +154,15 @@ public class AconaServiceTester {
 			}
 			log.info("=== All agents initialized ===");
 
-			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
+			// JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			memoryAgent.writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			memoryAgent.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().queryDatapoints(controller.getCell().getLocalName(), COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()), controller.getCell().getLocalName(), controllerFunctionName + ".state",
+			Datapoint state = controller.getCommunicator().queryDatapoints(controller.getCell().getLocalName(),
+					COMMANDDATAPOINTNAME, new JsonPrimitive(ControlCommand.START.toString()),
+					controller.getCell().getLocalName(), controllerFunctionName + ".state",
 					new JsonPrimitive(ServiceState.FINISHED.toString()), 10000);
 
 			double result = memoryAgent.getCommunicator().read(processDatapoint).getValue().getAsDouble();
@@ -170,9 +179,13 @@ public class AconaServiceTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
-	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
-	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller
+	 * runs every 5s. It starts a getDataFunction. When the data has been received,
+	 * the publish data function is executed. Data is read from another dummy agent,
+	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
+	 * memory agent, added and published within the agent. The result is subscribed
+	 * by an output agent The Outbuffer is only an empty mock, which is used as a
+	 * gateway
 	 * 
 	 */
 	@Test
@@ -207,18 +220,22 @@ public class AconaServiceTester {
 							.addCellfunction(CellFunctionConfig.newConfig("controllerservice", SequenceController.class)
 									.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 									.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
-									.setProperty("delay", "1").addManagedDatapoint(
-											DatapointConfig.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))))
+									.setProperty("delay", "1")
+									.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME,
+											COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))))
 					.addMemory(CellConfig.newConfig(memoryAgentName))
 					.addService(CellConfig.newConfig(agentName1)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)))
+									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+											SyncMode.READWRITEBACK)))
 					.addService(CellConfig.newConfig(agentName2)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)))
+									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+											SyncMode.READWRITEBACK)))
 					.addService(CellConfig.newConfig(agentName3)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)))
+									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+											SyncMode.READWRITEBACK)))
 					.setTopController(controllerAgentName);
 
 			// this.launcher.createDebugUserInterface();
@@ -226,18 +243,22 @@ public class AconaServiceTester {
 			this.launcher.init(totalConfig);
 			log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new
+			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
 			// Start the system by setting start
 
 			CellGateway controller = launcher.getTopController();
 
 			// Test the wrapper for controllers too
-			// ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
+			// ControllerCellGateway controllerCellGateway = new
+			// ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), "controllerservice.state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME,
+					ControlCommand.START.toString(), "controllerservice.state",
+					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
@@ -245,8 +266,8 @@ public class AconaServiceTester {
 			log.debug("Received state={}", state);
 
 			// Write the numbers in the database agents
-			// client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
-			// client2.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
+			// client1.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
+			// client2.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
 			//
 			// //Query the service with start and then get the status
 			// //Set default timeout to a high number to be able to debug
@@ -274,7 +295,8 @@ public class AconaServiceTester {
 			// }
 			// }
 
-			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue().getAsDouble();
+			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue()
+					.getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 
@@ -288,9 +310,13 @@ public class AconaServiceTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
-	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
-	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller
+	 * runs every 5s. It starts a getDataFunction. When the data has been received,
+	 * the publish data function is executed. Data is read from another dummy agent,
+	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
+	 * memory agent, added and published within the agent. The result is subscribed
+	 * by an output agent The Outbuffer is only an empty mock, which is used as a
+	 * gateway
 	 * 
 	 */
 	@Test
@@ -322,8 +348,7 @@ public class AconaServiceTester {
 			SystemConfig totalConfig = SystemConfig.newConfig();
 			totalConfig.addController(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, SimpleControllerService.class)
-							.setProperty("agentname", serviceAgentName)
-							.setProperty("servicename", serviceName)
+							.setProperty("agentname", serviceAgentName).setProperty("servicename", serviceName)
 							.setProperty("delay", "10")));
 
 			totalConfig.addMemory(CellConfig.newConfig(memoryAgentName));
@@ -331,7 +356,8 @@ public class AconaServiceTester {
 
 			totalConfig.addService(CellConfig.newConfig(serviceAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
-							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)));
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+									SyncMode.READWRITEBACK)));
 
 			// === System initialization ===//
 
@@ -341,7 +367,8 @@ public class AconaServiceTester {
 			CellGateway topController = launcher.getTopController();
 			topController.getCommunicator().setDefaultTimeout(100000);
 			// Set start values
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 
 			// }
 			// log.info("=== All agents initialized ===");
@@ -349,7 +376,9 @@ public class AconaServiceTester {
 			log.info("=== System initialized ===");
 			// === System operation ===//
 
-			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
+			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command",
+					ControlCommand.START.toString(), controllerServiceName + ".state",
+					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//
@@ -371,8 +400,10 @@ public class AconaServiceTester {
 	}
 
 	/**
-	 * In this test, one controller will start 100 increment services in a sequence. The incrementservices increases the number in the memory with +1. At the end the number in the memory shall be the same
-	 * as the number of services in the system.
+	 * In this test, one controller will start 100 increment services in a sequence.
+	 * The incrementservices increases the number in the memory with +1. At the end
+	 * the number in the memory shall be the same as the number of services in the
+	 * system.
 	 * 
 	 */
 	@Test
@@ -408,10 +439,8 @@ public class AconaServiceTester {
 			// Add controller
 			totalConfig.addController(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, LoopController.class)
-							.setProperty("agentnameprefix", serviceAgentName)
-							.setProperty("servicename", serviceName)
-							.setProperty("numberofagents", String.valueOf(numberOfAgents))
-							.setProperty("delay", "1")));
+							.setProperty("agentnameprefix", serviceAgentName).setProperty("servicename", serviceName)
+							.setProperty("numberofagents", String.valueOf(numberOfAgents)).setProperty("delay", "1")));
 
 			// Add memory
 			totalConfig.addMemory(CellConfig.newConfig(memoryAgentName));
@@ -421,7 +450,8 @@ public class AconaServiceTester {
 			for (int i = 1; i <= numberOfAgents; i++) {
 				totalConfig.addService(CellConfig.newConfig(serviceAgentName + i)
 						.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
-								.addManagedDatapoint(IncrementFunctionDatapointID, processDatapoint, memoryAgentName, SyncMode.READWRITEBACK)));
+								.addManagedDatapoint(IncrementFunctionDatapointID, processDatapoint, memoryAgentName,
+										SyncMode.READWRITEBACK)));
 			}
 
 			// this.launcher.createDebugUserInterface();
@@ -431,9 +461,10 @@ public class AconaServiceTester {
 			// }
 			// log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way. Start system");
-			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new
+			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
 			// Start the system by setting start
 
@@ -445,16 +476,19 @@ public class AconaServiceTester {
 			// agentName + 1, Datapoint.newDatapoint("Increment.state"),
 			// agentName + 1, 10000);
 
-			// controller.getCommunicator().query(Datapoint.newDatapoint(controllerServiceName + ".command").setValue(ControlCommand.START.toString()),
+			// controller.getCommunicator().query(Datapoint.newDatapoint(controllerServiceName
+			// + ".command").setValue(ControlCommand.START.toString()),
 			// Datapoint.newDatapoint(controllerServiceName + ".state"), 10000);
 
 			// Test the wrapper for controllers too
-			// ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
+			// ControllerCellGateway controllerCellGateway = new
+			// ControllerWrapper(controller);
 			ServiceState state = controller.getCommunicator().executeServiceBlocking(controllerServiceName);
 
 			log.debug("Received state={}", state);
 
-			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue().getAsDouble();
+			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue()
+					.getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 
@@ -468,11 +502,15 @@ public class AconaServiceTester {
 	}
 
 	/**
-	 * Idea: Start a function that calculates something with a delay. While it is calculating, new subscribed values arrives. The system shall automatically restart and process the newly arrived values.
-	 * The test tests the feature that new data retriggers the function. If multiple subscribed data arrives, the system shall still only start once. In order to trigger this type of function the setStart
-	 * shall be executed.
+	 * Idea: Start a function that calculates something with a delay. While it is
+	 * calculating, new subscribed values arrives. The system shall automatically
+	 * restart and process the newly arrived values. The test tests the feature that
+	 * new data retriggers the function. If multiple subscribed data arrives, the
+	 * system shall still only start once. In order to trigger this type of function
+	 * the setStart shall be executed.
 	 * 
-	 * There is a calculator function that calculates a result of operand A and B within 5s. During the calculation, operand A changes.
+	 * There is a calculator function that calculates a result of operand A and B
+	 * within 5s. During the calculation, operand A changes.
 	 * 
 	 * 
 	 */
@@ -496,10 +534,14 @@ public class AconaServiceTester {
 
 			// Use a system config to init the whole system
 			CellGatewayImpl cellAddition = this.launcher.createAgent(CellConfig.newConfig(agentName)
-					.addCellfunction(CellFunctionConfig.newConfig(additionServiceName, AdditionFunctionWithDuration.class)
-							.addManagedDatapoint(AdditionFunctionWithDuration.OPERANDID1, operand1Address, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint(AdditionFunctionWithDuration.OPERANDID2, operand2Address, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint(AdditionFunctionWithDuration.RESULT, resultAddress, SyncMode.WRITEONLY)));
+					.addCellfunction(CellFunctionConfig
+							.newConfig(additionServiceName, AdditionFunctionWithDuration.class)
+							.addManagedDatapoint(AdditionFunctionWithDuration.OPERANDID1, operand1Address,
+									SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint(AdditionFunctionWithDuration.OPERANDID2, operand2Address,
+									SyncMode.SUBSCRIBEONLY)
+							.addManagedDatapoint(AdditionFunctionWithDuration.RESULT, resultAddress,
+									SyncMode.WRITEONLY)));
 
 			synchronized (this) {
 				try {
@@ -512,8 +554,10 @@ public class AconaServiceTester {
 			log.info("=== All agents initialized ===");
 
 			// Write values
-			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand1Address).setValue(new JsonPrimitive(operand1)));
-			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2)));
+			cellAddition.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(operand1Address).setValue(new JsonPrimitive(operand1)));
+			cellAddition.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2)));
 
 			// The result should be there in 5s. Therefore wait 500ms
 			synchronized (this) {
@@ -524,9 +568,12 @@ public class AconaServiceTester {
 				}
 			}
 
-			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
-			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
-			cellAddition.writeLocalDatapoint(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
+			cellAddition.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(operand2Address).setValue(new JsonPrimitive(operand2new)));
 
 			// The result should be there in 5s. Therefore wait 500ms
 			synchronized (this) {
@@ -537,7 +584,7 @@ public class AconaServiceTester {
 				}
 			}
 
-			double result = cellAddition.readLocalDatapoint(resultAddress).getValue().getAsDouble();
+			double result = cellAddition.getCommunicator().read(resultAddress).getValue().getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 

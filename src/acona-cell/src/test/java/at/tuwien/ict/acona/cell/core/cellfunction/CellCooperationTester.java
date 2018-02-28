@@ -153,20 +153,20 @@ public class CellCooperationTester {
 			// Create services
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint,
-									memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
+									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service1 = this.launcher.createAgent(serviceAgent1);
 
 			CellConfig serviceAgent2 = CellConfig.newConfig(agentName2)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint,
-									memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
+									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service2 = this.launcher.createAgent(serviceAgent2);
 
 			CellConfig serviceAgent3 = CellConfig.newConfig(agentName3)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint,
-									memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
+									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
 			CellGatewayImpl service3 = this.launcher.createAgent(serviceAgent3);
 
 			synchronized (this) {
@@ -178,17 +178,19 @@ public class CellCooperationTester {
 			}
 			log.info("=== All agents initialized ===");
 
-			memoryAgent.writeLocalDatapoint(
-					DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			memoryAgent.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			memoryAgent.writeLocalDatapoint(
-					DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			memoryAgent.getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), controllerFunctionName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 10000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME,
+					ControlCommand.START.toString(), controllerFunctionName + ".state",
+					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 10000);
 
 			// Write the numbers in the database agents
-			// client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
-			// client2.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
+			// client1.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
+			// client2.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
 			//
 			// //Query the service with start and then get the status
 			// //Set default timeout to a high number to be able to debug
@@ -243,9 +245,13 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
-	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
-	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller
+	 * runs every 5s. It starts a getDataFunction. When the data has been received,
+	 * the publish data function is executed. Data is read from another dummy agent,
+	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
+	 * memory agent, added and published within the agent. The result is subscribed
+	 * by an output agent The Outbuffer is only an empty mock, which is used as a
+	 * gateway
 	 * 
 	 */
 	@Test
@@ -275,14 +281,13 @@ public class CellCooperationTester {
 			int expectedResult = 3;
 
 			// Use a system config to init the whole system
-			SystemConfig totalConfig = SystemConfig.newConfig()
-					.addController(CellConfig.newConfig(controllerAgentName)
-							.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
-									.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
-									.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
-									.setProperty("delay", "1")
-									.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME,
-											COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))))
+			SystemConfig totalConfig = SystemConfig.newConfig().addController(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
+							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
+							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
+							.setProperty("delay", "1")
+							.addManagedDatapoint(DatapointConfig
+									.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))))
 					.addMemory(CellConfig.newConfig(memoryAgentName))
 					.addService(CellConfig.newConfig(agentName1)
 							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
@@ -361,19 +366,22 @@ public class CellCooperationTester {
 			// }
 			log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(
-					DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new
+			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
 			// Start the system by setting start
 
 			CellGateway controller = launcher.getTopController();
 
 			// Test the wrapper for controllers too
-			// ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
+			// ControllerCellGateway controllerCellGateway = new
+			// ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME, ControlCommand.START.toString(), controllerFunctionName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
+			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME,
+					ControlCommand.START.toString(), controllerFunctionName + ".state",
+					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
@@ -381,8 +389,8 @@ public class CellCooperationTester {
 			log.debug("Received state={}", state);
 
 			// Write the numbers in the database agents
-			// client1.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
-			// client2.writeLocalDatapoint(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
+			// client1.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
+			// client2.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
 			//
 			// //Query the service with start and then get the status
 			// //Set default timeout to a high number to be able to debug
@@ -425,9 +433,13 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
-	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
-	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller
+	 * runs every 5s. It starts a getDataFunction. When the data has been received,
+	 * the publish data function is executed. Data is read from another dummy agent,
+	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
+	 * memory agent, added and published within the agent. The result is subscribed
+	 * by an output agent The Outbuffer is only an empty mock, which is used as a
+	 * gateway
 	 * 
 	 */
 	@Test
@@ -478,8 +490,8 @@ public class CellCooperationTester {
 			CellGateway topController = launcher.getTopController();
 			topController.getCommunicator().setDefaultTimeout(100000);
 			// Set start values
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(
-					DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 
 			// }
 			// log.info("=== All agents initialized ===");
@@ -487,8 +499,9 @@ public class CellCooperationTester {
 			log.info("=== System initialized ===");
 			// === System operation ===//
 
-			Datapoint resultState = topController.getCommunicator()
-					.queryDatapoints(controllerServiceName + ".command", ControlCommand.START.toString(), controllerServiceName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
+			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command",
+					ControlCommand.START.toString(), controllerServiceName + ".state",
+					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//
@@ -510,8 +523,10 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * In this test, one controller will start 100 increment services in a sequence. The incrementservices increases the number in the memory with +1. At the end the number in the memory shall be the same
-	 * as the number of services in the system.
+	 * In this test, one controller will start 100 increment services in a sequence.
+	 * The incrementservices increases the number in the memory with +1. At the end
+	 * the number in the memory shall be the same as the number of services in the
+	 * system.
 	 * 
 	 */
 	@Test
@@ -571,10 +586,10 @@ public class CellCooperationTester {
 			// }
 			// log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).writeLocalDatapoint(
-					DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator()
+					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way. Start system");
-			// memoryAgent.writeLocalDatapoint(Datapoint.newDatapoint(processDatapoint).setValue(new
+			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
 			// Start the system by setting start
 
@@ -591,7 +606,8 @@ public class CellCooperationTester {
 			// Datapoint.newDatapoint(controllerServiceName + ".state"), 10000);
 
 			// Test the wrapper for controllers too
-			// ControllerCellGateway controllerCellGateway = new ControllerWrapper(controller);
+			// ControllerCellGateway controllerCellGateway = new
+			// ControllerWrapper(controller);
 			ServiceState state = controller.getCommunicator().executeServiceBlocking(controllerServiceName);
 
 			log.debug("Received state={}", state);

@@ -16,7 +16,20 @@ public class CellBuilder {
 
 	private static Logger log = LoggerFactory.getLogger(CellBuilder.class);
 
-	public void initializeCellConfig(CellConfig config, CellInitialization caller) throws Exception {
+	private Cell caller;
+
+	public CellBuilder(Cell cell) {
+		this.caller = cell;
+	}
+
+	/**
+	 * Initialize the cell config. Create cell functions from Json configs.
+	 * 
+	 * @param config
+	 * @param caller
+	 * @throws Exception
+	 */
+	public void initializeCellConfig(CellConfig config) throws Exception {
 		try {
 			// === Instantiate the conditions ===
 
@@ -24,7 +37,7 @@ public class CellBuilder {
 			config.getCellfunctions().forEach(activatorConfig -> {
 				try {
 					// Instantiate and init function
-					CellFunction cellfunction = this.createCellFunctionFromConfig(activatorConfig.getAsJsonObject(), caller);
+					CellFunction cellfunction = this.createCellFunctionFromConfig(activatorConfig.getAsJsonObject());
 					if (cellfunction == null) {
 						throw new NullPointerException("activator does not exist");
 					}
@@ -43,7 +56,7 @@ public class CellBuilder {
 
 	}
 
-	protected synchronized CellFunction createCellFunctionFromConfig(JsonObject config, Cell caller) throws Exception {
+	protected synchronized CellFunction createCellFunctionFromConfig(JsonObject config) throws Exception {
 		CellFunction result = null;
 
 		// Get all values
@@ -61,7 +74,9 @@ public class CellBuilder {
 				// Init the class, create the list of subscriptions
 				result.init(cellconfig, caller);
 			} else {
-				throw new InstantiationException("Cannot convert object to cellfunction class. The instantiated object is no cell function. " + obj);
+				throw new InstantiationException(
+						"Cannot convert object to cellfunction class. The instantiated object is no cell function. "
+								+ obj);
 			}
 
 		} catch (ClassNotFoundException e) {

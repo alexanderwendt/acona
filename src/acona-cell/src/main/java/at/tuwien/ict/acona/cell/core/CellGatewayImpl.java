@@ -1,7 +1,6 @@
 package at.tuwien.ict.acona.cell.core;
 
 import at.tuwien.ict.acona.cell.communicator.Communicator;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 
 public class CellGatewayImpl implements CellGateway {
@@ -12,27 +11,30 @@ public class CellGatewayImpl implements CellGateway {
 		this.cell = cell;
 	}
 
+	@Override
 	public CellImpl getCell() {
 		return this.cell;
 	}
 
-	@Override
-	public void writeLocalDatapoint(Datapoint dp) throws Exception {
-		this.cell.getCommunicator().write(dp);
-	}
-
-	@Override
-	public Datapoint readLocalDatapoint(String address) throws Exception {
-		return this.getCommunicator().read(address);
-	}
+	// @Override
+	// public void writeLocalDatapoint(Datapoint dp) throws Exception {
+	// this.cell.getCommunicator().write(dp);
+	// }
 
 	// @Override
-	// public Datapoint subscribeForeignDatapoint(String address, String agentName) throws Exception {
+	// public Datapoint readLocalDatapoint(String address) throws Exception {
+	// return this.getCommunicator().read(address);
+	// }
+
+	// @Override
+	// public Datapoint subscribeForeignDatapoint(String address, String agentName)
+	// throws Exception {
 	// //create a temporary function and add to the cell
 	// //Check if
 	//
 	//
-	// List<Datapoint> list = this.getCommunicator().subscribe(Arrays.asList(address), agentName);
+	// List<Datapoint> list =
+	// this.getCommunicator().subscribe(Arrays.asList(address), agentName);
 	//
 	// Datapoint result = null;
 	// if (list.isEmpty() == false) {
@@ -45,8 +47,10 @@ public class CellGatewayImpl implements CellGateway {
 	// }
 
 	// @Override
-	// public void unsubscribeLocalDatapoint(String address, String agentName) throws Exception {
-	// this.getCell().getCommunicator().unsubscribe(Arrays.asList(address), agentName);
+	// public void unsubscribeLocalDatapoint(String address, String agentName)
+	// throws Exception {
+	// this.getCell().getCommunicator().unsubscribe(Arrays.asList(address),
+	// agentName);
 	// }
 
 	@Override
@@ -54,11 +58,11 @@ public class CellGatewayImpl implements CellGateway {
 		return this.getCell().getCommunicator();
 	}
 
-	@Override
-	public void setCustomAgentSetting(String key, String value) {
-		// TODO Auto-generated method stub
-
-	}
+	// @Override
+	// public void setCustomAgentSetting(String key, String value) {
+	// throw new UnsupportedOperationException();
+	//
+	// }
 
 	@Override
 	public DataStorage getDataStorage() {

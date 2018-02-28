@@ -1,11 +1,7 @@
 package at.tuwien.ict.acona.demowebservice;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,23 +9,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
@@ -91,22 +79,22 @@ public class DemoWebServiceTester {
 	@Test
 	public void functionStateTest() {
 		try {
-			String weatherAgent1Name = "WeatherAgent1"; 
-			//String weatherAgent2Name = "WeatherAgent2"; 
+			String weatherAgent1Name = "WeatherAgent1";
+			// String weatherAgent2Name = "WeatherAgent2";
 			String weatherservice = "Weather";
 			String publishAddress = "helloworld.currentweather";
 
 			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY))
-					//.addCellfunction(CellFunctionConfig.newConfig(weatherservice + "d", WeatherService.class))
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress, weatherAgent1Name, SyncMode.WRITEONLY))
+					// .addCellfunction(CellFunctionConfig.newConfig(weatherservice + "d", WeatherService.class))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, "systemstate", weatherAgent1Name, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
+							.addManagedDatapoint("ui1", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY));
 			CellGatewayImpl weatherAgent = this.controller.createAgent(cf);
-			
-			//=== Init finished ===//
+
+			// === Init finished ===//
 
 			synchronized (this) {
 				try {
@@ -116,10 +104,10 @@ public class DemoWebServiceTester {
 				}
 			}
 			log.info("=== All agents initialized ===");
-			
+
 			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			
-			//Wait while the system runs
+
+			// Wait while the system runs
 			synchronized (this) {
 				try {
 					this.wait(20000);
@@ -127,18 +115,18 @@ public class DemoWebServiceTester {
 
 				}
 			}
-			
-			//Read the state of the system
-			JsonObject systemState = weatherAgent.readLocalDatapoint(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject();
-			
+
+			// Read the state of the system
+			JsonObject systemState = weatherAgent.getCommunicator().read(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject();
+
 			String currentResult = systemState.get("hasFunction").getAsJsonArray().get(0).getAsJsonObject().get("hasState").getAsString();
-			String expectedResult = "RUNNING"; //As the system is still running, when the request is sent
-			
+			String expectedResult = "RUNNING"; // As the system is still running, when the request is sent
+
 			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
-			
+
 			log.info("current result={}, expected result={}", currentResult, expectedResult);
 			assertEquals(currentResult, expectedResult);
-			
+
 			log.info("Tests passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);
@@ -146,42 +134,42 @@ public class DemoWebServiceTester {
 		}
 
 	}
-	
+
 	@Test
 	public void algorithmTest() {
 		try {
-			
-			//=== General variables ===//
+
+			// === General variables ===//
 			String weatherAgent1Name = "WeatherAgent1";
-			String weatherAgent2Name = "WeatherAgent2"; 
-			String weatherAgent3Name = "WeatherAgent3"; 
-			String weatherAgent4Name = "WeatherAgent4"; 
+			String weatherAgent2Name = "WeatherAgent2";
+			String weatherAgent3Name = "WeatherAgent3";
+			String weatherAgent4Name = "WeatherAgent4";
 			String algorithmAgentName = "AlgorithmAgent";
 			String algorithmService = "algorithm";
 			String weatherservice = "Weather";
 			String publishAddress = "helloworld.currentweather";
-			
+
 			CellGatewayImpl weatherAgent1 = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY)
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress, weatherAgent1Name, SyncMode.WRITEONLY)
 							.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 							.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
-			
+
 			CellGatewayImpl weatherAgent2 = this.controller.createAgent(CellConfig.newConfig(weatherAgent2Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent2Name, SyncMode.WRITEONLY))
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress, weatherAgent2Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
-			
+
 			CellGatewayImpl weatherAgent3 = this.controller.createAgent(CellConfig.newConfig(weatherAgent3Name)
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent3Name, SyncMode.WRITEONLY))
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress, weatherAgent3Name, SyncMode.WRITEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
-			
+
 			synchronized (this) {
 				try {
 					this.wait(200);
@@ -189,9 +177,9 @@ public class DemoWebServiceTester {
 
 				}
 			}
-			
+
 			CellGatewayImpl calculator = this.controller.createAgent(CellConfig.newConfig(algorithmAgentName)
-					//.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
+					// .addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
 					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Vienna", publishAddress, weatherAgent2Name, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", publishAddress, weatherAgent3Name, SyncMode.SUBSCRIBEONLY)
@@ -199,9 +187,9 @@ public class DemoWebServiceTester {
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, CFStateGenerator.SYSTEMSTATEADDRESS, algorithmAgentName, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmService + ".result", algorithmAgentName, SyncMode.SUBSCRIBEONLY)
-							.addManagedDatapoint("ui1", publishAddress , weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
+							.addManagedDatapoint("ui1", publishAddress, weatherAgent1Name, SyncMode.SUBSCRIBEONLY))
 					.addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
-			
+
 			synchronized (this) {
 				try {
 					this.wait(2000);
@@ -209,13 +197,13 @@ public class DemoWebServiceTester {
 
 				}
 			}
-			
+
 			log.info("=== All agents initialized ===");
-			
-			weatherAgent1.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			weatherAgent2.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			weatherAgent3.writeLocalDatapoint(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			
+
+			weatherAgent1.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent2.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+			weatherAgent3.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
+
 			synchronized (this) {
 				try {
 					this.wait(200000);
@@ -223,15 +211,15 @@ public class DemoWebServiceTester {
 
 				}
 			}
-			
-			assert(false);
+
+			assert (false);
 			log.info("Tests passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
 		}
 	}
-	
+
 	/**
 	 * Create a broker agent. Create a depot. Add money to depot, read state of depot, buy stock, sell stock, unregister depot
 	 * 
@@ -239,8 +227,8 @@ public class DemoWebServiceTester {
 	@Test
 	public void functionWeatherServiceTest() {
 		try {
-			String weatherAgent1Name = "WeatherAgent1"; 
-			//String weatherAgent2Name = "WeatherAgent2"; 
+			String weatherAgent1Name = "WeatherAgent1";
+			// String weatherAgent2Name = "WeatherAgent2";
 			String weatherservice = "Weather";
 			String publishAddress = "helloworld.currentweather";
 
@@ -248,10 +236,10 @@ public class DemoWebServiceTester {
 					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
-							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress , weatherAgent1Name, SyncMode.WRITEONLY));
+							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, publishAddress, weatherAgent1Name, SyncMode.WRITEONLY));
 			CellGatewayImpl weatherAgent = this.controller.createAgent(cf);
-			
-			//=== Init finished ===//
+
+			// === Init finished ===//
 
 			synchronized (this) {
 				try {
@@ -261,10 +249,10 @@ public class DemoWebServiceTester {
 				}
 			}
 			log.info("=== All agents initialized ===");
-			
+
 			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(weatherservice + ".command").setValue(ControlCommand.START));
-			
-			//Wait while the system runs
+
+			// Wait while the system runs
 			synchronized (this) {
 				try {
 					this.wait(20000);
@@ -272,18 +260,18 @@ public class DemoWebServiceTester {
 
 				}
 			}
-			
-			//Read the state of the system
-			//JsonObject systemState = weatherAgent.readLocalDatapoint(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject();
-			
-			//String currentResult = systemState.get("hasFunction").getAsJsonArray().get(0).getAsJsonObject().get("hasState").getAsString();
-			//String expectedResult = "RUNNING"; //As the system is still running, when the request is sent
-			
-			//weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
-			
-			//log.info("current result={}, expected result={}", currentResult, expectedResult);
-			//assertEquals(currentResult, expectedResult);
-			assert(false);
+
+			// Read the state of the system
+			// JsonObject systemState = weatherAgent.readLocalDatapoint(CFStateGenerator.SYSTEMSTATEADDRESS).getValue().getAsJsonObject();
+
+			// String currentResult = systemState.get("hasFunction").getAsJsonArray().get(0).getAsJsonObject().get("hasState").getAsString();
+			// String expectedResult = "RUNNING"; //As the system is still running, when the request is sent
+
+			// weatherAgent.getCommunicator().write(Datapoints.newDatapoint(weatherservice + ".command").setValue(ControlCommand.STOP));
+
+			// log.info("current result={}, expected result={}", currentResult, expectedResult);
+			// assertEquals(currentResult, expectedResult);
+			assert (false);
 			log.info("Tests passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

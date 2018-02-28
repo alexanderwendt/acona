@@ -18,6 +18,7 @@ import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.helpers.DummyCell;
 import at.tuwien.ict.acona.cell.core.helpers.DummyFunction;
 
+@Deprecated
 public class CellBuilderTester {
 
 	private static Logger log = LoggerFactory.getLogger(CellBuilderTester.class);
@@ -59,12 +60,9 @@ public class CellBuilderTester {
 			// Create the cell
 			CellConfig cellConfig = CellConfig.newConfig("testcell", DummyCell.class);
 			cellConfig.addProperty("testproperty1", "10000");
-			cellConfig
-					.addCellfunction(
-							CellFunctionConfig.newConfig("function1", DummyFunction.class)
-									.addManagedDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value", SyncMode.SUBSCRIBEONLY))
-									.setExecuteOnce(true).setExecuterate(500)
-									.setProperty("TESTPROPERTY1", "valuesuccess"));
+			cellConfig.addCellfunction(CellFunctionConfig.newConfig("function1", DummyFunction.class)
+					.addManagedDatapoint(DatapointConfig.newConfig("ID1", "agent1.dp1.value", SyncMode.SUBSCRIBEONLY))
+					.setExecuteOnce(true).setExecuterate(500).setProperty("TESTPROPERTY1", "valuesuccess"));
 
 			log.info("Config={}", cellConfig);
 
@@ -123,13 +121,14 @@ public class CellBuilderTester {
 			// cellConfig.getAsJsonArray(CELLACTIVATORS).add(activatorConfig);
 
 			DummyCell cell = new DummyCell(cellConfig);
-			CellBuilder builder = new CellBuilder();
+			CellBuilder builder = new CellBuilder(cell);
 
-			builder.initializeCellConfig(cellConfig, cell);// .initializeCellConfig(cellConfig, cell);
+			builder.initializeCellConfig(cellConfig);
 
 			Map<String, List<String>> function = cell.getSubscriptionHandler().getCellFunctionDatapointMapping();
-			String actualResult = cell.getFunctionHandler().getCellFunction(
-					cell.getSubscriptionHandler().getCellFunctionDatapointMapping().get("testcell:agent1.dp1.value").get(0))
+			String actualResult = cell
+					.getFunctionHandler().getCellFunction(cell.getSubscriptionHandler()
+							.getCellFunctionDatapointMapping().get("testcell:agent1.dp1.value").get(0))
 					.getFunctionConfig().getProperty("TESTPROPERTY1");
 
 			// Get the name of one of the activators

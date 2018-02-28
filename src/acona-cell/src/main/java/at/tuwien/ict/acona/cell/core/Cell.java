@@ -4,6 +4,7 @@ import at.tuwien.ict.acona.cell.communicator.BasicServiceCommunicator;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandler;
 import at.tuwien.ict.acona.cell.communicator.SubscriptionHandler;
 import at.tuwien.ict.acona.cell.config.CellConfig;
+import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.storage.DataStorage;
 import jade.core.behaviours.Behaviour;
 
@@ -19,14 +20,16 @@ public interface Cell {
 	public DataStorage getDataStorage();
 
 	/**
-	 * Get activation handler for all activations, which control the cell internal bahviours
+	 * Get activation handler for all activations, which control the cell internal
+	 * bahviours
 	 * 
 	 * @return activation handler
 	 */
 	public CellFunctionHandler getFunctionHandler();
 
 	/**
-	 * Get subscription handler to register, deregister or activate subscribed datapoints
+	 * Get subscription handler to register, deregister or activate subscribed
+	 * datapoints
 	 * 
 	 * @return
 	 */
@@ -61,14 +64,22 @@ public interface Cell {
 	public void addBehaviour(Behaviour b);
 
 	/**
-	 * Reset current cellinternal behaviours and activators and setup new cell behaviours. It is a reset
-	 * with new cell behaviours
+	 * Reset current cellinternal behaviours and activators and setup new cell
+	 * behaviours. It is a reset with new cell behaviours
 	 * 
 	 * @param conf:
 	 *            Valid JsonObject for cells
 	 * @throws Exception
 	 */
 	public void setupCellFunctions(CellConfig conf) throws Exception;
+
+	/**
+	 * Add a new cell function to a running cell from a cellfunction config.
+	 * 
+	 * @param cellFunctionConfig
+	 * @throws Exception
+	 */
+	public void addCellFunction(CellFunctionConfig cellFunctionConfig) throws Exception;
 
 	/**
 	 * Register a service
