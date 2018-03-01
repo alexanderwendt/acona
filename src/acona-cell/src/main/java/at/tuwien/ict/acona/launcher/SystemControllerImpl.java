@@ -262,6 +262,22 @@ public class SystemControllerImpl implements SystemController {
 	// === Agent methods ===//
 
 	/**
+	 * Check if an agent with a given name exists.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean agentExists(String name) {
+		boolean result = false;
+
+		if (this.getAgent(name) != null) {
+			result = true;
+		}
+
+		return result;
+	}
+
+	/**
 	 * Create an agent from a cell config
 	 * 
 	 * @param cellConfig
@@ -269,6 +285,13 @@ public class SystemControllerImpl implements SystemController {
 	 * @throws Exception
 	 */
 	public synchronized CellGatewayImpl createAgent(CellConfig cellConfig) throws Exception {
+		// Check if the agent already exists
+		CellGateway existingAgent = this.getAgent(cellConfig.getName());
+		if (existingAgent != null) {
+			log.error("Agent={} in cellConfig already exists", cellConfig.getName());
+			throw new Exception("Agent " + cellConfig.getName() + " already exists.");
+		}
+
 		// Create the object
 		CellGatewayImpl externalController = new CellGatewayImpl();
 
