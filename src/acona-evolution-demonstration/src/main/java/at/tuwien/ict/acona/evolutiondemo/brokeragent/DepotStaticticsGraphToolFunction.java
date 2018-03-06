@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.evolutiondemo.stockmarketagent;
+package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,9 +18,9 @@ import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 
-public class GraphToolFunction extends CellFunctionThreadImpl {
+public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 	
-	private final static Logger log = LoggerFactory.getLogger(GraphToolFunction.class);
+	private final static Logger log = LoggerFactory.getLogger(DepotStaticticsGraphToolFunction.class);
 	
 	private OHLCGraph graph;
 	

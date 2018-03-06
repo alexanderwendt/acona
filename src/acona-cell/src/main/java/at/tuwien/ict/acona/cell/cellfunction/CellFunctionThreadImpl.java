@@ -30,7 +30,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	public final static String CONFIGSUFFIX = "config";
 
 	private static Logger log = LoggerFactory.getLogger(CellFunctionThreadImpl.class);
-	private static final int INITIALIZATIONPAUSE = 500;
+	// private static final int INITIALIZATIONPAUSE = 500;
 
 	/**
 	 * Deafult execute rate of the function

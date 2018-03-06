@@ -83,6 +83,7 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 		Datapoint history = this.getCommunicator().read(CognitiveProcess.ACTIONHISTORYADDRESS);
 		log.debug("Old history={}", history);
 		JsonArray historyData;
+		@SuppressWarnings("unused")
 		JsonObject actionHistoryObject = new JsonObject();
 
 		if (history.hasEmptyValue() == false) {

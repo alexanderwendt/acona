@@ -25,7 +25,6 @@ import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 public class CellExecutorWithCellTester {
 	private static Logger log = LoggerFactory.getLogger(CellExecutorWithCellTester.class);
@@ -64,8 +63,10 @@ public class CellExecutorWithCellTester {
 			}
 		}
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
+		this.launcher.stopSystem();
+
+		// Runtime runtime = Runtime.instance();
+		// runtime.shutDown();
 		synchronized (this) {
 			try {
 				this.wait(200);
@@ -246,13 +247,9 @@ public class CellExecutorWithCellTester {
 	// }
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller
-	 * runs every 5s. It starts a getDataFunction. When the data has been received,
-	 * the publish data function is executed. Data is read from another dummy agent,
-	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
-	 * memory agent, added and published within the agent. The result is subscribed
-	 * by an output agent The Outbuffer is only an empty mock, which is used as a
-	 * gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
+	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
+	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
 	 * 
 	 */
 	@Test

@@ -17,7 +17,7 @@ public class SelectionCodelet extends CognitiveCodelet {
 
 	private final static Logger log = LoggerFactory.getLogger(SelectionCodelet.class);
 
-	private final static String PARAMSELECTIONTHRESHOLD = "selectionthreshold";
+	// private final static String PARAMSELECTIONTHRESHOLD = "selectionthreshold";
 
 	// public final static String ATTRIBUTEOPTIONADDRESSSUFFIX = "optionaddress";
 	// public final static String ATTRIBUTESELECTEDOPTIONADDRESSSUFFIX = "selectionaddress";

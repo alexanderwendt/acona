@@ -219,16 +219,21 @@ public class CellImpl extends Agent implements Cell {
 	 */
 	@Override
 	protected void takeDown() {
+		// Deregister from the yellow pages
+		try {
+			DFAgentDescription[] result = DFService.search(this, this.dfDescriptionAgentDescription);
+			if (result.length > 0) {
+				log.debug("Found agent in DFService. Agent={}", result[0].getName());
+				DFService.deregister(this);
+			}
+
+		} catch (FIPAException fe) {
+			log.error("Cannot deregister agent {} as it is not-registered", this.getLocalName(), fe);
+		}
+
 		this.notificator.shutDown();
 
 		this.getCommunicator().shutDown();
-
-		// Deregister from the yellow pages
-		try {
-			DFService.deregister(this);
-		} catch (FIPAException fe) {
-			log.error("Cannot deregister agent", fe);
-		}
 
 		this.doDelete();
 		// Printout a dismissal message
@@ -267,16 +272,14 @@ public class CellImpl extends Agent implements Cell {
 	}
 
 	/**
-	 * Convenience function to access the arguments provided to the agent via
-	 * {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast
-	 * from the Object stored in the object array provided on agent generation
+	 * Convenience function to access the arguments provided to the agent via {@link Agent#getArguments()} in a typesafe manner. Note: the argument is cast from the Object stored in the object array
+	 * provided on agent generation
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
 	 * @param type
 	 *            The type of the requested argument
-	 * @return The argument at the given {@code index}, cast to the given
-	 *         {@code type}
+	 * @return The argument at the given {@code index}, cast to the given {@code type}
 	 */
 	protected <TYPE> TYPE getArgument(int index, Class<TYPE> type) {
 		if (getArguments() == null) {
@@ -297,21 +300,16 @@ public class CellImpl extends Agent implements Cell {
 	}
 
 	/**
-	 * Convenience function to access a List provided to the agent via
-	 * {@link Agent#getArguments()} in a typesafe manner. The provided type is the
-	 * type of the objects contained in the list. For example: if argument #1 is of
-	 * type {@code List<ACLMessage>} then the call would look like this: {@code List
-	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each
-	 * argument is cast from Object to the type stored in the list Also Note: this
-	 * method can not provide additional type checking for further containers within
-	 * the list and does not support other container types than list
+	 * Convenience function to access a List provided to the agent via {@link Agent#getArguments()} in a typesafe manner. The provided type is the type of the objects contained in the list. For example:
+	 * if argument #1 is of type {@code List<ACLMessage>} then the call would look like this: {@code List
+	 * <ACLMessage> result = getArgumentList(1, ACLMessage.class);} Note: each argument is cast from Object to the type stored in the list Also Note: this method can not provide additional type checking
+	 * for further containers within the list and does not support other container types than list
 	 * 
 	 * @param index
 	 *            The index of the request argument in the arguments list
 	 * @param type
 	 *            The content type of the requested list
-	 * @return The argument at the given {@code index}, cast to a list of the given
-	 *         {@code type}
+	 * @return The argument at the given {@code index}, cast to a list of the given {@code type}
 	 */
 	protected <TYPE> List<TYPE> getArgumentList(int index, Class<TYPE> type) {
 		List<TYPE> result = new ArrayList<>();
@@ -328,8 +326,7 @@ public class CellImpl extends Agent implements Cell {
 	}
 
 	/**
-	 * Shortcut method used to access the argument at the given {@code index} as
-	 * string This method calls: {@code getArgument(index, String.class)}
+	 * Shortcut method used to access the argument at the given {@code index} as string This method calls: {@code getArgument(index, String.class)}
 	 * 
 	 * @param index
 	 * @return
@@ -339,9 +336,7 @@ public class CellImpl extends Agent implements Cell {
 	}
 
 	/**
-	 * Shortcut method used to access the argument list at the given {@code index}
-	 * as list of strings This method calls:
-	 * {@code getArgumentList(index, String.class)}
+	 * Shortcut method used to access the argument list at the given {@code index} as list of strings This method calls: {@code getArgumentList(index, String.class)}
 	 * 
 	 * @param index
 	 * @return

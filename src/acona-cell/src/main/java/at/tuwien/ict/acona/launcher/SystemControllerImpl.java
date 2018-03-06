@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.launcher;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,12 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
-
 import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.SystemConfig;
 import at.tuwien.ict.acona.cell.core.CellGateway;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import jade.core.Runtime;
@@ -23,8 +16,7 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
 /**
- * This is a wrapper class for all types of jade initialization. it starts
- * agents and containers
+ * This is a wrapper class for all types of jade initialization. it starts agents and containers
  * 
  * @author wendt
  */
@@ -45,11 +37,11 @@ public class SystemControllerImpl implements SystemController {
 	private final Map<String, AgentController> agentControllerMap = new ConcurrentHashMap<>();
 	private final Map<String, CellGatewayImpl> externalAgentControllerMap = new ConcurrentHashMap<>();
 
-	private String topController = "";
+	// private String topController = "";
 
-	private final Map<String, CellGateway> controllerAgents = new ConcurrentHashMap<>();
-	private final Map<String, CellGateway> serviceAgents = new ConcurrentHashMap<>();
-	private final Map<String, CellGateway> memoryAgents = new ConcurrentHashMap<>();
+	// private final Map<String, CellGateway> controllerAgents = new ConcurrentHashMap<>();
+	// private final Map<String, CellGateway> serviceAgents = new ConcurrentHashMap<>();
+	// private final Map<String, CellGateway> memoryAgents = new ConcurrentHashMap<>();
 
 	private String defaultContainer = "";
 
@@ -216,17 +208,34 @@ public class SystemControllerImpl implements SystemController {
 			}
 		}
 
-		// Get all agents
-		this.agentControllerMap.values().forEach(a -> {
-			try {
-				log.debug("Kill agent={}", a.getName());
-				a.kill();
-			} catch (StaleProxyException e1) {
-				log.error("Cannot kill agent={}", a);
-			}
+		// Get all agents in the external controller map
+		this.externalAgentControllerMap.values().forEach(c -> {
+			log.debug("Take down cell={}", c.getCell().getName());
+			c.getCell().takeDownCell();
 		});
+		this.externalAgentControllerMap.clear();
 
+		// Get all agents in the controller map
+//		this.agentControllerMap.values().forEach(a -> {
+//			try {
+//				log.debug("Kill agent={}", a.getName());
+//				a.kill();
+//			} catch (StaleProxyException e1) {
+//				log.error("Cannot kill agent={}", a);
+//			}
+//		});
 		this.agentControllerMap.clear();
+
+		for (int i = 1; i <= 1; i++) {
+			synchronized (this) {
+				try {
+					this.wait(i * 1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.debug("Wait {}s", i);
+		}
 
 		this.agentContainerMap.values().forEach(c -> {
 			try {
@@ -239,12 +248,15 @@ public class SystemControllerImpl implements SystemController {
 
 		this.agentContainerMap.clear();
 
-		synchronized (this) {
-			try {
-				this.wait(2000);
-			} catch (InterruptedException e) {
+		for (int i = 1; i <= 1; i++) {
+			synchronized (this) {
+				try {
+					this.wait(i * 1000);
+				} catch (InterruptedException e) {
 
+				}
 			}
+			log.debug("Wait {}s", i);
 		}
 
 		Runtime runtime = Runtime.instance();
@@ -288,7 +300,7 @@ public class SystemControllerImpl implements SystemController {
 		// Check if the agent already exists
 		CellGateway existingAgent = this.getAgent(cellConfig.getName());
 		if (existingAgent != null) {
-			log.error("Agent={} in cellConfig already exists", cellConfig.getName());
+			log.error("Agent={} in cellConfig already exists. Cells={}.", cellConfig.getName(), this.agentControllerMap);
 			throw new Exception("Agent " + cellConfig.getName() + " already exists.");
 		}
 
@@ -313,8 +325,7 @@ public class SystemControllerImpl implements SystemController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * executeUserInput(java.lang.String, java.lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# executeUserInput(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public synchronized void executeUserInput(String command, String parameter) {
@@ -322,143 +333,134 @@ public class SystemControllerImpl implements SystemController {
 
 	}
 
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(com. google.gson.JsonObject)
+//	 */
+//	@Override
+//	public SystemController init(JsonObject config) throws Exception {
+//		return this.init(SystemConfig.newConfig(config));
+//	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(com.
-	 * google.gson.JsonObject)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(java. lang.String)
 	 */
-	@Override
-	public SystemController init(JsonObject config) throws Exception {
-		return this.init(SystemConfig.newConfig(config));
-	}
+//	@Override
+//	public synchronized SystemController init(String absolutefilePath) {
+//		JsonReader reader;
+//		try {
+//			reader = new JsonReader(new FileReader(absolutefilePath));
+//			JsonObject data = new Gson().fromJson(reader, JsonObject.class);
+//
+//			this.init(data);
+//		} catch (FileNotFoundException e) {
+//			log.error("Cannot open file", e);
+//		} catch (Exception e) {
+//			log.error("Cannot load config", e);
+//		}
+//
+//		return null;
+//	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(java.
-	 * lang.String)
-	 */
-	@Override
-	public synchronized SystemController init(String absolutefilePath) {
-		JsonReader reader;
-		try {
-			reader = new JsonReader(new FileReader(absolutefilePath));
-			JsonObject data = new Gson().fromJson(reader, JsonObject.class);
-
-			this.init(data);
-		} catch (FileNotFoundException e) {
-			log.error("Cannot open file", e);
-		} catch (Exception e) {
-			log.error("Cannot load config", e);
-		}
-
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * at.tuwien.ict.acona.framework.interfaces.KoreExternalController#getAgent(java
-	 * .lang.String)
+	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#getAgent(java .lang.String)
 	 */
 	@Override
 	public synchronized CellGateway getAgent(String localName) {
 		return externalAgentControllerMap.get(localName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * getTopController()
-	 */
-	@Override
-	public CellGateway getTopController() {
-		return this.getControllerAgent(this.topController);
-	}
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# getTopController()
+//	 */
+//	@Override
+//	public CellGateway getTopController() {
+//		return this.getControllerAgent(this.topController);
+//	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(at.
-	 * tuwien.ict.acona.cell.config.SystemConfig)
-	 */
-	@Override
-	public synchronized SystemController init(SystemConfig config) {
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#init(at.
+//	 * tuwien.ict.acona.cell.config.SystemConfig)
+//	 */
+//	@Override
+//	public synchronized SystemController init(SystemConfig config) {
+//
+//		// Set top controller
+//		this.setTopController(config.getTopController());
+//
+//		// Init memory agents
+//		config.getMemories().forEach(agentConfig -> {
+//			try {
+//				CellGateway agent = this.createAgent(agentConfig);
+//				this.memoryAgents.put(agentConfig.getName(), agent);
+//			} catch (Exception e) {
+//				log.error("Cannot create agent={} from config={}", agentConfig.getName(), agentConfig);
+//			}
+//		});
+//
+//		// Init service agents
+//		config.getServices().forEach(agentConfig -> {
+//			try {
+//				CellGateway agent = this.createAgent(agentConfig);
+//				this.serviceAgents.put(agentConfig.getName(), agent);
+//			} catch (Exception e) {
+//				log.error("Cannot create agent={} from config={}", agentConfig.getName(), agentConfig);
+//			}
+//		});
+//
+//		// Init controller agents
+//		config.getControllers().forEach(agentConfig -> {
+//			try {
+//				CellGateway agent = this.createAgent(agentConfig);
+//				this.controllerAgents.put(agentConfig.getName(), agent);
+//			} catch (Exception e) {
+//				log.error("Cannot create agent={} from config={}", agentConfig.getName(), agentConfig);
+//			}
+//		});
+//
+//		// Pause to init all agents
+//		log.debug("Wait for all agents to finish init");
+//		synchronized (this) {
+//			try {
+//				this.wait(1000);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
+//
+//		log.info("=== All agents initialized ===");
+//
+//		return this;
+//	}
 
-		// Set top controller
-		this.setTopController(config.getTopController());
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# setTopController(java.lang.String)
+//	 */
+//	@Override
+//	public void setTopController(String agentName) {
+//		this.topController = agentName;
+//	}
 
-		// Init memory agents
-		config.getMemories().forEach(agentConfig -> {
-			try {
-				CellGateway agent = this.createAgent(agentConfig);
-				this.memoryAgents.put(agentConfig.getName(), agent);
-			} catch (Exception e) {
-				log.error("Cannot create agent={} from config={}", agentConfig.getName(), agentConfig);
-			}
-		});
-
-		// Init service agents
-		config.getServices().forEach(agentConfig -> {
-			try {
-				CellGateway agent = this.createAgent(agentConfig);
-				this.serviceAgents.put(agentConfig.getName(), agent);
-			} catch (Exception e) {
-				log.error("Cannot create agent={} from config={}", agentConfig.getName(), agentConfig);
-			}
-		});
-
-		// Init controller agents
-		config.getControllers().forEach(agentConfig -> {
-			try {
-				CellGateway agent = this.createAgent(agentConfig);
-				this.controllerAgents.put(agentConfig.getName(), agent);
-			} catch (Exception e) {
-				log.error("Cannot create agent={} from config={}", agentConfig.getName(), agentConfig);
-			}
-		});
-
-		// Pause to init all agents
-		log.debug("Wait for all agents to finish init");
-		synchronized (this) {
-			try {
-				this.wait(1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-
-		log.info("=== All agents initialized ===");
-
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * setTopController(java.lang.String)
-	 */
-	@Override
-	public void setTopController(String agentName) {
-		this.topController = agentName;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController#
-	 * getControllerAgent(java.lang.String)
-	 */
-	@Override
-	public CellGateway getControllerAgent(String localName) {
-		return this.controllerAgents.get(localName);
-	}
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see at.tuwien.ict.acona.framework.interfaces.KoreExternalController# getControllerAgent(java.lang.String)
+//	 */
+//	@Override
+//	public CellGateway getControllerAgent(String localName) {
+//		return this.controllerAgents.get(localName);
+//	}
 
 	/**
 	 * Get the agent controller map
@@ -468,4 +470,10 @@ public class SystemControllerImpl implements SystemController {
 	public Map<String, CellGatewayImpl> getExternalAgentControllerMap() {
 		return Collections.unmodifiableMap(externalAgentControllerMap);
 	}
+
+//	@Override
+//	public SystemController init(JsonObject config) throws Exception {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 }

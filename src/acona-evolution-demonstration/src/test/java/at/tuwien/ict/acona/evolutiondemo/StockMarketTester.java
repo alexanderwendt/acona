@@ -1,11 +1,7 @@
 package at.tuwien.ict.acona.evolutiondemo;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,28 +9,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
-
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
-import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.GraphToolFunction;
-import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.OHLCGraph;
+import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
 import jade.core.Runtime;
 
@@ -92,22 +74,22 @@ public class StockMarketTester {
 	@Test
 	public void stockmarketGenerationTester() {
 		try {
-			String brokerAgentName = "BrokerAgent"; 
+			String brokerAgentName = "BrokerAgent";
 			String traderAgentName = "TraderAgent";
 			String traderType = "type1";
 			String brokerServiceName = "BrokerService";
 			String stockName = "Fingerprint";
 
-			//=== Controller ===//
+			// === Controller ===//
 			String controllerAgentName = "ControllerAgent";
 			String controllerService = "controllerservice";
-			
+
 			CellGatewayImpl controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
 							.setGenerateReponder(true))
 					.addCellfunction(CellFunctionConfig.newConfig("userconsole", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
-			
+
 			synchronized (this) {
 				try {
 					this.wait(200);
@@ -115,11 +97,11 @@ public class StockMarketTester {
 
 				}
 			}
-			
-			//=== Stock market ===//
+
+			// === Stock market ===//
 			String stockmarketAgentName = "StockMarketAgent";
 			String stockmarketServiceName = "StockMarketService";
-			
+
 			CellGatewayImpl stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
@@ -127,10 +109,10 @@ public class StockMarketTester {
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
 							.setGenerateReponder(true))
-					.addCellfunction(CellFunctionConfig.newConfig("OHLCGraph", GraphToolFunction.class)
-							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY)));	//Puts data on datapoint StockMarketAgent:data
-			
-			//=== Init finished ===//
+					.addCellfunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
+							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data
+
+			// === Init finished ===//
 
 			synchronized (this) {
 				try {
@@ -140,7 +122,7 @@ public class StockMarketTester {
 				}
 			}
 			log.info("=== All agents initialized ===");
-			
+
 //			JsonRpcRequest request1 = new JsonRpcRequest("registerdepot", 0);
 //			//request1.setParameterAsValue(0, traderAgentName);
 //			//request1.setParameterAsValue(1, traderType);
@@ -195,10 +177,10 @@ public class StockMarketTester {
 //			request1.setParameters(traderAgentName);
 //			result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
 //			JsonElement e = brokerAgent.readLocalDatapoint("depot." + traderAgentName).getValue();
-			
-			//log.info("unregistered depot={}", e);
+
+			// log.info("unregistered depot={}", e);
 			assertEquals(true, false);
-			
+
 			log.info("All tests passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

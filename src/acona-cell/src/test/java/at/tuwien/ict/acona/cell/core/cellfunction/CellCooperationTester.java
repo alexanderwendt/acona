@@ -17,7 +17,6 @@ import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
-import at.tuwien.ict.acona.cell.config.SystemConfig;
 import at.tuwien.ict.acona.cell.core.CellGateway;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFIncrementService;
@@ -27,7 +26,6 @@ import at.tuwien.ict.acona.cell.core.cellfunction.helpers.SimpleControllerServic
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 public class CellCooperationTester {
 	private static Logger log = LoggerFactory.getLogger(CellCooperationTester.class);
@@ -64,8 +62,10 @@ public class CellCooperationTester {
 			}
 		}
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
+		launcher.stopSystem();
+
+		// Runtime runtime = Runtime.instance();
+		// runtime.shutDown();
 		synchronized (this) {
 			try {
 				this.wait(200);
@@ -237,6 +237,8 @@ public class CellCooperationTester {
 
 			assertEquals(result, expectedResult, 0.0);
 			log.info("Test passed");
+
+			// launcher.stopSystem();
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
@@ -245,13 +247,9 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller
-	 * runs every 5s. It starts a getDataFunction. When the data has been received,
-	 * the publish data function is executed. Data is read from another dummy agent,
-	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
-	 * memory agent, added and published within the agent. The result is subscribed
-	 * by an output agent The Outbuffer is only an empty mock, which is used as a
-	 * gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
+	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
+	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
 	 * 
 	 */
 	@Test
@@ -280,32 +278,39 @@ public class CellCooperationTester {
 			double startValue = 0;
 			int expectedResult = 3;
 
-			// Use a system config to init the whole system
-			SystemConfig totalConfig = SystemConfig.newConfig().addController(CellConfig.newConfig(controllerAgentName)
+			// Create all agents
+			CellGateway controller = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
 							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
 							.setProperty("delay", "1")
 							.addManagedDatapoint(DatapointConfig
-									.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))))
-					.addMemory(CellConfig.newConfig(memoryAgentName))
-					.addService(CellConfig.newConfig(agentName1)
-							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
-											SyncMode.READWRITEBACK)))
-					.addService(CellConfig.newConfig(agentName2)
-							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
-											SyncMode.READWRITEBACK)))
-					.addService(CellConfig.newConfig(agentName3)
-							.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-									.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
-											SyncMode.READWRITEBACK)))
-					.setTopController(controllerAgentName);
+									.newConfig(COMMANDDATAPOINTNAME, COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))));
+			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
+			this.launcher.createAgent(CellConfig.newConfig(agentName1)
+					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+									SyncMode.READWRITEBACK)));
+			this.launcher.createAgent(CellConfig.newConfig(agentName2)
+					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+									SyncMode.READWRITEBACK)));
+			this.launcher.createAgent(CellConfig.newConfig(agentName3)
+					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+									SyncMode.READWRITEBACK)));
 
-			// this.launcher.createDebugUserInterface();
-
-			this.launcher.init(totalConfig);
+			// Use a system config to init the whole system
+//			SystemConfig totalConfig = SystemConfig.newConfig().addController()
+//					.addMemory()
+//					.addService()
+//					.addService()
+//					.addService()
+//					.setTopController(controllerAgentName);
+//
+//			// this.launcher.createDebugUserInterface();
+//
+//			this.launcher.init(totalConfig);
 
 			// // Memory
 			// CellGatewayImpl memoryAgent =
@@ -364,6 +369,13 @@ public class CellCooperationTester {
 			//
 			// }
 			// }
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 			log.info("=== All agents initialized ===");
 
 			launcher.getAgent(memoryAgentName).getCommunicator()
@@ -373,7 +385,7 @@ public class CellCooperationTester {
 			// JsonPrimitive(startValue)));
 			// Start the system by setting start
 
-			CellGateway controller = launcher.getTopController();
+			// CellGateway controller = launcher.getTopController();
 
 			// Test the wrapper for controllers too
 			// ControllerCellGateway controllerCellGateway = new
@@ -425,6 +437,8 @@ public class CellCooperationTester {
 
 			assertEquals(result, expectedResult, 0.0);
 			log.info("Test passed");
+
+			// launcher.stopSystem();
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
@@ -433,13 +447,9 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * Idea: Create an agent with the following behaviours (not jade): A controller
-	 * runs every 5s. It starts a getDataFunction. When the data has been received,
-	 * the publish data function is executed. Data is read from another dummy agent,
-	 * which acts as a memory In the "Drivetrack-Agent", 2 values are read from a
-	 * memory agent, added and published within the agent. The result is subscribed
-	 * by an output agent The Outbuffer is only an empty mock, which is used as a
-	 * gateway
+	 * Idea: Create an agent with the following behaviours (not jade): A controller runs every 5s. It starts a getDataFunction. When the data has been received, the publish data function is executed. Data
+	 * is read from another dummy agent, which acts as a memory In the "Drivetrack-Agent", 2 values are read from a memory agent, added and published within the agent. The result is subscribed by an
+	 * output agent The Outbuffer is only an empty mock, which is used as a gateway
 	 * 
 	 */
 	@Test
@@ -468,33 +478,42 @@ public class CellCooperationTester {
 			int expectedResult = 1;
 
 			// === Config ===//
-			SystemConfig totalConfig = SystemConfig.newConfig();
-			totalConfig.addController(CellConfig.newConfig(controllerAgentName)
+			CellGateway topController = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, SimpleControllerService.class)
 							.setProperty("agentname", serviceAgentName).setProperty("servicename", serviceName)
 							.setProperty("delay", "10")));
+			// SystemConfig totalConfig = SystemConfig.newConfig();
+			// totalConfig.addController();
+			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
 
-			totalConfig.addMemory(CellConfig.newConfig(memoryAgentName));
-			totalConfig.setTopController(controllerAgentName);
-
-			totalConfig.addService(CellConfig.newConfig(serviceAgentName)
+			this.launcher.createAgent(CellConfig.newConfig(serviceAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
 							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
 									SyncMode.READWRITEBACK)));
+			// totalConfig.addMemory();
+			// totalConfig.setTopController(controllerAgentName);
+
+			// totalConfig.addService();
 
 			// === System initialization ===//
 
 			// this.launcher.createDebugUserInterface();
 
-			this.launcher.init(totalConfig);
-			CellGateway topController = launcher.getTopController();
+			// this.launcher.init(totalConfig);
+			// CellGateway topController = launcher.getTopController();
 			topController.getCommunicator().setDefaultTimeout(100000);
 			// Set start values
-			launcher.getAgent(memoryAgentName).getCommunicator()
-					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator().write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 
 			// }
 			// log.info("=== All agents initialized ===");
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			log.info("=== System initialized ===");
 			// === System operation ===//
@@ -523,10 +542,8 @@ public class CellCooperationTester {
 	}
 
 	/**
-	 * In this test, one controller will start 100 increment services in a sequence.
-	 * The incrementservices increases the number in the memory with +1. At the end
-	 * the number in the memory shall be the same as the number of services in the
-	 * system.
+	 * In this test, one controller will start 100 increment services in a sequence. The incrementservices increases the number in the memory with +1. At the end the number in the memory shall be the same
+	 * as the number of services in the system.
 	 * 
 	 */
 	@Test
@@ -559,21 +576,23 @@ public class CellCooperationTester {
 
 			// === Config ===//
 			// Create total config
-			SystemConfig totalConfig = SystemConfig.newConfig();
+			// SystemConfig totalConfig = SystemConfig.newConfig();
 
 			// Add controller
-			totalConfig.addController(CellConfig.newConfig(controllerAgentName)
+			CellGateway controller = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, LoopController.class)
 							.setProperty("agentnameprefix", serviceAgentName).setProperty("servicename", serviceName)
-							.setProperty("numberofagents", String.valueOf(numberOfAgents)).setProperty("delay", "1")));
+							.setProperty("numberofagents", String.valueOf(numberOfAgents)).setProperty("delay", "10")));
+			// totalConfig.addController();
 
 			// Add memory
-			totalConfig.addMemory(CellConfig.newConfig(memoryAgentName));
-			totalConfig.setTopController(controllerAgentName);
+			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
+			// totalConfig.addMemory();
+			// totalConfig.setTopController(controllerAgentName);
 
 			// Add services
 			for (int i = 1; i <= numberOfAgents; i++) {
-				totalConfig.addService(CellConfig.newConfig(serviceAgentName + i)
+				this.launcher.createAgent(CellConfig.newConfig(serviceAgentName + i)
 						.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
 								.addManagedDatapoint(IncrementFunctionDatapointID, processDatapoint, memoryAgentName,
 										SyncMode.READWRITEBACK)));
@@ -581,9 +600,17 @@ public class CellCooperationTester {
 
 			// this.launcher.createDebugUserInterface();
 
-			this.launcher.init(totalConfig);
+			// this.launcher.init(totalConfig);
 
 			// }
+
+			synchronized (this) {
+				try {
+					this.wait(10000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 			// log.info("=== All agents initialized ===");
 
 			launcher.getAgent(memoryAgentName).getCommunicator()
@@ -595,7 +622,7 @@ public class CellCooperationTester {
 
 			// this.launcher.getAgent("AgentIncrementService1").getCommunicator().write(Datapoint.newDatapoint("Increment.command").setValue(ControlCommand.START.toString()));
 
-			CellGateway controller = launcher.getTopController();
+			// CellGateway controller = launcher.getTopController();
 
 			// controller.getCommunicator().query(Datapoint.newDatapoint("Increment.command").setValue(ControlCommand.START.toString()),
 			// agentName + 1, Datapoint.newDatapoint("Increment.state"),

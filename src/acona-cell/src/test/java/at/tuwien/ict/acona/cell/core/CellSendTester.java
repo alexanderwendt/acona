@@ -18,7 +18,6 @@ import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.cellfunction.helpers.CFDurationThreadTester;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 public class CellSendTester {
 
@@ -73,8 +72,10 @@ public class CellSendTester {
 			}
 		}
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
+		this.launchUtil.stopSystem();
+
+		// Runtime runtime = Runtime.instance();
+		// runtime.shutDown();
 		synchronized (this) {
 			try {
 				this.wait(2000);
@@ -85,13 +86,9 @@ public class CellSendTester {
 	}
 
 	/**
-	 * Test the high level method query. Query works like a combination of write
-	 * and subscribe. Start a controller agent and a service agent. Send a
-	 * command or query to the controller agent. It operates for 2s, then there
-	 * is a result, which is written to a certain datapoint. This datapoint is
-	 * subscribed by the query and if any calue is written to the subscribed
-	 * datapoint within a timeout, the query is executed. The value read is the
-	 * testvalue
+	 * Test the high level method query. Query works like a combination of write and subscribe. Start a controller agent and a service agent. Send a command or query to the controller agent. It operates
+	 * for 2s, then there is a result, which is written to a certain datapoint. This datapoint is subscribed by the query and if any calue is written to the subscribed datapoint within a timeout, the
+	 * query is executed. The value read is the testvalue
 	 * 
 	 * 
 	 */
@@ -146,13 +143,9 @@ public class CellSendTester {
 	}
 
 	/**
-	 * Test the high level method query. Query works like a combination of write
-	 * and subscribe. Start a controller agent and a service agent. Send a
-	 * command or query to the controller agent. It operates for 2s, then there
-	 * is a result, which is written to a certain datapoint. This datapoint is
-	 * subscribed by the query and if any calue is written to the subscribed
-	 * datapoint within a timeout, the query is executed. The value read is the
-	 * testvalue
+	 * Test the high level method query. Query works like a combination of write and subscribe. Start a controller agent and a service agent. Send a command or query to the controller agent. It operates
+	 * for 2s, then there is a result, which is written to a certain datapoint. This datapoint is subscribed by the query and if any calue is written to the subscribed datapoint within a timeout, the
+	 * query is executed. The value read is the testvalue
 	 * 
 	 * 
 	 */

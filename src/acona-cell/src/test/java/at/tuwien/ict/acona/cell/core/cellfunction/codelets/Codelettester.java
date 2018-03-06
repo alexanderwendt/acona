@@ -23,7 +23,6 @@ import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnCo
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 public class Codelettester {
 	private static Logger log = LoggerFactory.getLogger(Codelettester.class);
@@ -60,8 +59,10 @@ public class Codelettester {
 			}
 		}
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
+		this.launcher.stopSystem();
+
+		// Runtime runtime = Runtime.instance();
+		// runtime.shutDown();
 		synchronized (this) {
 			try {
 				this.wait(2000);
@@ -72,10 +73,8 @@ public class Codelettester {
 	}
 
 	/**
-	 * 2 codelets register in the codelet handler. Both of them will increment a
-	 * number by 1 if a condition applies. The condition is the number. The purpose
-	 * is that the codelet handler is triggered 2 times and the codelets are
-	 * executed in serie.
+	 * 2 codelets register in the codelet handler. Both of them will increment a number by 1 if a condition applies. The condition is the number. The purpose is that the codelet handler is triggered 2
+	 * times and the codelets are executed in serie.
 	 * 
 	 */
 	@Test
@@ -206,10 +205,8 @@ public class Codelettester {
 	}
 
 	/**
-	 * 2 codelets register in the codelet handler. Both of them will increment a
-	 * number by 1 if a condition applies. The condition is the number. The purpose
-	 * is that the codelet handler is triggered 1 time but execute both codelets in
-	 * series because they have different execution order
+	 * 2 codelets register in the codelet handler. Both of them will increment a number by 1 if a condition applies. The condition is the number. The purpose is that the codelet handler is triggered 1
+	 * time but execute both codelets in series because they have different execution order
 	 * 
 	 */
 	@Test
@@ -341,8 +338,7 @@ public class Codelettester {
 	}
 
 	/**
-	 * Execute the full ACONA architecture with 2 codelets for each codelet handler.
-	 * They shall increment different addresses in parallel.
+	 * Execute the full ACONA architecture with 2 codelets for each codelet handler. They shall increment different addresses in parallel.
 	 * 
 	 */
 	@Test

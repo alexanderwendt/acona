@@ -25,7 +25,6 @@ import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 public class CellStateTester {
 	private static Logger log = LoggerFactory.getLogger(CellStateTester.class);
@@ -79,8 +78,10 @@ public class CellStateTester {
 			}
 		}
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
+		this.launchUtil.stopSystem();
+
+		// Runtime runtime = Runtime.instance();
+		// runtime.shutDown();
 		synchronized (this) {
 			try {
 				this.wait(2000);
@@ -91,9 +92,7 @@ public class CellStateTester {
 	}
 
 	/**
-	 * Create a cell with some functions and a state collector function. Execute 4
-	 * function in the cell, read the state of one of the functions at the end by
-	 * the the state collector function
+	 * Create a cell with some functions and a state collector function. Execute 4 function in the cell, read the state of one of the functions at the end by the the state collector function
 	 * 
 	 * 
 	 */
@@ -229,9 +228,7 @@ public class CellStateTester {
 	}
 
 	/**
-	 * Create a cell with some functions and a state collector function. Execute 4
-	 * function in the cell, read the state of one of the functions at the end by
-	 * the the state collector function
+	 * Create a cell with some functions and a state collector function. Execute 4 function in the cell, read the state of one of the functions at the end by the the state collector function
 	 * 
 	 * 
 	 */

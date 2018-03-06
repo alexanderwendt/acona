@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,7 +25,7 @@ public class CellFunctionConfig {
 	public static final String RESPONDERPROTOCOL = "responderprotocol";
 	// public static final String REGISTERSTATE = "registerstate";
 
-	private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
+	// private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
 
 	/**
 	 * 

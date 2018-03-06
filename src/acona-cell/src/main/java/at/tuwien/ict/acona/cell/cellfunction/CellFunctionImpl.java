@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.communicator.Communicator;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
@@ -169,6 +168,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 				// Datapoint dp = Datapoints.newDatapoint(key);
 				// if (this.datapointActivationMap.containsKey(key) == false) {
 				String completeAddress = subscriptionConfig.getComposedAddress(this.getAgentName());
+				@SuppressWarnings("unused")
 				Datapoint initialValue = this.getCommunicator().subscribeDatapoint(completeAddress, this.getFunctionName());
 				log.debug("{}>Subscribed address={}.", this.getAgentName(), subscriptionConfig.getComposedAddress(completeAddress));
 				// } else {
@@ -285,14 +285,14 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return this.config;
 	}
 
-	private void setFunctionConfig(JsonObject config) throws Exception {
-		// Set new config
-		this.config = CellFunctionConfig.newConfig(config);
-
-		// Restart system
-		this.shutDown();
-		this.init(this.config, this.cell);
-	}
+//	private void setFunctionConfig(JsonObject config) throws Exception {
+//		// Set new config
+//		this.config = CellFunctionConfig.newConfig(config);
+//
+//		// Restart system
+//		this.shutDown();
+//		this.init(this.config, this.cell);
+//	}
 
 	// === read and write shortcuts ===//
 

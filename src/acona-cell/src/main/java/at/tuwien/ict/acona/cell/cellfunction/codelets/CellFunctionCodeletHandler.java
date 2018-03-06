@@ -52,7 +52,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private String workingMemoryAddress = "workingmemory";
 	private String internalStateMemoryAddress = "internalmemoryaddress";
 
-	private String resultDatapointAddress = "";
+	// private String resultDatapointAddress = "";
 
 	private final static int METHODTIMEOUT = 9000;
 	// private final static int CODELETHANDLERTIMEOUT = 10000;
@@ -97,7 +97,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 			String callerAddress = "";
 			switch (parameter.getMethod()) {
 			case EXECUTECODELETEHANDLER:
-				boolean isBlocking = parameter.getParameter(0, Boolean.class);
+				// boolean isBlocking = parameter.getParameter(0, Boolean.class);
 				log.debug("Execute the codelet handler");
 				this.startCodeletHandler();
 				result = new JsonRpcResponse(parameter, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));

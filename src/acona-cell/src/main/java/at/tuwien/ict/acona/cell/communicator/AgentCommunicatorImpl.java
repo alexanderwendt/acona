@@ -25,6 +25,7 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.NotFoundException;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.domain.FIPANames;
@@ -92,10 +93,31 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 		log.info("Shut down communicator");
 		synchronized (this.threadedBehaviours) {
 			this.threadedBehaviours.forEach(b -> {
-				log.debug("Interrupting behaviour={}. Behaviour done={}", b.getBehaviourName(), b.done());
-				tbf.getThread(b).interrupt();
+				try {
+					log.debug("Interrupting behaviour={}. Behaviour done={}", b.getBehaviourName(), b.done());
+					this.getCell().removeBehaviour(b);
+					tbf.interrupt(b);
+					// Thread x = tbf.getThread(b);
+					// if (x != null) {
+					// x.interrupt();
+					// } else {
+					// log.warn("Thread of behaviour={} is null", b.getAgent().getLocalName() + ":" + b.getBehaviourName());
+					// }
+				} catch (NotFoundException e) {
+					log.warn("Behaviour={} has already been removed", b.getBehaviourName());
+				} catch (Exception e) {
+					log.error("Cannot shut down threaded behaviour {} properly", b.getBehaviourName(), e);
+				}
 			});
 		}
+
+//		synchronized (this) {
+//			try {
+//				this.wait(100);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
 	}
 
 	@Override
@@ -192,6 +214,7 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 		 */
 		private static final long serialVersionUID = 1L;
 
+		@SuppressWarnings("unchecked")
 		public ServiceExecuteBehaviour(Agent a, ACLMessage msg, SynchronousQueue<String> queue) {
 			super(a, msg);
 			// msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
