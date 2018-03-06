@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
@@ -24,6 +25,7 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
 import at.tuwien.ict.acona.launcher.SystemControllerImpl;
@@ -191,7 +193,8 @@ public class BrokerTester {
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class));
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+							.setProperty(StatisticsCollector.DATAADDRESS, "test"));
 			CellGatewayImpl brokerAgent = this.launcher.createAgent(cf);
 
 			List<CellGatewayImpl> traderAgents = new ArrayList<CellGatewayImpl>();
@@ -235,11 +238,89 @@ public class BrokerTester {
 			log.debug("Read statistics");
 			JsonRpcRequest req = new JsonRpcRequest("gettypes", 0);
 			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
-			List<Types> list = result.getResult(new TypeToken<List<Types>>() {});
+			JsonElement typesEncoded = result.getResult().getAsJsonObject().get("types");
+			List<Types> list = (new Gson()).fromJson(typesEncoded, new TypeToken<List<Types>>() {}.getType());
 			Optional<Types> opt = list.stream().filter(o -> o.getType().equals(traderType1)).findFirst();
 
 			log.info("number of type1={}. Calculated number={}", 50, opt.get().getNumber());
 			assertEquals(50, opt.get().getNumber());
+
+			log.info("All tests passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
+
+	/**
+	 * Create a broker agent. Create a depot. Add money to depot, read state of depot, buy stock, sell stock, unregister depot
+	 * 
+	 */
+	@Test
+	public void speciesGraphTest() {
+		try {
+			String brokerAgentName = "BrokerAgent";
+			String traderType1 = "type1";
+			String traderType2 = "type2";
+			String brokerServiceName = "BrokerService";
+			String statisticsService = "StatisticsService";
+			String stockName = "Fingerprint";
+
+			CellConfig cf = CellConfig.newConfig(brokerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class))
+					.addCellfunction(CellFunctionConfig.newConfig("depotstatistics", DepotStaticticsGraphToolFunction.class));
+
+			CellGatewayImpl brokerAgent = this.launcher.createAgent(cf);
+
+//			List<CellGatewayImpl> traderAgents = new ArrayList<CellGatewayImpl>();
+//
+//			for (int i = 0; i < 50; i++) {
+//				CellGatewayImpl a = this.launcher.createAgent(CellConfig.newConfig(traderType1 + i));
+//				traderAgents.add(a);
+//				a.getCommunicator().write(DatapointBuilder.newDatapoint("type").setValue(traderType1));
+//			}
+//
+//			for (int i = 0; i < 15; i++) {
+//				CellGatewayImpl a = this.launcher.createAgent(CellConfig.newConfig(traderType2 + i));
+//				traderAgents.add(a);
+//				a.getCommunicator().write(DatapointBuilder.newDatapoint("type").setValue(traderType2));
+//			}
+
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			// === Init finished ===//
+			log.info("=== All agents initialized ===");
+
+//			log.debug("Register depots for all agents");
+//			traderAgents.forEach(a -> {
+//				JsonRpcRequest req = new JsonRpcRequest("registerdepot", 0);
+//				try {
+//					req.setParameters(a.getCell().getLocalName(), a.getCommunicator().read("type").getValueAsString());
+//					a.getCommunicator().execute(brokerAgentName, brokerServiceName, req, 1000);
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//				log.debug("registered depot={}", req);
+//			});
+//
+//			log.debug("Read statistics");
+//			JsonRpcRequest req = new JsonRpcRequest("gettypes", 0);
+//			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
+//			List<Types> list = result.getResult(new TypeToken<List<Types>>() {});
+//			Optional<Types> opt = list.stream().filter(o -> o.getType().equals(traderType1)).findFirst();
+//
+//			log.info("number of type1={}. Calculated number={}", 50, opt.get().getNumber());
+			assertEquals(true, false);
 
 			log.info("All tests passed");
 		} catch (Exception e) {

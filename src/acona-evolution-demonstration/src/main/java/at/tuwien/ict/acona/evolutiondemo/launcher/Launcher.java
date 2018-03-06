@@ -9,6 +9,8 @@ import at.tuwien.ict.acona.cell.config.CellConfig;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFunction;
+import at.tuwien.ict.acona.evolutiondemo.brokeragent.Evaluator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
@@ -58,6 +60,22 @@ public class Launcher {
 			String controllerAgentName = "ControllerAgent";
 			String controllerService = "controllerservice";
 
+			// === Stock Market agent ===//
+			String stockmarketAgentName = "StockMarketAgent";
+			String stockmarketServiceName = "StockMarketService";
+
+			// === Broker ===//
+			String brokerAgentName = "BrokerAgent";
+			String brokerServiceName = "BrokerService";
+			String statisticsService = "statisticsService";
+
+			String statisticsDatapointName = "stats";
+
+			// === Traders ===//
+			String traderAgentName = "TraderAgent";
+			String signalService = "signal";
+
+			// === Controller agent implementation === //
 			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
 					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
@@ -75,15 +93,20 @@ public class Launcher {
 			}
 
 			// === Broker ===//
-			String brokerAgentName = "BrokerAgent";
-
-			String brokerServiceName = "BrokerService";
-			String statisticsService = "statisticsService";
 
 			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
+					.addCellfunction(CellFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
+							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
+							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, statisticsService)
+							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName)
+							.setGenerateReponder(true))
+					.addCellfunction(CellFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
+							.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
 
 			synchronized (this) {
 				try {
@@ -94,8 +117,6 @@ public class Launcher {
 			}
 
 			// === Stock market ===//
-			String stockmarketAgentName = "StockMarketAgent";
-			String stockmarketServiceName = "StockMarketService";
 
 			CellGatewayImpl stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
@@ -108,13 +129,11 @@ public class Launcher {
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
 			// === Traders ===//
-			String traderAgentName = "TraderAgent";
-			String signalService = "signal";
 
 			// Create 100 trading agents that first buy a stock, then sell it
 			for (int i = 1; i <= 10; i++) {
 				String traderType = "type";
-				if (i % 2 == 0) {
+				if (i % 3 == 0) {
 					traderType += "_even";
 				} else {
 					traderType += "_odd";

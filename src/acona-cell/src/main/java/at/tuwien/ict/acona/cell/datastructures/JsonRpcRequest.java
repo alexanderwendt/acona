@@ -42,6 +42,8 @@ public class JsonRpcRequest {
 	}
 
 	/**
+	 * Create a new request from a method name and the number of parameters. In case of 0, there are no other parameters to pass.
+	 * 
 	 * @param method
 	 * @param numberOfParameter
 	 */
@@ -55,6 +57,8 @@ public class JsonRpcRequest {
 	}
 
 	/**
+	 * Instantiate a Json RPC request from a JSON string
+	 * 
 	 * @param stringrpcRequest
 	 * @throws Exception
 	 */
@@ -111,13 +115,13 @@ public class JsonRpcRequest {
 	public <T> T getParameter(int index, TypeToken<T> type) throws JsonSyntaxException {
 		T result = null;
 
-		//Get first parameter and convert it
+		// Get first parameter and convert it
 		if (gson == null) {
 			gson = new Gson();
 		}
 
 		try {
-			//First convert to JsonObject
+			// First convert to JsonObject
 			JsonElement element = gson.toJsonTree(this.getParams()[index]);
 			result = gson.fromJson(element, type.getType());
 		} catch (JsonSyntaxException e) {
@@ -194,7 +198,7 @@ public class JsonRpcRequest {
 		if (gson == null) {
 			gson = new Gson();
 		}
-		//JsonElement jsonObject = gson.toJsonTree(obj, T);
+		// JsonElement jsonObject = gson.toJsonTree(obj, T);
 
 		if (this.params != null || this.params.length > index) {
 			this.params[index] = obj.toString();
@@ -206,8 +210,7 @@ public class JsonRpcRequest {
 	}
 
 	/**
-	 * Get a certain parameter from the parameter list if not an "inside" type.
-	 * All parameters must be json format
+	 * Get a certain parameter from the parameter list if not an "inside" type. All parameters must be json format
 	 * 
 	 * @param index
 	 * @param clazz
@@ -215,7 +218,7 @@ public class JsonRpcRequest {
 	 * @throws Exception
 	 */
 	public <T> T getParameter(int index, Class<T> clazz) throws Exception {
-		//Get first parameter and convert it
+		// Get first parameter and convert it
 		if (gson == null) {
 			gson = new Gson();
 		}
@@ -303,12 +306,12 @@ public class JsonRpcRequest {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		//builder.append("jsonrpc=");
-		//builder.append(jsonrpc);
+		// builder.append("jsonrpc=");
+		// builder.append(jsonrpc);
 		builder.append(", method=");
 		builder.append(method);
-		//builder.append(", id=");
-		//builder.append(id);
+		// builder.append(", id=");
+		// builder.append(id);
 		builder.append(", params=");
 		builder.append(Arrays.toString(params));
 		return builder.toString();

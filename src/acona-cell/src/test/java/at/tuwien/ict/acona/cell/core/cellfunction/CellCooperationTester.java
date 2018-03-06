@@ -585,10 +585,26 @@ public class CellCooperationTester {
 							.setProperty("numberofagents", String.valueOf(numberOfAgents)).setProperty("delay", "10")));
 			// totalConfig.addController();
 
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
 			// Add memory
 			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
 			// totalConfig.addMemory();
 			// totalConfig.setTopController(controllerAgentName);
+
+			synchronized (this) {
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			// Add services
 			for (int i = 1; i <= numberOfAgents; i++) {
@@ -596,6 +612,13 @@ public class CellCooperationTester {
 						.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
 								.addManagedDatapoint(IncrementFunctionDatapointID, processDatapoint, memoryAgentName,
 										SyncMode.READWRITEBACK)));
+				synchronized (this) {
+					try {
+						this.wait(10);
+					} catch (InterruptedException e) {
+
+					}
+				}
 			}
 
 			// this.launcher.createDebugUserInterface();
@@ -613,8 +636,7 @@ public class CellCooperationTester {
 			}
 			// log.info("=== All agents initialized ===");
 
-			launcher.getAgent(memoryAgentName).getCommunicator()
-					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			launcher.getAgent(memoryAgentName).getCommunicator().write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way. Start system");
 			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
@@ -639,8 +661,7 @@ public class CellCooperationTester {
 
 			log.debug("Received state={}", state);
 
-			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue()
-					.getAsDouble();
+			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue().getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 

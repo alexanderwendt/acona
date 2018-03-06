@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -27,12 +28,17 @@ public class StatisticsCollector extends CellFunctionImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(StatisticsCollector.class);
 
+	public final static String DATAADDRESS = "dataaddress";
 	private final static String DEPOTPREFIX = "depot";
+
+	private String dataaddress = "data";
 
 	@Override
 	protected void cellFunctionInit() throws Exception {
 		// Service shall be reachable from abroad
 		this.getFunctionConfig().setGenerateReponder(true);
+
+		dataaddress = this.getFunctionConfig().getProperty(DATAADDRESS);
 
 	}
 
@@ -55,12 +61,22 @@ public class StatisticsCollector extends CellFunctionImpl {
 	}
 
 	private JsonElement generateTypeStatistics() throws Exception {
-		JsonElement result = null;
+		JsonObject result = new JsonObject();
 
 		Map<String, Integer> typeCount = new ConcurrentHashMap<String, Integer>();
 
 		// Read whole address space
 		List<Datapoint> agents = this.getCommunicator().readWildcard(DEPOTPREFIX + "." + "*");
+
+		// Read the date
+		String dateString = "";
+		if (this.getCommunicator().read(dataaddress).hasEmptyValue() == false) {
+			dateString = this.getCommunicator().read(dataaddress).getValue().getAsJsonObject().getAsJsonPrimitive("date").getAsString();
+		}
+		// Calendar cal = Calendar.getInstance();
+		// SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+		// cal.setTime(dateFormat.parse(dateString));
+		// Day currentDay = new Day(cal.getTime());
 
 		// Count how many of each type are there
 		agents.forEach(a -> {
@@ -79,7 +95,11 @@ public class StatisticsCollector extends CellFunctionImpl {
 			types.add(new Types(k, v));
 		});
 
-		result = (new Gson()).toJsonTree(types);
+		JsonElement tree = (new Gson()).toJsonTree(types);
+		result.add("types", tree);
+		result.addProperty("date", dateString);
+
+		// Object with a date and a tree of a map
 
 		return result;
 	}

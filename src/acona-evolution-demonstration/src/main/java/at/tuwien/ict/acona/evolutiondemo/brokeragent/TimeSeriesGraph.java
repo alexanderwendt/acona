@@ -1,46 +1,67 @@
 package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
+import java.awt.Color;
+
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.xy.CandlestickRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Day;
-import org.jfree.data.time.ohlc.OHLCSeries;
-import org.jfree.data.time.ohlc.OHLCSeriesCollection;
-import org.jfree.data.xy.OHLCDataset;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.TimeSeriesDataItem;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.RefineryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LineGraph extends ApplicationFrame {
+public class TimeSeriesGraph extends ApplicationFrame {
 
-	private final static Logger log = LoggerFactory.getLogger(LineGraph.class);
+	private final static Logger log = LoggerFactory.getLogger(TimeSeriesGraph.class);
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private OHLCSeriesCollection seriesCollection;
+	private TimeSeriesCollection seriesCollection;
 	// private Dataset dataset;
 	private JPanel chartPanel;
 
-	public LineGraph(String title) {
+	public TimeSeriesGraph(String title) {
 		super(title);
 
 		seriesCollection = this.initSeriesCollection();
 		this.chartPanel = this.generateGraph(seriesCollection);
+		RefineryUtilities.centerFrameOnScreen(this);
+		// chartPanel.setVisible(true);
 
 	}
 
-	private JPanel generateGraph(OHLCDataset dataset) {
-		JFreeChart chart = createChart(dataset);
-		JPanel panel = new ChartPanel(chart);
+	private JPanel generateGraph(XYDataset dataset) {
+
+		JFreeChart chart = ChartFactory.createTimeSeriesChart("Spieces trends",
+				"Time days", "Type count",
+				dataset, true, true, true);
+		chart.setBackgroundPaint(Color.WHITE);
+
+		final XYPlot plot = chart.getXYPlot();
+		// plot.setDomainCrosshairVisible(true);
+		// plot.setRangeCrosshairVisible(false);
+		// final XYItemRenderer renderer = plot.getRenderer();
+		// if (renderer instanceof StandardXYItemRenderer) {
+		// final StandardXYItemRenderer rr = (StandardXYItemRenderer) renderer;
+		// rr.setSeriesStroke(0, new BasicStroke(2.0f));
+		// rr.setSeriesStroke(1, new BasicStroke(2.0f));
+		// }
+
+		// final DateAxis axis = (DateAxis) plot.getDomainAxis();
+		// axis.setDateFormatOverride(new SimpleDateFormat("hh:mma"));
+
+		final JPanel panel = new ChartPanel(chart);
 		panel.setPreferredSize(new java.awt.Dimension(1000, 600));
 		setContentPane(panel);
 
@@ -48,50 +69,31 @@ public class LineGraph extends ApplicationFrame {
 	}
 
 	/**
-	 * Creates a sample chart.
-	 *
-	 * @param dataset
-	 *            a dataset.
-	 *
-	 * @return a sample chart.
-	 */
-	private JFreeChart createChart(DefaultCategoryDataset dataset) {
-
-		JFreeChart chart = ChartFactory.createLineChart("Spieces trends",
-				"Spieces count",
-				"Time",
-				dataset,
-				PlotOrientation.VERTICAL,
-				true, true, false);
-		// XYPlot plot = (XYPlot) chart.getPlot();
-		// HighLowRenderer renderer = (HighLowRenderer) plot.getRenderer();
-		// renderer.setBaseStroke(new BasicStroke(2.0f));
-		// renderer.setSeriesPaint(0, Color.blue);
-
-		// DateAxis axis = (DateAxis) plot.getDomainAxis();
-		// axis.setTickMarkPosition(DateTickMarkPosition.MIDDLE);
-
-		// NumberAxis yAxis1 = (NumberAxis) plot.getRangeAxis();
-		// yAxis1.setAutoRangeIncludesZero(false);
-
-		// NumberAxis yAxis2 = new NumberAxis("Price 2");
-		// yAxis2.setAutoRangeIncludesZero(false);
-		// plot.setRangeAxis(1, yAxis2);
-		plot.setDataset(1, dataset);
-		plot.setRenderer(1, new CandlestickRenderer(10.0));
-		plot.mapDatasetToRangeAxis(1, 1);
-		ChartUtilities.applyCurrentTheme(chart);
-		return chart;
-	}
-
-	/**
 	 * Creates a sample high low dataset.
 	 *
 	 * @return a sample high low dataset.
 	 */
-	private OHLCSeriesCollection initSeriesCollection() {
+	private TimeSeriesCollection initSeriesCollection() {
 
-		OHLCSeries s1 = new OHLCSeries("S1");
+		final TimeSeries series = new TimeSeries("Testdata");
+		series.add(new TimeSeriesDataItem(new Day(24, 9, 2007), 10));
+		series.add(new TimeSeriesDataItem(new Day(25, 9, 2007), 11));
+		series.add(new TimeSeriesDataItem(new Day(26, 9, 2007), 13));
+
+		final TimeSeries series2 = new TimeSeries("Testdata2");
+		series2.add(new TimeSeriesDataItem(new Day(24, 9, 2007), 14));
+		series2.add(new TimeSeriesDataItem(new Day(25, 9, 2007), 15));
+		series2.add(new TimeSeriesDataItem(new Day(26, 9, 2007), 16));
+
+		final TimeSeries series3 = new TimeSeries("Testdata2");
+		series3.add(new TimeSeriesDataItem(new Day(24, 9, 2007), 3));
+		series3.add(new TimeSeriesDataItem(new Day(25, 9, 2007), 10));
+		series3.add(new TimeSeriesDataItem(new Day(26, 9, 2007), 19));
+
+		TimeSeriesCollection s1 = new TimeSeriesCollection();
+		// s1.addSeries(series);
+		// s1.addSeries(series2);
+		// s1.addSeries(series3);
 //        s1.add(new Day(24, 9, 2007), 50.5, 53.2, 49.8, 50.1);
 //        s1.add(new Day(25, 9, 2007), 50.2, 51.2, 47.8, 48.1);
 //        s1.add(new Day(26, 9, 2007), 48.0, 49.2, 45.3, 47.4);
@@ -102,13 +104,13 @@ public class LineGraph extends ApplicationFrame {
 //        s1.add(new Day(3, 10, 2007), 48.0, 49.2, 45.3, 47.4);
 //        s1.add(new Day(4, 10, 2007), 50.2, 51.2, 47.8, 48.1);
 		// s1.add(new Day(5, 10, 2007), 50.5, 53.2, 49.8, 50.1);
-		OHLCSeriesCollection seriesCollection = new OHLCSeriesCollection();
+		// OHLCSeriesCollection seriesCollection = new OHLCSeriesCollection();
 
-		return seriesCollection;
+		return s1;
 	}
 
-	private OHLCSeries addOrGetSeries(String name) {
-		OHLCSeries result;
+	private TimeSeries addOrGetSeries(String name) {
+		TimeSeries result;
 
 		// Check if series exists
 		int numberOfSeries = seriesCollection.getSeriesCount();
@@ -122,8 +124,9 @@ public class LineGraph extends ApplicationFrame {
 			}
 		}
 
+		// Add series if it does not exists
 		if (index == -1) {
-			OHLCSeries s1 = new OHLCSeries(name);
+			TimeSeries s1 = new TimeSeries(name);
 			s1.setMaximumItemCount(200);
 			seriesCollection.addSeries(s1);
 			int newNumberOfSeries = seriesCollection.getSeriesCount();
@@ -131,16 +134,16 @@ public class LineGraph extends ApplicationFrame {
 			log.debug("Number of series={}, name={}", newNumberOfSeries, name);
 		}
 
-		result = seriesCollection.getSeries(index);
+		result = seriesCollection.getSeries(name);
 
 		return result;
 	}
 
-	public void updateDataset(String timerowid, Day time, double open, double high, double low, double close) {
+	public void updateDataset(String id, Day time, double value) {
 
-		OHLCSeries serie = this.addOrGetSeries(timerowid);
+		TimeSeries serie = this.addOrGetSeries(id);
 
-		serie.add(time, open, high, low, close);
+		serie.add(time, value);
 		serie.fireSeriesChanged();
 
 		// Remove old chart
