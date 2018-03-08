@@ -71,7 +71,7 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 		} catch (Exception e) {
 			log.error("Cannot add new system state", e);
 		}
-		// log.warn("State update={}", data);
+		log.trace("system state update finished");
 	}
 
 	private void generateSystemState() throws Exception {

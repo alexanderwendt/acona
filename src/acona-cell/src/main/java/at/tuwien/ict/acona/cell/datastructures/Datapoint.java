@@ -15,6 +15,7 @@ public class Datapoint {
 	private String ADDRESS = "";
 	private String AGENT = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
+	private long timeStamp = 0;
 
 	private transient Gson gson = new Gson(); // Add transient not to serialize this
 

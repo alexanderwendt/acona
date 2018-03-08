@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
@@ -112,7 +113,10 @@ public class Trader extends CellFunctionCodelet {
 		// 1. Split depot if necessary
 		this.multiplyAgent();
 		// 2. Check depot death
-		this.killAgentOnDepotDeath();
+		boolean isKilled = this.killAgentOnDepotDeath();
+		if (isKilled) {
+			this.interruptFunction();
+		}
 		// 3. Calculate indicator
 		// this.calculateIndicator();
 		// 4. Calculate signal
@@ -124,6 +128,23 @@ public class Trader extends CellFunctionCodelet {
 		this.executeTraderPostProcessing();
 	}
 
+	private void executeTraderPreProcessing() throws Exception {
+		// Read depot
+		// Write to broker a new depot
+		JsonRpcRequest req = new JsonRpcRequest("getdepotinfo", 1);
+		req.setParameters(this.getCell().getLocalName());
+		depot = this.getCommunicator().execute(this.brokerAddress, req).getResult(new TypeToken<Depot>() {});
+
+		// Update prices
+		log.debug("Value map={}", this.getValueMap());
+		this.closePrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
+		this.highPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
+		this.lowPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
+
+		// write prices to storage
+
+	}
+
 	private void executeTraderPostProcessing() throws Exception {
 		// Reset signals
 		this.buySignal = false;
@@ -133,17 +154,6 @@ public class Trader extends CellFunctionCodelet {
 		Gson gson = new Gson();
 		JsonElement jsonDepot = gson.toJsonTree(depot);
 		this.writeLocal(DatapointBuilder.newDatapoint(this.localDepotAddress).setValue(jsonDepot));
-	}
-
-	private void executeTraderPreProcessing() throws Exception {
-		// Update prices
-		log.debug("Value map={}", this.getValueMap());
-		this.closePrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
-		this.highPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
-		this.lowPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
-
-		// write prices to storage
-
 	}
 
 	@Override
@@ -220,7 +230,7 @@ public class Trader extends CellFunctionCodelet {
 		}
 
 		this.depot = null;
-		log.debug("Depot deleted={}");
+		log.debug("Depot deleted={}", depot);
 	}
 
 	private void multiplyAgent() {
@@ -230,10 +240,20 @@ public class Trader extends CellFunctionCodelet {
 		}
 	}
 
-	private void killAgentOnDepotDeath() throws Exception {
+	private boolean killAgentOnDepotDeath() throws Exception {
+		boolean isKilled = false;
+
 		if (this.depot.getTotalValue() < this.deathLimit) {
-			this.shutDownExecutor();
+			log.info("Agent dies. Depot={}, deathlimit={}", this.depot.getTotalValue(), this.deathLimit);
+			this.shutDownCodelet();
+			this.getCell().takeDownCell();
+			isKilled = true;
+			this.setAllowedToRun(false);
+			this.setActive(false);
+			log.debug("Agent is killed");
 		}
+
+		return isKilled;
 	}
 
 	private void calculateSignal() throws Exception {

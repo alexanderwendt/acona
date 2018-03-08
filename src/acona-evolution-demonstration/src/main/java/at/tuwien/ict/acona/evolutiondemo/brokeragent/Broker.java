@@ -87,6 +87,11 @@ public class Broker extends CellFunctionImpl {
 				depot = this.addMoneyToDepot(parameterdata.getParameter(0, String.class), parameterdata.getParameter(1, Double.class));
 				result = new JsonRpcResponse(parameterdata, depot);
 				break;
+			case "removemoney":
+				// Parameter: 1) name, 2) amount
+				depot = this.removeMoneyFromDepot(parameterdata.getParameter(0, String.class), parameterdata.getParameter(1, Double.class));
+				result = new JsonRpcResponse(parameterdata, depot);
+				break;
 			default:
 				throw new Exception("Method " + parameterdata.getMethod() + " does not exist");
 			}
@@ -184,6 +189,21 @@ public class Broker extends CellFunctionImpl {
 		}
 
 		depot.addLiquid(amount);
+
+		JsonElement jsonDepot = gson.toJsonTree(depot);
+		this.writeLocal(DatapointBuilder.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
+		log.debug("Agent={}>Added money={}. Total amount={}", agentName, amount, depot.getLiquid());
+
+		return jsonDepot;
+	}
+
+	private JsonElement removeMoneyFromDepot(String agentName, double amount) throws Exception {
+		Depot depot = this.getDepot(agentName);
+		if (depot == null) {
+			throw new Exception("Depot " + agentName + " does not exist");
+		}
+
+		double removedMoney = depot.removeLiquid(amount);
 
 		JsonElement jsonDepot = gson.toJsonTree(depot);
 		this.writeLocal(DatapointBuilder.newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));

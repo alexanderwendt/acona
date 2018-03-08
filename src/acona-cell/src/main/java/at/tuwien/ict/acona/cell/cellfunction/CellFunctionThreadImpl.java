@@ -153,6 +153,13 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	protected abstract void executeFunction() throws Exception;
 
+	protected void interruptFunction() {
+		synchronized (this.monitoringObject) {
+			t.interrupt();
+		}
+
+	}
+
 	@Override
 	public void run() {
 		// log.warn("Start cell function {}", this.getFunctionName());
@@ -191,20 +198,23 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 						log.error("Error in the preprocessing", e);
 						throw new Exception("Error in the proprocessing", e);
 					}
+				}
 
+				if (this.isAllowedToRun() == true) {
 					try {
 						executeFunction();
 					} catch (Exception e) {
 						log.error("Error in the function execution. Continue with post processing", e);
 					}
+				}
 
+				if (this.isAllowedToRun() == true) {
 					try {
 						executePostProcessing();
 					} catch (Exception e) {
 						log.error("Error in the postprocessing", e);
 						throw new Exception("Error in the postprocessing", e);
 					}
-
 				}
 			} catch (Exception e1) {
 				try {

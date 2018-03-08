@@ -200,10 +200,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	}
 
-	// protected String getCodeletStateDatapointAddress() {
-	// return codeletStateDatapointAddress;
-	// }
-
 	protected String getWorkingMemoryAddress() {
 		return workingMemoryAddress;
 	}
