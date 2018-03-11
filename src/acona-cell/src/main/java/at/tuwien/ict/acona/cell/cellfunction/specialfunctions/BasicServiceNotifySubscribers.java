@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.cell.cellfunction.specialfunctions;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,22 +27,44 @@ public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 
 	private static Logger log = LoggerFactory.getLogger(BasicServiceWrite.class);
 
+	private ExecutorService executor = Executors.newFixedThreadPool(5);
+
 	@Override
-	public JsonRpcResponse performOperation(final JsonRpcRequest parameterdata, String caller) {
+	protected void basicServiceInit() throws Exception {
+		super.basicServiceInit();
+
+	}
+
+	@Override
+	public JsonRpcResponse performOperation(final JsonRpcRequest parameterdata, final String caller) {
 
 		JsonRpcResponse result = null;
 
 		try {
 			String s = parameterdata.getParameter(0, new TypeToken<String>() {});
-
-			Datapoint dp = (new Gson()).fromJson(s, Datapoint.class);
+			final Datapoint dp = (new Gson()).fromJson(s, Datapoint.class);
 
 			// Datapoint dp = parameterdata.getParameter(0, new TypeToken<Datapoint>() {
 			// });
 
-			log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.getParams());
+			// Implement a runnable in the method because the threads shall not block each other
+			Runnable worker = new Runnable() {
+
+				@Override
+				public void run() {
+					log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.getParams());
+					// dp.forEach(d -> {
+					getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
+
+				}
+
+			};
+
+			executor.execute(worker);
+
+			// log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.getParams());
 			// dp.forEach(d -> {
-			this.getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
+			// this.getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
 			// });
 
 			result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));

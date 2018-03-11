@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
 import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.cell.cellfunction.CellFunctionType;
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.communicator.CellFunctionHandlerListener;
@@ -28,7 +28,7 @@ import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
  *         exists, as well as description and current state [RUNNING, FINISHED, ERROR, INITIALZING]
  *
  */
-public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHandlerListener {
+public class CFStateGenerator extends CellFunctionThreadImpl implements CellFunctionHandlerListener {
 
 	private static final Logger log = LoggerFactory.getLogger(CFStateGenerator.class);
 	public final static String SYSTEMSTATEADDRESS = "systemstate";
@@ -38,9 +38,10 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	private Map<String, String> currentDescriptions = new ConcurrentHashMap<>();
 
 	@Override
-	protected void cellFunctionInit() throws Exception {
-
+	protected void cellFunctionThreadInit() throws Exception {
 		// Register this function to get notified if new functions are registered or deregistered.
+		// this.
+
 		this.currentlyRegisteredFunctions = this.getCell().getFunctionHandler().registerLister(this);
 		this.currentlyRegisteredFunctions.forEach((f) -> {
 			try {
@@ -48,8 +49,8 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 			} catch (Exception e) {
 				log.error("Cannot init state monitor function", e);
 			}
-
 		});
+
 	}
 
 	@Override
@@ -59,19 +60,42 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	}
 
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		// log.info("============ Message update =============");
-		try {
-			data.forEach((k, v) -> {
-				ServiceState state = ServiceState.valueOf(v.getValue().getAsString());
-				this.currentStates.put(k, state);
-			});
+	protected void executeCustomPreProcessing() throws Exception {
+		// TODO Auto-generated method stub
 
-			this.generateSystemState();
-		} catch (Exception e) {
-			log.error("Cannot add new system state", e);
+	}
+
+	@Override
+	protected void executeFunction() throws Exception {
+		this.generateSystemState();
+	}
+
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		this.getFunctionType();
+
+	}
+
+	@Override
+	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+		// log.info("============ Message update =============");
+		if (this.isSystemDatapoint(data) == false) {
+			try {
+				data.forEach((k, v) -> {
+					ServiceState state = ServiceState.valueOf(v.getValue().getAsString());
+					this.currentStates.put(k, state);
+				});
+
+				this.setStart();
+
+			} catch (Exception e) {
+				log.error("Cannot add new system state", e);
+			}
 		}
+
 		log.trace("system state update finished");
+
 	}
 
 	private void generateSystemState() throws Exception {
@@ -136,7 +160,7 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	}
 
 	@Override
-	protected void shutDownImplementation() throws Exception {
+	protected void shutDownExecutor() throws Exception {
 		// Unregister this function from the function handler listeners
 		this.getCell().getFunctionHandler().unregisterListener(this);
 
@@ -167,6 +191,11 @@ public class CFStateGenerator extends CellFunctionImpl implements CellFunctionHa
 	@Override
 	public String getListenerFunction() {
 		return this.getFunctionName();
+	}
+
+	@Override
+	public CellFunctionType getFunctionType() {
+		return CellFunctionType.BASEFUNCTION;
 	}
 
 }

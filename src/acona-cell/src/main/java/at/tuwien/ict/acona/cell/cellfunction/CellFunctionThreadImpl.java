@@ -151,8 +151,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		return "Service " + this.getFunctionName() + ". Thread; external responder=" + this.getFunctionConfig().getGenerateReponder().getAsBoolean();
 	}
 
-	protected abstract void executeFunction() throws Exception;
-
 	protected void interruptFunction() {
 		synchronized (this.monitoringObject) {
 			t.interrupt();
@@ -290,6 +288,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	}
 
+	protected abstract void executeCustomPreProcessing() throws Exception;
+
+	protected abstract void executeFunction() throws Exception;
+
 	protected void executePostProcessing() throws Exception {
 
 		// Put the custom post processing before the values of the value map are written. In that way, values can be added in advance.
@@ -331,8 +333,6 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 	}
 
 	protected abstract void executeCustomPostProcessing() throws Exception;
-
-	protected abstract void executeCustomPreProcessing() throws Exception;
 
 	@Override
 	protected void updateDatapointsById(Map<String, Datapoint> data) {
