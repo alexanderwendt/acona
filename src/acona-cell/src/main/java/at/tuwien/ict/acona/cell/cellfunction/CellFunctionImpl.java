@@ -250,15 +250,15 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	@Override
 	public void updateSubscribedData(final Map<String, Datapoint> data, final String caller) {
-		// Create datapointmapping ID to datapoint with new value
-		Map<String, Datapoint> subscriptions = new HashMap<>();
-		this.getSubscribedDatapoints().forEach((k, v) -> {
-			if (data.containsKey(v.getAddress())) {
-				subscriptions.put(k, data.get(v.getAddress()));
-			}
-		});
-
 		synchronized (this.monitoringObject) {
+			// Create datapointmapping ID to datapoint with new value
+			Map<String, Datapoint> subscriptions = new HashMap<>();
+			this.getSubscribedDatapoints().forEach((k, v) -> {
+				if (data.containsKey(v.getAddress())) {
+					subscriptions.put(k, data.get(v.getAddress()));
+				}
+			});
+
 			this.updateDatapointsById(subscriptions);
 		}
 	}

@@ -208,6 +208,8 @@ public class SystemControllerImpl implements SystemController {
 			}
 		}
 
+		log.info("Stopping system");
+
 		// Get all agents in the external controller map
 		this.externalAgentControllerMap.values().forEach(c -> {
 			log.debug("Take down cell={}", c.getCell().getName());
