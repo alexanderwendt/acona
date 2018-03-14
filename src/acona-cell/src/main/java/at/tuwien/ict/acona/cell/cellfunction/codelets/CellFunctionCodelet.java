@@ -134,6 +134,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	}
 
 	protected JsonRpcResponse performCodeletOperation(JsonRpcRequest parameterdata, String caller) {
+		// throw new UnsupportedOperationException("This method is not supported by codelets.");
 		return null;
 	}
 
@@ -158,10 +159,20 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		log.debug("Set state running");
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
 		this.setServiceState(ServiceState.RUNNING);
+
+		// Execute the codelet specific preprocessing
+		this.executeCodeletPostprocessing();
+	}
+
+	protected void executeCodeletPreprocessing() throws Exception {
+
 	}
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
+		// Execute the codelet post processing
+		this.executeCodeletPostprocessing();
+
 		// Set state of the codelet to finished
 		JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		log.debug("Set state finished");
@@ -169,6 +180,10 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		this.setServiceState(ServiceState.FINISHED);
 
 		this.getCommunicator().execute(this.codeletHandlerAgentName, this.codeletHandlerServiceName, request, this.timeout);
+
+	}
+
+	protected void executeCodeletPostprocessing() throws Exception {
 
 	}
 

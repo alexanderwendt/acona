@@ -39,7 +39,8 @@ public interface Communicator extends AgentCommunicator {
 	public Datapoint read(String datapointName) throws Exception;
 
 	/**
-	 * Read a range of datapoints like data.data.* to get the whole branch
+	 * Read a range of datapoints like data.data.* to get the whole branch. If a datapoint name has no "*" at the end, it is added to the end of the string in the function. Therefore, the method always
+	 * returns a range of an address.
 	 * 
 	 * @param datapointName
 	 * @return
@@ -183,6 +184,8 @@ public interface Communicator extends AgentCommunicator {
 	 * @throws Exception
 	 */
 	public Datapoint queryDatapoints(String writeAddress, String content, String resultAddress, String resultContent, int timeout) throws Exception;
+
+	public Datapoint executeServiceQueryDatapoints(String agentAndServiceName, JsonRpcRequest serviceParameter, String agentAndResultAddress, JsonElement expectedResult, int timeout) throws Exception;
 
 	/**
 	 * Execute a service in an agent and wait for a value in a certain datapoint

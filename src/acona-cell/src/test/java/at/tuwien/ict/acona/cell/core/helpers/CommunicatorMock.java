@@ -240,4 +240,10 @@ public class CommunicatorMock implements BasicServiceCommunicator {
 
 	}
 
+	@Override
+	public Datapoint executeServiceQueryDatapoints(String agentAndServiceName, JsonRpcRequest serviceParameter, String agentAndResultAddress, JsonElement expectedResult, int timeout) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

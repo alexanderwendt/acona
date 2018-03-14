@@ -15,18 +15,18 @@ public interface CellFunction {
 	 * Initialize the cellfunction with the cell and a jsonobject with settings
 	 * 
 	 * @param settings:
-	 *            Settings shall contain: functionname; subscriptions as a list
-	 *            of ID, Agent, datapointaddress and optional conditions; custom
-	 *            properties as json objects
+	 *            Settings shall contain: functionname; subscriptions as a list of ID, Agent, datapointaddress and optional conditions; custom properties as json objects
 	 * @param cell
-	 * @return itself, in order to instantiate the cell and init at the same
-	 *         time
+	 * @return itself, in order to instantiate the cell and init at the same time
 	 * @throws Exception
 	 */
 	public void init(CellFunctionConfig config, Cell cell) throws Exception;
 
 	/**
-	 * Update subscribed data
+	 * Update subscribed data.
+	 * 
+	 * Warning: Do not put long blocking methods here because they may block another whole functions, which can cause the system to freeze. This function shall be primary used to provide data to the
+	 * function.
 	 * 
 	 * @param datapoints,
 	 *            which are subscribe
@@ -35,16 +35,14 @@ public interface CellFunction {
 	public void updateSubscribedData(Map<String, Datapoint> data, String caller) throws Exception;
 
 	/**
-	 * Return the name of the function, which has been specified in the config
-	 * file
+	 * Return the name of the function, which has been specified in the config file
 	 * 
 	 * @return Name of the function
 	 */
 	public String getFunctionName();
 
 	/**
-	 * Get the defined type of function, e.g. base functions shall not be shown
-	 * in the monitoring of an application, only codelets and threads.
+	 * Get the defined type of function, e.g. base functions shall not be shown in the monitoring of an application, only codelets and threads.
 	 * 
 	 * @return
 	 */
@@ -58,8 +56,7 @@ public interface CellFunction {
 	public Map<String, DatapointConfig> getSubscribedDatapoints();
 
 	/**
-	 * Perform an operation of this service. The actual method that is executed,
-	 * is defined in the parameter data.
+	 * Perform an operation of this service. The actual method that is executed, is defined in the parameter data.
 	 * 
 	 * @param param
 	 * @param caller

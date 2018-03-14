@@ -193,7 +193,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 					try {
 						executePreProcessing();
 					} catch (Exception e) {
-						log.error("Error in the preprocessing", e);
+						log.error("Error in the preprocessing. Skipping the function execution.", e);
 						throw new Exception("Error in the proprocessing", e);
 					}
 				}
@@ -288,10 +288,25 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	}
 
+	/**
+	 * Execute some preprocessing work like reading values from a storage. This function runs immediately before the execution function.
+	 * 
+	 * @throws Exception
+	 */
 	protected abstract void executeCustomPreProcessing() throws Exception;
 
+	/**
+	 * Execute the main function of the cell function.
+	 * 
+	 * @throws Exception
+	 */
 	protected abstract void executeFunction() throws Exception;
 
+	/**
+	 * Execute some postprocessing work like cleaning up a working memory or writing values to a data storage.
+	 * 
+	 * @throws Exception
+	 */
 	protected void executePostProcessing() throws Exception {
 
 		// Put the custom post processing before the values of the value map are written. In that way, values can be added in advance.

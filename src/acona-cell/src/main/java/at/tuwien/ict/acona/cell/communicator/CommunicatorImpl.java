@@ -79,7 +79,9 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 
 	@Override
 	public List<Datapoint> readWildcard(String datapointName) throws Exception {
-		Datapoint dp = DatapointBuilder.newDatapoint(datapointName);
+		// Enhance the datapoint name with a * if it is not already set.
+		String extendedDatapointName = (datapointName.endsWith("*") == false ? datapointName + "*" : datapointName);
+		Datapoint dp = DatapointBuilder.newDatapoint(extendedDatapointName);
 
 		// String agentName = this.getLocalAgentName();
 		// String address = datapointName;
@@ -353,6 +355,23 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 		} catch (Exception e) {
 			log.error("Cannot execute query", e);
 			throw new Exception(e.getMessage());
+		}
+
+		return result;
+	}
+
+	@Override
+	public Datapoint executeServiceQueryDatapoints(String agentAndServiceName, JsonRpcRequest serviceParameter, String agentAndResultAddress, JsonElement expectedResult, int timeout) throws Exception {
+		Datapoint result = null;
+
+		try {
+			Datapoint input = DatapointBuilder.newDatapoint(agentAndServiceName);
+			Datapoint output = DatapointBuilder.newDatapoint(agentAndResultAddress);
+
+			CFSubscribeLock lock = new CFSubscribeLock();
+			result = lock.newServiceExecutionAndSubscribeLock(input.getAgent(this.getLocalAgentName()), input.getAddress(), serviceParameter, output.getAgent(), output.getAddress(), expectedResult, timeout, this.getCell());
+		} catch (Exception e) {
+			log.error("Cannot execute query", e);
 		}
 
 		return result;

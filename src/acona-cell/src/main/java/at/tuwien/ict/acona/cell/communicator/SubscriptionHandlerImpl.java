@@ -38,25 +38,28 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
 		// If there are any functions, then they should be activated
 		if (datapointActivationMap.containsKey(key)) {
-			// Get all instances, which subscribe the datapoint
-			List<String> instanceList = datapointActivationMap.get(key);
 			// Add datapoint to map
 			Map<String, Datapoint> subscribedDatapointMap = new HashMap<>();
 			// FIXME: The function itself does not know from which agent the value arrives
 			subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
 
-			// FIXME: Sometimes, the instancelist is empty, after keys have been
-			// deleted. Consider that
+			// Get all instances, which subscribe the datapoint
+			synchronized (this.datapointActivationMap) {
+				List<String> instanceList = datapointActivationMap.get(key);
+				// FIXME: Sometimes, the instancelist is empty, after keys have been
+				// deleted. Consider that
 
-			// run all activations of that datapoint in parallel
-			log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
-			instanceList.forEach((String a) -> {
-				try {
-					this.functionHandler.getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);
-				} catch (Exception e) {
-					log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
-				}
-			});
+				// run all activations of that datapoint in parallel
+				log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
+				instanceList.forEach((String a) -> {
+					try {
+						this.functionHandler.getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);
+					} catch (Exception e) {
+						log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
+					}
+				});
+			}
+
 		}
 	}
 
