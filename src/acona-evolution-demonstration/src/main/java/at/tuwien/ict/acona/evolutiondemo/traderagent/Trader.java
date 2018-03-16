@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
+import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
 import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
@@ -63,6 +64,7 @@ public class Trader extends CellFunctionCodelet {
 	private double closePrice = 0;
 	private boolean buySignal = false;
 	private boolean sellSignal = false;
+	private boolean killSignal = false;
 
 	@Override
 	protected void cellFunctionCodeletInit() throws Exception {
@@ -105,30 +107,7 @@ public class Trader extends CellFunctionCodelet {
 	}
 
 	@Override
-	protected void executeFunction() throws Exception {
-		this.executeTraderPreProcessing();
-
-		log.info("{}>Start agent caluclation", this.getAgentName());
-		// Program logic
-		// 1. Split depot if necessary
-		this.multiplyAgent();
-		// 2. Check depot death
-		boolean isKilled = this.killAgentOnDepotDeath();
-		if (isKilled) {
-			this.interruptFunction();
-		}
-		// 3. Calculate indicator
-		// this.calculateIndicator();
-		// 4. Calculate signal
-		this.calculateSignal();
-		// 5. Execute signal
-		this.executeTrade();
-		log.info("{}:{}>Finished. Assets in the depot: {}", this.getAgentName(), this.agentType, this.depot.getAssets());
-
-		this.executeTraderPostProcessing();
-	}
-
-	private void executeTraderPreProcessing() throws Exception {
+	public void executeCodeletPreprocessing() throws Exception {
 		// Read depot
 		// Write to broker a new depot
 		JsonRpcRequest req = new JsonRpcRequest("getdepotinfo", 1);
@@ -140,12 +119,39 @@ public class Trader extends CellFunctionCodelet {
 		this.closePrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
 		this.highPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
 		this.lowPrice = this.getValueMap().get(IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
-
-		// write prices to storage
-
 	}
 
-	private void executeTraderPostProcessing() throws Exception {
+	@Override
+	protected void executeFunction() throws Exception {
+
+		log.info("{}>Start agent caluclation", this.getAgentName());
+		// Program logic
+		// 2. Check depot death
+		this.killSignal = this.killAgentOnDepotDeath();
+		if (this.killSignal == false) {
+			// 1. Split depot if necessary
+			this.multiplyAgent();
+			// 3. Calculate indicator
+			// this.calculateIndicator();
+			// 4. Calculate signal
+			this.calculateSignal();
+			// 5. Execute signal
+			this.executeTrade();
+
+			log.info("{}:{}>Finished. Assets in the depot: {}", this.getAgentName(), this.agentType, this.depot.getAssets());
+
+		} else {
+			// If the kill signal has been set, the system shall exit.
+			this.setCommand(ControlCommand.EXIT);
+
+			DelayedCellShutDown killSwitch = new DelayedCellShutDown();
+			killSwitch.killSwitch(2000, this.getCell());
+			log.info("Cell will also be shut down");
+		}
+	}
+
+	@Override
+	public void executeCodeletPostprocessing() throws Exception {
 		// Reset signals
 		this.buySignal = false;
 		this.sellSignal = false;
@@ -245,12 +251,12 @@ public class Trader extends CellFunctionCodelet {
 
 		if (this.depot.getTotalValue() < this.deathLimit) {
 			log.info("Agent dies. Depot={}, deathlimit={}", this.depot.getTotalValue(), this.deathLimit);
-			this.shutDownCodelet();
-			this.getCell().takeDownCell();
+			// this.shutDownCodelet();
+			// this.getCell().takeDownCell();
 			isKilled = true;
-			this.setAllowedToRun(false);
-			this.setActive(false);
-			log.debug("Agent is killed");
+			// this.setAllowedToRun(false);
+			// this.setActive(false);
+			// log.debug("Agent is killed");
 		}
 
 		return isKilled;

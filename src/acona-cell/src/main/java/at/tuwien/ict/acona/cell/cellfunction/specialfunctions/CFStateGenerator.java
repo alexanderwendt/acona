@@ -160,7 +160,7 @@ public class CFStateGenerator extends CellFunctionThreadImpl implements CellFunc
 	}
 
 	@Override
-	protected void shutDownExecutor() throws Exception {
+	protected void shutDownThreadExecutor() throws Exception {
 		// Unregister this function from the function handler listeners
 		this.getCell().getFunctionHandler().unregisterListener(this);
 

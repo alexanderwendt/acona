@@ -67,7 +67,7 @@ public interface CellFunction {
 	/**
 	 * Shut down function
 	 */
-	public void shutDown();
+	public void shutDownFunction();
 
 	/**
 	 * Get the cell function configuration

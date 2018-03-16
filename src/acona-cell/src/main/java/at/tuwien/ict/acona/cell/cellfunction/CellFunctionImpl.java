@@ -227,7 +227,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	// }
 
 	@Override
-	public void shutDown() {
+	public void shutDownFunction() {
 		// Unsubscribe all datapoints
 		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
 		try {
@@ -246,6 +246,11 @@ public abstract class CellFunctionImpl implements CellFunction {
 		}
 	}
 
+	/**
+	 * This function is first executed in case the function shall be closed. It is implemented by the children. However, it should not be used to close the function.
+	 * 
+	 * @throws Exception
+	 */
 	protected abstract void shutDownImplementation() throws Exception;
 
 	@Override

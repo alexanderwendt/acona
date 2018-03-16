@@ -181,13 +181,13 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		// } while (initFinished == false);
 		// log.info("CellFunction as thread implementation {} initilized", this.getFunctionName());
 
-		while (isActive == true) {
+		while (this.isActive() == true) {
 			// Stop the system at the end of the turn, if STOP command has been
 			// given
 			executeWait();
 
 			try {
-				if (this.isAllowedToRun() == true) {
+				if (this.isActive() == true && this.isAllowedToRun() == true) {
 					// Clear the blocker queue
 					// blocker.clear();
 					try {
@@ -198,7 +198,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 					}
 				}
 
-				if (this.isAllowedToRun() == true) {
+				if (this.isActive() == true && this.isAllowedToRun() == true) {
 					try {
 						executeFunction();
 					} catch (Exception e) {
@@ -206,7 +206,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 					}
 				}
 
-				if (this.isAllowedToRun() == true) {
+				if (this.isActive() == true && this.isAllowedToRun() == true) {
 					try {
 						executePostProcessing();
 					} catch (Exception e) {
@@ -245,7 +245,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		}
 
 		log.debug("Stop executor {}", this.getFunctionName());
-		this.getCell().takeDownCell();
+		try {
+			this.setServiceState(ServiceState.FINISHED);
+		} catch (Exception e) {
+			log.error("Cannot set the state to finish after the function is being killed.", e);
+		}
+		this.shutDownFunction();
 	}
 
 	protected void executePreProcessing() throws Exception {
@@ -257,16 +262,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		this.getReadDatapointConfigs().forEach((k, v) -> {
 			try {
-
-				// FIXME: Make that also local datapoints are put in the table
-
 				// Read the remote datapoint
-				// if (v.getAgentid(this.getCell().getLocalName()).equals(this.getCell().getLocalName()) == false) {
 				Datapoint temp = this.getCommunicator().read(v.getAgentid(this.getCell().getLocalName()), v.getAddress());
 				// Write local value to synchronize the datapoints
 				this.valueMap.put(k, temp);
 				log.trace("{}> Preprocessing phase: Read datapoint and write into value table={}", temp);
-				// }
 			} catch (Exception e) {
 				log.error("{}>Cannot read datapoint={}", this.getFunctionName(), v, e);
 			}
@@ -494,11 +494,12 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	@Override
 	protected void shutDownImplementation() throws Exception {
+		log.debug("Shut down threaded implementation");
 		this.setCommand(ControlCommand.EXIT);
-		this.shutDownExecutor();
+		this.shutDownThreadExecutor();
 	}
 
-	protected abstract void shutDownExecutor() throws Exception;
+	protected abstract void shutDownThreadExecutor() throws Exception;
 
 	/**
 	 * For a certain datapoint suffix, add the service name and a . to the suffix.

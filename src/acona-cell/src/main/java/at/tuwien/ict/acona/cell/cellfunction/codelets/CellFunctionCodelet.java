@@ -145,12 +145,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 
 	}
 
-	// @Override
-	// protected void executeFunction() throws Exception {
-	// // TODO Auto-generated method stub
-	//
-	// }
-
 	@Override
 	protected void executeCustomPreProcessing() throws Exception {
 		// Set state to running
@@ -161,7 +155,8 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		this.setServiceState(ServiceState.RUNNING);
 
 		// Execute the codelet specific preprocessing
-		this.executeCodeletPostprocessing();
+		this.executeCodeletPreprocessing();
+
 	}
 
 	protected void executeCodeletPreprocessing() throws Exception {
@@ -199,7 +194,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	}
 
 	@Override
-	protected void shutDownExecutor() throws Exception {
+	protected void shutDownThreadExecutor() throws Exception {
 		this.shutDownCodelet();
 
 		JsonRpcRequest request = new JsonRpcRequest(DEREGISTERCODELETSERVICENAME, 1);
@@ -211,6 +206,12 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 * 
+	 *             If the codelet is supposed to be shut down, put codelet specific shut-down code here. However, this function shall not be called from the codelet itself. The easiest way to shut down a
+	 *             codelet is to set the command EXIT.
+	 */
 	protected void shutDownCodelet() throws Exception {
 
 	}

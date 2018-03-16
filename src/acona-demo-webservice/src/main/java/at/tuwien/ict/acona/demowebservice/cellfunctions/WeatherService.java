@@ -114,7 +114,7 @@ public class WeatherService extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void shutDownExecutor() throws Exception {
+	protected void shutDownThreadExecutor() throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

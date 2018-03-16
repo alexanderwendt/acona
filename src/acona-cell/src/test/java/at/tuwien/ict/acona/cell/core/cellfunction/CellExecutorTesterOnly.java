@@ -41,7 +41,7 @@ public class CellExecutorTesterOnly {
 
 	@After
 	public void tearDown() throws Exception {
-		executor.shutDown();
+		executor.shutDownFunction();
 	}
 
 	/**

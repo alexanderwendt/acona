@@ -38,7 +38,7 @@ public class RequestReceiverUserConsole extends UserConsoleFunction {
 	public void exitProgram() {
 		//client.shutdown();
 		try {
-			client.shutDown();
+			client.shutDownFunction();
 		} catch (Exception e) {
 			log.error("Cannot correctly exit the program", e);
 		}

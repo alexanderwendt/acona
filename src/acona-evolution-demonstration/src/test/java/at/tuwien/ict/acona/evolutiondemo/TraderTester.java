@@ -559,20 +559,23 @@ public class TraderTester {
 
 			req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 			req.setParameterAsValue(0, false);
-			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 2000);
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 5000);
 
-			// req = new JsonRpcRequest("gettypes", 0);
-			// JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
-			// List<Types> list = result.getResult(new TypeToken<List<Types>>() {});
+			controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 5000);
 
-			// log.info("Got types={}", list);
-			// assertEquals(list.get(0).getNumber(), list.get(1).getNumber());
+			synchronized (this) {
+				try {
+					this.wait(2000);
+				} catch (InterruptedException e) {
+
+				}
+			}
 
 			// The test is to read the depot of agent 69, which shall be empty
 			Cell cell = traderAgent.getCell();
 
 			// log.info("Got money from agent 69={}. Correct answer={}", money, 1000);
-			assertEquals(1000, 999, 0);
+			assert (false);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

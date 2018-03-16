@@ -60,7 +60,7 @@ public class CFQuery extends CellFunctionImpl {
 			throw new Exception(e);
 		} finally {
 			//Deregister
-			this.shutDown();
+			this.shutDownFunction();
 		}
 
 		return result;

@@ -176,8 +176,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	@Override
 	public void deregisterCodelet(String codeletName) {
-		this.getCodeletMap().remove(codeletName);
 		this.removeCodeletExecutionOrder(codeletName);
+		this.getCodeletMap().remove(codeletName);
 		log.debug("Codelet={} deregistered", codeletName);
 
 	}
@@ -301,7 +301,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		} else {
 			log.debug("Current run order={} of total run orders={}. Run codelets.", this.getCurrentRunOrder(), this.retrieveExecutionOrder());
 			// For each, send a message to start in parallel
-			this.getExecutionOrderMap().get(this.currentRunOrder).forEach((k) -> {
+			this.getExecutionOrderMap().get(this.getCurrentRunOrder()).forEach((k) -> {
 				String agentName = k.split(":")[0];
 				String functionName = k.split(":")[1];
 
@@ -418,7 +418,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	}
 
 	@Override
-	protected void shutDownExecutor() throws Exception {
+	protected void shutDownThreadExecutor() throws Exception {
 		// TODO Auto-generated method stub
 
 	}
@@ -506,15 +506,23 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * @param name
 	 */
 	private void removeCodeletExecutionOrder(String name) {
-		Iterator<Entry<Integer, List<String>>> iter = this.getExecutionOrderMap().entrySet().iterator();
+		synchronized (this.executionOrderMap) {
+			Iterator<Entry<Integer, List<String>>> iter = this.executionOrderMap.entrySet().iterator();
 
-		while (iter.hasNext()) {
-			Entry<Integer, List<String>> e = iter.next();
-			e.getValue().remove(name);
-			if (e.getValue().isEmpty()) {
-				iter.remove();
-				log.debug("Removed codelet={} with execution order={}", name, e.getKey());
+			while (iter.hasNext()) {
+				Entry<Integer, List<String>> e = iter.next();
+				e.getValue().remove(name);
+				// log.warn("Removeale={}", e);
+				if (e.getValue().isEmpty()) {
+					iter.remove();
+					this.executionOrderMap.remove(e.getKey());
+					int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
+					this.setCurrentRunOrder(nextRunOrder);
+					log.debug("Removed codelet={} with execution order={}", name, e.getKey());
+				}
 			}
+
+			log.debug("Remaining codelets={}", this.executionOrderMap);
 		}
 	}
 

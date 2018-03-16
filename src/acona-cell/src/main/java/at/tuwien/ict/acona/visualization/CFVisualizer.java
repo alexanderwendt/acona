@@ -81,7 +81,7 @@ public class CFVisualizer extends CellFunctionThreadImpl implements Visualizatio
 	}
 
 	@Override
-	protected void shutDownExecutor() {
+	protected void shutDownThreadExecutor() {
 		// TODO Auto-generated method stub
 
 	}

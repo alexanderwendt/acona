@@ -97,7 +97,7 @@ public class CFIncrementService extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void shutDownExecutor() {
+	protected void shutDownThreadExecutor() {
 		// TODO Auto-generated method stub
 
 	}

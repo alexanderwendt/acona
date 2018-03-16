@@ -86,7 +86,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 			throw new Exception(e.getMessage());
 		} finally {
 			// Deregister
-			this.shutDown();
+			this.shutDownFunction();
 		}
 
 		return result;
@@ -168,7 +168,7 @@ public class CFSubscribeLock extends CellFunctionImpl {
 				}
 
 				if (result == null) {
-					log.error("Service {}>Timeouterror after {}ms. Expected datapoint={}, value={}", this.getFunctionConfig().getName(), timeout, resultAgentName + ":" + this.resultAddress, this.expectedResult);
+					log.error("Service {}>Timeouterror after {}ms. Expected datapoint={}, value={}. Got datapoint={}", this.getFunctionConfig().getName(), timeout, resultAgentName + ":" + this.resultAddress, this.expectedResult, dp);
 					throw new Exception("Service " + this.getFunctionConfig().getName() + ">Timeouterror. Waiting to hear from address=" + resultAgentName + ":" + resultAddress);
 				}
 			}
