@@ -14,6 +14,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.cellfunction.CellFunction;
+import at.tuwien.ict.acona.cell.cellfunction.MonitoringObject;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
@@ -32,7 +33,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SimpleAchieveREInitiator;
 
-public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
+public class AgentCommunicatorImpl implements AgentCommunicator {
 
 	protected static Logger log = LoggerFactory.getLogger(AgentCommunicatorImpl.class);
 
@@ -43,6 +44,8 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	private final SubscriptionHandler subscriptionHandler;
 	// private final static Gson gson = new Gson();
 	private final ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+
+	private final MonitoringObject monitor = new MonitoringObject();
 
 	/**
 	 * Keeps the behaviours that have been implemented as threads in the communicator because they have to be explicitely killed.
@@ -138,66 +141,70 @@ public class AgentCommunicatorImpl extends Thread implements AgentCommunicator {
 	}
 
 	@Override
-	public synchronized JsonRpcResponse execute(final String agentName, final String serviceName, final JsonRpcRequest methodParameters, final int timeout, final boolean useSubscribeProtocol) throws Exception {
+	public JsonRpcResponse execute(final String agentName, final String serviceName, final JsonRpcRequest methodParameters, final int timeout, final boolean useSubscribeProtocol) throws Exception {
 
-		JsonRpcResponse result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); // = new ArrayList<>();
-		// If a local data storage is meant, then write it there, else a foreign
-		// data storage is meant.
-		String newAgentName = agentName;
-		if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
-			newAgentName = this.cell.getLocalName();
-		}
+		JsonRpcResponse result = null;
 
-		if (newAgentName.equals(this.cell.getLocalName()) == true) {
-			// Execute local function
-			log.debug("Execute local function={}, parameters={}, agent={}. Hashcode={}.", serviceName, methodParameters, this.getLocalAgentName(), this.hashCode());
-			CellFunction cf = this.getCellFunctionHandler().getCellFunction(serviceName);
-			// synchronized (cf) {
-			result = cf.performOperation(methodParameters, this.getLocalAgentName());
-			// }
-
-		} else {
-			// Create a InitiatorBehaviour to write the datapoints to the target
-			// agent if that agent is external
-			ACLMessage requestMsg;
-			if (useSubscribeProtocol == true) {
-				requestMsg = new ACLMessage(ACLMessage.SUBSCRIBE);
-				requestMsg.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
-			} else {
-				requestMsg = new ACLMessage(ACLMessage.REQUEST);
-				requestMsg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		synchronized (this.monitor) {
+			result = new JsonRpcResponse(methodParameters, new JsonRpcError("ExecutionFailure", -1, "Unknown error", "unknown error")); // = new ArrayList<>();
+			// If a local data storage is meant, then write it there, else a foreign
+			// data storage is meant.
+			String newAgentName = agentName;
+			if (agentName == null || agentName.isEmpty() || agentName.equals("")) {
+				newAgentName = this.cell.getLocalName();
 			}
 
-			requestMsg.addReceiver(new AID(newAgentName, AID.ISLOCALNAME));
-			requestMsg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
-			requestMsg.setOntology(serviceName);
+			if (newAgentName.equals(this.cell.getLocalName()) == true) {
+				// Execute local function
+				log.debug("Execute local function={}, parameters={}, agent={}. Hashcode={}.", serviceName, methodParameters, this.getLocalAgentName(), this.hashCode());
+				CellFunction cf = this.getCellFunctionHandler().getCellFunction(serviceName);
+				// synchronized (cf) {
+				result = cf.performOperation(methodParameters, this.getLocalAgentName());
+				// }
 
-			// JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
-
-			requestMsg.setContent(methodParameters.toJson().toString());
-
-			// Blocking read and write
-			SynchronousQueue<String> queue = new SynchronousQueue<>();
-
-			// synchronized (this) {
-			this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
-			String writeBehaviourFinished = "";
-			try {
-				writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
-				if (writeBehaviourFinished == null) {
-					throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
-							+ "Possible causes: 1: target address " + newAgentName + ":" + serviceName + " does not exist. "
-							+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
-							+ "2: Error at the receiver site so that no message is returned.");
+			} else {
+				// Create a InitiatorBehaviour to write the datapoints to the target
+				// agent if that agent is external
+				ACLMessage requestMsg;
+				if (useSubscribeProtocol == true) {
+					requestMsg = new ACLMessage(ACLMessage.SUBSCRIBE);
+					requestMsg.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
+				} else {
+					requestMsg = new ACLMessage(ACLMessage.REQUEST);
+					requestMsg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 				}
 
-				result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {}.getType());
-			} catch (InterruptedException e) {
-				log.warn("Queue interrupted");
-			} catch (JsonSyntaxException e) {
-				log.error("Cannot read respond message={}", writeBehaviourFinished);
+				requestMsg.addReceiver(new AID(newAgentName, AID.ISLOCALNAME));
+				requestMsg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+				requestMsg.setOntology(serviceName);
+
+				// JsonArray object = (new GsonUtils()).convertListToJsonArray(methodParameters);
+
+				requestMsg.setContent(methodParameters.toJson().toString());
+
+				// Blocking read and write
+				SynchronousQueue<String> queue = new SynchronousQueue<>();
+
+				// synchronized (this) {
+				this.cell.addBehaviour(tbf.wrap(new ServiceExecuteBehaviour(this.cell, requestMsg, queue)));
+				String writeBehaviourFinished = "";
+				try {
+					writeBehaviourFinished = queue.poll(timeout, TimeUnit.MILLISECONDS);
+					if (writeBehaviourFinished == null) {
+						throw new Exception("No answer. Operation timed out after " + timeout + "ms. "
+								+ "Possible causes: 1: target address " + newAgentName + ":" + serviceName + " does not exist. "
+								+ "Check if the service on the other agent has a responder activated or if the address has been misspelled."
+								+ "2: Error at the receiver site so that no message is returned.");
+					}
+
+					result = new Gson().fromJson(writeBehaviourFinished, new TypeToken<JsonRpcResponse>() {}.getType());
+				} catch (InterruptedException e) {
+					log.warn("Queue interrupted");
+				} catch (JsonSyntaxException e) {
+					log.error("Cannot read respond message={}", writeBehaviourFinished);
+				}
+				// }
 			}
-			// }
 		}
 
 		return result;

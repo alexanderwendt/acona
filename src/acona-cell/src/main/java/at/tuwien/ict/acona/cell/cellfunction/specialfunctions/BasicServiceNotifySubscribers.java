@@ -54,7 +54,11 @@ public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 				public void run() {
 					log.trace("Notify subscribers service for caller={}, addresses={}", caller, parameterdata.getParams());
 					// dp.forEach(d -> {
-					getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
+					try {
+						getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
+					} catch (Exception e) {
+						log.error("Error at the notification of subscriptions", e);
+					}
 
 				}
 

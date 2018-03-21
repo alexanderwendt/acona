@@ -16,13 +16,13 @@ public interface SubscriptionHandler {
 	public void init(CellFunctionHandler functionHandler, String cellName);
 
 	/**
-	 * Test if behaviors can be activated. The internal activations to trigger a
-	 * behavior
+	 * Test if behaviors can be activated. The internal activations to trigger a behavior
 	 * 
 	 * @param address
 	 * @param subscribedData
+	 * @throws Exception
 	 */
-	public void activateNotifySubscribers(String callerAgent, Datapoint subscribedData);
+	public void activateNotifySubscribers(String callerAgent, Datapoint subscribedData) throws Exception;
 
 	public void addSubscription(String cellFunctionInstanceName, String key) throws Exception;
 
@@ -33,7 +33,7 @@ public interface SubscriptionHandler {
 	 * @param subscriptionConfig
 	 * @throws Exception
 	 */
-	//public void addSubscription(String cellFunctionInstanceName, DatapointConfig subscriptionConfig) throws Exception;
+	// public void addSubscription(String cellFunctionInstanceName, DatapointConfig subscriptionConfig) throws Exception;
 
 	/**
 	 * Remove a subscription, e.g. if a function is deregistered and closed
@@ -42,7 +42,7 @@ public interface SubscriptionHandler {
 	 * @param subscriptionConfig
 	 * @throws Exception
 	 */
-	//public void removeSubscription(String activatorInstance, DatapointConfig subscriptionConfig) throws Exception;
+	// public void removeSubscription(String activatorInstance, DatapointConfig subscriptionConfig) throws Exception;
 
 	/**
 	 * Remove a subscription, e.g. if a function is deregistered and closed
