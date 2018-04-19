@@ -1,14 +1,16 @@
 package at.tuwien.ict.acona.cognitivearchitecture.frameworkcodelets;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
@@ -20,8 +22,7 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 
 	private final static Logger log = LoggerFactory.getLogger(ActionExecutionCodelet.class);
 
-	// private String selectionAddress="selection";
-	// private String actionHistoryAddress = "state.history";
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss:SSS");
 
 	@Override
 	protected void cellFunctionCodeletInit() throws Exception {
@@ -35,6 +36,7 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 		Datapoint dpOption = this.getCommunicator().read(CognitiveProcess.SELECTEDOPTIONADDRESS);
 
 		String serviceName = "";
+		String[] parameter = new String[0];
 
 		if (dpOption.hasEmptyValue() == false) {
 			Option option = dpOption.getValue(Option.class);
@@ -42,7 +44,7 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 			// Extract the action and the parameter
 			serviceName = option.getActionServiceName();
 			if (serviceName.isEmpty() == false) {
-				String[] parameter = option.getActionParameter();
+				parameter = option.getActionParameter();
 				List<String> parameterList = Arrays.asList(parameter);
 				String method = option.getActionMethod();
 				if (method.isEmpty()) {
@@ -69,7 +71,7 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 		}
 
 		log.debug("Update action history with action={}", serviceName);
-		this.updateActionHistory(serviceName);
+		this.updateActionHistory(serviceName, parameter);
 
 	}
 
@@ -78,26 +80,27 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 	 * 
 	 * @throws Exception
 	 */
-	private void updateActionHistory(String action) throws Exception {
+	private void updateActionHistory(String action, String[] parameter) throws Exception {
+		Date date = new Date(System.currentTimeMillis());
+
 		// Update
 		Datapoint history = this.getCommunicator().read(CognitiveProcess.ACTIONHISTORYADDRESS);
 		log.debug("Old history={}", history);
-		JsonArray historyData;
-		@SuppressWarnings("unused")
-		JsonObject actionHistoryObject = new JsonObject();
+		List<ActionHistoryEntry> historyData = new ArrayList<ActionHistoryEntry>();
+		// JsonArray historyData = new JsonArray();
+		// @SuppressWarnings("unused")
+		// JsonObject actionHistoryObject = new JsonObject();
 
 		if (history.hasEmptyValue() == false) {
-			historyData = history.getValue().getAsJsonArray();
-		} else {
-			historyData = new JsonArray();
+			historyData = history.getValue(new TypeToken<List<ActionHistoryEntry>>() {});
 		}
 
 		// actionHistoryObject.add("timestamp", );
 		// actionHistoryObject.add("action", );
 
-		historyData.add(action);
+		historyData.add(new ActionHistoryEntry(this.sdf.format(date), action, parameter));
 
-		while (historyData.size() >= 50) {
+		while (historyData.size() >= 100) {
 			historyData.remove(0);
 		}
 

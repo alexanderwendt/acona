@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
 
 public class Datapoint {
 	// public final static String KEYADDRESS = "ADDRESS";
@@ -15,7 +16,7 @@ public class Datapoint {
 	private String ADDRESS = "";
 	private String AGENT = "";
 	private JsonElement VALUE = new JsonObject(); // new JsonObject();
-	private long timeStamp = 0;
+	private final long timeStamp = System.currentTimeMillis();
 
 	private transient Gson gson = new Gson(); // Add transient not to serialize this
 
@@ -117,6 +118,15 @@ public class Datapoint {
 		return VALUE;
 	}
 
+	/**
+	 * Get time stamp
+	 * 
+	 * @return
+	 */
+	public long getTimeStamp() {
+		return timeStamp;
+	}
+
 	public JsonElement getValueOrDefault(JsonElement defaultValue) {
 
 		JsonElement result = null;
@@ -138,6 +148,19 @@ public class Datapoint {
 		T result = null;
 		if (this.getValue().isJsonNull() == false) {
 			result = gson.fromJson(this.VALUE, clzz);
+		}
+
+		return result;
+	}
+
+	public <T> T getValue(TypeToken<T> t) {
+		if (gson == null) {
+			gson = new Gson();
+		}
+
+		T result = null;
+		if (this.getValue().isJsonNull() == false) {
+			result = gson.fromJson(this.VALUE, t.getType());
 		}
 
 		return result;

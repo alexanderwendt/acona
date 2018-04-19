@@ -6,7 +6,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
@@ -87,32 +89,16 @@ public abstract class CognitiveCodelet extends CellFunctionCodelet {
 		return goalReferenceAddress;
 	}
 
-	// protected List<Datapoint> getDatapointGroup(boolean isWorkingMemory, String
-	// subgroup) throws Exception {
-	// String episodeGroupAddress = "";
-	//
-	// if (isWorkingMemory==true) {
-	// episodeGroupAddress = this.getWorkingMemoryAddress() + "." + subgroup + "*";
-	// } else {
-	// episodeGroupAddress = this.getInternalStateMemoryAddress() + "." + subgroup +
-	// "*";
-	// }
-	//
-	// List<Datapoint> episodes =
-	// this.getCommunicator().readWildcard(episodeGroupAddress);
-	// return episodes;
-	// }
-
 	protected String getLastAction() throws Exception {
-		JsonArray historyData = this.getCommunicator()
-				.read(CognitiveProcess.ACTIONHISTORYADDRESS)
+		JsonArray historyData = this.getCommunicator().read(CognitiveProcess.ACTIONHISTORYADDRESS)
 				.getValueOrDefault(new JsonArray())
 				.getAsJsonArray();
 
 		String result = "";
 		if (historyData.size() > 0) {
-			result = historyData.get(historyData.size() - 1)
-					.getAsString();
+			JsonObject obj = historyData.get(historyData.size() - 1).getAsJsonObject();
+			ActionHistoryEntry entry = (new Gson()).fromJson(obj, ActionHistoryEntry.class);
+			result = entry.getAction();
 		}
 
 		return result;
@@ -133,9 +119,10 @@ public abstract class CognitiveCodelet extends CellFunctionCodelet {
 		}
 
 		for (int i = historyData.size() - 1; i >= endValue; i--) {
-			String record = historyData.get(i)
-					.getAsJsonPrimitive()
-					.getAsString();
+			JsonObject obj = historyData.get(i).getAsJsonObject();
+			ActionHistoryEntry entry = (new Gson()).fromJson(obj, ActionHistoryEntry.class);
+
+			String record = entry.getAction();
 
 			if (record.equals(action) == true) {
 				result = true;
@@ -145,24 +132,5 @@ public abstract class CognitiveCodelet extends CellFunctionCodelet {
 
 		return result;
 	}
-
-	// protected String[] updateHistory(String[]) {
-	// //Update
-	// Datapoint history =
-	// this.getCommunicator().read(CognitiveProcessUtil.ACTIONHISTORYADDRESS);
-	// log.debug("Old history={}", history);
-	// JsonArray historyData;
-	// if (history.hasEmptyValue()==false) {
-	// historyData = history.getValue().getAsJsonArray();
-	// } else {
-	// historyData = new JsonArray();
-	// }
-	//
-	// historyData.add(action);
-	//
-	// while (historyData.size()>=20) {
-	// historyData.remove(0);
-	// }
-	// }
 
 }
