@@ -5,7 +5,7 @@
   </evaluator>
   
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
-  <logger name="at.tuwien.ict.acona.cell.communicator" level="INFO"/>
+  <logger name="at.tuwien.ict.acona.cell.communicator" level="TRACE"/>
   <logger name="at.tuwien.ict.acona.cell.storage" level="WARN"/>
   <logger name="at.tuwien.ict.acona.cell.cellfunction" level="DEBUG"/>
   <logger name="at.tuwien.ict.acona.cell.core" level="WARN"/>

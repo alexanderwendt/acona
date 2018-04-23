@@ -56,8 +56,6 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			JsonRpcRequest request = new JsonRpcRequest(READSERVICENAME, false, new Object[1]);
 			request.setParameterAsList(0, datapointaddress);
 
-			// datapointaddress.forEach(s -> inputList.add(Datapoint.newDatapoint(s)));
-
 			JsonRpcResponse response = this.execute(agentName, READSERVICENAME, request, timeout);
 
 			if (response.getError() != null) {
@@ -65,7 +63,6 @@ public class CommunicatorImpl extends AgentCommunicatorImpl implements BasicServ
 			}
 
 			// Get the result and convert it to datapoints
-			// response.getResultAsList(new TypeToken<List<Datapoint>>(){}.getType());
 			List<Datapoint> responseList = response.getResult(new TypeToken<List<Datapoint>>() {});
 			result.addAll(responseList);
 

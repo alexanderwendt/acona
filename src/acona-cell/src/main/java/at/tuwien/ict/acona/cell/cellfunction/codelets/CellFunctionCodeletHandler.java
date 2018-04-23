@@ -296,6 +296,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	@Override
 	protected void executeFunction() throws Exception {
 		// Load all codelets to execute, i.e. only the codelets that shall run in parallel, get the map
+
 		if (this.codeletHandlerRunAllowed == false) {
 			log.debug("Run not allowed. States={}", this.getCodeletMap());
 		} else {

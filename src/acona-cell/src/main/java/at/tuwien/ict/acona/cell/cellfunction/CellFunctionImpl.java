@@ -11,9 +11,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.communicator.Communicator;
+import at.tuwien.ict.acona.cell.communicator.CommunicatorImpl;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.cell.core.Cell;
+import at.tuwien.ict.acona.cell.core.CellImpl;
 import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
 import jade.domain.FIPANames;
@@ -27,6 +29,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	private Cell cell;
 	private CellFunctionConfig config;
+
+	private Communicator comm;
 
 	/**
 	 * Name of the activator
@@ -62,6 +66,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 			// Extract settings
 			this.config = config;
 			this.cell = caller;
+
+			comm = new CommunicatorImpl((CellImpl) this.cell);
 
 			// Get the settings but set also default values
 
@@ -302,7 +308,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	// === read and write shortcuts ===//
 
 	protected Communicator getCommunicator() {
-		return this.getCell().getCommunicator();
+		return this.comm;
 	}
 
 	protected void writeLocal(Datapoint datapoint) throws Exception {
