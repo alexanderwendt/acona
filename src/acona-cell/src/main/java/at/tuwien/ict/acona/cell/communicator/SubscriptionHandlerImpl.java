@@ -40,6 +40,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 		List<String> instanceList = null;
 		Map<String, Datapoint> subscribedDatapointMap = new HashMap<>();
 		try {
+			// synchronized (this.datapointActivationMap) {
 			if (datapointActivationMap.containsKey(key)) {
 				// Add datapoint to map
 
@@ -47,13 +48,14 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 				subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
 
 				// Get all instances, which subscribe the datapoint
-				// synchronized (this.datapointActivationMap) {
 				instanceList = datapointActivationMap.get(key);
 				// FIXME: Sometimes, the instancelist is empty, after keys have been
 				// deleted. Consider that
 
 				// run all activations of that datapoint in parallel
 				log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
+				// FIXME ERROR possible sync stuff!!!!
+				// synchronized (this.functionHandler) {
 				for (String a : instanceList) {
 					try {
 						this.functionHandler.getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);
@@ -61,9 +63,13 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 						log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
 					}
 				}
+				// }
+
+				// }
+
 			}
 		} catch (Exception e) {
-			log.error("Error at the notification of a subscriber. Instancelist={}. Subscribermap={}", instanceList, subscribedDatapointMap);
+			log.error("Error at the notification of a subscriber. Instancelist={}. Subscribermap={}, subscribed data={}", instanceList, subscribedDatapointMap, subscribedData, e);
 			throw new Exception(e.getMessage());
 		}
 	}
