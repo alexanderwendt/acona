@@ -32,7 +32,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 	}
 
 	@Override
-	public void activateNotifySubscribers(String callerAgent, Datapoint subscribedData) throws Exception {
+	public synchronized void activateNotifySubscribers(String callerAgent, Datapoint subscribedData) throws Exception {
 		// Construct key
 		String key = callerAgent + ":" + subscribedData.getAddress();
 
@@ -48,17 +48,17 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 				subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
 
 				// Get all instances, which subscribe the datapoint
-				instanceList = datapointActivationMap.get(key);
+				instanceList = this.getCellFunctionDatapointMapping().get(key);
 				// FIXME: Sometimes, the instancelist is empty, after keys have been
 				// deleted. Consider that
 
 				// run all activations of that datapoint in parallel
-				log.trace("Activation dp={}, instancelist={}", subscribedData, instanceList);
+				log.debug("Activation dp={}, instancelist={}", subscribedData, instanceList);
 				// FIXME ERROR possible sync stuff!!!!
-				// synchronized (this.functionHandler) {
+				// synchronized (this.datapointActivationMap) {
 				for (String a : instanceList) {
 					try {
-						this.functionHandler.getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);
+						this.getFunctionHandler().getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);
 					} catch (Exception e) {
 						log.error("Cannot test activation of activator {} and subscription {}", a, subscribedData, e);
 					}
@@ -92,19 +92,20 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
 		String key = address;
 
-		// synchronized (this.datapointActivationMap) {
-		if (this.datapointActivationMap.containsKey(key) == false) {
-			// Add new entry
-			List<String> activators = new LinkedList<>();
-			activators.add(cellFunctionInstanceName);
-			this.datapointActivationMap.put(key, activators);
+		synchronized (this.datapointActivationMap) {
+			if (this.datapointActivationMap.containsKey(key) == false) {
+				// Add new entry
+				List<String> activators = new LinkedList<>();
+				activators.add(cellFunctionInstanceName);
+				this.datapointActivationMap.put(key, activators);
 
-			log.info("Agent={}>, address={}>Registered activator={} in agent{}", this.cellName, key, cellFunctionInstanceName, this.cellName);
-		} else if (this.datapointActivationMap.get(key).contains(cellFunctionInstanceName) == false) {
-			this.datapointActivationMap.get(key).add(cellFunctionInstanceName);
-			log.info("Agent={}, address={}>Added activator={}", this.cellName, key, cellFunctionInstanceName);
-		} else {
-			log.warn("Agent={}, function={}>WARNING: Subscription will not be registered for address={}. Instance already exists. Will not overwrite it.", this.cellName, cellFunctionInstanceName, key);
+				log.info("Agent={}>, address={}>Registered activator={} in agent{}", this.cellName, key, cellFunctionInstanceName, this.cellName);
+			} else if (this.datapointActivationMap.get(key).contains(cellFunctionInstanceName) == false) {
+				this.datapointActivationMap.get(key).add(cellFunctionInstanceName);
+				log.info("Agent={}, address={}>Added activator={}", this.cellName, key, cellFunctionInstanceName);
+			} else {
+				log.warn("Agent={}, function={}>WARNING: Subscription will not be registered for address={}. Instance already exists. Will not overwrite it.", this.cellName, cellFunctionInstanceName, key);
+			}
 		}
 	}
 
@@ -125,6 +126,10 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 				throw new Exception(e.getMessage());
 			}
 		}
+	}
+
+	private CellFunctionHandler getFunctionHandler() {
+		return this.functionHandler;
 	}
 
 }
