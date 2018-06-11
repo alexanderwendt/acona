@@ -35,7 +35,7 @@ In the src/test/java, the unit tests are put. The unit tests present good exampl
 
 Acona Documentation
 ====================================================
-A comprehensive documentation of the ACONA framework can be found within the repository in the folder /acona/docs/Acona_Manual. 
+A comprehensive documentation of the ACONA framework can be found within the repository in the folder https://github.com/aconaframework/acona/blob/master/docs/Acona_Manual/. 
 First, the motivation and the goals of the project are explained. Then the architecture is described very close to the actual code.
 It is followed by an installation guide for eclipse and a tutorial to setup your first running ACONA application.
 
