@@ -35,9 +35,7 @@ public class GsonUtils {
 	}
 
 	/**
-	 * Json merger for Gson from
-	 * http://stackoverflow.com/questions/34092373/merge-extend-json-objects-
-	 * using-gson-in-java
+	 * Json merger for Gson from http://stackoverflow.com/questions/34092373/merge-extend-json-objects- using-gson-in-java
 	 * 
 	 * @param destinationObject
 	 * @param conflictResolutionStrategy
@@ -114,8 +112,7 @@ public class GsonUtils {
 	 * @return
 	 */
 	public List<Datapoint> convertJsonArrayToDatapointList(JsonArray jsonArray) {
-		List<Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<List<Datapoint>>() {
-		}.getType());
+		List<Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<List<Datapoint>>() {}.getType());
 		return result;
 	}
 
@@ -127,8 +124,7 @@ public class GsonUtils {
 	 * @return
 	 */
 	public Map<String, Datapoint> convertJsonArrayToDatapointMap(JsonArray jsonArray) {
-		Map<String, Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<Map<String, Datapoint>>() {
-		}.getType());
+		Map<String, Datapoint> result = gson.fromJson(jsonArray.toString(), new TypeToken<Map<String, Datapoint>>() {}.getType());
 		return result;
 	}
 
@@ -153,8 +149,7 @@ public class GsonUtils {
 	 */
 	public JsonArray convertListToJsonArray(List<?> list) throws Exception {
 		Gson gson = new Gson();
-		JsonElement element = gson.toJsonTree(list, new TypeToken<List<?>>() {
-		}.getType());
+		JsonElement element = gson.toJsonTree(list, new TypeToken<List<?>>() {}.getType());
 
 		if (!element.isJsonArray()) {
 			// fail appropriately
@@ -167,8 +162,7 @@ public class GsonUtils {
 
 	public JsonObject convertListToJsonArray(Map<?, ?> map) throws Exception {
 		Gson gson = new Gson();
-		JsonElement element = gson.toJsonTree(map, new TypeToken<Map<?, ?>>() {
-		}.getType());
+		JsonElement element = gson.toJsonTree(map, new TypeToken<Map<?, ?>>() {}.getType());
 
 		if (!element.isJsonObject()) {
 			// fail appropriately
@@ -190,5 +184,9 @@ public class GsonUtils {
 
 	public String prettyPrint(JsonElement e) {
 		return this.gsonExtended.toJson(e);
+	}
+
+	public Gson getGson() {
+		return gson;
 	}
 }

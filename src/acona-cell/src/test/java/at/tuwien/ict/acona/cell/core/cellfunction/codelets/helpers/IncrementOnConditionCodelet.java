@@ -30,8 +30,7 @@ public class IncrementOnConditionCodelet extends CellFunctionCodelet {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		//Read address
-
+		// Read address
 		int value = 0;
 		String checkValue = this.getCommunicator().read(checkAddress).getValue().toString();
 		log.debug("Read value={}", checkValue);

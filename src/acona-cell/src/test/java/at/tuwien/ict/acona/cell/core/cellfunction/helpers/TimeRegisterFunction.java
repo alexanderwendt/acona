@@ -17,7 +17,7 @@ public class TimeRegisterFunction extends CellFunctionThreadImpl {
 
 	private long registeredTime = 0;
 
-	//The time is written in the result
+	// The time is written in the result
 
 	@Override
 	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
@@ -28,6 +28,7 @@ public class TimeRegisterFunction extends CellFunctionThreadImpl {
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		// TODO Auto-generated method stub
+		this.getFunctionConfig().setGenerateReponder(true);
 
 	}
 

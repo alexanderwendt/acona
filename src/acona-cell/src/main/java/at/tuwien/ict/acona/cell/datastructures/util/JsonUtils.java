@@ -10,7 +10,8 @@ import com.google.gson.JsonPrimitive;
 public class JsonUtils {
 	private final Gson gson = new Gson();
 
-	private JsonUtils() {
+	public JsonUtils() {
+
 	}
 
 	public boolean isJSONValid(String JSON_STRING) {
@@ -23,10 +24,10 @@ public class JsonUtils {
 	}
 
 	public JsonObject generateErrorMessage(String name, int code, String message, String error) {
-		//"error": {"name": "JSONRPCError",
-		//"code": (number 100-999),
-		//"message": "Some Error Occurred",
-		//"error": "whatever you want\n(a traceback?)"
+		// "error": {"name": "JSONRPCError",
+		// "code": (number 100-999),
+		// "message": "Some Error Occurred",
+		// "error": "whatever you want\n(a traceback?)"
 
 		JsonObject errorObject = new JsonObject();
 		errorObject.addProperty("name", name);

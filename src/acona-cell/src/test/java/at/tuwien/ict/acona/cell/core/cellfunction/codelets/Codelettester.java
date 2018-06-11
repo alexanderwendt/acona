@@ -61,8 +61,6 @@ public class Codelettester {
 
 		this.launcher.stopSystem();
 
-		// Runtime runtime = Runtime.instance();
-		// runtime.shutDown();
 		synchronized (this) {
 			try {
 				this.wait(2000);
@@ -78,7 +76,7 @@ public class Codelettester {
 	 * 
 	 */
 	@Test
-	public void CodeletHandlerWith2CodeletsTest() {
+	public void CodeletHandlerWith3CodeletsTest() {
 		try {
 			String codeletName1 = "CodeletIncrement1"; // The same name for all services
 			String codeletName2 = "CodeletIncrement2";
@@ -91,7 +89,7 @@ public class Codelettester {
 			double startValue = 1;
 			int expectedResult = 4;
 
-			// Agent with handler and 2 codelets
+			// Agent with handler and 3 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
 					.addCellfunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
@@ -133,17 +131,8 @@ public class Codelettester {
 					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()),
 					20000);
 
-			// synchronized (this) {
-			// try {
-			// this.wait(500);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
-
 			log.info("Datapoints on the way. Set datapoint value={} to 1.0", processDatapoint);
-			controller.getCommunicator()
-					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			controller.getCommunicator().write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 
 			JsonRpcRequest request2 = new JsonRpcRequest("executecodelethandler", 1);
@@ -154,15 +143,6 @@ public class Codelettester {
 					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()),
 					20000);
 
-			// synchronized (this) {
-			// try {
-			// this.wait(500);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
-			// controller.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
-			// JsonPrimitive(3)));
 			log.debug("Read if the value has been incremented");
 			int x = controller.getCommunicator().read(processDatapoint).getValue().getAsInt();
 			if (x == 2) {
@@ -180,14 +160,6 @@ public class Codelettester {
 			controller.getCommunicator().executeServiceQueryDatapoints(controllerAgentName, handlerName, request3,
 					controllerAgentName, handlerName + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()),
 					20000);
-
-			// synchronized (this) {
-			// try {
-			// this.wait(500);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
 
 			log.info("Value is={}", controller.getCommunicator().read(processDatapoint).getValue().getAsInt());
 

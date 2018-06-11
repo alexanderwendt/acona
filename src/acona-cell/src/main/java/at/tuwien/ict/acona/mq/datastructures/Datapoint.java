@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.cell.datastructures;
+package at.tuwien.ict.acona.mq.datastructures;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -6,6 +6,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * @author wendt
+ * 
+ *         The data point combines content and an address. For the MQTT, it is a topic and Json-serialized content
+ *
+ */
 public class Datapoint {
 	private String ADDRESS = "";
 	private String AGENT = "";
@@ -34,8 +40,8 @@ public class Datapoint {
 
 	private String getAgentNameFromString(String address) {
 		String result = "";
-		if (address.contains(":")) {
-			result = address.split(":")[0];
+		if (address.contains("/")) {
+			result = address.split("/")[0];
 		}
 
 		return result;
@@ -43,8 +49,8 @@ public class Datapoint {
 
 	private String getLocalAddressFromString(String address) {
 		String result = address;
-		if (address.contains(":")) {
-			result = address.split(":")[1];
+		if (address.contains("/")) {
+			result = address.substring(address.indexOf("/")); // The first part is always the agent. The rest is functions in the agent
 		}
 
 		return result;
@@ -53,7 +59,7 @@ public class Datapoint {
 	private String combineAddress(String agent, String address) {
 		String combinedAddress = address;
 		if (agent.isEmpty() == false) {
-			combinedAddress = agent + ":" + address;
+			combinedAddress = agent + "/" + address;
 		}
 
 		return combinedAddress;
