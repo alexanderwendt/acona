@@ -33,6 +33,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
+
 /**
  * A Mqtt basic requestor
  *
@@ -49,18 +53,19 @@ public class MqttCommunicatorImpl {
 	private Map<String, JsonElement> incomingMessages = new ConcurrentHashMap<>();
 
 	// Service Classes
-	final Map<String, Function<JsonElement, JsonElement>> handlerMap = new HashMap<>();
+	final Map<String, Function<Request, JsonElement>> handlerMap = new HashMap<>();
 
 	// Semaphore used for synchronizing b/w threads
 	private final Semaphore latch = new Semaphore(0);
 	private MqttClient mqttClient;
 
 	// === Parameter variables ===//
-	String host = "tcp://127.0.0.1:1883";
-	String username = "acona";
-	String password = "acona";
-	String functionName = "FunctionRequester";
-	String agentName = "agent1";
+	private final String host = "tcp://127.0.0.1:1883";
+	private final String username = "acona";
+	private final String password = "acona";
+	private final String functionName = "FunctionRequester";
+	private final String agentName = "agent1";
+	// private final String functionReplyTopic = agentName + "/" + functionName + "/" + "replyto";
 
 	private int timeout = 100000;
 
@@ -84,7 +89,7 @@ public class MqttCommunicatorImpl {
 
 		try {
 			this.rootAddress = agentName + "/" + functionName;
-			this.subscribedReplyAddress = this.rootAddress + "/reply-to";
+			this.subscribedReplyAddress = this.rootAddress + "/replyto";
 			this.subscribedServiceAddressPrefix = this.rootAddress + "/service";
 			this.subscribedCommandAddress = this.rootAddress + "/command";
 			this.publishedStateAddress = this.rootAddress + "/state";
@@ -116,27 +121,34 @@ public class MqttCommunicatorImpl {
 					JsonObject jsonMessage = gson.fromJson(payloadString, JsonObject.class);
 					// Make a check if String is Json
 
-					// If this is a reply of a request
+					// If this is a reply of a request done by this function
 					if (topic != null && topic.equals(subscribedReplyAddress)) {
-						// String replyToPayload = new String(message.getPayload());
-						log.debug("\nReceived Reply-to topic from Solace for the MQTT client:" +
-								"\n\tReply-To: " + jsonMessage + "\n");
+						// JsonObject jsonResponse = gson.fromJson(payloadString, JsonObject.class);
+						Response response = Response.newResponse(payloadString);
+						log.debug("\nReceived Reply-to topic from Solace for the MQTT client:" + "\n\tReply-To: " + jsonMessage + "\n");
 
 						// JsonObject response = gson.fromJson(jsonMessage, JsonObject.class);
 						// Get correlationid
-						String correlationid = jsonMessage.get("correlationid").getAsString();
-						JsonElement responseMessage = jsonMessage.get("message"); // The message can be any json structure
+						String correlationid = response.getCorrenationid();
+						JsonElement responseMessage = response.getResult(); // The message can be any json structure
+						JsonElement error = response.getError();
 
 						incomingMessages.put(correlationid, responseMessage);
 
+						// If this is a received RPC call
 					} else if (topic != null && topic.startsWith(subscribedServiceAddressPrefix)) {
 						// Run service
-						JsonElement responseMessage = jsonMessage.get("message"); // The message can be any json structure
-						JsonElement result = handlerMap.get(topic).apply(responseMessage);
+						Request req = Request.newRequest(payloadString);
+						// JsonElement responseMessage = req.getjsonMessage.get("message"); // The message can be any json structure
+						JsonElement result = handlerMap.get(topic).apply(req);
 
 						// this.performaction
 						// TODO: Add method(method name)
 
+						// send back
+						Response response = new Response(req, result);
+
+						mqttClient.publish(response.getReplyTo(), message);
 					} else if (topic != null && topic.equals(subscribedCommandAddress)) {
 						// this.setcommand(command)
 						// TODO: Add method;
@@ -201,7 +213,7 @@ public class MqttCommunicatorImpl {
 //			mqttClient.subscribe(replyToTopic, 0);
 
 			// Add function to function table
-			this.handlerMap.put("test", (JsonElement input) -> serviceRead(input));
+			this.handlerMap.put("test", (Request input) -> serviceRead(input));
 			// this.handlerMap.get("address").accept();
 
 		} catch (MqttException me) {
@@ -216,7 +228,13 @@ public class MqttCommunicatorImpl {
 	}
 
 	// Service function
-	private JsonElement serviceRead(JsonElement message) {
+	private JsonElement serviceRead(Request request) {
+		try {
+			request.getParameter("test", Datapoint.class);
+		} catch (Exception e) {
+
+		}
+
 		return new JsonPrimitive("test");
 
 	}
@@ -241,12 +259,15 @@ public class MqttCommunicatorImpl {
 			// String type []
 			// JsonElement message
 
-			JsonObject payload = new JsonObject();
-			String correlationID = "1"; // UUID.randomUUID().toString();
-			payload.addProperty("correlationid", correlationID);
-			payload.addProperty("caller", agentName + "/" + functionName);
-			payload.add("message", message);
-			String reqPayload = payload.toString();
+			Request request = new Request(this.subscribedReplyAddress);
+			request.setParameter("message", message);
+
+//			JsonObject payload = new JsonObject();
+			String correlationID = request.getCorrelationId(); // UUID.randomUUID().toString();
+//			payload.addProperty("correlationid", correlationID);
+//			payload.addProperty("caller", agentName + "/" + functionName);
+//			payload.add("message", message);
+			String reqPayload = request.toJson().toString();
 
 			// Create a request message and set the request payload
 			MqttMessage reqMessage = new MqttMessage(reqPayload.getBytes());

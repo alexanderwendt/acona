@@ -37,7 +37,7 @@ public class CellFunctionRequester {
 	private static final Logger log = LoggerFactory.getLogger(CellFunctionRequester.class);
 
 	// A unique Reply-To Topic for the client is obtained from Solace
-	private String replyToTopic = "";
+	private String replyToTopic = "$SYS/client/reply-to";
 
 	private Gson parser = new Gson();
 
@@ -113,21 +113,21 @@ public class CellFunctionRequester {
 
 			// Subscribe client to the special Solace topic for requesting a unique
 			// Reply-to destination for the MQTT client
-			log.debug("Requesting Reply-To topic from Solace...");
-			mqttClient.subscribe("$SYS/client/reply-to", 0);
+			// log.debug("Requesting Reply-To topic from Solace...");
+			// mqttClient.subscribe("$SYS/client/reply-to", 0);
 
 			// Wait for till we have received the reply to Topic
-			try {
-				latch.acquire();
-			} catch (InterruptedException e) {
-				log.debug("I was awoken while waiting");
-			}
+			// try {
+			// latch.acquire();
+			// } catch (InterruptedException e) {
+			// log.debug("I was awoken while waiting");
+			// }
 
 			// Check if we have a Reply-To topic
-			if (replyToTopic == null || replyToTopic.isEmpty()) {
-				log.debug("Unable to request Reply-To from Solace. Exiting");
-				System.exit(0);
-			}
+			// if (replyToTopic == null || replyToTopic.isEmpty()) {
+			// log.debug("Unable to request Reply-To from Solace. Exiting");
+			// System.exit(0);
+			// }
 
 			// Subscribe client to the Solace provide Reply-To topic with a QoS level of 0
 			log.debug("Subscribing client to Solace provide Reply-To topic");
@@ -138,7 +138,7 @@ public class CellFunctionRequester {
 			obj.addProperty("correlationId", UUID.randomUUID().toString());
 			obj.addProperty("replyTo", replyToTopic);
 			obj.addProperty("message", "Sample Request");
-			String reqPayload = obj.getAsString();
+			String reqPayload = obj.toString();
 
 			// Create a request message and set the request payload
 			MqttMessage reqMessage = new MqttMessage(reqPayload.getBytes());

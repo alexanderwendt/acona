@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.mq.datastructures;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -31,6 +32,8 @@ public class Request {
 	// private JsonObject params;
 
 	/**
+	 * Create the request with a reply-to address
+	 * 
 	 * @param address
 	 * @param replyToTopic
 	 */
@@ -45,6 +48,8 @@ public class Request {
 	}
 
 	/**
+	 * Create the request from a json object
+	 * 
 	 * @param rpcRequest
 	 * @throws Exception
 	 */
@@ -57,6 +62,11 @@ public class Request {
 			throw new Exception("No Request");
 		}
 
+	}
+
+	public static Request newRequest(String input) {
+		Gson gson = new Gson();
+		return gson.fromJson(input, Request.class);
 	}
 
 	public JsonObject toJson() {

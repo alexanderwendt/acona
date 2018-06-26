@@ -1,5 +1,6 @@
 package at.tuwien.ict.acona.cell.communicator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,7 +38,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 		String key = callerAgent + ":" + subscribedData.getAddress();
 
 		// If there are any functions, then they should be activated
-		List<String> instanceList = null;
+		List<String> instanceList = new ArrayList<>();
 		Map<String, Datapoint> subscribedDatapointMap = new HashMap<>();
 		try {
 			// synchronized (this.datapointActivationMap) {
@@ -48,7 +49,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 				subscribedDatapointMap.put(subscribedData.getAddress(), subscribedData);
 
 				// Get all instances, which subscribe the datapoint
-				instanceList = this.getCellFunctionDatapointMapping().get(key);
+				instanceList = this.getCellFunctionDatapointMapping().getOrDefault(key, new ArrayList<String>());
 				// FIXME: Sometimes, the instancelist is empty, after keys have been
 				// deleted. Consider that
 
@@ -56,6 +57,10 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 				log.debug("Activation dp={}, instancelist={}", subscribedData, instanceList);
 				// FIXME ERROR possible sync stuff!!!!
 				// synchronized (this.datapointActivationMap) {
+				if (instanceList.isEmpty()) {
+					log.warn("The instance list for key={} is empty", key);
+				}
+
 				for (String a : instanceList) {
 					try {
 						this.getFunctionHandler().getCellFunction(a).updateSubscribedData(subscribedDatapointMap, callerAgent);

@@ -2,6 +2,7 @@ package at.tuwien.ict.acona.mq.datastructures;
 
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -18,11 +19,13 @@ public class Response {
 	private GsonUtils util = new GsonUtils();
 
 	private final String correlationid;
+	private final String replyto;
 	private JsonElement result;
 	private JsonElement error;
 
 	public Response(Request request, JsonElement resultOrError, boolean isError) {
 		this.correlationid = request.getCorrelationId();
+		this.replyto = request.getReplyTo();
 		if (isError == false) {
 			this.result = resultOrError;
 			this.error = null;
@@ -35,18 +38,29 @@ public class Response {
 
 	public Response(Request request, JsonElement result) {
 		this.correlationid = request.getCorrelationId();
+		this.replyto = request.getReplyTo();
 		this.result = result;
 		this.error = new JsonObject();
 	}
 
 	public Response(Request request, List<?> result) throws Exception {
 		this.correlationid = request.getCorrelationId();
+		this.replyto = request.getReplyTo();
 		this.setResult(result);
 		this.error = null;
 	}
 
-	public String getId() {
+	public static Response newResponse(String input) {
+		Gson gson = new Gson();
+		return gson.fromJson(input, Response.class);
+	}
+
+	public String getCorrenationid() {
 		return correlationid;
+	}
+
+	public String getReplyTo() {
+		return this.replyto;
 	}
 
 	public JsonElement getResult() {

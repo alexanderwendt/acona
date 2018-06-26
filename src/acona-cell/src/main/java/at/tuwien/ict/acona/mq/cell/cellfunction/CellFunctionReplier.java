@@ -73,7 +73,7 @@ public class CellFunctionReplier {
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
 					try {
 						// Parse the received request message and convert payload to a JSONObject
-						JsonElement payloadObj = gson.toJsonTree(new String(message.getPayload()));
+						JsonElement payloadObj = gson.fromJson(new String(message.getPayload()), JsonObject.class);
 						JsonObject jsonPayload = payloadObj.getAsJsonObject();
 
 						// Get the correlationId and replyTo fields from the payload

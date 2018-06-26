@@ -57,7 +57,7 @@ public class BasicServiceNotifySubscribers extends CellFunctionBasicService {
 					try {
 						getCell().getSubscriptionHandler().activateNotifySubscribers(caller, dp);
 					} catch (Exception e) {
-						log.error("Error at the notification of subscriptions", e);
+						log.error("Error at the notification of subscriptions. Caller={}, Address={}, Request={}", caller, parameterdata, e);
 					}
 
 				}
