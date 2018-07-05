@@ -13,34 +13,38 @@ import at.tuwien.ict.acona.cell.datastructures.util.GsonUtils;
 public class Response {
 	public final static String CORRELATIONID = "correlationid";
 	public final static String REPLYTO = "replyto";
-	public final static String RESULT = "parameter";
+	public final static String RESULT = "result";
 	public final static String ERROR = "error";
 
-	private GsonUtils util = new GsonUtils();
+	private transient GsonUtils util = new GsonUtils();
 
 	private final String correlationid;
 	private final String replyto;
 	private JsonElement result;
-	private JsonElement error;
-
-	public Response(Request request, JsonElement resultOrError, boolean isError) {
-		this.correlationid = request.getCorrelationId();
-		this.replyto = request.getReplyTo();
-		if (isError == false) {
-			this.result = resultOrError;
-			this.error = null;
-		} else {
-			this.result = null;
-			this.error = resultOrError;
-		}
-
-	}
+	private RequestError error;
 
 	public Response(Request request, JsonElement result) {
 		this.correlationid = request.getCorrelationId();
 		this.replyto = request.getReplyTo();
+
 		this.result = result;
-		this.error = new JsonObject();
+		this.error = null;
+	}
+
+	public Response(Request request) {
+		this.correlationid = request.getCorrelationId();
+		this.replyto = request.getReplyTo();
+
+		this.result = null;
+		this.error = null;
+	}
+
+	public Response(Request request, RequestError resultOrError) {
+		this.correlationid = request.getCorrelationId();
+		this.replyto = request.getReplyTo();
+		this.result = null;
+		this.error = resultOrError;
+
 	}
 
 	public Response(Request request, List<?> result) throws Exception {
@@ -53,6 +57,16 @@ public class Response {
 	public static Response newResponse(String input) {
 		Gson gson = new Gson();
 		return gson.fromJson(input, Response.class);
+	}
+
+	public static boolean isResponse(JsonObject obj) {
+		boolean result = false;
+
+		if (obj.has(CORRELATIONID) && obj.has(REPLYTO) && (obj.has(RESULT) || obj.has(ERROR))) {
+			result = true;
+		}
+
+		return result;
 	}
 
 	public String getCorrenationid() {
@@ -78,7 +92,7 @@ public class Response {
 		this.result = util.convertListToJsonArray(result);
 	}
 
-	public JsonElement getError() {
+	public RequestError getError() {
 		return error;
 	}
 
@@ -127,5 +141,9 @@ public class Response {
 		builder.append("|error=");
 		builder.append(error);
 		return builder.toString();
+	}
+
+	public void setError(String error) {
+		this.error = new RequestError(error);
 	}
 }

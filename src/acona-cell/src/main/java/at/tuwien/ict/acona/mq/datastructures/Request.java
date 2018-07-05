@@ -21,31 +21,24 @@ public class Request {
 	private transient GsonUtils util = new GsonUtils();
 
 	private final String correlationid;
-	private final String replyto;
-	private JsonObject parameter;
+	private String replyto = "";
+	private JsonObject parameter = new JsonObject();
 
-	// private transient Gson gson = new Gson();
-	// private transient GsonUtils util = new GsonUtils();
-
-	// private String replyto; //Reply-to
-	// private final String correlationid;
-	// private JsonObject params;
-
-	/**
-	 * Create the request with a reply-to address
-	 * 
-	 * @param address
-	 * @param replyToTopic
-	 */
-	public Request(String replyToTopic) {
-		// Add correlationid
-		correlationid = UUID.randomUUID().toString();
-		// parameter.addProperty(CORRELATIONID, correlationid);
-
-		// Add ReplyTo
-		replyto = replyToTopic;
-		// parameter.addProperty(REPLYTO, replyToTopic);
-	}
+//	/**
+//	 * Create the request with a reply-to address
+//	 * 
+//	 * @param address
+//	 * @param replyToTopic
+//	 */
+//	public Request(String replyToTopic) {
+//		// Add correlationid
+//		correlationid = UUID.randomUUID().toString();
+//		// parameter.addProperty(CORRELATIONID, correlationid);
+//
+//		// Add ReplyTo
+//		caller = replyToTopic;
+//		// parameter.addProperty(REPLYTO, replyToTopic);
+//	}
 
 	/**
 	 * Create the request from a json object
@@ -61,12 +54,22 @@ public class Request {
 		} else {
 			throw new Exception("No Request");
 		}
+	}
 
+	public Request() {
+		// Set correlation id
+		this.correlationid = UUID.randomUUID().toString();
 	}
 
 	public static Request newRequest(String input) {
 		Gson gson = new Gson();
 		return gson.fromJson(input, Request.class);
+	}
+
+	public static Request newRequest(JsonObject parameter) {
+		// Gson gson = new Gson();
+		// return gson.fromJson(input, Request.class);
+		return new Request();
 	}
 
 	public JsonObject toJson() {
@@ -136,6 +139,10 @@ public class Request {
 
 	public String getReplyTo() {
 		return this.replyto;
+	}
+
+	public void setReplyTo(String replyto) {
+		this.replyto = replyto;
 	}
 
 //	/**

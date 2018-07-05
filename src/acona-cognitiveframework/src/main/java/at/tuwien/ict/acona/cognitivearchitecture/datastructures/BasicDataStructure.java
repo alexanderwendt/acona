@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public abstract class BasicDataStructure {
-	// protected transient DecimalFormat df = new DecimalFormat("#.##");
 
 	private String name;
 	private String type;

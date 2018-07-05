@@ -1,9 +1,12 @@
 package at.tuwien.ict.acona.mq.cell.cellfunction;
 
+import java.util.Map;
+
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
+import at.tuwien.ict.acona.mq.datastructures.Request;
 
 public interface MqttCellFunction {
 
@@ -39,7 +42,7 @@ public interface MqttCellFunction {
 	 * @param caller
 	 * @return
 	 */
-	public JsonRpcResponse performOperation(JsonRpcRequest param, String caller);
+	public JsonRpcResponse performOperation(Request param);
 
 	/**
 	 * Shut down function
@@ -66,4 +69,16 @@ public interface MqttCellFunction {
 	 * @return
 	 */
 	public String getAgentName();
+
+	/**
+	 * Update subscribed data.
+	 * 
+	 * Warning: Do not put long blocking methods here because they may block another whole functions, which can cause the system to freeze. This function shall be primary used to provide data to the
+	 * function.
+	 * 
+	 * @param datapoints,
+	 *            which are subscribe
+	 * @throws Exception
+	 */
+	public void updateSubscribedData(Map<String, Datapoint> data, String caller) throws Exception;
 }

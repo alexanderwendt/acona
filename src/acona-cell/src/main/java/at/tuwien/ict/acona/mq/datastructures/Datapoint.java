@@ -50,7 +50,7 @@ public class Datapoint {
 	private String getLocalAddressFromString(String address) {
 		String result = address;
 		if (address.contains("/")) {
-			result = address.substring(address.indexOf("/")); // The first part is always the agent. The rest is functions in the agent
+			result = address.substring(address.indexOf("/") + 1); // The first part is always the agent. The rest is functions in the agent
 		}
 
 		return result;

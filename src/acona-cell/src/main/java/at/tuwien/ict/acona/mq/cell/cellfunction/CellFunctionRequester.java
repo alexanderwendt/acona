@@ -14,6 +14,7 @@ import java.util.UUID;
  */
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -151,7 +152,7 @@ public class CellFunctionRequester {
 
 			// Wait for till we have received a response
 			try {
-				latch.acquire(); // block here until message received
+				latch.tryAcquire(1000, TimeUnit.MILLISECONDS); // block here until message received
 			} catch (InterruptedException e) {
 				log.debug("I was awoken while waiting");
 			}

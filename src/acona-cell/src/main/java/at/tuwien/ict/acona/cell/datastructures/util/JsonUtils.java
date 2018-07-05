@@ -14,9 +14,18 @@ public class JsonUtils {
 
 	}
 
-	public boolean isJSONValid(String JSON_STRING) {
+	public boolean isJsonObject(String JSON_STRING) {
 		try {
 			gson.fromJson(JSON_STRING, JsonObject.class);
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+
+	public boolean isJsonPrimitive(String JSON_STRING) {
+		try {
+			gson.fromJson(JSON_STRING, JsonPrimitive.class);
 			return true;
 		} catch (Exception ex) {
 			return false;
