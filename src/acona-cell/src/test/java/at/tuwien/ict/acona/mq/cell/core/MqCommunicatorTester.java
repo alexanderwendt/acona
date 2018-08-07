@@ -3,7 +3,9 @@ package at.tuwien.ict.acona.mq.cell.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
+import java.util.function.Function;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,13 +13,19 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionDummy;
 import at.tuwien.ict.acona.mq.cell.cellfunction.helper.RequesterResponseFunction;
 import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicatorImpl;
+import at.tuwien.ict.acona.mq.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
 
-public class MqCommunicationTester {
-	private static Logger log = LoggerFactory.getLogger(MqCommunicationTester.class);
+public class MqCommunicatorTester {
+	private static Logger log = LoggerFactory.getLogger(MqCommunicatorTester.class);
 	// private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
@@ -86,7 +94,7 @@ public class MqCommunicationTester {
 			responder.init(sem, host, username, password, agentName, functionNameResponder, agentName + "/" + functionNameResponder + "/" + "increment", false);
 
 			RequesterResponseFunction requester = new RequesterResponseFunction();
-			requester.setNumberOfRuns(2000);
+			requester.setNumberOfRuns(200);
 			requester.init(sem, host, username, password, agentName, functionNameRequester, agentName + "/" + functionNameResponder + "/" + "increment", true);
 
 			// Aquire run as both threads are finished
@@ -101,7 +109,6 @@ public class MqCommunicationTester {
 			log.error("Error testing system", e);
 			fail("Error");
 		}
-
 	}
 
 	/**
@@ -117,14 +124,12 @@ public class MqCommunicationTester {
 			String functionName = "DummyFunction";
 			String agentName = "agent1";
 
-			String addressToRead = "agent1/database/workingmemory/episode1s";
+			String addressToRead = "<agent1>/database/workingmemory/episode1s";
 			double value = 1.99;
 
-			int numberOfRuns = 200;
-
 			// ============================================================//
-			MqttCommunicator comm = new MqttCommunicatorImpl();
-			comm.init(host, username, password, agentName, functionName);
+			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
+			comm.init(host, username, password, agentName, new CellFunctionDummy(functionName), new HashMap<String, Function<Request, Response>>());
 			comm.setDefaultTimeout(1000);
 			// Write the topic
 
@@ -138,11 +143,51 @@ public class MqCommunicationTester {
 			assertEquals(value, dp.getValue().getAsDouble(), 0.0);
 			log.info("Test passed");
 
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void testReadEmptyChannelFunction() {
+		try {
+			String host = "tcp://127.0.0.1:1883";
+			String username = "acona";
+			String password = "acona";
+
+			String functionName = "DummyFunction";
+			String agentName = "agent1";
+
+			String addressToRead = "agent1/database/workingmemory/episode1";
+			double value = 1.99;
+			double expectedValue = 0;
+
+			int numberOfRuns = 200;
+
+			// ============================================================//
+			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
+			comm.init(host, username, password, agentName, new CellFunctionDummy(functionName), new HashMap<String, Function<Request, Response>>());
+			comm.setDefaultTimeout(1000);
+			// Write the topic
+
+			//
+			// comm.write((new Datapoint(addressToRead)).setValue(value));
+
+			// Read the datapoint
+			Datapoint dp = comm.read(addressToRead);
+
+			log.debug("correct value={}, actual value={}", expectedValue, dp.getValueOrDefault(new JsonPrimitive(0)).getAsDouble());
+			assertEquals(expectedValue, dp.getValueOrDefault(new JsonPrimitive(0)).getAsDouble(), 0.0);
+			log.info("Test passed");
+
 			// launcher.stopSystem();
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
 		}
-
 	}
 }

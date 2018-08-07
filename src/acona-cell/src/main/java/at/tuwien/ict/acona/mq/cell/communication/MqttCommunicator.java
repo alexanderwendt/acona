@@ -1,7 +1,12 @@
 package at.tuwien.ict.acona.mq.cell.communication;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
+import com.google.gson.JsonElement;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
@@ -20,7 +25,7 @@ public interface MqttCommunicator {
 //	private final String functionName = "FunctionRequester";
 //	private final String agentName = "agent1";
 
-	public void init(String host, String userName, String password, String agentName, String functionName) throws Exception;
+	public void init(String host, String userName, String password, String agentName, CellFunction function, Map<String, Function<Request, Response>> functions) throws Exception;
 
 	/**
 	 * Sets default timeout for all communication functions
@@ -81,12 +86,65 @@ public interface MqttCommunicator {
 	 */
 	public void shutDown();
 
-	public Datapoint read(String topic) throws Exception;
+	/**
+	 * Read datapoints with wildcards from the storage of an agent
+	 * 
+	 * @param address
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Datapoint> readWildcard(String address) throws Exception;
 
+	/**
+	 * Read a specific datapoint from the storage of an agent
+	 * 
+	 * @param address
+	 * @return
+	 * @throws Exception
+	 */
+	public Datapoint read(String address) throws Exception;
+
+	/**
+	 * Write a datapoint to the data storage of an agent
+	 * 
+	 * @param datapoint
+	 * @throws Exception
+	 */
 	public void write(Datapoint datapoint) throws Exception;
 
-	public Datapoint subscribeDatapoint(String key) throws Exception;
+	/**
+	 * Subscribe any datapoint through MQTT
+	 * 
+	 * @param address
+	 * @return
+	 * @throws Exception
+	 */
+	public Datapoint subscribeDatapoint(String address) throws Exception;
 
-	public void unsubscribeDatapoint(String key) throws Exception;
+	/**
+	 * Unsubscribe any datapoint through MQTT
+	 * 
+	 * @param address
+	 * @throws Exception
+	 */
+	public void unsubscribeDatapoint(String address) throws Exception;
 
+	public void publishDatapoint(Datapoint dp) throws Exception;
+
+	/**
+	 * Publish a topic with any general json element
+	 * 
+	 * @param topic
+	 * @param message
+	 * @throws Exception
+	 */
+	public void publishTopic(String topic, JsonElement message) throws Exception;
+
+	/**
+	 * Subscribe a topic with the topic filter of MQTT
+	 * 
+	 * @param topicfilter
+	 * @throws Exception
+	 */
+	public void subscribeTopic(String topicfilter) throws Exception;
 }

@@ -1,15 +1,9 @@
-package at.tuwien.ict.acona.cell.config;
+package at.tuwien.ict.acona.mq.cell.config;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceNotifySubscribers;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceRead;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceRemove;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceSubscribe;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceUnsubscribe;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.BasicServiceWrite;
 import at.tuwien.ict.acona.cell.core.CellImpl;
 
 public class CellConfig {
@@ -84,16 +78,24 @@ public class CellConfig {
 		this.configObject.add(CELLFUNCTIONS, new JsonArray());
 
 		// Add basic cell functions. Then nothing has to be generated in the code
-		this.addBasicCellFunctions();
+		// this.addBasicCellFunctions();
 	}
 
-	private void addBasicCellFunctions() {
-		this.addCellfunction(CellFunctionConfig.newConfig("write", BasicServiceWrite.class));
-		this.addCellfunction(CellFunctionConfig.newConfig("read", BasicServiceRead.class));
-		this.addCellfunction(CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class));
-		this.addCellfunction(CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class));
-		this.addCellfunction(CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class));
-		this.addCellfunction(CellFunctionConfig.newConfig("remove", BasicServiceRemove.class));
+//	private void addBasicCellFunctions() {
+//		this.addCellfunction(CellFunctionConfig.newConfig("write", BasicServiceWrite.class));
+//		this.addCellfunction(CellFunctionConfig.newConfig("read", BasicServiceRead.class));
+//		this.addCellfunction(CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class));
+//		this.addCellfunction(CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class));
+//		this.addCellfunction(CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class));
+//		this.addCellfunction(CellFunctionConfig.newConfig("remove", BasicServiceRemove.class));
+//	}
+
+	private CellConfig(JsonObject config) throws Exception {
+		if (this.isCellConfig(config)) {
+			this.configObject = config;
+		} else {
+			throw new Exception("This is no cellconfig: " + config);
+		}
 	}
 
 	/**
@@ -107,12 +109,37 @@ public class CellConfig {
 		return this;
 	}
 
-	private CellConfig(JsonObject config) throws Exception {
-		if (this.isCellConfig(config)) {
-			this.configObject = config;
-		} else {
-			throw new Exception("This is no cellconfig: " + config);
-		}
+	/**
+	 * Set MQTT host
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CellConfig setHost(String name) {
+		this.configObject.addProperty(HOST, name);
+		return this;
+	}
+
+	/**
+	 * Set MQTT username
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CellConfig setUsername(String name) {
+		this.configObject.addProperty(USERNAME, name);
+		return this;
+	}
+
+	/**
+	 * Set MQTT username
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CellConfig setPassword(String name) {
+		this.configObject.addProperty(PASSWORD, name);
+		return this;
 	}
 
 	/**
@@ -221,6 +248,33 @@ public class CellConfig {
 	 */
 	public String getName() {
 		return this.configObject.getAsJsonPrimitive(CELLNAME).getAsString();
+	}
+
+	/**
+	 * Get host
+	 * 
+	 * @return
+	 */
+	public String getHost() {
+		return this.configObject.getAsJsonPrimitive(HOST).getAsString();
+	}
+
+	/**
+	 * Get username
+	 * 
+	 * @return
+	 */
+	public String getUsername() {
+		return this.configObject.getAsJsonPrimitive(USERNAME).getAsString();
+	}
+
+	/**
+	 * Get password
+	 * 
+	 * @return
+	 */
+	public String getPassword() {
+		return this.configObject.getAsJsonPrimitive(PASSWORD).getAsString();
 	}
 
 	/**

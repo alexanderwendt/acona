@@ -17,9 +17,9 @@ import at.tuwien.ict.acona.mq.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
-public class RequesterResponseFunction implements Runnable {
+public class SubscriptionReceiverFunction implements Runnable {
 
-	private static Logger log = LoggerFactory.getLogger(RequesterResponseFunction.class);
+	private static Logger log = LoggerFactory.getLogger(SubscriptionReceiverFunction.class);
 
 	private MqttCommunicator comm;
 	private Thread t;
@@ -40,7 +40,7 @@ public class RequesterResponseFunction implements Runnable {
 	 * @param responderFunctionAndMethod
 	 * @throws Exception
 	 */
-	public RequesterResponseFunction() {
+	public SubscriptionReceiverFunction() {
 
 	}
 
@@ -50,8 +50,6 @@ public class RequesterResponseFunction implements Runnable {
 		this.semaphore = sem;
 
 		Map<String, Function<Request, Response>> methods = new HashMap<>();
-
-		// Put the registered functions here
 		methods.put("increment", (Request input) -> increment(input));
 
 		comm = new MqttCommunicatorImpl(new DataStorageImpl());

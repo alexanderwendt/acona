@@ -21,6 +21,10 @@ public class Datapoint {
 	private transient Gson gson = new Gson(); // Add transient not to serialize this
 
 	// private final static Logger log = LoggerFactory.getLogger(Datapoint.class);
+	// Possible ways to write an address:
+	// agent1:address1 = agent and address
+	// <agent1>/address2 = topic agent and address
+	// address1, local address
 
 	/**
 	 * Create a datapoint from an address
@@ -38,19 +42,42 @@ public class Datapoint {
 		this.AGENT = agent;
 	}
 
+	/**
+	 * Get agent from string
+	 * 
+	 * @param address
+	 * @return
+	 */
 	private String getAgentNameFromString(String address) {
 		String result = "";
-		if (address.contains("/")) {
-			result = address.split("/")[0];
+		// If the address is a topic
+		if (address.startsWith("<") && address.contains(">")) {
+			int end = address.indexOf(">");
+			result = address.substring(1, end);
+			// If the address is a short form
+		} else if (address.contains(":")) {
+			result = address.split(":")[0];
 		}
 
 		return result;
 	}
 
+	/**
+	 * Get the local address part for the data storage without agent
+	 * 
+	 * @param address
+	 * @return
+	 */
 	private String getLocalAddressFromString(String address) {
+		// Possible types to write the address
+		// * agent:address = agent/address
+		// * address = localagent/address
+
 		String result = address;
-		if (address.contains("/")) {
-			result = address.substring(address.indexOf("/") + 1); // The first part is always the agent. The rest is functions in the agent
+		if (address.contains(":")) {
+			result = address.split(":")[1]; // The first part is always the agent. The rest is functions in the agent
+		} else if (address.startsWith("<") && address.contains(">")) {
+			result = address.substring(address.indexOf(">") + 2, address.length());
 		}
 
 		return result;
@@ -59,7 +86,7 @@ public class Datapoint {
 	private String combineAddress(String agent, String address) {
 		String combinedAddress = address;
 		if (agent.isEmpty() == false) {
-			combinedAddress = agent + "/" + address;
+			combinedAddress = agent + ":" + address;
 		}
 
 		return combinedAddress;
@@ -71,6 +98,26 @@ public class Datapoint {
 
 	public String getCompleteAddress() {
 		return this.combineAddress(this.AGENT, this.ADDRESS);
+	}
+
+	/**
+	 * Get the datapoint address as a topic for MQTT
+	 * 
+	 * @param defaultAgentName
+	 * @return
+	 */
+	public String getCompleteAddressAsTopic(String defaultAgentName) {
+		String agentName;
+
+		if (this.AGENT.isEmpty() == false) {
+			agentName = this.AGENT;
+		} else {
+			agentName = defaultAgentName;
+		}
+
+		String result = "<" + agentName + ">/" + this.getAddress();
+
+		return result;
 	}
 
 	public String getAgent() {
