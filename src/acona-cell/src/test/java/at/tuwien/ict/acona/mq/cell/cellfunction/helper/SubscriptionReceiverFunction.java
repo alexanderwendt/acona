@@ -52,7 +52,9 @@ public class SubscriptionReceiverFunction implements Runnable {
 		Map<String, Function<Request, Response>> methods = new HashMap<>();
 		methods.put("increment", (Request input) -> increment(input));
 
-		comm = new MqttCommunicatorImpl(new DataStorageImpl());
+		CellFunction incrementFunction =
+
+				comm = new MqttCommunicatorImpl(new DataStorageImpl());
 		comm.init(host, userName, password, agentName, new CellFunctionDummy(functionName), methods);
 
 		// Add functions

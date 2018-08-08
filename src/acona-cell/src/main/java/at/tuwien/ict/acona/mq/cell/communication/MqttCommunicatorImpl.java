@@ -1,7 +1,6 @@
 package at.tuwien.ict.acona.mq.cell.communication;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -55,13 +53,13 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	private static final Logger log = LoggerFactory.getLogger(MqttCommunicatorImpl.class);
 
 	private Gson gson = new Gson();
-	private final DPBuilder dp = new DPBuilder();
+	private final DPBuilder dpBuilder = new DPBuilder();
 
 	private Map<String, Response> incomingRequestMessages = new ConcurrentHashMap<>();
-	private Map<String, Datapoint> incomingReadMessages = new HashMap<>();
+	// private Map<String, Datapoint> incomingReadMessages = new HashMap<>();
 
 	// Service Classes
-	private final Map<String, Function<Request, Response>> handlerMap = new HashMap<>();
+	// private final Map<String, Function<Request, Response>> handlerMap = new HashMap<>();
 
 	// Random Function Methods to process the incoming input
 	// final Map<String, Consumer<JsonElement>> customHandlerMap = new HashMap<>();
@@ -89,7 +87,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	// final String requestTopic = "T/GettingStarted/request";
 
 	// Subscribed mqtt addresses
-	private String rootAddress = "";
+	private String rootAddress = ""; // Root address <[agentname]>/functionname
 	private String subscribedReplyAddress = "";
 	private String subscribedServiceAddressPrefix = "";
 	private String subscribedCommandAddress = "";
@@ -102,8 +100,10 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	}
 
 	@Override
-	public void init(String host, String userName, String password, String agentName, CellFunction cellFunction, Map<String, Function<Request, Response>> functions) throws Exception {
+	public void init(String host, String userName, String password, CellFunction cellFunction) throws Exception {
 		log.debug("BasicRequestor Tester initializing...");
+
+		// , Map<String, Function<Request, Response>> functions
 
 		try {
 			// Set the input parameters
@@ -111,9 +111,9 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			this.username = userName;
 			this.password = password;
 			this.cellfunction = cellFunction;
-			this.agentName = agentName;
+			this.agentName = this.cellfunction.getCellName();
 
-			this.rootAddress = agentName;
+			this.rootAddress = this.dpBuilder.generateCellTopic(agentName);
 			if (this.cellfunction.getFunctionName().isEmpty() == false) {
 				this.rootAddress += "/" + cellfunction.getFunctionName();
 			}
@@ -124,7 +124,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			this.publishedStateAddress = this.rootAddress + "/state";
 
 			// Create an Mqtt client
-			mqttClient = new MqttClient(this.host, this.cellfunction.getFunctionName());
+			mqttClient = new MqttClient(this.host, this.agentName + "_" + this.cellfunction.getFunctionName());
 			MqttConnectOptions connOpts = new MqttConnectOptions();
 			connOpts.setCleanSession(true);
 			connOpts.setUserName(this.username);
@@ -149,42 +149,54 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					log.debug("Recieved message={} from topic={}", payloadString, topic);
 					JsonUtils util = new JsonUtils();
 
+					// log.debug("1");
 					JsonElement jsonMessage;
 					if (util.isJsonObject(payloadString)) {
+						// log.debug("1");
 						jsonMessage = gson.fromJson(payloadString, JsonObject.class);
+						// log.debug("2");
 					} else {
+						// log.debug("3");
 						jsonMessage = gson.toJsonTree(payloadString);
+						// log.debug("4");
 					}
 
 					// Make a check if String is Json
 
 					// If this is a reply of a request done by this function, then put it in the table
-					if (topic != null && incomingReadMessages.containsKey(topic)) {
-						// This message origins from the read method. The message shall be
-						Datapoint dp = (new Datapoint(topic)).setValue(jsonMessage);
-						incomingReadMessages.put(topic, dp);
-						log.debug("Received read message={}", dp);
-
-						latch.release(); // unblock main thread
-
-						// Message is an incoming response to a request. Provide answer to the calling function
-					} else if (topic != null && topic.equals(subscribedReplyAddress) && jsonMessage instanceof JsonObject && Response.isResponse((JsonObject) jsonMessage)) {
+//					if (topic != null && incomingReadMessages.containsKey(topic)) {
+//						// This message origins from the read method. The message shall be
+//						Datapoint dp = (new Datapoint(topic)).setValue(jsonMessage);
+//						incomingReadMessages.put(topic, dp);
+//						log.debug("Received read message={}", dp);
+//
+//						latch.release(); // unblock main thread
+//
+//						// Message is an incoming response to a request. Provide answer to the calling function
+					// log.debug("5");
+					if (topic != null && topic.equals(subscribedReplyAddress) && jsonMessage instanceof JsonObject && Response.isResponse((JsonObject) jsonMessage)) {
+						// log.debug("6");
 						Response response = Response.newResponse(payloadString);
+						// log.debug("7");
 						log.debug("Received Reply-to topic for the MQTT client:" + "Reply-To: " + jsonMessage);
 
 						incomingRequestMessages.put(response.getCorrenationid(), response);
+						// log.debug("8");
+						// log.debug("Sync1");
 						latch.release(); // unblock main thread
+						// log.debug("Sync2");
 
+						// log.debug("9");
 						// If this is a received RPC call request. Start service for the service
 					} else if (topic != null && topic.startsWith(subscribedServiceAddressPrefix) && jsonMessage instanceof JsonObject && Request.isRequest((JsonObject) jsonMessage)) {
 						// Run service
 						Request req = Request.newRequest(payloadString);
 						// JsonElement responseMessage = req.getjsonMessage.get("message"); // The message can be any json structure
-						Response response = handlerMap.get(topic).apply(req);
+						// Response response = handlerMap.get(topic).apply(req);
 
 						// this.performaction
 						// FIXME
-						// response = cellFunction.performOperation(topic, req);
+						Response response = cellFunction.performOperation(topic, req);
 
 						// send back
 						// Response response = result;
@@ -193,7 +205,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 						// Create a request message and set the request payload
 						MqttMessage responseMessage = new MqttMessage(responseString.getBytes());
-						responseMessage.setQos(0);
+						responseMessage.setQos(1);
 
 						MqttTopic mqttTopic = mqttClient.getTopic(response.getReplyTo());
 						mqttTopic.publish(responseMessage);
@@ -208,23 +220,24 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 						// Else, any other message that is subscribed
 					} else {
-						try {
-							// execute the updatefunction, updateValueByID
-							// TODO: Addmethod
+						cellFunction.updateSubscribedData(topic, jsonMessage);
 
-							// Parse the response payload and convert to a JSONObject
-							JsonElement obj = gson.toJsonTree(new String(message.getPayload()));
-							JsonObject jsonPayload = obj.getAsJsonObject();
-
-							log.debug("\nReceived a response!" +
-									"\n\tCorrel. Id: " + jsonPayload.get("correlationId") +
-									"\n\tMessage:    " + jsonPayload.get("message") + "\n");
-						} catch (Exception ex) {
-							log.debug("Exception parsing response message!");
-							ex.printStackTrace();
-						}
+//						try {
+//							// execute the updatefunction, updateValueByID
+//							// TODO: Addmethod
+//
+//							// Parse the response payload and convert to a JSONObject
+//							JsonElement obj = gson.toJsonTree(new String(message.getPayload()));
+//							JsonObject jsonPayload = obj.getAsJsonObject();
+//
+//							log.debug("\nReceived a response!" +
+//									"\n\tCorrel. Id: " + jsonPayload.get("correlationId") +
+//									"\n\tMessage:    " + jsonPayload.get("message") + "\n");
+//						} catch (Exception ex) {
+//							log.debug("Exception parsing response message!");
+//							ex.printStackTrace();
+//						}
 					}
-
 				}
 
 				@Override
@@ -275,14 +288,14 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 //				}
 //			});
 
-			functions.entrySet().forEach(e -> {
-				try {
-					this.addRequestHandlerFunction(e.getKey(), e.getValue());
-					log.debug("Added request method={}", e.getKey());
-				} catch (Exception e1) {
-					log.error("Cannot add function {}", e);
-				}
-			});
+//			functions.entrySet().forEach(e -> {
+//				try {
+//					this.addRequestHandlerFunction(e.getKey(), e.getValue());
+//					log.debug("Added request method={}", e.getKey());
+//				} catch (Exception e1) {
+//					log.error("Cannot add function {}", e);
+//				}
+//			});
 
 			log.info("{}>initialized", this.cellfunction.getFunctionName());
 
@@ -303,26 +316,26 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 	}
 
-	@Override
-	public void addRequestHandlerFunction(String topicSuffix, Function<Request, Response> function) throws Exception {
-		this.handlerMap.put(this.rootAddress + "/" + topicSuffix, function);
-		try {
-			mqttClient.subscribe(this.rootAddress + "/" + topicSuffix, 0);
-		} catch (MqttException e) {
-			log.error("Cannot subscribe input to service function {}", this.rootAddress + "/" + topicSuffix);
-			throw new Exception(e.getMessage());
-		}
-		log.info("Added function to {}", this.rootAddress + "/" + topicSuffix);
-
-	}
-
-	@Override
-	public void removeRequestHandlerFunction(String topicSuffix) throws Exception {
-		mqttClient.unsubscribe(topicSuffix);
-		this.handlerMap.remove(topicSuffix);
-
-		log.debug("Unsubscribed topic={} and removed its function.", topicSuffix);
-	}
+//	@Override
+//	public void addRequestHandlerFunction(String topicSuffix, Function<Request, Response> function) throws Exception {
+//		this.handlerMap.put(this.rootAddress + "/" + topicSuffix, function);
+//		try {
+//			mqttClient.subscribe(this.rootAddress + "/" + topicSuffix, 0);
+//		} catch (MqttException e) {
+//			log.error("Cannot subscribe input to service function {}", this.rootAddress + "/" + topicSuffix);
+//			throw new Exception(e.getMessage());
+//		}
+//		log.info("Added function to {}", this.rootAddress + "/" + topicSuffix);
+//
+//	}
+//
+//	@Override
+//	public void removeRequestHandlerFunction(String topicSuffix) throws Exception {
+//		mqttClient.unsubscribe(topicSuffix);
+//		this.handlerMap.remove(topicSuffix);
+//
+//		log.debug("Unsubscribed topic={} and removed its function.", topicSuffix);
+//	}
 
 //	// Service function
 //	private JsonElement serviceDoAnything(Request request) {
@@ -364,7 +377,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 			// Create a request message and set the request payload
 			MqttMessage reqMessage = new MqttMessage(reqPayload.getBytes());
-			reqMessage.setQos(0);
+			reqMessage.setQos(1);
 
 			log.debug("Sending request to: " + topic);
 
@@ -374,17 +387,17 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			if (isSychronousCall == true) {
 				// Wait for till we have received a response
 				try {
-					log.debug("Message sent, wait for answer for {}ms", timeout);
+					log.debug("Message sent, wait for answer for {}ms, correlationoid={}", timeout, correlationID);
 					latch.tryAcquire(timeout, TimeUnit.MILLISECONDS); // block here until message received
 				} catch (InterruptedException e) {
-					log.error("Timeout or interruption error for request " + request, e);
+					log.error("Interruption error for request " + request, e);
 					// latch.release();
 				}
 
 				// Get the message answer from the map
 				result = this.incomingRequestMessages.getOrDefault(correlationID, new Response(request, new RequestError("Timeout error")));
 				if (result.hasError() == true) {
-					log.error("Timeout after {}ms. No response from request on topic {}", timeout, topic);
+					log.error("Timeout after {}ms. No response from request on correlationID {}, topic {}, request={}", timeout, correlationID, topic, request);
 					throw new Exception("Timeout after " + timeout + "ms. No response from request on topic " + topic);
 				}
 				this.incomingRequestMessages.remove(correlationID);
@@ -435,7 +448,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 		try {
 			// Check if the datapoint is uses the local agent, else call a service in another agent
-			Datapoint dp = this.dp.newDatapoint(address);
+			Datapoint dp = this.dpBuilder.newDatapoint(address);
 			if (dp.getAgent(this.agentName).equals(this.agentName) == true) {
 				// If the agent name in the address is this agent, then use the local access
 				result = storage.read(dp.getAddress());
@@ -458,7 +471,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			}
 
 			if (result == null || result.isEmpty()) {
-				result.add(this.dp.newDatapoint(address));
+				result.add(this.dpBuilder.newDatapoint(address));
 			}
 
 		} catch (Exception e) {
@@ -539,7 +552,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			req.setParameter("param", datapoint.toJsonObject());
 
 			Response resp = this.execute(serviceAddress, req);
-			resp.getResult(new TypeToken<List<Datapoint>>() {});
+			// resp.getResult(new TypeToken<List<Datapoint>>() {});
 
 			log.debug("Written datapoint={} remote. Result={}", datapoint, resp.getResult());
 		}
@@ -554,31 +567,33 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	public Datapoint subscribeDatapoint(String address) throws Exception {
 		final String service = "/dataaccess/subscribe";
 
-		Datapoint dp = this.dp.newDatapoint(address);
+		Datapoint dp = this.dpBuilder.newDatapoint(address);
 		// Subscribe in the database
 		if (dp.getAgent(this.agentName).equals(this.agentName) == true) {
 			// If the agent name in the address is this agent, then use the local access
-			storage.subscribeDatapoint(address, this.cellfunction.getFunctionName());
-			dp = storage.readFirst(address);
+			storage.subscribeDatapoint(dp.getAddress(), this.cellfunction.getFunctionName());
+			dp = storage.readFirst(dp.getAddress());
 		} else {
 			// If the agent name differs from this agent, then use service execution
 			// Get the read service address in the other agent
 			// <agent>/dataaccess/read
 			String remoteAgentName = dp.getAgent(this.agentName);
-			String serviceAddress = "<" + remoteAgentName + ">" + service;
+			String serviceAddress = dpBuilder.generateCellTopic(remoteAgentName) + service;
 
 			// Create the request
 			Request req = new Request();
-			req.setParameter("param", address);
+			req.setParameter("param", dp.getAddress());
 
 			Response resp = this.execute(serviceAddress, req);
-			dp = resp.getResult(new TypeToken<Datapoint>() {});
+
+			// Read the value of the datapoint.
+			dp = this.read(address);
 		}
 
 		// Subscribe a topic in MQTT
 		this.mqttClient.subscribe(dp.getCompleteAddressAsTopic(this.agentName));
 
-		log.debug("Subscribed address={}, topic= {}", address, dp.getCompleteAddressAsTopic(this.agentName));
+		log.debug("Subscribed address={}, topic={}", address, dp.getCompleteAddressAsTopic(this.agentName));
 
 		return dp;
 	}
@@ -587,7 +602,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	public void unsubscribeDatapoint(String address) throws Exception {
 		final String service = "/dataaccess/unsubscribe";
 
-		Datapoint dp = this.dp.newDatapoint(address);
+		Datapoint dp = this.dpBuilder.newDatapoint(address);
 		// Subscribe in the database
 		if (dp.getAgent(this.agentName).equals(this.agentName) == true) {
 			// If the agent name in the address is this agent, then use the local access
@@ -621,7 +636,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			topic = dp.getCompleteAddressAsTopic(this.agentName);
 			MqttTopic top = this.mqttClient.getTopic(topic);
 			MqttMessage mqttMessage = new MqttMessage(dp.toJsonObject().toString().getBytes());
-			mqttMessage.setQos(0);
+			mqttMessage.setQos(1);
 			top.publish(mqttMessage);
 			log.debug("Published {} to {}", dp, topic);
 
@@ -635,17 +650,17 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	public void publishTopic(String topic, JsonElement message) throws Exception {
 		// Publish only the topic, use the local address of the
 		MqttMessage mqttMessage = new MqttMessage(message.toString().getBytes());
-		mqttMessage.setQos(0);
+		mqttMessage.setQos(1);
 		try {
 			MqttTopic top = this.mqttClient.getTopic(topic);
 			top.publish(mqttMessage);
 
 			log.debug("Published message={} to topic= {}", message, topic);
 		} catch (MqttPersistenceException e) {
-			log.error("Persistent error to publish datapoint={}", dp);
+			log.error("Persistent error to publish datapoint={}", dpBuilder);
 			throw new Exception(e.getMessage());
 		} catch (MqttException e) {
-			log.error("MQTT error for datapoint={}", dp);
+			log.error("MQTT error for datapoint={}", dpBuilder);
 			throw new Exception(e.getMessage());
 		}
 	}
@@ -655,5 +670,13 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 		// Subscribe a topic
 		this.mqttClient.subscribe(topicfilter);
 		log.debug("Subscribed topic={}", topicfilter);
+	}
+
+	@Override
+	public void unsubscribeTopic(String topicfilter) throws Exception {
+		// Subscribe a topic
+		this.mqttClient.unsubscribe(topicfilter);
+		log.debug("Unsubscribed topic={}", topicfilter);
+
 	}
 }

@@ -1,19 +1,14 @@
 package at.tuwien.ict.acona.mq.cell.cellfunction.helper;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Semaphore;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonPrimitive;
-
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionDummy;
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
-import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicatorImpl;
-import at.tuwien.ict.acona.mq.cell.storage.DataStorageImpl;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.mq.cell.core.DummyCell;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
@@ -44,18 +39,21 @@ public class RequesterResponseFunction implements Runnable {
 
 	}
 
-	public void init(Semaphore sem, String host, String userName, String password, String agentName, String functionName, String responderFunctionAndMethod, boolean isRequester) throws Exception {
-		this.responderFunctionAndMethod = responderFunctionAndMethod;
+	public void init(Semaphore sem, String host, String userName, String password, String agentName, String functionName, String targetAddress, boolean isRequester) throws Exception {
+		this.responderFunctionAndMethod = targetAddress;
 		this.isRequester = isRequester;
 		this.semaphore = sem;
 
-		Map<String, Function<Request, Response>> methods = new HashMap<>();
+		// Map<String, Function<Request, Response>> methods = new HashMap<>();
 
 		// Put the registered functions here
-		methods.put("increment", (Request input) -> increment(input));
+		// methods.put("increment", (Request input) -> increment(input));
+		CellFunction incrementFunction = new IncrementFunction();
+		incrementFunction.init(CellFunctionConfig.newConfig(functionName, IncrementFunction.class), new DummyCell(agentName));
 
-		comm = new MqttCommunicatorImpl(new DataStorageImpl());
-		comm.init(host, userName, password, agentName, new CellFunctionDummy(functionName), methods);
+		this.comm = incrementFunction.getCommunicator();
+		// comm = new MqttCommunicatorImpl(new DataStorageImpl());
+		// comm.init(host, userName, password, new CellFunctionDummy("OnlyForCommunicator" + this.hashCode(), agentName));
 
 		// Add functions
 		// comm.addRequestHandlerFunction("test", (Request input) -> testFunction(input));
@@ -108,23 +106,6 @@ public class RequesterResponseFunction implements Runnable {
 //		return new JsonPrimitive("Method executed in the method testFunction");
 //
 //	}
-
-	private Response increment(Request req) {
-		log.debug("Increment the number in the request={}", req);
-		Response result = new Response(req);
-
-		try {
-			int value = req.getParameter("input", Integer.class);
-			value++;
-			result.setResult(new JsonPrimitive(value));
-		} catch (Exception e) {
-			log.error("Cannot get value to increment");
-			result.setError("Cannot increment string");
-		}
-
-		return result;
-
-	}
 
 	public int getValue() {
 		return this.value;

@@ -1,8 +1,6 @@
 package at.tuwien.ict.acona.mq.cell.communication;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 import com.google.gson.JsonElement;
 
@@ -25,7 +23,7 @@ public interface MqttCommunicator {
 //	private final String functionName = "FunctionRequester";
 //	private final String agentName = "agent1";
 
-	public void init(String host, String userName, String password, String agentName, CellFunction function, Map<String, Function<Request, Response>> functions) throws Exception;
+	public void init(String host, String userName, String password, CellFunction function) throws Exception;
 
 	/**
 	 * Sets default timeout for all communication functions
@@ -77,9 +75,9 @@ public interface MqttCommunicator {
 	 */
 	public void executeAsynchronous(String agentAndServiceName, Request methodParameters) throws Exception;
 
-	public void addRequestHandlerFunction(String topicSuffix, Function<Request, Response> function) throws Exception;
+	// public void addRequestHandlerFunction(String topicSuffix, Function<Request, Response> function) throws Exception;
 
-	public void removeRequestHandlerFunction(String topicSuffix) throws Exception;
+	// public void removeRequestHandlerFunction(String topicSuffix) throws Exception;
 
 	/**
 	 * Shut down communicator of the agent
@@ -147,4 +145,12 @@ public interface MqttCommunicator {
 	 * @throws Exception
 	 */
 	public void subscribeTopic(String topicfilter) throws Exception;
+
+	/**
+	 * Unsubscribes a MQTT topic
+	 * 
+	 * @param topicfilter
+	 * @throws Exception
+	 */
+	public void unsubscribeTopic(String topicfilter) throws Exception;
 }

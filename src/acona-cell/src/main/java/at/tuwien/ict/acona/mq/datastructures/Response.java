@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
@@ -145,5 +146,12 @@ public class Response {
 
 	public void setError(String error) {
 		this.error = new RequestError(error);
+	}
+
+	/**
+	 * Set the OK result as an achknowledge
+	 */
+	public void setResultOK() {
+		this.setResult(new JsonPrimitive("OK"));
 	}
 }

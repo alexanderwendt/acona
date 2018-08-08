@@ -3,6 +3,7 @@ package at.tuwien.ict.acona.mq.cell.core;
 import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.cell.storage.DataStorage;
 
+@Deprecated
 public interface CellGateway {
 
 	/**

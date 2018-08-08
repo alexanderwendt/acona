@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
+import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.cell.core.Cell;
@@ -13,10 +14,12 @@ import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class CellFunctionDummy implements CellFunction {
 
-	private final String name;
+	private final String functionName;
+	private final String cellName;
 
-	public CellFunctionDummy(String name) {
-		this.name = name;
+	public CellFunctionDummy(String name, String cellName) {
+		this.functionName = name;
+		this.cellName = cellName;
 	}
 
 	@Override
@@ -27,14 +30,12 @@ public class CellFunctionDummy implements CellFunction {
 
 	@Override
 	public String getFunctionName() {
-		// TODO Auto-generated method stub
-		return name;
+		return functionName;
 	}
 
 	@Override
 	public String getCellName() {
-		// TODO Auto-generated method stub
-		return null;
+		return cellName;
 	}
 
 	@Override
@@ -69,6 +70,12 @@ public class CellFunctionDummy implements CellFunction {
 
 	@Override
 	public ServiceState getCurrentState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MqttCommunicator getCommunicator() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -3,9 +3,8 @@ package at.tuwien.ict.acona.mq.cell.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Semaphore;
-import java.util.function.Function;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,11 +20,9 @@ import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicatorImpl;
 import at.tuwien.ict.acona.mq.cell.storage.DataStorageImpl;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
-import at.tuwien.ict.acona.mq.datastructures.Request;
-import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class MqCommunicatorTester {
-	private static Logger log = LoggerFactory.getLogger(MqCommunicatorTester.class);
+	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	// private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
@@ -87,18 +84,20 @@ public class MqCommunicatorTester {
 
 			String agentName = "agent1";
 
-			int numberOfRuns = 200;
+			String targetName = "<agent1>/FunctionResponder/increment";
+			int numberOfRuns = 20000;
 
 			final Semaphore sem = new Semaphore(0);
 			RequesterResponseFunction responder = new RequesterResponseFunction();
-			responder.init(sem, host, username, password, agentName, functionNameResponder, agentName + "/" + functionNameResponder + "/" + "increment", false);
+			responder.init(sem, host, username, password, agentName, functionNameResponder, targetName, false);
 
 			RequesterResponseFunction requester = new RequesterResponseFunction();
-			requester.setNumberOfRuns(200);
-			requester.init(sem, host, username, password, agentName, functionNameRequester, agentName + "/" + functionNameResponder + "/" + "increment", true);
+			requester.setNumberOfRuns(numberOfRuns);
+			requester.init(sem, host, username, password, agentName, functionNameRequester, targetName, true);
 
 			// Aquire run as both threads are finished
 			sem.acquire();
+			log.debug("test");
 
 			log.debug("correct value={}, actual value={}", numberOfRuns, requester.getValue());
 			assertEquals(numberOfRuns, requester.getValue(), 0.0);
@@ -129,7 +128,7 @@ public class MqCommunicatorTester {
 
 			// ============================================================//
 			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
-			comm.init(host, username, password, agentName, new CellFunctionDummy(functionName), new HashMap<String, Function<Request, Response>>());
+			comm.init(host, username, password, new CellFunctionDummy(functionName, agentName));
 			comm.setDefaultTimeout(1000);
 			// Write the topic
 
@@ -170,7 +169,7 @@ public class MqCommunicatorTester {
 
 			// ============================================================//
 			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
-			comm.init(host, username, password, agentName, new CellFunctionDummy(functionName), new HashMap<String, Function<Request, Response>>());
+			comm.init(host, username, password, new CellFunctionDummy(functionName, agentName));
 			comm.setDefaultTimeout(1000);
 			// Write the topic
 

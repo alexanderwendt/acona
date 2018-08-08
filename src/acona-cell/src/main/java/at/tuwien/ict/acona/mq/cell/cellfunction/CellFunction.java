@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
+import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.cell.core.Cell;
@@ -91,5 +92,7 @@ public interface CellFunction {
 	 * @return
 	 */
 	public ServiceState getCurrentState();
+
+	public MqttCommunicator getCommunicator();
 
 }

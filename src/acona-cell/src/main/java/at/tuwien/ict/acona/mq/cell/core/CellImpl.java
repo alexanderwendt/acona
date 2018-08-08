@@ -1,28 +1,25 @@
 package at.tuwien.ict.acona.mq.cell.core;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionDummy;
+import at.tuwien.ict.acona.mq.cell.cellfunction.basicfunctions.CommunicatorFunction;
+import at.tuwien.ict.acona.mq.cell.cellfunction.basicfunctions.DataAccess;
 import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
-import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicatorImpl;
 import at.tuwien.ict.acona.mq.cell.config.CellConfig;
 import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.storage.DataStorage;
 import at.tuwien.ict.acona.mq.cell.storage.DataStorageImpl;
-import at.tuwien.ict.acona.mq.datastructures.Request;
-import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class CellImpl implements Cell, Runnable {
 
-	protected static final Logger log = LoggerFactory.getLogger(CellImpl.class);
+	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 	private final DataStorage dataStorage = new DataStorageImpl();
 	private final CellFunctionHandler functionHandler = new CellFunctionHandlerImpl();
-	private final MqttCommunicator comm = new MqttCommunicatorImpl(dataStorage);
+	private MqttCommunicator comm;
 	// Create the cellbuilder and apply activators
 	private CellBuilder builder = new CellBuilder(this);
 
@@ -45,11 +42,15 @@ public class CellImpl implements Cell, Runnable {
 		this.conf = conf;
 		this.agentName = conf.getName();
 
-		Map<String, Function<Request, Response>> methods = new HashMap<>();
+		// Add the basic function for communication
+		CommunicatorFunction commFunction = new CommunicatorFunction();
+		commFunction.init(CellFunctionConfig.newConfig(agentName + "_" + "CommFunction", CommunicatorFunction.class), this);
 
-		// Init communicator
-		// FIXME Cell Function Dummy in the cell
-		this.comm.init(conf.getHost(), conf.getUsername(), conf.getPassword(), conf.getName(), new CellFunctionDummy("test"), methods);
+		this.initializeDefaultCellFunctions();
+
+		// Get the communicator from the communicator cell function
+		// Important: Only cell functions can have communicators
+		this.comm = commFunction.getCommunicator();
 
 		// Create notifications
 		this.notificator = new CellNotificator(this.comm);
@@ -64,6 +65,24 @@ public class CellImpl implements Cell, Runnable {
 		this.functionHandler.init(this);
 
 		this.internalInit();
+	}
+
+	/**
+	 * Put all cell functions that shall be initialized in the cell by default.
+	 * 
+	 * @throws Exception
+	 * 
+	 */
+	private void initializeDefaultCellFunctions() throws Exception {
+		try {
+			DataAccess dataAccessFunction = new DataAccess();
+			dataAccessFunction.init(CellFunctionConfig.newConfig("dataaccess", DataAccess.class), this);
+
+			log.info("Basic database access functions initialized");
+		} catch (Exception e) {
+			log.error("Cannot initialize default cell functions", e);
+			throw new Exception(e.getMessage());
+		}
 	}
 
 	@Override

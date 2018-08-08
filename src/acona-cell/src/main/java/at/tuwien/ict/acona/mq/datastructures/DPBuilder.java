@@ -74,4 +74,8 @@ public class DPBuilder {
 
 		return result;
 	}
+
+	public String generateCellTopic(String agentName) {
+		return "<" + agentName + ">";
+	}
 }

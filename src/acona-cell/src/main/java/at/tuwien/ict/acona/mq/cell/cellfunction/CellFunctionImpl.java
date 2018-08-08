@@ -1,6 +1,5 @@
 package at.tuwien.ict.acona.mq.cell.cellfunction;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -25,6 +24,21 @@ import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
+/**
+ * The main implementation of a cell function.
+ * 
+ * Example of how to implement a service that is executed on demand: private Response methodName(Request req) { log.debug("Increment the number in the request={}", req); Response result = new
+ * Response(req);
+ *
+ * try { int value = req.getParameter("input", Integer.class); value++; result.setResult(new JsonPrimitive(value)); } catch (Exception e) { log.error("Cannot get value to increment");
+ * result.setError("Cannot increment string"); } return result; }
+ *
+ * The method is added to the cell function and communicator in the initialization. This is put in the function specific initialization Map<String, Function<Request, Response>> methods = new
+ * HashMap<>(); methods.put("increment", (Request input) -> methodName(input));
+ * 
+ * @author wendt
+ *
+ */
 public abstract class CellFunctionImpl implements CellFunction {
 
 	private static final Logger log = LoggerFactory.getLogger(CellFunctionImpl.class);
@@ -33,19 +47,32 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * Cell, which executes this function
 	 */
 	private Cell cell;
+	/**
+	 * Cell function configuration
+	 */
 	private CellFunctionConfig config;
 
+	/**
+	 * Communicator
+	 */
 	private MqttCommunicator comm;
 
+	/**
+	 * Datapoint builder utility
+	 */
 	private final DPBuilder dpBuilder = new DPBuilder();
 
-	// Service Classes for this specific function
-	private final Map<String, Function<Request, Response>> handlerMap = new HashMap<>();
+	/**
+	 * Service Classes for this specific function
+	 */
+	private final Map<String, Function<Request, Response>> subFunctionsHandlerMap = new ConcurrentHashMap<>();
 
 	/**
 	 * Name of the activator
 	 */
 	private String cellFunctionName;
+
+	private String functionRootAddress;
 
 	/**
 	 * List of datapoints that shall be subscribed
@@ -60,12 +87,11 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	private ServiceState currentServiceState = ServiceState.INITIALIZING;
 
-	// protected final MonitoringObject monitoringObject = new MonitoringObject();
+	private String host = "tcp://127.0.0.1:1883";
+	private String username = "acona";
+	private String password = "acona";
 
-	/**
-	 * 
-	 */
-	private final Map<String, Function<Request, Response>> functions = new HashMap<>();
+	// protected final MonitoringObject monitoringObject = new MonitoringObject();
 
 	/**
 	 * Constructor
@@ -82,30 +108,34 @@ public abstract class CellFunctionImpl implements CellFunction {
 			this.config = config;
 			this.cell = caller;
 
-			this.comm = new MqttCommunicatorImpl(this.cell.getDataStorage());
-
 			// Get the settings but set also default values
-
 			// Get name
 			this.cellFunctionName = this.config.getName();
 
+			this.functionRootAddress = this.dpBuilder.generateCellTopic(this.getCellName()) + "/" + this.cellFunctionName + "/";
+			log.debug("{}>Root address={}", this.cellFunctionName, this.functionRootAddress);
+
 			log.trace("Initialize an agent with config:{}", config);
+
+			// Create and initialize the communicator
+			this.comm = new MqttCommunicatorImpl(this.cell.getDataStorage());
+			this.comm.init(host, username, password, this);
 
 			// === Internal init ===//
 			this.setServiceState(ServiceState.INITIALIZING);
 
 			// Possibility to add more subscriptions and to overwrite default
 			// settings
-			cellFunctionInit();
+			this.cellFunctionInit();
 
-			functions.entrySet().forEach(e -> {
-				try {
-					this.addRequestHandlerFunction(e.getKey(), e.getValue());
-					log.debug("Added request method={}", e.getKey());
-				} catch (Exception e1) {
-					log.error("Cannot add function {}", e);
-				}
-			});
+//			this.subFunctionsHandlerMap.entrySet().forEach(e -> {
+//				try {
+//					this.addRequestHandlerFunction(e.getKey(), e.getValue());
+//					log.debug("Added request method={}", e.getKey());
+//				} catch (Exception e1) {
+//					log.error("Cannot add function {}", e);
+//				}
+//			});
 
 			// === Extract execution settings ===//
 
@@ -142,7 +172,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 		this.setServiceState(ServiceState.FINISHED);
 
-		log.debug("Function={} initialized. Sync datapoints={}", this.getFunctionName(), this.managedDatapointConfigs);
+		log.debug("Function={} in cell={} initialized. Sync datapoints={}", this.getFunctionName(), this.getCellName(), this.managedDatapointConfigs);
 	}
 
 	protected abstract void cellFunctionInit() throws Exception;
@@ -155,16 +185,58 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * @throws Exception
 	 */
 	protected void addRequestHandlerFunction(String topicSuffix, Function<Request, Response> function) throws Exception {
-		this.handlerMap.put(this.getCellName() + "/" + topicSuffix, function);
+
+		// Create the topic
+		String topic = this.functionRootAddress + topicSuffix;
+
+		this.subFunctionsHandlerMap.put(topic, function);
 
 		try {
-			this.getCommunicator().subscribeTopic(this.getCellName() + "/" + topicSuffix);
+			this.getCommunicator().subscribeTopic(topic);
 		} catch (MqttException e) {
-			log.error("Cannot subscribe input to service function {}", this.getCellName() + "/" + topicSuffix);
+			log.error("Cannot subscribe input to service function {}", this.functionRootAddress + topicSuffix);
 			throw new Exception(e.getMessage());
 		}
-		log.info("Added function to {}", this.getCellName() + "/" + topicSuffix);
+		log.info("Added function to {}", topic);
 
+	}
+
+	/**
+	 * Remove a function from the handler
+	 * 
+	 * @param topicSuffix
+	 * @throws Exception
+	 */
+	protected void removeRequestHandlerFunction(String topicSuffix) throws Exception {
+		String topic = this.functionRootAddress + topicSuffix;
+		this.getCommunicator().unsubscribeTopic(topic);
+		this.subFunctionsHandlerMap.remove(topic);
+
+		log.debug("Unsubscribed topic={} and removed its function.", topic);
+	}
+
+	@Override
+	public Response performOperation(String topic, Request param) {
+		log.debug("{}>Execute service method={}", this.getFunctionName(), topic);
+		Response response;
+		synchronized (this.subFunctionsHandlerMap) {
+			if (this.subFunctionsHandlerMap.containsKey(topic)) {
+				response = subFunctionsHandlerMap.get(topic).apply(param);
+			} else {
+				log.warn("No method for the topic={}. Available methods={}", topic, this.subFunctionsHandlerMap.keySet());
+				response = new Response(param);
+				response.setError("No method for this topic");
+			}
+
+		}
+
+		if (response.hasError() == true) {
+			log.warn("{}>Execution of service method={} unsuccessful. Error={}.", this.getFunctionName(), topic, response.getError());
+		} else {
+			log.debug("{}>Execution of service method={} finished.", this.getFunctionName(), topic);
+		}
+
+		return response;
 	}
 
 	/**
@@ -220,7 +292,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 				String completeAddress = subscriptionConfig.getComposedAddress(this.getCellName());
 				// @SuppressWarnings("unused")
 				Datapoint initialValue = this.getCommunicator().subscribeDatapoint(completeAddress);
-				log.debug("{}>Subscribed address={}.", this.getCellName(), subscriptionConfig.getComposedAddress(completeAddress));
+				log.debug("{}>Subscribed address={}.", this.getCellName(), completeAddress);
 				// } else {
 				// log.debug("Key={} already exists in the function mapping. Therefore no additional subscription is necessary", key);
 				// }
@@ -358,7 +430,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	// === read and write shortcuts ===//
 
-	protected MqttCommunicator getCommunicator() {
+	@Override
+	public MqttCommunicator getCommunicator() {
 		return this.comm;
 	}
 
@@ -439,8 +512,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return dpBuilder;
 	}
 
-	protected Map<String, Function<Request, Response>> getFunctions() {
-		return functions;
+	protected Map<String, Function<Request, Response>> getSubfunctions() {
+		return this.subFunctionsHandlerMap;
 	}
 
 }
