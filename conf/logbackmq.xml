@@ -1,0 +1,46 @@
+<configuration debug="true">
+  <evaluator name="TEST_EVALUATOR">
+    <expression>logger.contains("ControlGateway") &amp;&amp;
+	message.contains("TestTest")</expression>
+  </evaluator>
+  
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core.cellfunction.codelets.helpers" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.storage" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.CFStateGenerator" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.communication" level="DEBUG" />
+  <logger name="org.eclipse.jetty" level="WARN"/>
+  
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <withJansi>false</withJansi>
+	
+
+	
+	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+      <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <expression>return logger.contains("BidirectionalGatewayAgent");</expression>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>DENY</OnMatch>
+    </filter>
+	
+    <encoder>
+      <!--<pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%highlight(%-5level)) %-25(%cyan(%logger{0}))(%F:%L\) - %msg%n%throwable</pattern>-->
+	  <!--<pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%-5level)) %logger{0}(%F:%L\) - %msg%n%throwable</pattern>-->
+	  <!--<pattern>%-40(%date{HH:mm:ss.SSS} [%thread]) %-40(%-5level %logger{5}) - %msg%n%throwable</pattern>-->
+	  <!--<pattern>%-30(%d{HH:mm:ss.SSS} [%thread]) %-20(%-5level %logger{0} -)(%F:%L\) %msg%n</pattern>-->
+	  <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level (%file:%line\) - %message%n</pattern>
+	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->
+    </encoder>
+  </appender>
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
