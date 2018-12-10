@@ -135,7 +135,9 @@ public class Response {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("corrid=");
+		builder.append("replyto=");
+		builder.append(this.replyto);
+		builder.append("|corrid=");
 		builder.append(correlationid);
 		builder.append("|result=");
 		builder.append(result);

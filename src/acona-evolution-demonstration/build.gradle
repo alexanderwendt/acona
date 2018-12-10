@@ -56,16 +56,16 @@ dependencies {
     compile 'org.codehaus.janino:commons-compiler:2.7.8'
     compile 'org.fusesource.jansi:jansi:1.11'
 	//compile project(':acona-jadecommunicator')
-	compile project(':acona-cell')
+	compile project(':acona-core')
 	compile project(':simple-user-console')
 	
     
     //Jade library
-	compile group: 'com.tilab.jade', name: 'jade', version: '4.4.0'
+	//compile group: 'com.tilab.jade', name: 'jade', version: '4.4.0'
     //compile files('../../../SharedLibs/libs/jade.jar')
 	
 	//Apache Jena for RDF
-	compile 'org.apache.jena:apache-jena-libs:3.1.0'
+	//compile 'org.apache.jena:apache-jena-libs:3.1.0'
     
     //GSON for representing data structures
 	// https://mvnrepository.com/artifact/com.google.code.gson/gson
@@ -106,7 +106,7 @@ jar {
 configure(install.repositories.mavenInstaller) {
    	pom.project {
        	groupId 'at.tuwien.ict.acona.cell'
-      	artifactId 'acona-cell'
+      	artifactId 'acona-evolution-demonstration'
        	version '0.1.0'
        	inceptionYear '2016'
        	packaging 'jar'

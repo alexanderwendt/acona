@@ -10,13 +10,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-
 public class Broker extends CellFunctionImpl {
 
 	// private Map<String, List<String>> agentTypeMap = new HashMap<String, List<String>>(); //Type, agentname

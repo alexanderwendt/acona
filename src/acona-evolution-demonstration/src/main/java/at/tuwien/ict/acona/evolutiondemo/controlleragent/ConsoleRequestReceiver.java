@@ -7,16 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
-import at.tuwien.ict.acona.cell.cellfunction.ServiceState;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-
 public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 
 	private final RequestReceiverUserConsole console = new RequestReceiverUserConsole(log, this);

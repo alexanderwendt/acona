@@ -148,6 +148,12 @@ public interface MqttCommunicator {
 	 */
 	public void unsubscribeDatapoint(String address) throws Exception;
 
+	/**
+	 * Publish a datapoint in MQTT. No writing to the data storage
+	 * 
+	 * @param dp
+	 * @throws Exception
+	 */
 	public void publishDatapoint(Datapoint dp) throws Exception;
 
 	/**

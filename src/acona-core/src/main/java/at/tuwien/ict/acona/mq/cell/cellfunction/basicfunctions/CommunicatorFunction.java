@@ -32,7 +32,7 @@ public class CommunicatorFunction extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateDatapointsById(String id, String topic, JsonElement data) {
 		log.warn("Nothing should be subscribed by this function, id {} and data {}", id, data);
 
 	}

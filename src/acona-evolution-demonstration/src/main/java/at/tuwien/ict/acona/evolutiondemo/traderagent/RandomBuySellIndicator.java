@@ -7,11 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-
 public class RandomBuySellIndicator extends CellFunctionImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(RandomBuySellIndicator.class);

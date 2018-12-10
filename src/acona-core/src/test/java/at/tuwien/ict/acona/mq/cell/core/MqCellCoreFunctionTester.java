@@ -53,7 +53,7 @@ public class MqCellCoreFunctionTester {
 		// Clear all cells
 		synchronized (this) {
 			try {
-				this.wait(1000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
@@ -62,7 +62,7 @@ public class MqCellCoreFunctionTester {
 
 		synchronized (this) {
 			try {
-				this.wait(1000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
@@ -329,7 +329,7 @@ public class MqCellCoreFunctionTester {
 	@Test
 	public void chainOfSubscribersTest() {
 		// final int minWaitTime = 5;
-		final int numberOfAgents = 10; // If there are errors with nullpointers.
+		final int numberOfAgents = 100; // If there are errors with nullpointers.
 										// Set the timeouts of the queues in the
 										// communication!!
 		// create message for subscription. Fields: Address
@@ -442,7 +442,7 @@ public class MqCellCoreFunctionTester {
 			// Controller
 			CellConfig controllerAgentConfig = CellConfig.newConfig(controllerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SimpleController.class)
-							.setProperty("agent1", controllerAgentName)
+							.setProperty("agentname", controllerAgentName)
 							.setProperty("servicename", ServiceName)
 							.setProperty("delay", "1000"))
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
@@ -605,8 +605,8 @@ public class MqCellCoreFunctionTester {
 	@Test
 	public void aconaServiceWithFullControlReadDatapointsTest() {
 		try {
-			String COMMANDDATAPOINTNAME = "command";
-			String STATUSDATAPOINTNAME = "status";
+			//String COMMANDDATAPOINTNAME = "command";
+			//String STATUSDATAPOINTNAME = "status";
 			String INCREMENTATIONDATAPOINTNAME = "increment";
 
 			String controllerFunctionName = "controller";
@@ -625,29 +625,27 @@ public class MqCellCoreFunctionTester {
 			String memoryAgentName = "MemoryAgent";
 
 			// values
-			double startValue = 0;
-			int expectedResult = 3;
+			double startValue = 3;
+			int expectedResult = 6;
 
 			// Use a system config to init the whole system
-			CellGateway controller = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig("controllerservice", SequenceController.class)
+			Cell controller = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
 							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
-							.setProperty("delay", "1")
-							.addManagedDatapoint(DatapointConfig.newConfig(COMMANDDATAPOINTNAME,
-									COMMANDDATAPOINTNAME, SyncMode.SUBSCRIBEONLY))));
+							.setProperty("delay", "1")));
 			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
 			this.launcher.createAgent(CellConfig.newConfig(agentName1)
-					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 			this.launcher.createAgent(CellConfig.newConfig(agentName2)
-					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 			this.launcher.createAgent(CellConfig.newConfig(agentName3)
-					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, CFIncrementService.class)
-							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 
 //			SystemConfig totalConfig = SystemConfig.newConfig()
@@ -664,7 +662,7 @@ public class MqCellCoreFunctionTester {
 			log.info("=== All agents initialized ===");
 
 			launcher.getAgent(memoryAgentName).getCommunicator()
-					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+					.write(this.dpb.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
 			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
 			// JsonPrimitive(startValue)));
@@ -676,14 +674,16 @@ public class MqCellCoreFunctionTester {
 			// ControllerCellGateway controllerCellGateway = new
 			// ControllerWrapper(controller);
 
-			Datapoint state = controller.getCommunicator().queryDatapoints(COMMANDDATAPOINTNAME,
-					ControlCommand.START.toString(), "controllerservice.state",
-					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
+			controller.getCommunicator().execute(controller.getName() + ":" + controllerFunctionName + "/command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", true), 100000);
+					
 
 			// controllerCellGateway.executeService("", "controllerservice", new
 			// JsonObject(), 10000);
 
-			log.debug("Received state={}", state);
+			//log.debug("Received state={}", state);
 
 			// Write the numbers in the database agents
 			// client1.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
@@ -761,8 +761,8 @@ public class MqCellCoreFunctionTester {
 			int expectedResult = 1;
 
 			// === Config ===//
-			CellGateway topController = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, SimpleControllerService.class)
+			Cell topController = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, SimpleController.class)
 							.setProperty("agentname", serviceAgentName).setProperty("servicename", serviceName)
 							.setProperty("delay", "10")));
 			// SystemConfig totalConfig = SystemConfig.newConfig();
@@ -770,8 +770,8 @@ public class MqCellCoreFunctionTester {
 
 			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
 			this.launcher.createAgent(CellConfig.newConfig(serviceAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(serviceName, CFIncrementService.class)
-							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, processDatapoint, memoryAgentName,
+					.addCellfunction(CellFunctionConfig.newConfig(serviceName, IncrementServiceThread.class)
+							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 
 			// totalConfig.addMemory();
@@ -788,7 +788,7 @@ public class MqCellCoreFunctionTester {
 			topController.getCommunicator().setDefaultTimeout(100000);
 			// Set start values
 			launcher.getAgent(memoryAgentName).getCommunicator()
-					.write(DatapointBuilder.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+					.write(this.dpb.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 
 			// }
 			// log.info("=== All agents initialized ===");
@@ -796,13 +796,14 @@ public class MqCellCoreFunctionTester {
 			log.info("=== System initialized ===");
 			// === System operation ===//
 
-			Datapoint resultState = topController.getCommunicator().queryDatapoints(controllerServiceName + ".command",
-					ControlCommand.START.toString(), controllerServiceName + ".state",
-					new JsonPrimitive(ServiceState.FINISHED.toString()).getAsString(), 100000);
+			topController.getCommunicator().execute(controllerAgentName + ":" + controllerServiceName + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", true), 100000);
+					
 
 			log.info("=== System operation finished. Extract results ===");
 			// === Extract results ===//
-			log.debug("Received state={}", resultState);
 
 			// Read from memory
 			Datapoint memoryDatapoint = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint);

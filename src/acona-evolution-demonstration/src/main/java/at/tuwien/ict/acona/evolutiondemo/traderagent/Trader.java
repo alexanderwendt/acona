@@ -9,14 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.cell.config.DatapointConfig;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 
 public class Trader extends CellFunctionCodelet {

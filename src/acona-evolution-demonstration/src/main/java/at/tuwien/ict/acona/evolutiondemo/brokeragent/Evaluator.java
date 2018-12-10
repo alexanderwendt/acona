@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
 
 public class Evaluator extends CellFunctionCodelet {
 
@@ -42,9 +39,21 @@ public class Evaluator extends CellFunctionCodelet {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+	public void resetCodelet() {
 		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void shutDown() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

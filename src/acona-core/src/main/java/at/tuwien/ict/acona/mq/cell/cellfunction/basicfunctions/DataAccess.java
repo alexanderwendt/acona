@@ -47,7 +47,7 @@ public class DataAccess extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateDatapointsById(String id, String topic, JsonElement data) {
 		// log.warn("This method shall not subscribe anything");
 		log.debug("received id={}, value={}", id, data);
 
@@ -69,6 +69,7 @@ public class DataAccess extends CellFunctionImpl {
 			Datapoint dp = this.getDatapointBuilder().newDatapoint(param);
 
 			List<Datapoint> readData = this.getCell().getDataStorage().read(dp.getAddress());
+			readData.forEach(d->d.setAgent(this.getCellName()));
 
 			result.setResult(readData);
 
@@ -116,6 +117,8 @@ public class DataAccess extends CellFunctionImpl {
 			String param = req.getParameter("param", String.class);
 			this.getCell().getDataStorage().subscribeDatapoint(param, req.getReplyTo());
 			List<Datapoint> readData = this.getCell().getDataStorage().read(param);
+			
+			readData.forEach(d->d.setAgent(this.getCellName()));
 
 			result.setResult(readData);
 		} catch (Exception e) {

@@ -4,11 +4,6 @@ import java.util.Map;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-
 public class PermanentBuySellIndicator extends CellFunctionImpl {
 	
 	private boolean swapSignal = true;

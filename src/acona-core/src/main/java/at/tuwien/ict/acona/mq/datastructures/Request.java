@@ -61,16 +61,28 @@ public class Request {
 		this.correlationid = UUID.randomUUID().toString();
 	}
 
+	/**
+	 * Create a new request from an existing reqiest string or json
+	 * 
+	 * @param input
+	 * @return
+	 */
 	public static Request newRequest(String input) {
 		Gson gson = new Gson();
 		return gson.fromJson(input, Request.class);
 	}
 
-	public static Request newRequest(JsonObject parameter) {
-		// Gson gson = new Gson();
-		// return gson.fromJson(input, Request.class);
-		return new Request();
-	}
+//	/**
+//	 * Create a 
+//	 * 
+//	 * @param parameter
+//	 * @return
+//	 */
+//	public static Request newRequest(JsonObject parameter) {
+//		// Gson gson = new Gson();
+//		// return gson.fromJson(input, Request.class);
+//		return new Request();
+//	}
 
 	public JsonObject toJson() {
 		if (util == null) {
@@ -226,6 +238,10 @@ public class Request {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
+		builder.append("corrid=");
+		builder.append(this.correlationid);
+		builder.append("|replyto=");
+		builder.append(this.replyto);
 		builder.append("|params=");
 		builder.append(this.parameter);
 		return builder.toString();

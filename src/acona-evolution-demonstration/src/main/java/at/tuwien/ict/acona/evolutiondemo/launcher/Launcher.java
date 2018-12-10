@@ -3,11 +3,6 @@ package at.tuwien.ict.acona.evolutiondemo.launcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Evaluator;
@@ -17,8 +12,6 @@ import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
-import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
 
 /**
  * This class manages the launching of the whole cognitive system

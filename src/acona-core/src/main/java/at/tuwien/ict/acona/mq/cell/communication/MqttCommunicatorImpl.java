@@ -362,6 +362,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 				log.error("MQTT other error. Message cannot be published {}", response, e);
 				throw new Exception(e.getMessage());
 			}
+			
 			log.debug("Returning response {}", response);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
@@ -475,7 +476,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			}
 
 			if (result == null || result.isEmpty()) {
-				result.add(this.dpBuilder.newDatapoint(address));
+				result.add(this.dpBuilder.newDatapoint(address).setAgentIfAbsent(cellName));
 			}
 
 		} catch (Exception e) {

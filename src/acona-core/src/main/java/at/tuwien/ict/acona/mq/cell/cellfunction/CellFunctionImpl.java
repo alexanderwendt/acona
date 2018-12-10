@@ -281,15 +281,16 @@ public abstract class CellFunctionImpl implements CellFunction {
 		synchronized (this.subFunctionsHandlerMap) {
 			if (this.subFunctionsHandlerMap.containsKey(topic)) {
 				response = subFunctionsHandlerMap.get(topic).apply(param);
+				//log.debug("Response={}", response);
 				
 				//Set the state variable if the request is open after the function. If open, the response is null and nothing shall be returned to the caller
 				//If not null, the the response shall be returned to the caller. In that way, a request can trigger other functions to complete. Asynchronous calls
 				//can be converted into synchronous calls.
 				if (response==null) {
 					this.setOpenRequest(param);	//Set the current open request as response is null
-				} else {
-					this.setOpenRequest(null);	//Return a response and therefore set the open request to null
-				}
+				} //else {
+				//	this.setOpenRequest(null);	//Return a response and therefore set the open request to null
+				//}
 				
 			} else {
 				//If no topic could be identified, 
@@ -578,6 +579,20 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	protected void setOpenRequest(Request openRequest) {
 		this.openRequest = openRequest;
+		log.warn("OpenRequest set from {} to {}", this.openRequest, openRequest);
+	}
+	
+	protected void closeOpenRequestWithOK(boolean closeOpenRequest) throws Exception {
+		if (this.getOpenRequest()!=null) {
+			this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest()).setResultOK()));
+			
+			if (closeOpenRequest==true) {
+				this.setOpenRequest(null);
+			}
+			
+		} else {
+			log.error("open request is null. Nothing can be returned");
+		}
 	}
 
 }

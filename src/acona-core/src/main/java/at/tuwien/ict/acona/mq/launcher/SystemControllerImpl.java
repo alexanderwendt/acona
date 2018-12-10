@@ -48,7 +48,7 @@ public class SystemControllerImpl implements SystemController {
 	public void stopSystem() {
 		synchronized (this) {
 			try {
-				this.wait(200);
+				this.wait(20);
 			} catch (InterruptedException e) {
 
 			}
@@ -57,10 +57,12 @@ public class SystemControllerImpl implements SystemController {
 		log.info("Stopping system");
 
 		// Get all agents in the external controller map
-		this.agentControllerMap.values().forEach(c -> {
+		for (Cell c : this.agentControllerMap.values()) {
 			log.debug("Take down cell={}", c.getName());
 			c.takeDownCell();
-		});
+			log.debug("Cell {} closed", c.getName());
+		}
+		
 		this.agentControllerMap.clear();
 
 //		for (int i = 1; i <= 1; i++) {
@@ -79,7 +81,7 @@ public class SystemControllerImpl implements SystemController {
 
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(20);
 			} catch (InterruptedException e) {
 
 			}

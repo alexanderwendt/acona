@@ -18,15 +18,19 @@ public class SimpleController extends CellFunctionThreadImpl {
 	private static Logger log = LoggerFactory.getLogger(SimpleController.class);
 
 	private int delay = 200;
+	private String serviceName;
+	private String agentName;
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		this.delay = Integer.valueOf(this.getFunctionConfig().getProperty("delay", String.valueOf(this.delay)));
+		this.serviceName = this.getFunctionConfig().getProperty("servicename", "servicename");
+		this.agentName = this.getFunctionConfig().getProperty("agentname", "agent1");
 	}
 
 	@Override
 	protected void executeFunction() throws Exception {
-		this.executeBlockingServiceById("servicename", "agent1", 1000);
+		this.executeBlockingServiceById("servicename", "agentname", 1000);
 
 		log.info("Function sequence controller finished");
 

@@ -15,11 +15,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-
 public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(DepotStaticticsGraphToolFunction.class);

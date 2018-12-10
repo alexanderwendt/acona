@@ -5,13 +5,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.core.Cell;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
-
 public class DelayedCellShutDown extends CellFunctionImpl {
 
 	protected static Logger log = LoggerFactory.getLogger(DelayedCellShutDown.class);

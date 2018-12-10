@@ -12,12 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.cell.config.DatapointConfig;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-
 /**
  * This function generates a highest, lowest and close price for the system and writes it into the working memory of itself. On trigger, 
  * it creates these 3 numbers, adds to the history and puts in the memory

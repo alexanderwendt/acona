@@ -15,8 +15,8 @@ include 'api'
 include 'services:webservice'
 */
 
-include ':acona-cell'
-project(':acona-cell').projectDir = new File('C:\Projekte\19_SoC_SAVE\SAVE_Workspace\acona\src\acona-cell')
+include ':acona-core'
+project(':acona-core').projectDir = new File('C:/Projekte/19_SoC_SAVE/SAVE_Workspace/acona/src/acona-core')
 
 include ':simple-user-console'
 project(':simple-user-console').projectDir = new File('../../../commonutils/src/simple-user-console/')

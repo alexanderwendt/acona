@@ -133,8 +133,9 @@ public class Datapoint {
 		return result;
 	}
 
-	public void setAgent(String agent) {
+	public Datapoint setAgent(String agent) {
 		this.AGENT = agent;
+		return this;
 	}
 
 	/**
@@ -142,10 +143,12 @@ public class Datapoint {
 	 * 
 	 * @param agent
 	 */
-	public void setAgentIfAbsent(String agent) {
+	public Datapoint setAgentIfAbsent(String agent) {
 		if (this.hasLocalAgent() == true) {
 			this.AGENT = agent;
 		}
+		
+		return this;
 	}
 
 	public boolean hasLocalAgent() {

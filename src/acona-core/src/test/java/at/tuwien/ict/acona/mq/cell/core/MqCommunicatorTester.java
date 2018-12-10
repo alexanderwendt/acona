@@ -69,124 +69,124 @@ public class MqCommunicatorTester {
 //		}
 	}
 
-	/**
-	 * 
-	 */
-	@Test
-	public void testServiceRequestRespondPattern() {
-		try {
-			String host = "tcp://127.0.0.1:1883";
-			String username = "acona";
-			String password = "acona";
-
-			String functionNameResponder = "FunctionResponder";
-			String functionNameRequester = "FunctionRequester";
-
-			String agentName = "agent1";
-
-			String targetName = "<agent1>/FunctionResponder/increment";
-			int numberOfRuns = 20000;
-
-			final Semaphore sem = new Semaphore(0);
-			RequesterResponseFunction responder = new RequesterResponseFunction();
-			responder.init(sem, host, username, password, agentName, functionNameResponder, targetName, false);
-
-			RequesterResponseFunction requester = new RequesterResponseFunction();
-			requester.setNumberOfRuns(numberOfRuns);
-			requester.init(sem, host, username, password, agentName, functionNameRequester, targetName, true);
-
-			// Aquire run as both threads are finished
-			sem.acquire();
-			log.debug("test");
-
-			log.debug("correct value={}, actual value={}", numberOfRuns, requester.getValue());
-			assertEquals(numberOfRuns, requester.getValue(), 0.0);
-			log.info("Test passed");
-
-			// launcher.stopSystem();
-		} catch (Exception e) {
-			log.error("Error testing system", e);
-			fail("Error");
-		}
-	}
-
-	/**
-	 * 
-	 */
-	@Test
-	public void testReadWriteFunction() {
-		try {
-			String host = "tcp://127.0.0.1:1883";
-			String username = "acona";
-			String password = "acona";
-
-			String functionName = "DummyFunction";
-			String agentName = "agent1";
-
-			String addressToRead = "<agent1>/database/workingmemory/episode1s";
-			double value = 1.99;
-
-			// ============================================================//
-			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
-			comm.init(host, username, password, new CellFunctionDummy(functionName, agentName));
-			comm.setDefaultTimeout(1000);
-			// Write the topic
-
-			// Write the topic
-			comm.write((new Datapoint(addressToRead)).setValue(value));
-
-			// Read the datapoint
-			Datapoint dp = comm.read(addressToRead);
-
-			log.debug("correct value={}, actual value={}", value, dp.getValue().getAsDouble());
-			assertEquals(value, dp.getValue().getAsDouble(), 0.0);
-			log.info("Test passed");
-
-		} catch (Exception e) {
-			log.error("Error testing system", e);
-			fail("Error");
-		}
-	}
-
-	/**
-	 * 
-	 */
-	@Test
-	public void testReadEmptyChannelFunction() {
-		try {
-			String host = "tcp://127.0.0.1:1883";
-			String username = "acona";
-			String password = "acona";
-
-			String functionName = "DummyFunction";
-			String agentName = "agent1";
-
-			String addressToRead = "agent1/database/workingmemory/episode1";
-			double value = 1.99;
-			double expectedValue = 0;
-
-			int numberOfRuns = 200;
-
-			// ============================================================//
-			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
-			comm.init(host, username, password, new CellFunctionDummy(functionName, agentName));
-			comm.setDefaultTimeout(1000);
-			// Write the topic
-
-			//
-			// comm.write((new Datapoint(addressToRead)).setValue(value));
-
-			// Read the datapoint
-			Datapoint dp = comm.read(addressToRead);
-
-			log.debug("correct value={}, actual value={}", expectedValue, dp.getValueOrDefault(new JsonPrimitive(0)).getAsDouble());
-			assertEquals(expectedValue, dp.getValueOrDefault(new JsonPrimitive(0)).getAsDouble(), 0.0);
-			log.info("Test passed");
-
-			// launcher.stopSystem();
-		} catch (Exception e) {
-			log.error("Error testing system", e);
-			fail("Error");
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	@Test
+//	public void testServiceRequestRespondPattern() {
+//		try {
+//			String host = "tcp://127.0.0.1:1883";
+//			String username = "acona";
+//			String password = "acona";
+//
+//			String functionNameResponder = "FunctionResponder";
+//			String functionNameRequester = "FunctionRequester";
+//
+//			String agentName = "agent1";
+//
+//			String targetName = "<agent1>/FunctionResponder/increment";
+//			int numberOfRuns = 20000;
+//
+//			final Semaphore sem = new Semaphore(0);
+//			RequesterResponseFunction responder = new RequesterResponseFunction();
+//			responder.init(sem, host, username, password, agentName, functionNameResponder, targetName, false);
+//
+//			RequesterResponseFunction requester = new RequesterResponseFunction();
+//			requester.setNumberOfRuns(numberOfRuns);
+//			requester.init(sem, host, username, password, agentName, functionNameRequester, targetName, true);
+//
+//			// Aquire run as both threads are finished
+//			sem.acquire();
+//			log.debug("test");
+//
+//			log.debug("correct value={}, actual value={}", numberOfRuns, requester.getValue());
+//			assertEquals(numberOfRuns, requester.getValue(), 0.0);
+//			log.info("Test passed");
+//
+//			// launcher.stopSystem();
+//		} catch (Exception e) {
+//			log.error("Error testing system", e);
+//			fail("Error");
+//		}
+//	}
+//
+//	/**
+//	 * 
+//	 */
+//	@Test
+//	public void testReadWriteFunction() {
+//		try {
+//			String host = "tcp://127.0.0.1:1883";
+//			String username = "acona";
+//			String password = "acona";
+//
+//			String functionName = "DummyFunction";
+//			String agentName = "agent1";
+//
+//			String addressToRead = "<agent1>/database/workingmemory/episode1s";
+//			double value = 1.99;
+//
+//			// ============================================================//
+//			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
+//			comm.init(host, username, password, new CellFunctionDummy(functionName, agentName));
+//			comm.setDefaultTimeout(1000);
+//			// Write the topic
+//
+//			// Write the topic
+//			comm.write((new Datapoint(addressToRead)).setValue(value));
+//
+//			// Read the datapoint
+//			Datapoint dp = comm.read(addressToRead);
+//
+//			log.debug("correct value={}, actual value={}", value, dp.getValue().getAsDouble());
+//			assertEquals(value, dp.getValue().getAsDouble(), 0.0);
+//			log.info("Test passed");
+//
+//		} catch (Exception e) {
+//			log.error("Error testing system", e);
+//			fail("Error");
+//		}
+//	}
+//
+//	/**
+//	 * 
+//	 */
+//	@Test
+//	public void testReadEmptyChannelFunction() {
+//		try {
+//			String host = "tcp://127.0.0.1:1883";
+//			String username = "acona";
+//			String password = "acona";
+//
+//			String functionName = "DummyFunction";
+//			String agentName = "agent1";
+//
+//			String addressToRead = "agent1/database/workingmemory/episode1";
+//			double value = 1.99;
+//			double expectedValue = 0;
+//
+//			int numberOfRuns = 200;
+//
+//			// ============================================================//
+//			MqttCommunicator comm = new MqttCommunicatorImpl(new DataStorageImpl());
+//			comm.init(host, username, password, new CellFunctionDummy(functionName, agentName));
+//			comm.setDefaultTimeout(1000);
+//			// Write the topic
+//
+//			//
+//			// comm.write((new Datapoint(addressToRead)).setValue(value));
+//
+//			// Read the datapoint
+//			Datapoint dp = comm.read(addressToRead);
+//
+//			log.debug("correct value={}, actual value={}", expectedValue, dp.getValueOrDefault(new JsonPrimitive(0)).getAsDouble());
+//			assertEquals(expectedValue, dp.getValueOrDefault(new JsonPrimitive(0)).getAsDouble(), 0.0);
+//			log.info("Test passed");
+//
+//			// launcher.stopSystem();
+//		} catch (Exception e) {
+//			log.error("Error testing system", e);
+//			fail("Error");
+//		}
+//	}
 }
