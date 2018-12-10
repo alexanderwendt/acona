@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
+
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -123,15 +125,34 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 	protected abstract void cellFunctionThreadInit() throws Exception;
 
+	//=== Internal sub function objects ===//
+	/**
+	 * Function object that sets the command of the system
+	 * 
+	 * @param req
+	 * @return
+	 */
 	private Response setCommandRequest(Request req) {
 		log.debug("set command from={}", req);
-		Response result = new Response(req);
+		Response result = null;
 
 		try {
 			ControlCommand command = req.getParameter("command", ControlCommand.class);
+			boolean waitForFinished = req.getParameter("blocking", Boolean.class);
+			
+			//Set the command
 			this.setCommand(command);
-
-			result.setResultOK();
+			
+			//If the requester does not block, return OK message
+			if (waitForFinished==false) {
+				result = new Response(req);
+				result.setResultOK();
+			//If the requester is blocking until finish, set the open request
+			} else {
+				//this.setOpenRequest(req);	//Open request does not need to be set as the parent method does it. 
+				//Do not forget to send the release on finish
+				result = null;
+			}
 		} catch (Exception e) {
 			log.error("Cannot set the command", e);
 			result.setError("Command cannot be executed");
@@ -139,6 +160,8 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		return result;
 	}
+	
+	//=== Internal sub function objects end ===//
 
 	@Override
 	protected String setFunctionDescription() {
@@ -212,6 +235,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 				try {
 					this.setServiceState(ServiceState.ERROR);
 					this.setServiceState(ServiceState.FINISHED);
+					//If the request has set an open request, here, the request shall be returned with an error
+					if (this.getOpenRequest()!=null) {
+						this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest())).setError(e1.getMessage()));   //(new Response(this.getOpenRequest())).setResultOK(): OK Response
+					}
 				} catch (Exception e) {
 					log.error("Cannot write service state ERROR", e);
 				}
@@ -241,6 +268,11 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		log.debug("Stop executor {}", this.getFunctionName());
 		try {
 			this.setServiceState(ServiceState.FINISHED);
+			
+			//If the executor is stopped and a finish is demanded
+			if (this.getOpenRequest()!=null) {
+				this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest())).setResultOK());   //(new Response(this.getOpenRequest())).setResultOK(): OK Response
+			}
 		} catch (Exception e) {
 			log.error("Cannot set the state to finish after the function is being killed.", e);
 		}
@@ -257,7 +289,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 		this.getReadDatapointConfigs().forEach((k, v) -> {
 			try {
 				// Read the remote datapoint
-				Datapoint temp = this.getCommunicator().read(v.getComposedAddress(v.getAgentid(this.getCellName())));
+				Datapoint temp = this.getCommunicator().read(v.getAddress());
 				// Write local value to synchronize the datapoints
 				this.valueMap.put(k, temp);
 				log.trace("{}> Preprocessing phase: Read datapoint and write into value table={}", temp);
@@ -270,7 +302,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			try {
 
 				// Write local value to synchronize the datapoints
-				this.valueMap.putIfAbsent(k, v.toDatapoint(this.getCellName()));
+				this.valueMap.putIfAbsent(k, v.toDatapoint());
 				log.trace("{}> Preprocessing phase: Init write datapoint and write into value table={}", v);
 				// }
 			} catch (Exception e) {
@@ -317,10 +349,10 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			try {
 				Datapoint dp = this.valueMap.get(config.getId());
 				if (dp != null) {
-					String agentName = config.getAgentid(this.getCellName());
+					String agentName = config.getAgentid();
 					// log.trace("{}>Write datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 					this.getCommunicator().write(dp);
-					log.trace("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
+					log.debug("{}>Written datapoint={} to agent={}", this.getFunctionName(), dp, agentName);
 				} else {
 					log.warn("A datapoint in the write config is not available in the value map with values that should be written");
 				}
@@ -336,12 +368,30 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 
 		if (this.isFinishedAfterSingleRun() == true) {
 			this.setServiceState(ServiceState.FINISHED);
+			
+			//If the request has set an open request, here, the request shall be returned
+			if (this.getOpenRequest()!=null) {
+				this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest())).setResultOK());   //(new Response(this.getOpenRequest())).setResultOK(): OK Response
+			}
 		}
 
 		log.debug("{}>Service execution run finished", this.getFunctionName());
 	}
 
 	protected abstract void executeCustomPostProcessing() throws Exception;
+	
+	protected void updateDatapointsById(final String id, final String topic, final JsonElement data) {
+		//Update value map for managed datapoints
+		if (data.isJsonObject() && this.getDatapointBuilder().isDatapoint(data.getAsJsonObject())) {
+			this.getValueMap().put(id, this.getDatapointBuilder().toDatapoint(data.getAsJsonObject()));
+		}
+		
+		
+		this.updateCustomDatapointsById(id, data);
+	}
+	
+    protected abstract void updateCustomDatapointsById(final String id, final JsonElement data); 
+	
 
 	// === Internal functions for the control of the tread ===//
 

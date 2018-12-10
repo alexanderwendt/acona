@@ -222,8 +222,8 @@ public class MqCellCoreFunctionTester {
 			// Create the server agent
 			CellConfig serverConfig = CellConfig.newConfig(agentNameServer)
 					.addCellfunction(CellFunctionConfig.newConfig(DatapointTransfer.class)
-							.setProperty(DatapointTransfer.PARAMSOURCEADDRESS, datapointSourceAddress)
-							.setProperty(DatapointTransfer.PARAMDESTINATIONADDRESS, datapointDestinationAddress));
+							.setProperty(DatapointTransfer.PARAMSOURCEADDRESS, "<" + agentNameServer + ">/" + datapointSourceAddress)
+							.setProperty(DatapointTransfer.PARAMDESTINATIONADDRESS, "<" + agentNameServer + ">/" + datapointDestinationAddress));
 			Cell server = launcher.createAgent(serverConfig);
 
 			synchronized (this) {
@@ -351,7 +351,7 @@ public class MqCellCoreFunctionTester {
 			for (int i = 1; i < numberOfAgents; i++) {
 				Cell cell = (this.launcher.createAgent(CellConfig.newConfig(agentNameTemplate + i)
 						.addCellfunction(CellFunctionConfig.newConfig("updater", DatapointMirroring.class)
-								.addManagedDatapoint(datapointaddress, datapointaddress, inspectors.get(i - 1).getName(), SyncMode.SUBSCRIBEONLY))));
+								.addManagedDatapoint(datapointaddress, inspectors.get(i - 1).getName() + ":" + datapointaddress, SyncMode.SUBSCRIBEONLY))));
 				inspectors.add(cell);
 				cell.getFunctionHandler().getCellFunction("updater").getCommunicator().setDefaultTimeout(60000);
 			}
@@ -359,7 +359,7 @@ public class MqCellCoreFunctionTester {
 			// Add special time function
 			Cell timeRegister = this.launcher.createAgent(CellConfig.newConfig("TimeRegister")
 					.addCellfunction(CellFunctionConfig.newConfig("TimeRegisterFunction", TimeRegisterFunction.class)
-							.addManagedDatapoint("STOPTIME", datapointaddress, agentNameTemplate + (numberOfAgents - 1), SyncMode.SUBSCRIBEONLY)));
+							.addManagedDatapoint("STOPTIME", agentNameTemplate + (numberOfAgents - 1) + ":" + datapointaddress, SyncMode.SUBSCRIBEONLY)));
 
 			long setupStopTime = System.currentTimeMillis();
 
@@ -425,7 +425,6 @@ public class MqCellCoreFunctionTester {
 	public void requestInReqiestTest() {
 		try {
 			String controllerAgentName = "ServiceAgent";
-
 			String controllerFunctionName = "controllerService";
 			String ServiceName = "IncrementService"; // The same name for all services
 
@@ -434,8 +433,8 @@ public class MqCellCoreFunctionTester {
 			String INCREMENTATIONDATAPOINTNAME = "increment";
 
 			// values
-			double startValue = 0;
-			int expectedResult = 1;
+			double startValue = 2;
+			int expectedResult = 4;
 
 			// Memory
 			// Cell memoryAgent = this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
@@ -447,7 +446,7 @@ public class MqCellCoreFunctionTester {
 							.setProperty("servicename", ServiceName)
 							.setProperty("delay", "1000"))
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
-							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, processDatapoint, controllerAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, controllerAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell controller = this.launcher.createAgent(controllerAgentConfig);
 
 			synchronized (this) {
@@ -465,12 +464,16 @@ public class MqCellCoreFunctionTester {
 			controller.getCommunicator().write(this.dpb.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 
 			log.debug("Start value set. Start the service");
-			// Start the system by setting start
-			Datapoint state = controller.getCommunicator().executeRequestBlockForResult(
-					this.dpb.generateCellTopic(controller.getName()) + "/" + controllerFunctionName + "/command",
-					(new Request()).setParameter("command", ControlCommand.START.toString()),
-					"<" + controller.getName() + ">/" + controllerFunctionName + "/state",
-					new JsonPrimitive(ServiceState.FINISHED.toString()));
+			// Start the system by setting start. Blocking system by setting blocking true
+			controller.getCommunicator().execute(controller.getName() + ":" + controllerFunctionName + "/command", 
+				(new Request())
+				.setParameter("command", ControlCommand.START)
+				.setParameter("blocking", true), 100000);
+			
+			controller.getCommunicator().execute(controller.getName() + ":" + controllerFunctionName + "/command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", true), 100000);
 
 			double result = controller.getCommunicator().read(processDatapoint).getValue().getAsDouble();
 
@@ -478,6 +481,15 @@ public class MqCellCoreFunctionTester {
 
 			assertEquals(result, expectedResult, 0.0);
 			log.info("Test passed");
+			
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
 		} catch (Exception e) {
 			log.error("Error testing system", e);
 			fail("Error");
@@ -514,8 +526,8 @@ public class MqCellCoreFunctionTester {
 			String memoryAgentName = "MemoryAgent";
 
 			// values
-			double startValue = 0;
-			int expectedResult = 3;
+			double startValue = 2;
+			int expectedResult = 5;
 
 			// Memory
 			Cell memoryAgent = this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
@@ -536,19 +548,19 @@ public class MqCellCoreFunctionTester {
 			CellConfig serviceAgent1 = CellConfig.newConfig(agentName1)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
-									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+									memoryAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell service1 = this.launcher.createAgent(serviceAgent1);
 
 			CellConfig serviceAgent2 = CellConfig.newConfig(agentName2)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
-									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+									memoryAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell service2 = this.launcher.createAgent(serviceAgent2);
 
 			CellConfig serviceAgent3 = CellConfig.newConfig(agentName3)
 					.addCellfunction(CellFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
-									processDatapoint, memoryAgentName, SyncMode.SUBSCRIBEWRITEBACK)));
+									memoryAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell service3 = this.launcher.createAgent(serviceAgent3);
 
 			synchronized (this) {
@@ -566,12 +578,11 @@ public class MqCellCoreFunctionTester {
 			memoryAgent.getCommunicator().write(this.dpb.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			// Start the system by setting start
 			controller.getCommunicator().setDefaultTimeout(100000);
-			Datapoint state = controller.getCommunicator().executeRequestBlockForResult(
-					this.dpb.generateCellTopic(controller.getName()) + "/" + controllerFunctionName + "/command",
-					(new Request()).setParameter("command", ControlCommand.START.toString()),
-					"<" + controller.getName() + ">/" + controllerFunctionName + "/state",
-					new JsonPrimitive(ServiceState.FINISHED.toString()));
-
+			controller.getCommunicator().execute(controller.getName() + ":" + controllerFunctionName + "/command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", true), 100000);
+			
 			double result = memoryAgent.getCommunicator().read(processDatapoint).getValue().getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);

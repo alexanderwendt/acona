@@ -392,21 +392,21 @@ public class CellFunctionConfig {
 	 * @param syncMode
 	 * @return
 	 */
-	public CellFunctionConfig addManagedDatapoint(String id, String address, String agentId, SyncMode syncMode) {
-		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, agentId, syncMode));
+	public CellFunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
+		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, syncMode));
 	}
 
-	/**
-	 * @param id
-	 * @param address
-	 * @param agentId
-	 * @param syncMode
-	 * @return
-	 */
-	public CellFunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
-		Datapoint dp = (new DPBuilder()).newDatapoint(address);
-		return this.addManagedDatapoint(DatapointConfig.newConfig(id, dp.getAddress(), dp.getAgent(""), syncMode));
-	}
+//	/**
+//	 * @param id
+//	 * @param address
+//	 * @param agentId
+//	 * @param syncMode
+//	 * @return
+//	 */
+//	public CellFunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
+//		//Datapoint dp = (new DPBuilder()).newDatapoint(address);
+//		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, syncMode));
+//	}
 
 	/**
 	 * @return

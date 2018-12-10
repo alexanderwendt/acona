@@ -144,14 +144,16 @@ public class Response {
 		return builder.toString();
 	}
 
-	public void setError(String error) {
+	public Response setError(String error) {
 		this.error = new RequestError(error);
+		return this;
 	}
 
 	/**
 	 * Set the OK result as an achknowledge
 	 */
-	public void setResultOK() {
+	public Response setResultOK() {
 		this.setResult(new JsonPrimitive("OK"));
+		return this;
 	}
 }

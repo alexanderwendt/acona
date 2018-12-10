@@ -123,6 +123,11 @@ public class Request {
 		this.parameter.addProperty(key, value);
 		return this;
 	}
+	
+	public Request setParameter(String key, Object value) {
+		this.parameter.addProperty(key, value.toString());
+		return this;
+	}
 
 	public <T> Request setParameter(String key, List<T> value) throws Exception {
 		// Convert list to JsonElement

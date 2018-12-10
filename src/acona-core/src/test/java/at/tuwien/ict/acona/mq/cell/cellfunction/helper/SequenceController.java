@@ -25,36 +25,36 @@ public class SequenceController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		ServiceState result1 = this.executeServiceById("servicename", "agent1", 1000);
+		this.executeServiceById("servicename", "agent1", 1000);
 
-		synchronized (this) {
-			try {
-				this.wait(delay);
-			} catch (InterruptedException e) {
+//		synchronized (this) {
+//			try {
+//				this.wait(delay);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
 
-			}
-		}
+		//log.debug("Result1 = {}", result1);
+		this.executeServiceById("servicename", "agent2", 1000);
+		//log.debug("Result2 = {}", result2);
+//		synchronized (this) {
+//			try {
+//				this.wait(delay);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
 
-		log.debug("Result1 = {}", result1);
-		ServiceState result2 = this.executeServiceById("servicename", "agent2", 1000);
-		log.debug("Result2 = {}", result2);
-		synchronized (this) {
-			try {
-				this.wait(delay);
-			} catch (InterruptedException e) {
-
-			}
-		}
-
-		ServiceState result3 = this.executeServiceById("servicename", "agent3", 1000);
-		log.debug("Result3 = {}", result3);
-		synchronized (this) {
-			try {
-				this.wait(delay);
-			} catch (InterruptedException e) {
-
-			}
-		}
+		this.executeServiceById("servicename", "agent3", 1000);
+		//log.debug("Result3 = {}", result3);
+//		synchronized (this) {
+//			try {
+//				this.wait(delay);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
 
 		log.info("Function sequence controller finished");
 
@@ -69,18 +69,24 @@ public class SequenceController extends CellFunctionThreadImpl {
 	 * @return
 	 * @throws Exception
 	 */
-	private ServiceState executeServiceById(String serviceNameId, String agentNameId, int timeout) throws Exception {
-		return executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId), timeout);
+	private void executeServiceById(String serviceNameId, String agentNameId, int timeout) throws Exception {
+		executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId), timeout);
 	}
 
-	private ServiceState executeService(String serviceName, String agentName, int timeout) throws Exception {
+	private void executeService(String serviceName, String agentName, int timeout) throws Exception {
 		String commandDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + "/" + serviceName + "/command";
-		String resultDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + "/" + serviceName + "/state";
+		//String resultDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + "/" + serviceName + "/state";
 		log.debug("Execute service={}", serviceName);
-		Datapoint result1 = this.getCommunicator().executeRequestBlockForResult(commandDatapoint, (new Request()).setParameter("command", ControlCommand.START.toString()), resultDatapoint, new JsonPrimitive(ServiceState.FINISHED.toString()));
+		
+		this.getCommunicator().execute(commandDatapoint, 
+				(new Request())
+				.setParameter("command", ControlCommand.START)
+				.setParameter("blocking", true), 100000);
+		
+		//Datapoint result1 = this.getCommunicator().executeRequestBlockForResult(commandDatapoint, (new Request()).setParameter("command", ControlCommand.START.toString()), resultDatapoint, new JsonPrimitive(ServiceState.FINISHED.toString()));
 
-		log.debug("Service={} executed. Result={}", commandDatapoint, result1);
-		return ServiceState.valueOf(result1.getValueAsString());
+		//log.debug("Service={} executed. Result={}", commandDatapoint, result1);
+		//return ServiceState.valueOf(result1.getValueAsString());
 	}
 
 	@Override
@@ -107,7 +113,7 @@ public class SequenceController extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
 		// TODO Auto-generated method stub
 
 	}

@@ -32,7 +32,7 @@ public class IncrementFunction extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateDatapointsById(String id, String topic, JsonElement data) {
 		// TODO Auto-generated method stub
 
 	}

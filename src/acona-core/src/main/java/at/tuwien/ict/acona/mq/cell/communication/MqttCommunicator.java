@@ -75,15 +75,23 @@ public interface MqttCommunicator {
 	 */
 	public void executeAsynchronous(String agentAndServiceName, Request methodParameters) throws Exception;
 
-	/**
-	 * This method takes a request that is sent to a service. It subscribes the result datapoint of an agent Set the timeout of the function by changing the default timeout of the communicator
-	 * 
-	 * @param serviceAddress
-	 * @param req
-	 * @throws Exception
-	 */
-	public Datapoint executeRequestBlockForResult(String serviceAddress, Request req, String resultAddress, JsonElement expectedResult) throws Exception;
+//	/**
+//	 * This method takes a request that is sent to a service. It subscribes the result datapoint of an agent Set the timeout of the function by changing the default timeout of the communicator
+//	 * 
+//	 * @param serviceAddress
+//	 * @param req
+//	 * @throws Exception
+//	 */
+//	//public Datapoint executeRequestBlockForResult(String serviceAddress, Request req, String resultAddress, JsonElement expectedResult) throws Exception;
 
+	/**
+	 * Send a response to an open request
+	 * 
+	 * @param request
+	 * @throws Exception 
+	 */
+	public void sendResponseToOpenRequest(Response response) throws Exception;
+	
 	/**
 	 * Shut down communicator of the agent
 	 */

@@ -11,6 +11,7 @@ import at.tuwien.ict.acona.mq.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class SimpleController extends CellFunctionThreadImpl {
 
@@ -25,7 +26,7 @@ public class SimpleController extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		ServiceState result1 = this.executeServiceById("servicename", "agent1", 1000);
+		this.executeBlockingServiceById("servicename", "agent1", 1000);
 
 		log.info("Function sequence controller finished");
 
@@ -40,18 +41,20 @@ public class SimpleController extends CellFunctionThreadImpl {
 	 * @return
 	 * @throws Exception
 	 */
-	private ServiceState executeServiceById(String serviceNameId, String agentNameId, int timeout) throws Exception {
-		return executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId), timeout);
+	private void executeBlockingServiceById(String serviceNameId, String agentNameId, int timeout) throws Exception {
+		executeService(this.getFunctionConfig().getProperty(serviceNameId), this.getFunctionConfig().getProperty(agentNameId), timeout);
 	}
 
-	private ServiceState executeService(String serviceName, String agentName, int timeout) throws Exception {
-		String commandDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + "/" + serviceName + "/command";
-		String resultDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + "/" + serviceName + "/state";
+	private void executeService(String serviceName, String agentName, int timeout) throws Exception {
+		String commandDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + ":" + serviceName + "/command";
+		//String resultDatapoint = this.getDatapointBuilder().generateCellTopic(agentName) + "/" + serviceName + "/state";
 		log.debug("Execute service={}", serviceName);
-		Datapoint result1 = this.getCommunicator().executeRequestBlockForResult(commandDatapoint, (new Request()).setParameter("command", ControlCommand.START.toString()), resultDatapoint, new JsonPrimitive(ServiceState.FINISHED.toString()));
+		Response result = this.getCommunicator().execute(commandDatapoint, 
+				(new Request())
+				.setParameter("command", ControlCommand.START)
+				.setParameter("blocking", true), 100000);
 
-		log.debug("Service={} executed. Result={}", commandDatapoint, result1);
-		return ServiceState.valueOf(result1.getValueAsString());
+		log.debug("Service={} executed. Result={}", commandDatapoint, result);
 	}
 
 	@Override
@@ -60,8 +63,9 @@ public class SimpleController extends CellFunctionThreadImpl {
 
 		// this.writeLocal(Datapoints.newDatapoint("state").setValue(ServiceState.FINISHED.toString()));
 		log.debug("Set finished state");
-		this.setServiceState(ServiceState.FINISHED);
-		log.debug("Finished state set");
+		this.setFinishedAfterSingleRun(true);
+		//this.setServiceState(ServiceState.FINISHED);
+		//log.debug("Finished state set");
 
 	}
 
@@ -78,7 +82,7 @@ public class SimpleController extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
 		// TODO Auto-generated method stub
 
 	}

@@ -27,7 +27,7 @@ public class DatapointMirroring extends CellFunctionImpl {
 
 		for (DatapointConfig config : this.getFunctionConfig().getManagedDatapoints()) {
 
-			if (config.getAgentid(this.getCell().getName()).equals(this.getCell().getName())) {
+			if (config.getAgentid().equals(this.getCell().getName())) {
 				throw new Exception("Function " + this.getFunctionName() + " is not allowed to subscribe datapoints of the own agent, in order to avoid circular references. Erroneous subscription: " + config);
 			}
 		}
@@ -42,7 +42,7 @@ public class DatapointMirroring extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateDatapointsById(String id, String topic, JsonElement data) {
 		try {
 			Datapoint dp = this.getDatapointBuilder().toDatapoint(data.toString());
 

@@ -53,6 +53,7 @@ public class DPBuilder {
 		try {
 			if (this.isDatapoint(data) == true) {
 				result = this.newDatapoint(data.get(KEYADDRESS).getAsString()).setValue(data.get(KEYVALUE));
+				result.setAgent(data.get(KEYAGENT).getAsString());
 				// .setType(data.get(KEYTYPE).getAsString()).setValue(data.get(KEYVALUE));
 			} else {
 				throw new IllegalArgumentException("Cannot cast json data to datapoint " + data);

@@ -48,7 +48,7 @@ public class DatapointTransfer extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateDatapointsById(String id, String topic, JsonElement data) {
 		try {
 			Datapoint sourceDatapoint = this.getDatapointBuilder().toDatapoint(data.toString());
 			Datapoint destinationDatapoint = this.getDatapointBuilder().newDatapoint(destination).setValue(sourceDatapoint.getValue());

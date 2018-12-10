@@ -96,6 +96,9 @@ public abstract class CellFunctionImpl implements CellFunction {
 	private String host = "tcp://127.0.0.1:1883";
 	private String username = "acona";
 	private String password = "acona";
+	
+	//State variables
+	private Request openRequest = null;
 
 	/**
 	 * Constructor
@@ -274,24 +277,40 @@ public abstract class CellFunctionImpl implements CellFunction {
 	@Override
 	public Response performOperation(String topic, Request param) {
 		log.debug("{}>Execute service method={}", this.getFunctionName(), topic);
-		Response response;
+		Response response=null;
 		synchronized (this.subFunctionsHandlerMap) {
 			if (this.subFunctionsHandlerMap.containsKey(topic)) {
 				response = subFunctionsHandlerMap.get(topic).apply(param);
+				
+				//Set the state variable if the request is open after the function. If open, the response is null and nothing shall be returned to the caller
+				//If not null, the the response shall be returned to the caller. In that way, a request can trigger other functions to complete. Asynchronous calls
+				//can be converted into synchronous calls.
+				if (response==null) {
+					this.setOpenRequest(param);	//Set the current open request as response is null
+				} else {
+					this.setOpenRequest(null);	//Return a response and therefore set the open request to null
+				}
+				
 			} else {
+				//If no topic could be identified, 
 				log.warn("No method for the topic={}. Available methods={}", topic, this.subFunctionsHandlerMap.keySet());
 				response = new Response(param);
 				response.setError("No method for this topic");
 			}
-
 		}
-
-		if (response.hasError() == true) {
-			log.warn("{}>Execution of service method={} unsuccessful. Error={}.", this.getFunctionName(), topic, response.getError());
+		
+		if (response!=null) {
+			//Handle errors
+			if (response.hasError() == true) {
+				log.warn("{}>Execution of service method={} unsuccessful. Error={}.", this.getFunctionName(), topic, response.getError());
+			} else {
+				log.debug("{}>Execution of service method={} finished.", this.getFunctionName(), topic);
+			}
 		} else {
-			log.debug("{}>Execution of service method={} finished.", this.getFunctionName(), topic);
+			log.debug("The response is open and will be handled by another method.");
 		}
-
+		
+		
 		return response;
 	}
 
@@ -331,7 +350,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 		this.getSubscribedDatapoints().values().forEach(subscriptionConfig -> {
 			try {
 				// Adds the subscription to the handler
-				String completeAddress = subscriptionConfig.getComposedAddress(this.getCellName());
+				String completeAddress = subscriptionConfig.getAddress();
 				// @SuppressWarnings("unused")
 				Datapoint initialValue = this.getCommunicator().subscribeDatapoint(completeAddress);
 				log.debug("{}>Subscribed address={}.", this.getCellName(), completeAddress);
@@ -349,7 +368,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 		// Go through each address and remove the activator to this address
 		this.getSubscribedDatapoints().values().forEach(subscriptionsConfig -> {
 			try {
-				this.getCommunicator().unsubscribeDatapoint(subscriptionsConfig.getComposedAddress(this.getCellName()));
+				this.getCommunicator().unsubscribeDatapoint(subscriptionsConfig.getAddress());
 			} catch (Exception e) {
 				log.error("Cannot unsubscribe address={}", subscriptionsConfig.getAddress(), e);
 			}
@@ -409,11 +428,11 @@ public abstract class CellFunctionImpl implements CellFunction {
 //				}
 //			});
 
-		this.updateDatapointsById(id, data);
+		this.updateDatapointsById(id, topic, data);
 		// }
 	}
 
-	protected abstract void updateDatapointsById(final String id, final JsonElement data);
+	protected abstract void updateDatapointsById(final String id, final String address, final JsonElement data);
 
 	@Override
 	public String getFunctionName() {
@@ -541,6 +560,24 @@ public abstract class CellFunctionImpl implements CellFunction {
 
 	protected String enhanceWithRootAddress(String suffix) {
 		return this.getFunctionRootAddress() + suffix;
+	}
+	
+	/**
+	 * Get the current ope request to see if there is smething to return
+	 * 
+	 * @return null if no open request is available, request to get the current open request
+	 */
+	protected Request getOpenRequest() {
+		return openRequest;
+	}
+
+	/**
+	 * Set the open request as a parameter if the function cannot return an answer. Else the open request is null.
+	 * 
+	 * @param openRequest
+	 */
+	protected void setOpenRequest(Request openRequest) {
+		this.openRequest = openRequest;
 	}
 
 }

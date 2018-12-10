@@ -20,8 +20,8 @@ public class IncrementServiceThread extends CellFunctionThreadImpl {
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
+		this.setFinishedAfterSingleRun(true);
 		log.info("Add a managed datapoint for {} to subscribe and write back", ATTRIBUTEINCREMENTDATAPOINT);
-
 		log.info("Init service={}", this.getFunctionName());
 
 	}
@@ -54,7 +54,7 @@ public class IncrementServiceThread extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {
-		this.setServiceState(ServiceState.FINISHED);
+		//this.setServiceState(ServiceState.FINISHED);
 		// this.getCommunicator().write(Datapoints.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.getCurrentState().toString()));
 
 	}
@@ -66,8 +66,9 @@ public class IncrementServiceThread extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
-		// log.debug("Nothing shall be subscribed {}:{}", id, data);
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		log.debug("Nothing shall be subscribed {}:{}", id, data);
+		
 
 	}
 

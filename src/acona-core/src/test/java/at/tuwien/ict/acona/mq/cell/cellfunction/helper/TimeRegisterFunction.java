@@ -28,7 +28,7 @@ public class TimeRegisterFunction extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(String id, JsonElement data) {
+	protected void updateDatapointsById(String id, String topic, JsonElement data) {
 		log.info("Received subscribed update={}", data);
 		this.registeredTime = System.currentTimeMillis();
 		Datapoint result = (new DPBuilder()).newDatapoint(this.getFunctionRootAddress() + RESULTSUFFIX).setValue(String.valueOf(this.registeredTime));
