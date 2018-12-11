@@ -12,11 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.demowebservice.launcher.GraphServer;
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
 
 
 
@@ -44,17 +41,6 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 		gserver = new GraphServer(8000);
 		
 		
-	}
-	
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		//Add your own service here and test it with
-		//parameterdata.getMethod()
-		
-		
-		
-		return null;
 	}
 	
 	@Override
@@ -212,7 +198,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	}
 	
 	@Override
-	protected synchronized void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
 	
 		
 		log.debug("Received data={}", data);
@@ -223,7 +209,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 		int circleSize = 10;
 		JsonArray  outputJSON = new JsonArray();
 		
-		if (data.containsKey(UserInterfaceCollector.SYSTEMSTATEADDRESSID)) {
+		if (id.equals(UserInterfaceCollector.SYSTEMSTATEADDRESSID)) {
 			
 			//log.info("Current state={}", data.get(UserInterfaceCollector.SYSTEMSTATEADDRESSID).getValue());
 			//log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
@@ -235,7 +221,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 			JsonObject graphConfig = new JsonObject();
 			
 			//Parse JSON Input
-			JsonObject tmpAgent = data.get("state").getValue().getAsJsonObject();
+			JsonObject tmpAgent = data.getAsJsonObject();
 
 			// getting Agent name
 			String agentName = tmpAgent.get("agentname").getAsString();
@@ -311,9 +297,9 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        //log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 	        //gserver.put(outputJSON.toString());
 	        //gserver.setString(outputJSON.toString());
-		} else if (data.containsKey("RESULT")) {
+		} else if (id.equals("RESULT")) {
 			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-			log.info("Current state={}", data.get("RESULT").getValue());
+			log.info("Current state={}", data);
 			//Datapoint y = data.get("RESULT").getValue();
 			log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			//gserver.setString(data.get("RESULT").getValue().toString());
@@ -327,7 +313,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 //			JsonObject graphConfig = new JsonObject();
 			
 //			//Parse JSON Input - THIS IS THE ADDRESS CONTAINER
-			JsonObject inDataJSON= data.get("RESULT").getValue().getAsJsonObject();
+			JsonObject inDataJSON= data.getAsJsonObject();
 
 			// 1ST LEVEL OF ARCHITECTURE			
 			
@@ -393,10 +379,10 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 	        outputJSON.add(allLinks);
 	        gserver.setString(outputJSON.toString());
 	        
-		} else if (data.containsKey("KORE")) {
+		} else if (id.equals("KORE")) {
 			log.info("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-			log.info("Current state={}", data.get("KORE").getValue());
-	        gserver.setString(data.get("KORE").getValue().toString());
+			log.info("Current state={}", data);
+	        gserver.setString(data.toString());
 			log.info("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
 
         	// Create the Ouput JSONArrays
@@ -414,7 +400,7 @@ public class UserInterfaceCollector extends CellFunctionThreadImpl {
 //			JsonObject graphConfig = new JsonObject();
 			
 //			//Parse JSON Input - THIS IS THE KORE CONTAINER
-			JsonObject inDataJSON= data.get("KORE").getValue().getAsJsonObject();
+			JsonObject inDataJSON= data.getAsJsonObject();
 			
 			//Create an entrySet to loop through root values (without knowing member names);In this case we have 9 JsonArray values
 			Set<Map.Entry<String, JsonElement>> entrySet = inDataJSON.entrySet();

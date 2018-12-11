@@ -79,4 +79,10 @@ public class CellFunctionDummy implements CellFunction {
 		return null;
 	}
 
+	@Override
+	public String getFunctionRootAddress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

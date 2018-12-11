@@ -41,66 +41,7 @@ public class CellNotificator implements DataStorageSubscriberNotificator {
 
 	public void shutDown() {
 		log.debug("Shut down notificator");
-		// threadPoolExecutor.shutdown();
-		// while (!threadPoolExecutor.isTerminated()) {
-		//
-		// }
 	}
 
-//	private class WorkerThread implements Runnable {
-//
-//		private final List<String> subscribers;
-//		private final String caller;
-//		private final Datapoint subscribedData;
-//		private final CellFunctionHandler activationHandler;
-//		private final BasicServiceCommunicator communicator;
-//		private final String localName;
-//
-//		public WorkerThread(CellFunctionHandler activationHandler, BasicServiceCommunicator communicator, List<String> subscribers, String caller, String localName, Datapoint subscribedData) {
-//			this.communicator = communicator;
-//			this.activationHandler = activationHandler;
-//			this.subscribers = subscribers;
-//			this.caller = caller;
-//			this.localName = localName;
-//			this.subscribedData = subscribedData;
-//			// Thread.currentThread().setName("Subscriberpool-localName-" + this.hashCode());
-//		}
-//
-//		@Override
-//		public void run() {
-//			log.trace("running subscription notification for data={} and subscribers={}", this.subscribedData.getAddress() + ":" + this.subscribedData.getValue(), this.subscribers);
-//
-//			if (subscribers.isEmpty() == false) {
-//				subscribers.forEach(s -> {
-//					try {
-//						this.communicator.notifySubscriber(s, subscribedData);
-//					} catch (Exception e) {
-//						log.error("Cannot notify datapoint={} to subscriber={}", subscribedData, s, e);
-//					}
-//				});
-//			}
-//
-//		}
-
-//		@Override
-//		public String toString() {
-//			StringBuilder builder = new StringBuilder();
-//			builder.append("WorkerThread [subscribers=");
-//			builder.append(subscribers);
-//			builder.append(", caller=");
-//			builder.append(caller);
-//			builder.append(", subscribedData=");
-//			builder.append(subscribedData);
-//			builder.append(", activationHandler=");
-//			builder.append(activationHandler);
-//			builder.append(", communicator=");
-//			builder.append(communicator);
-//			builder.append(", localName=");
-//			builder.append(localName);
-//			builder.append("]");
-//			return builder.toString();
-//		}
-//
-//	}
 
 }

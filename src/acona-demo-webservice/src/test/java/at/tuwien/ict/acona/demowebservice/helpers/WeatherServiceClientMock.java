@@ -7,12 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.datastructures.Chunk;
-import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.datastructures.Chunk;
+import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
+
 
 /**
  * This is a class that reads the weather from the internet and presents it as datapoints on a certain address
@@ -42,12 +40,6 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 		this.cityName = this.getFunctionConfig().getProperty(CITYNAME);
 		this.userid = this.getFunctionConfig().getProperty(USERID);
 		
-	}
-	
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -90,12 +82,13 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	protected void shutDownThreadExecutor() throws Exception {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
 		// TODO Auto-generated method stub
 		
 	}

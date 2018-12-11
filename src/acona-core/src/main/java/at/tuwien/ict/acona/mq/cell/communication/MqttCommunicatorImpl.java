@@ -220,10 +220,10 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 
 					// Message is a command for the function
-					//} else if (topic.equals(subscribedCommandAddress)) {
+					} else if (topic.equals(subscribedCommandAddress)) {
 						// this.setcommand(command)
 						// TODO: Add method;
-					//	log.warn("Commands shall not get here {}, {}", topic, jsonMessage);
+						log.warn("Commands shall not get here {}, {}", topic, jsonMessage);
 
 					// Else, any other message that is subscribed
 					} else {
@@ -234,7 +234,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 				@Override
 				public void connectionLost(Throwable cause) {
-					log.error("Connection to MQTT messaging lost!", cause);
+					log.info("Connection to MQTT messaging lost!");
 					// latch.release();
 				}
 
@@ -433,8 +433,12 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	public void shutDown() {
 		// Disconnect the client
 		try {
+			//Release locks
+			this.latch.release();
+			
 			// disconnect
 			mqttClient.disconnect();
+			//mqttClient.disconnect();
 
 			// Close the client
 			mqttClient.close();

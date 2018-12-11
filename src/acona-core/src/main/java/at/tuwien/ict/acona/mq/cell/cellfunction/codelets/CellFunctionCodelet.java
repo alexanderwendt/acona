@@ -46,7 +46,7 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	protected void cellFunctionThreadInit() throws Exception {
 		try {
 			// Set the caller address
-			this.callerAddress = this.getFunctionRootAddress().substring(0, this.getFunctionRootAddress().length()-1);  //this.getCell().getName() + ":" + this.getFunctionName();
+			this.callerAddress = this.getFunctionRootAddress();  //this.getCell().getName() + ":" + this.getFunctionName();
 
 			// Set the system state datapoint
 			// codeletStateDatapointAddress = this.getFunctionName() + "." + "state";

@@ -119,7 +119,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 			// Get name
 			this.cellFunctionName = this.config.getName();
 
-			this.functionRootAddress = this.dpBuilder.generateCellTopic(this.getCellName()) + "/" + this.cellFunctionName + "/";
+			this.functionRootAddress = this.dpBuilder.generateCellTopic(this.getCellName()) + "/" + this.cellFunctionName;
 			log.debug("{}>Root address={}", this.cellFunctionName, this.functionRootAddress);
 
 			log.trace("Initialize an agent with config:{}", config);
@@ -262,7 +262,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 * @throws Exception
 	 */
 	protected void removeRequestHandlerFunction(String topicSuffix) throws Exception {
-		String topic = this.functionRootAddress + topicSuffix;
+		String topic = this.functionRootAddress + "/" + topicSuffix;
 		this.getCommunicator().unsubscribeTopic(topic);
 		this.subFunctionsHandlerMap.remove(topic);
 
@@ -383,8 +383,8 @@ public abstract class CellFunctionImpl implements CellFunction {
 		// this.getCell().getFunctionHandler().deregisterActivatorInstance(this);
 		try {
 			// Set communication timeouts to small number
-			this.getCommunicator().setDefaultTimeout(1);
-
+			//this.getCommunicator().setDefaultTimeout(1);
+			
 			// Execute specific functions
 			this.shutDownImplementation();
 
@@ -395,7 +395,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 			this.getCommunicator().shutDown();
 
 			// Execute general deregister
-			this.getCell().getFunctionHandler().deregisterActivatorInstance(this.getFunctionName());
+			this.getCell().getFunctionHandler().deregisterActivatorInstance(this.getFunctionRootAddress());
 
 			// this.getCell().takeDownCell();
 			log.debug("Agent {}> ==== shut down function={} ====", this.getCell().getName(), this.getFunctionName());
@@ -530,7 +530,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	protected void setServiceState(ServiceState serviceState) throws Exception {
 		this.currentServiceState = serviceState;
 		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(STATESUFFIX)).setValue(serviceState.toString()));
-		// this.getCommunicator().publishTopic(this.enhanceWithRootAddress(STATESUFFIX), new JsonPrimitive(serviceState.toString()));
+		//this.getCommunicator().publishTopic(this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(STATESUFFIX)).getCompleteAddressAsTopic(""), new JsonPrimitive(serviceState.toString()), true);
 
 		// if (this.getFunctionConfig().getRegisterState().getAsBoolean() == true) {
 		// this.getCell().getFunctionHandler().updateState(this, this.currentServiceState);
@@ -555,12 +555,13 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return this.subFunctionsHandlerMap;
 	}
 
+	@Override
 	public String getFunctionRootAddress() {
 		return functionRootAddress;
 	}
 
 	protected String enhanceWithRootAddress(String suffix) {
-		return this.getFunctionRootAddress() + suffix;
+		return this.getFunctionRootAddress() + "/" + suffix;
 	}
 	
 	/**

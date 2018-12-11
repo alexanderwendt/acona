@@ -37,6 +37,13 @@ public interface CellFunction {
 	 * @return
 	 */
 	public String getCellName();
+	
+	/**
+	 * Get function root address
+	 * 
+	 * @return
+	 */
+	public String getFunctionRootAddress();
 
 	/**
 	 * Get the cell function configuration

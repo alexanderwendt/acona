@@ -8,11 +8,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.cell.communicator.Communicator;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
+import com.google.gson.JsonElement;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl;
+import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
 
 public class JerseyRestServer  extends CellFunctionImpl {
 	private final static Logger log = LoggerFactory.getLogger(JerseyRestServer.class);
@@ -53,30 +52,21 @@ public class JerseyRestServer  extends CellFunctionImpl {
 	        jettyServer.destroy();
 	     }
 	}
-
-
-
-	@Override
-	protected void shutDownImplementation() {
-		
-		
-	}
-
-	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		// TODO Auto-generated method stub
-	}
 	
-	protected Communicator getCommunicatorFromFunction() {
+	protected MqttCommunicator getCommunicatorFromFunction() {
 		return this.getCommunicator();
 	}
 
-
+	@Override
+	protected void shutDownImplementation() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
+	protected void updateDatapointsById(String id, String address, JsonElement data) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 }

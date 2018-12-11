@@ -237,12 +237,13 @@ public class CellImpl implements Cell, Runnable {
 
 	@Override
 	public void takeDownCell() {
-		// Close notificator
-		this.notificator.shutDown();
-
 		// Close all functions
 		this.getFunctionHandler().getCellFunctionNames().forEach(name -> this.getFunctionHandler().getCellFunction(name).shutDownFunction());
 
+		// Close notificator
+		this.notificator.shutDown();
+		
+		
 		// this.doDelete();
 		// Printout a dismissal message
 		log.info("Cell" + this.getName() + " terminated.");
@@ -365,8 +366,8 @@ public class CellImpl implements Cell, Runnable {
 	}
 
 	@Override
-	public void removeCellFunction(String cellFunctionName) throws Exception {
-		this.functionHandler.deregisterActivatorInstance(cellFunctionName);
+	public void removeCellFunction(String cellFunctionRootAddress) throws Exception {
+		this.functionHandler.deregisterActivatorInstance(cellFunctionRootAddress);
 
 	}
 

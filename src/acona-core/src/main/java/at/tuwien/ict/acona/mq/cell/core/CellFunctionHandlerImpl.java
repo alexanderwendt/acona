@@ -35,23 +35,23 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			// Get all subscribed addresses
 			// Add the cellfunction itself
 			// Check if this name is already registered
-			if (this.cellFunctionsMap.containsKey(cellFunctionInstance.getFunctionName())) {
-				log.warn("Agent {}>Cell function={} is already registered. Cellfunction will be overwritten. Watch for errors.", this.hostCell.getName(), cellFunctionInstance.getFunctionName());
+			if (this.cellFunctionsMap.containsKey(cellFunctionInstance.getFunctionRootAddress())) {
+				log.warn("Agent {}>Cell function={} is already registered. Cellfunction will be overwritten. Watch for errors.", this.hostCell.getName(), cellFunctionInstance.getFunctionRootAddress());
 			}
 
-			this.cellFunctionsMap.put(cellFunctionInstance.getFunctionName(), cellFunctionInstance);
+			this.cellFunctionsMap.put(cellFunctionInstance.getFunctionRootAddress(), cellFunctionInstance);
 
 			// Set init state
-			if ((this.applicationFunctions.contains(cellFunctionInstance.getFunctionName()) == false)) {
+			if ((this.applicationFunctions.contains(cellFunctionInstance.getFunctionRootAddress()) == false)) {
 				synchronized (this.applicationFunctions) {
-					this.applicationFunctions.add(cellFunctionInstance.getFunctionName());
+					this.applicationFunctions.add(cellFunctionInstance.getFunctionRootAddress());
 				}
 
 				// Notify all listeners that a new function has been registered
 				synchronized (this.listenerList) {
 					this.listenerList.forEach(l -> {
-						if (l.getListenerFunction().equals(cellFunctionInstance.getFunctionName()) == false) {
-							l.notifyAddedFunction(cellFunctionInstance.getFunctionName());
+						if (l.getListenerFunction().equals(cellFunctionInstance.getFunctionRootAddress()) == false) {
+							l.notifyAddedFunction(cellFunctionInstance.getFunctionRootAddress());
 						}
 					});
 				}
@@ -60,7 +60,7 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			// Create a responder to the cellfunction if it is set in the
 			if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
 				// this.hostCell.getCommunicator().createResponderForFunction(cellFunctionInstance);
-				log.info("Agent {}, function {}>Generate external responder to be able to answer incoming messages.", this.hostCell.getName(), cellFunctionInstance.getFunctionName());
+				log.info("Agent {}, function {}>Generate external responder to be able to answer incoming messages.", this.hostCell.getName(), cellFunctionInstance.getFunctionRootAddress());
 			}
 		} catch (Exception e) {
 			log.error("Cannot register cell function " + cellFunctionInstance + ".", e);

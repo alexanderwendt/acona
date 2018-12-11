@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.datastructures.Chunk;
-import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcError;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
+import com.google.gson.JsonElement;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.datastructures.Chunk;
+import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
 
 /**
  * @author wendt
@@ -30,6 +30,8 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	private final static Logger log = LoggerFactory.getLogger(ComparisonAlgorithm.class);
 	private DecimalFormat df = new DecimalFormat("#.#");
 	
+	public final static String GETDATASUFFIX = "getresult";
+	
 	private final static String DATAPREDICATE = "hasData";
 
 	@Override
@@ -38,6 +40,24 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 
 		algorithmResult = this.generateResponse(this.algorithmResult);
 		
+		// Add subfunctions
+		this.addRequestHandlerFunction(GETDATASUFFIX, (Request input) -> getResult(input));
+		
+	}
+	
+	private Response getResult(Request req) {
+		Response result = new Response(req);
+		
+		log.debug("Get result");
+		try {
+			result.setResult(algorithmResult.toJsonObject());
+		} catch (Exception e) {
+			log.error("Cannot get result", e);
+			result = new Response(req);
+			result.setError(e.getMessage());
+		}
+		
+		return result;
 	}
 	
 	private Chunk generateResponse(final Chunk currentResult) throws Exception {
@@ -72,24 +92,6 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 		
 		return result;
 	}
-	
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		JsonRpcResponse result;
-		try {
-			switch (parameterdata.getMethod()) {
-				case "getresult":
-					result = new JsonRpcResponse(parameterdata, algorithmResult.toJsonObject());
-					break;
-				default:
-					throw new Exception("No such method");
-			}
-		} catch (Exception e) {
-			result = new JsonRpcResponse(parameterdata, new JsonRpcError("Error", -1, e.getMessage(), e.getMessage()));
-		}
-		
-		return result;
-	}
 
 	@Override
 	protected void executeFunction() throws Exception {
@@ -106,7 +108,7 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	protected void executeCustomPostProcessing() throws Exception {
 		//write conclusio to datapoint
 		
-		Datapoint resultDatapoint = DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
+		Datapoint resultDatapoint = this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(RESULTSUFFIX)).setValue(this.algorithmResult.toJsonObject());
 		//this.getCommunicator().read("agent1:hugo").getValue(Episode.class)
 		//this.getCommunicator().execute(agentName, serviceName, methodParameters, timeout)
 		synchronized (resultDatapoint) {
@@ -124,10 +126,11 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-		if (this.isSystemDatapoint(data)==false && data.isEmpty()==false) {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		//if (this.isSystemDatapoint(data)==false && data.isEmpty()==false) {
 			//Every datapoint that is not a system datapoint must be a subscribed weather datapoint
-			data.values().forEach(dp->{
+			//data.values().forEach(dp->{
+			Datapoint dp = this.getDatapointBuilder().toDatapoint(data.getAsJsonObject());	
 				try {
 					Chunk receivedChunk = ChunkBuilder.newChunk(dp.getValue().getAsJsonObject());
 					
@@ -149,8 +152,8 @@ public class ComparisonAlgorithm extends CellFunctionThreadImpl {
 				} catch (Exception e) {
 					log.error("Cannot update datapoint: " + dp);
 				}
-			});
-		}
+			//});
+		//}
 	}
 
 	@Override

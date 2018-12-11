@@ -8,13 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
 
 public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
 
@@ -26,12 +23,6 @@ public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
 		log.info("KORE data structure generator. The generator is triggered by any incoming datapoint");
 
 		
-	}
-	
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -46,7 +37,7 @@ public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
 		
 		log.debug("Generated KORE string={}", obj);
 		
-		this.getCommunicator().write(DatapointBuilder.newDatapoint(this.addServiceName(RESULTSUFFIX)).setValue(obj));
+		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(RESULTSUFFIX)).setValue(obj));
 		
 	}
 
@@ -63,18 +54,14 @@ public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-		if (this.isSystemDatapoint(data)==false) {
-			log.debug("Got start command from={}", data);
-			this.setStart();
-		}
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	protected void shutDownThreadExecutor() throws Exception {
-		// TODO Auto-generated method stub
-		
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		this.setStart();
 	}
 
 }

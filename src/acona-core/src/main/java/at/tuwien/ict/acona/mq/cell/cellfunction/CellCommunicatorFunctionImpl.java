@@ -69,7 +69,7 @@ public class CellCommunicatorFunctionImpl implements CellFunction {
 			// Get name
 			this.cellFunctionName = this.config.getName();
 
-			this.functionRootAddress = this.dpBuilder.generateCellTopic(this.getCellName()) + "/" + this.cellFunctionName + "/";
+			this.functionRootAddress = this.dpBuilder.generateCellTopic(this.getCellName()) + "/" + this.cellFunctionName;
 			log.debug("{}>Root address={}", this.cellFunctionName, this.functionRootAddress);
 
 			log.trace("Initialize special communications functions for an agent with config:{}", config);
@@ -151,7 +151,7 @@ public class CellCommunicatorFunctionImpl implements CellFunction {
 			this.getCommunicator().setDefaultTimeout(1);
 
 			// Execute general deregister
-			this.cell.getFunctionHandler().deregisterActivatorInstance(this.getFunctionName());
+			this.cell.getFunctionHandler().deregisterActivatorInstance(this.getFunctionRootAddress());
 
 			// Close communicator
 			this.getCommunicator().shutDown();
@@ -173,6 +173,11 @@ public class CellCommunicatorFunctionImpl implements CellFunction {
 	@Override
 	public MqttCommunicator getCommunicator() {
 		return this.comm;
+	}
+
+	@Override
+	public String getFunctionRootAddress() {
+		return this.functionRootAddress;
 	}
 
 }

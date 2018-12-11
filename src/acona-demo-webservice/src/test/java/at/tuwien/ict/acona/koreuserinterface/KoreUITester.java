@@ -2,6 +2,7 @@ package at.tuwien.ict.acona.koreuserinterface;
 
 import static org.junit.Assert.*;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,44 +19,27 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.cell.cellfunction.ControlCommand;
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.Codelettester;
-import at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers.IncrementOnConditionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
-import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.config.CellConfig;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
+import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 
 public class KoreUITester {
 
-	private static final Logger log = LoggerFactory.getLogger(KoreUITester.class);
+	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {
 		try {
-			// Create container
-			log.debug("Create or get main container");
-			this.launcher.createMainContainer("localhost", 1099, "MainContainer");
-
-			log.debug("Create subcontainer");
-			this.launcher.createSubContainer("localhost", 1099, "Subcontainer");
-
-			// log.debug("Create gui");
-			// this.commUtil.createDebugUserInterface();
-
-			// Create gateway
-			// commUtil.initJadeGateway();
 
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
@@ -64,24 +48,26 @@ public class KoreUITester {
 
 	@After
 	public void tearDown() throws Exception {
+		// Clear all cells
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
 		}
+		this.launcher.stopSystem();
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
 		}
 	}
+
+
 
 	
 	/**
@@ -99,7 +85,7 @@ public class KoreUITester {
 					.addCellfunction(CellFunctionConfig.newConfig(datageneratorservice, KoreDataStructureGeneratorMock.class))
 					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint("KORE", datageneratorservice + ".result", SyncMode.SUBSCRIBEONLY));
-			CellGatewayImpl weatherAgent = this.launcher.createAgent(cf);
+			Cell weatherAgent = this.launcher.createAgent(cf);
 			
 			//=== Init finished ===//
 
@@ -112,7 +98,9 @@ public class KoreUITester {
 			}
 			log.info("=== All agents initialized ===");
 			
-			weatherAgent.getCommunicator().write(DatapointBuilder.newDatapoint(datageneratorservice + ".command").setValue(ControlCommand.START));
+			weatherAgent.getCommunicator().execute(weatherAgent.getName() + ":" + datageneratorservice + "/command", (new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", true), 100000);
 			
 			//Wait while the system runs
 			synchronized (this) {

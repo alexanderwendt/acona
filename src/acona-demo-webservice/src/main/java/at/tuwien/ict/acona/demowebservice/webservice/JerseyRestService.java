@@ -17,10 +17,9 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.cell.datastructures.Chunk;
-import at.tuwien.ict.acona.cell.datastructures.ChunkBuilder;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
+import at.tuwien.ict.acona.mq.datastructures.Chunk;
+import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
 @Path("korecogsys")
 public class JerseyRestService {

@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.ServiceState;
 import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.mq.cell.cellfunction.helper.IncrementServiceThread;
+import at.tuwien.ict.acona.mq.cell.cellfunction.helper.LoopController;
 import at.tuwien.ict.acona.mq.cell.cellfunction.helper.SequenceController;
 import at.tuwien.ict.acona.mq.cell.cellfunction.helper.SimpleController;
 import at.tuwien.ict.acona.mq.cell.cellfunction.helper.TimeRegisterFunction;
@@ -353,7 +353,7 @@ public class MqCellCoreFunctionTester {
 						.addCellfunction(CellFunctionConfig.newConfig("updater", DatapointMirroring.class)
 								.addManagedDatapoint(datapointaddress, inspectors.get(i - 1).getName() + ":" + datapointaddress, SyncMode.SUBSCRIBEONLY))));
 				inspectors.add(cell);
-				cell.getFunctionHandler().getCellFunction("updater").getCommunicator().setDefaultTimeout(60000);
+				cell.getFunctionHandler().getCellFunction("<" + agentNameTemplate + i + ">/" + "updater").getCommunicator().setDefaultTimeout(60000);
 			}
 
 			// Add special time function
@@ -922,5 +922,143 @@ public class MqCellCoreFunctionTester {
 //		}
 //
 //	}
+	
+	/**
+	 * In this test, one controller will start 100 increment services in a sequence. The incrementservices increases the number in the memory with +1. At the end the number in the memory shall be the same
+	 * as the number of services in the system.
+	 * 
+	 */
+	@Test
+	public void aconaServiceIncrementorCountTo100() {
+		try {
+			log.info("=== Test AconaServiceStartsAconaService ===");
+
+			// === Agent names ===//
+			String serviceAgentName = "IncrementServiceAgent";
+			String controllerAgentName = "ControllerAgent";
+			String memoryAgentName = "MemoryAgent";
+
+			// === Function names ===//
+			String controllerServiceName = "controllerservice";
+
+			String serviceName = "IncrementService"; // The same name for all
+														// services
+			final String IncrementFunctionDatapointID = "increment";
+
+			// === Datappointnames ===//
+			String processDatapoint = "memory.value"; // put into memory mock
+														// agent
+
+			// === Values ===//
+			int numberOfAgents = 100;
+
+			// values
+			double startValue = 0;
+			int expectedResult = numberOfAgents;
+
+			// === Config ===//
+			// Create total config
+			// SystemConfig totalConfig = SystemConfig.newConfig();
+
+			// Add controller
+			Cell controller = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerServiceName, LoopController.class)
+							.setProperty("agentnameprefix", serviceAgentName)
+							.setProperty("servicename", serviceName)
+							.setProperty("numberofagents", String.valueOf(numberOfAgents))
+							.setProperty("delay", "10")));
+			// totalConfig.addController();
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			// Add memory
+			this.launcher.createAgent(CellConfig.newConfig(memoryAgentName));
+			// totalConfig.addMemory();
+			// totalConfig.setTopController(controllerAgentName);
+
+			synchronized (this) {
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			// Add services
+			for (int i = 1; i <= numberOfAgents; i++) {
+				this.launcher.createAgent(CellConfig.newConfig(serviceAgentName + i)
+						.addCellfunction(CellFunctionConfig.newConfig(serviceName, IncrementServiceThread.class)
+								.addManagedDatapoint(IncrementFunctionDatapointID, memoryAgentName + ":" + processDatapoint,
+										SyncMode.READWRITEBACK)));
+				synchronized (this) {
+					try {
+						this.wait(10);
+					} catch (InterruptedException e) {
+
+					}
+				}
+			}
+
+			// this.launcher.createDebugUserInterface();
+
+			// this.launcher.init(totalConfig);
+
+			// }
+
+			synchronized (this) {
+				try {
+					this.wait(10000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			// log.info("=== All agents initialized ===");
+
+			launcher.getAgent(memoryAgentName).getCommunicator().write(this.dpb.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
+			log.info("Datapoints on the way. Start system");
+			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
+			// JsonPrimitive(startValue)));
+			// Start the system by setting start
+
+			// this.launcher.getAgent("AgentIncrementService1").getCommunicator().write(Datapoint.newDatapoint("Increment.command").setValue(ControlCommand.START.toString()));
+
+			// CellGateway controller = launcher.getTopController();
+
+			// controller.getCommunicator().query(Datapoint.newDatapoint("Increment.command").setValue(ControlCommand.START.toString()),
+			// agentName + 1, Datapoint.newDatapoint("Increment.state"),
+			// agentName + 1, 10000);
+
+			// controller.getCommunicator().query(Datapoint.newDatapoint(controllerServiceName
+			// + ".command").setValue(ControlCommand.START.toString()),
+			// Datapoint.newDatapoint(controllerServiceName + ".state"), 10000);
+
+			// Test the wrapper for controllers too
+			// ControllerCellGateway controllerCellGateway = new
+			// ControllerWrapper(controller);
+			controller.getCommunicator().execute(controllerAgentName + ":" + controllerServiceName + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", true), 100000);
+
+			log.debug("Received finished");
+
+			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue().getAsDouble();
+
+			log.debug("correct value={}, actual value={}", expectedResult, result);
+
+			assertEquals(result, expectedResult, 0.0);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
 
 }
