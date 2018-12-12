@@ -180,7 +180,7 @@ public class DataStorageImpl implements DataStorage {
 	}
 
 	@Override
-	public void remove(String address, String caller) {
+	public void remove(String address) {
 		List<String> listToRemove = new ArrayList<>();
 
 		if (address.endsWith("*")) {

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-public class EMAIndicator extends CellFunctionImpl {
+public class EMAIndicator extends CellFunctionThreadImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(EMAIndicator.class);
 

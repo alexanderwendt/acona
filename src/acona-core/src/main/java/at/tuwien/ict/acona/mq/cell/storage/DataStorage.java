@@ -23,7 +23,7 @@ public interface DataStorage {
 	 * @param caller:
 	 *            Caller agent
 	 */
-	public void remove(String address, String caller);
+	public void remove(String address);
 
 	public Datapoint readFirst(String address);
 

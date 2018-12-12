@@ -1,5 +1,7 @@
 package at.tuwien.ict.acona.evolutiondemo.launcher;
 
+import java.lang.invoke.MethodHandles;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,13 @@ import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
+import at.tuwien.ict.acona.mq.cell.config.CellConfig;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
+import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 
 /**
  * This class manages the launching of the whole cognitive system
@@ -21,11 +30,11 @@ import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
  */
 public class Launcher {
 
-	private final static Logger log = LoggerFactory.getLogger(Launcher.class);
-
-	private static Launcher launcher;
-
+	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
+	
+	private static Launcher launcher;
 
 	public static void main(String[] args) {
 		log.info("Welcome to the ACONA Stock Market Evolution Demonstrator");
@@ -69,7 +78,7 @@ public class Launcher {
 			String signalService = "signal";
 
 			// === Controller agent implementation === //
-			CellGatewayImpl controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
+			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
 					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
 							.setGenerateReponder(true))
@@ -87,7 +96,7 @@ public class Launcher {
 
 			// === Broker ===//
 
-			CellGatewayImpl brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
+			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
@@ -111,7 +120,7 @@ public class Launcher {
 
 			// === Stock market ===//
 
-			CellGatewayImpl stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
+			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) // First, the stock market generates a price
@@ -132,7 +141,7 @@ public class Launcher {
 					traderType += "_odd";
 				}
 
-				CellGatewayImpl traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
+				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
 						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
@@ -161,51 +170,51 @@ public class Launcher {
 
 	}
 
-	private void startJade() throws Exception {
-		try {
-			// Create container
-			log.debug("Create or get main container");
-			this.controller.createMainContainer("localhost", 1099, "MainContainer");
-
-			log.debug("Create subcontainer");
-			this.controller.createSubContainer("localhost", 1099, "Subcontainer");
-
-			// log.debug("Create gui");
-			// this.commUtil.createDebugUserInterface();
-
-			// Create gateway
-			// commUtil.initJadeGateway();
-			synchronized (this) {
-				try {
-					this.wait(2000);
-				} catch (InterruptedException e) {
-
-				}
-			}
-
-		} catch (Exception e) {
-			log.error("Cannot initialize test environment", e);
-		}
-	}
-
-	private void stopJade() throws Exception {
-		synchronized (this) {
-			try {
-				this.wait(200);
-			} catch (InterruptedException e) {
-
-			}
-		}
-
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
-		synchronized (this) {
-			try {
-				this.wait(2000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-	}
+//	private void startJade() throws Exception {
+//		try {
+//			// Create container
+//			log.debug("Create or get main container");
+//			this.controller.createMainContainer("localhost", 1099, "MainContainer");
+//
+//			log.debug("Create subcontainer");
+//			this.controller.createSubContainer("localhost", 1099, "Subcontainer");
+//
+//			// log.debug("Create gui");
+//			// this.commUtil.createDebugUserInterface();
+//
+//			// Create gateway
+//			// commUtil.initJadeGateway();
+//			synchronized (this) {
+//				try {
+//					this.wait(2000);
+//				} catch (InterruptedException e) {
+//
+//				}
+//			}
+//
+//		} catch (Exception e) {
+//			log.error("Cannot initialize test environment", e);
+//		}
+//	}
+//
+//	private void stopJade() throws Exception {
+//		synchronized (this) {
+//			try {
+//				this.wait(200);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
+//
+//		Runtime runtime = Runtime.instance();
+//		runtime.shutDown();
+//		synchronized (this) {
+//			try {
+//				this.wait(2000);
+//			} catch (InterruptedException e) {
+//
+//			}
+//		}
+//	}
 
 }

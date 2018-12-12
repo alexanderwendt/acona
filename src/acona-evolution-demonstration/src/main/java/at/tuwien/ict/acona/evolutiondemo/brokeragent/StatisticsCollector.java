@@ -12,45 +12,51 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
+
 /**
  * The statistics collector reads all depots in the broker, extracts the number for each type and returns a list of <TYPENAME, COUNT> to the user.
  * 
  * @author wendt
  *
  */
-public class StatisticsCollector extends CellFunctionImpl {
+public class StatisticsCollector extends CellFunctionThreadImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(StatisticsCollector.class);
 
 	public final static String DATAADDRESS = "dataaddress";
+	public final static String GETSTATISTICSSUFFIX = "getstats";
 	private final static String DEPOTPREFIX = "depot";
 
 	private String dataaddress = "data";
 
 	@Override
-	protected void cellFunctionInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		// Service shall be reachable from abroad
 		this.getFunctionConfig().setGenerateReponder(true);
 
 		dataaddress = this.getFunctionConfig().getProperty(DATAADDRESS);
 
+		// Add subfunctions
+		this.addRequestHandlerFunction(GETSTATISTICSSUFFIX, (Request input) -> getStatistics(input));
 	}
-
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-
-		JsonRpcResponse result = null;
-
-		log.debug("Got request={}", parameterdata);
-
+	
+	private Response getStatistics(Request req) {
+		Response result = new Response(req);
+		
+		log.debug("Get result");
 		try {
-			JsonElement resultObject = this.generateTypeStatistics();
-			result = new JsonRpcResponse(parameterdata, resultObject);
+			JsonElement res = this.generateTypeStatistics();
+			result.setResult(res);
 		} catch (Exception e) {
-			result = new JsonRpcResponse(parameterdata, new JsonRpcError("Statistics caluclation error", -1, e.getMessage(), e.getMessage()));
-			log.error("Error in calulating the distribution of types.", e);
+			log.error("Statistics caluclation error", e);
+			result = new Response(req);
+			result.setError(e.getMessage());
 		}
-
+		
 		return result;
 	}
 
@@ -105,9 +111,33 @@ public class StatisticsCollector extends CellFunctionImpl {
 	}
 
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
+	protected void executeCustomPreProcessing() throws Exception {
 		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	protected void executeFunction() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

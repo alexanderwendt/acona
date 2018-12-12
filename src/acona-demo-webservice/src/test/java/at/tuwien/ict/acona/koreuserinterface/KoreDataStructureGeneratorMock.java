@@ -35,7 +35,7 @@ public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
 		
 		JsonObject obj = gson.fromJson(kore, JsonObject.class);
 		
-		log.debug("Generated KORE string={}", obj);
+		log.debug("Generated KORE string={}\n", obj);
 		
 		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(RESULTSUFFIX)).setValue(obj));
 		
@@ -61,7 +61,7 @@ public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
 
 	@Override
 	protected void updateCustomDatapointsById(String id, JsonElement data) {
-		this.setStart();
+		//this.setStart();
 	}
 
 }

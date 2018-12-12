@@ -189,4 +189,12 @@ public interface MqttCommunicator {
 	 * @throws Exception
 	 */
 	public void unsubscribeTopic(String topicfilter) throws Exception;
+	
+	/**
+	 * Remove a datapoint  from an address
+	 * 
+	 * @param address
+	 * @throws Exception
+	 */
+	public void remove(String address) throws Exception;
 }

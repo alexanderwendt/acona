@@ -10,6 +10,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 
 public class Trader extends CellFunctionCodelet {
 
@@ -75,7 +79,7 @@ public class Trader extends CellFunctionCodelet {
 
 		// Add subscription to the stock market price
 		log.debug("Read from address={}", stockMarketAddress);
-		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, DatapointBuilder.newDatapoint(stockMarketAddress).getAddress(), DatapointBuilder.newDatapoint(stockMarketAddress).getAgent(), SyncMode.READONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, this.getDatapointBuilder().newDatapoint(stockMarketAddress).getAgent() + ":" + this.getDatapointBuilder().newDatapoint(stockMarketAddress).getAddress(), SyncMode.READONLY));
 
 		// Create a depot
 		this.createDepot();
@@ -89,21 +93,11 @@ public class Trader extends CellFunctionCodelet {
 //	}
 
 	@Override
-	protected JsonRpcResponse performCodeletOperation(JsonRpcRequest parameterdata, String caller) {
-
-		if (parameterdata.getMethod().equals("getdepot")) {
-
-		}
-
-		return null;
-	}
-
-	@Override
 	public void executeCodeletPreprocessing() throws Exception {
 		// Read depot
 		// Write to broker a new depot
 		JsonRpcRequest req = new JsonRpcRequest("getdepotinfo", 1);
-		req.setParameters(this.getCell().getLocalName());
+		req.setParameters(this.getCell().getName());
 		depot = this.getCommunicator().execute(this.brokerAddress, req).getResult(new TypeToken<Depot>() {});
 
 		// Update prices
@@ -116,7 +110,7 @@ public class Trader extends CellFunctionCodelet {
 	@Override
 	protected void executeFunction() throws Exception {
 
-		log.info("{}>Start agent caluclation", this.getAgentName());
+		log.info("{}>Start agent caluclation", this.getCellName());
 		// Program logic
 		// 2. Check depot death
 		this.killSignal = this.killAgentOnDepotDeath();
@@ -130,7 +124,7 @@ public class Trader extends CellFunctionCodelet {
 			// 5. Execute signal
 			this.executeTrade();
 
-			log.info("{}:{}>Finished. Assets in the depot: {}", this.getAgentName(), this.agentType, this.depot.getAssets());
+			log.info("{}:{}>Finished. Assets in the depot: {}", this.getCellName(), this.agentType, this.depot.getAssets());
 
 		} else {
 			// If the kill signal has been set, the system shall exit.
@@ -151,23 +145,16 @@ public class Trader extends CellFunctionCodelet {
 		// Write the local depot
 		Gson gson = new Gson();
 		JsonElement jsonDepot = gson.toJsonTree(depot);
-		this.writeLocal(DatapointBuilder.newDatapoint(this.localDepotAddress).setValue(jsonDepot));
+		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.localDepotAddress).setValue(jsonDepot));
 	}
 
-	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-//		if (data.containsKey(IDPRICE)) {
-//			this.setStart();
-//		}
-//		
-	}
 
 	@Override
 	protected void shutDownCodelet() throws Exception {
 		// Delete the depot
 		this.deleteDepot();
 
-		log.info("{}>Agent is killed", this.getCell().getLocalName());
+		log.info("{}>Agent is killed", this.getCell().getName());
 		// Then, agent is killed
 	}
 
@@ -184,7 +171,7 @@ public class Trader extends CellFunctionCodelet {
 	private void createDepot() throws Exception {
 		// Write to broker a new depot
 		JsonRpcRequest req = new JsonRpcRequest("registerdepot", 0);
-		req.setParameters(this.getCell().getLocalName(), this.agentType);
+		req.setParameters(this.getCell().getName(), this.agentType);
 		JsonRpcResponse result1 = this.getCommunicator().execute(this.brokerAddress, req);
 
 		// Add money to broker
@@ -193,7 +180,7 @@ public class Trader extends CellFunctionCodelet {
 		}
 
 		JsonRpcRequest req2 = new JsonRpcRequest("addmoney", 0);
-		req2.setParameters(this.getCell().getLocalName(), this.startSize);
+		req2.setParameters(this.getCell().getName(), this.startSize);
 		JsonRpcResponse result2 = this.getCommunicator().execute(this.brokerAddress, req2);
 
 		if (result2.hasError() == true) {
@@ -208,7 +195,7 @@ public class Trader extends CellFunctionCodelet {
 		// Sell everything
 		this.depot.getAssets().forEach(a -> {
 			JsonRpcRequest req = new JsonRpcRequest("sell", 0);
-			req.setParameters(this.getCell().getLocalName(), a.getStockName(), this.closePrice, a.getVolume());
+			req.setParameters(this.getCell().getName(), a.getStockName(), this.closePrice, a.getVolume());
 			JsonRpcResponse result1 = null;
 			try {
 				result1 = this.getCommunicator().execute(this.brokerAddress, req);
@@ -219,7 +206,7 @@ public class Trader extends CellFunctionCodelet {
 
 		// Addregister
 		JsonRpcRequest req = new JsonRpcRequest("unregisterdepot", 0);
-		req.setParameters(this.getCell().getLocalName());
+		req.setParameters(this.getCell().getName());
 		JsonRpcResponse result1 = this.getCommunicator().execute(this.brokerAddress, req);
 
 		// Check if unregister error
@@ -271,7 +258,7 @@ public class Trader extends CellFunctionCodelet {
 				JsonRpcRequest request1 = new JsonRpcRequest("buy", 0);
 				// request1.setParameterAsValue(0, traderAgentName);
 				// request1.setParameterAsValue(1, traderType);
-				request1.setParameters(this.getCell().getLocalName(), this.stockName, this.closePrice, 1);
+				request1.setParameters(this.getCell().getName(), this.stockName, this.closePrice, 1);
 				JsonRpcResponse result = this.getCommunicator().execute(this.brokerAddress, request1);
 				if (result.hasError()) {
 					throw new Exception("Cannot buy stock. " + result.getError().getMessage());
@@ -290,7 +277,7 @@ public class Trader extends CellFunctionCodelet {
 					&& (this.depot.getAssets().stream().filter(a -> a.getVolume() >= 1)).findFirst().isPresent()) {
 
 				JsonRpcRequest request1 = new JsonRpcRequest("sell", 0);
-				request1.setParameters(this.getCell().getLocalName(), this.stockName, this.closePrice, 1);
+				request1.setParameters(this.getCell().getName(), this.stockName, this.closePrice, 1);
 				JsonRpcResponse result = this.getCommunicator().execute(this.brokerAddress, request1);
 				if (result.hasError()) {
 					throw new Exception("Cannot buy stock. " + result.getError().getMessage());
@@ -304,6 +291,24 @@ public class Trader extends CellFunctionCodelet {
 			}
 
 		}
+	}
+
+	@Override
+	public void resetCodelet() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void shutDown() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.datastructures.Request;
 
 public class Evaluator extends CellFunctionCodelet {
 
@@ -28,12 +29,13 @@ public class Evaluator extends CellFunctionCodelet {
 	@Override
 	protected void executeFunction() throws Exception {
 		// Read the statistics
-		JsonRpcRequest req = new JsonRpcRequest("any", 0);
 
-		JsonElement statistics = this.getCommunicator().execute(statServiceName, req).getResult();
+		JsonElement statistics = this.getCommunicator().execute(statServiceName + "/" + StatisticsCollector.GETSTATISTICSSUFFIX, new Request()).getResult();
+		
+		
 
 		// Write the statistics to a datapoint
-		this.getCommunicator().write(DatapointBuilder.newDatapoint(statisticsDatapointName).setValue(statistics));
+		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(statisticsDatapointName).setValue(statistics));
 		log.debug("Written stats={} to {}", statistics, statisticsDatapointName);
 
 	}

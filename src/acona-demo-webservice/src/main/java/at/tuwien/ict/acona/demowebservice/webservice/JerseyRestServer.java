@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.demowebservice.webservice;
 
-import java.util.Map;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;

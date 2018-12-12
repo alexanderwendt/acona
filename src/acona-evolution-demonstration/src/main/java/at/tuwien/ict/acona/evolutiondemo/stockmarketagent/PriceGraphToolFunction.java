@@ -10,7 +10,10 @@ import org.jfree.ui.RefineryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
 
 public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 	
@@ -25,13 +28,6 @@ public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 	private double low;
 	private Day day;
 	
-	
-
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
@@ -63,47 +59,44 @@ public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
-			if (this.isSystemDatapoint(data)==false) {
-				//Read datapoint
-				String key = data.keySet().iterator().next();
-				JsonObject object;
-				try {
-					object = data.get(key).getValue(JsonObject.class);
-					
-					//Check if OHLC data
-					if (object.has("open")) {
-						
-						seriesName=key;
-						open=object.get("open").getAsDouble();
-						close=object.get("close").getAsDouble();
-						high=object.get("high").getAsDouble();
-						low=object.get("low").getAsDouble();
-						String date = object.get("date").getAsString();
-						
-						Calendar cal = Calendar.getInstance();  
-						SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-						cal.setTime(dateFormat.parse(date));    
-						day = new Day(cal.getTime());
-						
-						this.setStart();
-						
-						log.debug("received update={}", object);
-					} else {
-						log.warn("No valid OHLC value={}", object);
-					}
-					
-				} catch (Exception e) {
-					log.error("Cannot read value", e);
-				}
-				
-			}
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	protected void shutDownThreadExecutor() throws Exception {
-		// TODO Auto-generated method stub
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		//Read datapoint
+		//String key = data.keySet().iterator().next();
+		JsonObject object;
+		try {
+			object = data.getAsJsonObject();
+			
+			//Check if OHLC data
+			if (object.has("open")) {
+				
+				seriesName=id;
+				open=object.get("open").getAsDouble();
+				close=object.get("close").getAsDouble();
+				high=object.get("high").getAsDouble();
+				low=object.get("low").getAsDouble();
+				String date = object.get("date").getAsString();
+				
+				Calendar cal = Calendar.getInstance();  
+				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+				cal.setTime(dateFormat.parse(date));    
+				day = new Day(cal.getTime());
+				
+				this.setStart();
+				
+				log.debug("received update={}", object);
+			} else {
+				log.warn("No valid OHLC value={}", object);
+			}
+			
+		} catch (Exception e) {
+			log.error("Cannot read value", e);
+		}
 		
 	}
 

@@ -5,7 +5,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DelayedCellShutDown extends CellFunctionImpl {
+import com.google.gson.JsonElement;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.mq.cell.core.Cell;
+
+public class DelayedCellShutDown extends CellFunctionThreadImpl {
 
 	protected static Logger log = LoggerFactory.getLogger(DelayedCellShutDown.class);
 
@@ -15,7 +21,7 @@ public class DelayedCellShutDown extends CellFunctionImpl {
 		try {
 			this.finaldelay = delay;
 			// create and register instance
-			String name = cell.getLocalName() + "_KillSwitch";
+			String name = cell.getName() + "_KillSwitch";
 			this.init(CellFunctionConfig.newConfig(name, DelayedCellShutDown.class), cell);
 
 			Runnable t = new Runnable() {
@@ -48,26 +54,45 @@ public class DelayedCellShutDown extends CellFunctionImpl {
 	}
 
 	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest param, String caller) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected void cellFunctionInit() throws Exception {
-
-	}
-
-	@Override
 	protected void shutDownImplementation() throws Exception {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
+	protected void cellFunctionThreadInit() throws Exception {
 		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	protected void executeCustomPreProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void executeFunction() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -10,7 +10,12 @@ import org.jfree.ui.RefineryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
 
 /**
  * This function generates a highest, lowest and close price for the system and writes it into the working memory of itself. On trigger, 
@@ -88,9 +93,9 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 		
 		this.currentPeriod++;
 		
-		log.info("Generated price={}. Put it on address={}", functionResult, this.getAgentName() + ":" + dataAddress);
+		log.info("Generated price={}. Put it on address={}", functionResult, this.getCellName() + ":" + dataAddress);
 		
-		this.getValueMap().put(dataAddress, DatapointBuilder.newDatapoint(dataAddress).setValue(functionResult));
+		this.getValueMap().put(dataAddress, this.getDatapointBuilder().newDatapoint(dataAddress).setValue(functionResult));
 	}
 	
 	/**
@@ -112,28 +117,23 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 		this.low = offset - 2;
 	}
 
-//	@Override
-//	protected void executeCustomPostProcessing() throws Exception {
-//		this.setServiceState(ServiceState.FINISHED);
-//		
-//	}
-//
-//	@Override
-//	protected void executeCustomPreProcessing() throws Exception {
-//		this.setServiceState(ServiceState.RUNNING);
-//		
-//	}
-
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+	public void resetCodelet() {
+		// TODO Auto-generated method stub
 		
 	}
 
-//	@Override
-//	protected void shutDownExecutor() throws Exception {
-//		// TODO Auto-generated method stub
-//		
-//	}
+	@Override
+	public void shutDown() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 

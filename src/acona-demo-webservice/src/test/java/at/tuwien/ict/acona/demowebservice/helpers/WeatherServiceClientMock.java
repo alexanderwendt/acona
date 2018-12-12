@@ -35,7 +35,8 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		this.setExecuteOnce(false);
-		this.setExecuteRate(10000);
+		this.setFinishedAfterSingleRun(false);
+		this.setExecuteRate(1000);
 		
 		this.cityName = this.getFunctionConfig().getProperty(CITYNAME);
 		this.userid = this.getFunctionConfig().getProperty(USERID);
@@ -62,7 +63,7 @@ public class WeatherServiceClientMock extends CellFunctionThreadImpl {
 			//Through the write map,
 			this.getValueMap().get(WEATHERADDRESSID).setValue(result.toJsonObject());
 			
-			log.debug("wrote weather data={} to={}", result, this.getValueMap().get(WEATHERADDRESSID).getCompleteAddress());
+			log.info("wrote weather data={} to={}", result, this.getValueMap().get(WEATHERADDRESSID).getCompleteAddress());
 			
 		} catch (Exception e) {
 			log.error("Cannot return weather data", e);

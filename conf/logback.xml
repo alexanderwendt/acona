@@ -5,18 +5,17 @@
   </evaluator>
   
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet" level="INFO" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.CellFunctionThreadImpl" level="WARN" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.CellFunctionImpl" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.cell.core.cellfunction.codelets.helpers" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.cell.core" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.cell.storage" level="WARN" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.specialfunctions" level="WARN" />
-  <logger name="at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator" level="WARN" />
-  <logger name="at.tuwien.ict.acona.cell.communicator" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core.cellfunction.codelets.helpers" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.storage" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.communication" level="WARN" />
   <logger name="org.eclipse.jetty" level="WARN"/>
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

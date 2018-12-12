@@ -25,17 +25,19 @@ public class DataAccess extends CellFunctionImpl {
 
 	public final static String BASICSERVICESUFFIX = "dataaccess";
 
-	private final String METHODNAMEREAD = "read";
-	private final String METHODNAMEWRITE = "write";
-	private final String METHODNAMESUBSCRIBE = "subscribe";
-	private final String METHODNAMEUNSUBSCRIBE = "unsubscribe";
+	private final static String METHODNAMEREAD = "read";
+	private final static String METHODNAMEWRITE = "write";
+	private final static String METHODNAMESUBSCRIBE = "subscribe";
+	private final static String METHODNAMEUNSUBSCRIBE = "unsubscribe";
+	private final static String METHODNAMEREMOVE = "remove";
 
 	@Override
 	protected void cellFunctionInit() throws Exception {
-		this.addRequestHandlerFunction(this.METHODNAMEREAD, (Request input) -> read(input));
-		this.addRequestHandlerFunction(this.METHODNAMEWRITE, (Request input) -> write(input));
-		this.addRequestHandlerFunction(this.METHODNAMESUBSCRIBE, (Request input) -> subscribe(input));
-		this.addRequestHandlerFunction(this.METHODNAMEUNSUBSCRIBE, (Request input) -> unsubscribe(input));
+		this.addRequestHandlerFunction(METHODNAMEREAD, (Request input) -> read(input));
+		this.addRequestHandlerFunction(METHODNAMEWRITE, (Request input) -> write(input));
+		this.addRequestHandlerFunction(METHODNAMESUBSCRIBE, (Request input) -> subscribe(input));
+		this.addRequestHandlerFunction(METHODNAMEUNSUBSCRIBE, (Request input) -> unsubscribe(input));
+		this.addRequestHandlerFunction(METHODNAMEREMOVE, (Request input) -> remove(input));
 
 		log.info("{}>Initialized.", this.getFunctionName());
 	}
@@ -146,6 +148,28 @@ public class DataAccess extends CellFunctionImpl {
 		} catch (Exception e) {
 			log.error("Cannot subscribe {} from the database", req, e);
 			result.setError("Cannot unsubscribe " + req + " from database" + e);
+		}
+
+		return result;
+	}
+	
+	/**
+	 * Remove a datapoint
+	 * 
+	 * @param req
+	 * @return
+	 */
+	private Response remove(Request req) {
+		Response result = new Response(req);
+
+		try {
+			String param = req.getParameter("param", String.class);
+			this.getCell().getDataStorage().remove(param);
+
+			result.setResultOK();
+		} catch (Exception e) {
+			log.error("Cannot remove {} from the database", req, e);
+			result.setError("Cannot remove " + req + " from database" + e);
 		}
 
 		return result;

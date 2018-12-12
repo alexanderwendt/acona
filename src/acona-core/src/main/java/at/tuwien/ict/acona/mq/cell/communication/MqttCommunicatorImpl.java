@@ -234,7 +234,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 				@Override
 				public void connectionLost(Throwable cause) {
-					log.info("Connection to MQTT messaging lost!");
+					log.info("Connection to MQTT messaging lost!", cause);
 					// latch.release();
 				}
 
@@ -698,6 +698,11 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 		this.mqttClient.unsubscribe(topicfilter);
 		log.debug("Unsubscribed topic={}", topicfilter);
 
+	}
+
+	@Override
+	public void remove(String address) throws Exception {
+		this.storage.remove(address);
 	}
 
 }
