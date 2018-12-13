@@ -3,64 +3,57 @@ package at.tuwien.ict.acona.evolutiondemo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.lang.invoke.MethodHandles;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
-import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
+import at.tuwien.ict.acona.mq.cell.config.CellConfig;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
+import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 
 public class StockMarketTester {
 
-	private static final Logger log = LoggerFactory.getLogger(StockMarketTester.class);
+	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		try {
-			// Create container
-			log.debug("Create or get main container");
-			this.launcher.createMainContainer("localhost", 1099, "MainContainer");
-
-			log.debug("Create subcontainer");
-			this.launcher.createSubContainer("localhost", 1099, "Subcontainer");
-
-			// log.debug("Create gui");
-			// this.commUtil.createDebugUserInterface();
-
-			// Create gateway
-			// commUtil.initJadeGateway();
 
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
 		}
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
+		// Clear all cells
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
 		}
+		this.launcher.stopSystem();
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
@@ -84,9 +77,8 @@ public class StockMarketTester {
 			String controllerAgentName = "ControllerAgent";
 			String controllerService = "controllerservice";
 
-			CellGatewayImpl controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
-							.setGenerateReponder(true))
+			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class))
 					.addCellfunction(CellFunctionConfig.newConfig("userconsole", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
 
@@ -102,13 +94,12 @@ public class StockMarketTester {
 			String stockmarketAgentName = "StockMarketAgent";
 			String stockmarketServiceName = "StockMarketService";
 
-			CellGatewayImpl stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
+			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)
-							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
-							.setGenerateReponder(true))
+							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
 					.addCellfunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data
 

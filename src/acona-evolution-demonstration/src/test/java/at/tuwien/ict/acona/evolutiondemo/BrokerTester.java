@@ -1,15 +1,16 @@
 package at.tuwien.ict.acona.evolutiondemo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,61 +18,49 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.cell.core.CellGatewayImpl;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Types;
-import at.tuwien.ict.acona.launcher.SystemControllerImpl;
-import jade.core.Runtime;
+import at.tuwien.ict.acona.mq.cell.config.CellConfig;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
+import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
+import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 
 public class BrokerTester {
 
-	private static final Logger log = LoggerFactory.getLogger(BrokerTester.class);
+	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		try {
-			// Create container
-			log.debug("Create or get main container");
-			this.launcher.createMainContainer("localhost", 1099, "MainContainer");
-
-			log.debug("Create subcontainer");
-			this.launcher.createSubContainer("localhost", 1099, "Subcontainer");
-
-			// log.debug("Create gui");
-			// this.commUtil.createDebugUserInterface();
-
-			// Create gateway
-			// commUtil.initJadeGateway();
 
 		} catch (Exception e) {
 			log.error("Cannot initialize test environment", e);
 		}
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
+		// Clear all cells
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
 		}
+		this.launcher.stopSystem();
 
-		Runtime runtime = Runtime.instance();
-		runtime.shutDown();
 		synchronized (this) {
 			try {
-				this.wait(2000);
+				this.wait(10);
 			} catch (InterruptedException e) {
 
 			}
@@ -94,9 +83,9 @@ public class BrokerTester {
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName));
-			CellGatewayImpl brokerAgent = this.launcher.createAgent(cf);
+			Cell brokerAgent = this.launcher.createAgent(cf);
 
-			CellGatewayImpl traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName));
+			Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName));
 
 			// === Init finished ===//
 
@@ -109,10 +98,10 @@ public class BrokerTester {
 			}
 			log.info("=== All agents initialized ===");
 
-			JsonRpcRequest request1 = new JsonRpcRequest("registerdepot", 0);
+			//JsonRpcRequest request1 = new JsonRpcRequest("registerdepot", 0);
 			// request1.setParameterAsValue(0, traderAgentName);
 			// request1.setParameterAsValue(1, traderType);
-			request1.setParameters(traderAgentName, traderType);
+			//request1.setParameters(traderAgentName, traderType);
 
 			// traderAgent.getCommunicator().write(Datapoints.newDatapoint(brokerAgentName + ":" + "test").setValue("test"));
 
@@ -121,51 +110,90 @@ public class BrokerTester {
 
 			// JsonRpcResponse result = traderAgent.getCommunicator().execute(brokerAgentName, "write", request, 100);
 
-			JsonRpcResponse result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 2000);
+			//Response result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 2000);
+			Response result = brokerAgent.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName + "/" + "registerdepot", (new Request())
+					.setParameter("agentname", traderAgentName)
+					.setParameter("agenttype", traderType)
+					, 200000);
+			
 			Depot depot = brokerAgent.getCommunicator().read("depot." + traderAgentName).getValue(Depot.class);
+			
+			
 
 			log.info("Registered depot={}", depot);
 			assertEquals(traderAgentName, depot.getOwner());
 
-			request1 = new JsonRpcRequest("addmoney", 0);
+			//request1 = new JsonRpcRequest("addmoney", 0);
 			// request1.setParameterAsValue(0, traderAgentName);
 			// request1.setParameterAsValue(1, traderType);
-			request1.setParameters(traderAgentName, 1000);
-			result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 2000);
+			//request1.setParameters(traderAgentName, 1000);
+			//result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 2000);
+			
+			result = brokerAgent.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName + "/" + "addmoney", (new Request())
+					.setParameter("agentname", traderAgentName)
+					.setParameter("amount", 1000)
+					, 200000);
+			
 			depot = result.getResult(new TypeToken<Depot>() {});
 
 			log.info("Added money={}", depot);
-			assertEquals(1000, depot.getLiquid(), 0.0);
+			double liquid = depot.getLiquid();
+			assertEquals(1000, liquid);
+			log.info("Test passed");
 
-			request1 = new JsonRpcRequest("buy", 0);
+			//request1 = new JsonRpcRequest("buy", 0);
 			// request1.setParameterAsValue(0, traderAgentName);
 			// request1.setParameterAsValue(1, traderType);
-			request1.setParameters(traderAgentName, stockName, 59.75, 10);
-			result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
+			//request1.setParameters(traderAgentName, stockName, 59.75, 10);
+			//result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
+			result = brokerAgent.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName + "/" + "buy", (new Request())
+					.setParameter("agentname", traderAgentName)
+					.setParameter("stockname", stockName)
+					.setParameter("price", 59.75)
+					.setParameter("volume", 10)
+					, 200000);
+			
+			
 			depot = result.getResult(new TypeToken<Depot>() {});
 
 			log.info("Bought stock={}", depot);
 			assertEquals(stockName, depot.getAssets().get(0).getStockName());
+			log.info("Test passed");
 
-			request1 = new JsonRpcRequest("sell", 0);
+			//request1 = new JsonRpcRequest("sell", 0);
 			// request1.setParameterAsValue(0, traderAgentName);
 			// request1.setParameterAsValue(1, traderType);
-			request1.setParameters(traderAgentName, stockName, 70.50, 5);
-			result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
+			//request1.setParameters(traderAgentName, stockName, 70.50, 5);
+			//result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
+			
+			result = brokerAgent.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName + "/" + "sell", (new Request())
+					.setParameter("agentname", traderAgentName)
+					.setParameter("stockname", stockName)
+					.setParameter("price", 70.50)
+					.setParameter("volume", 5)
+					, 200000);
+			
 			depot = result.getResult(new TypeToken<Depot>() {});
 
 			log.info("Sold stock={}", depot);
-			assertEquals(5, depot.getAssets().get(0).getVolume(), 0.0);
+			assertEquals(5, depot.getAssets().get(0).getVolume());
+			log.info("Test passed");
 
-			request1 = new JsonRpcRequest("unregisterdepot", 0);
+			//request1 = new JsonRpcRequest("unregisterdepot", 0);
 			// request1.setParameterAsValue(0, traderAgentName);
 			// request1.setParameterAsValue(1, traderType);
-			request1.setParameters(traderAgentName);
-			result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
+			//request1.setParameters(traderAgentName);
+			//result = traderAgent.getCommunicator().execute(brokerAgentName, brokerServiceName, request1, 20000);
+			
+			result = brokerAgent.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName + "/" + "unregisterdepot", (new Request())
+					.setParameter("agentname", traderAgentName)
+					, 200000);
+			
 			JsonElement e = brokerAgent.getCommunicator().read("depot." + traderAgentName).getValue();
 
 			log.info("unregistered depot={}", e);
 			assertEquals(true, e.toString().equals("{}"));
+			log.info("Test passed");
 
 			log.info("All tests passed");
 		} catch (Exception e) {
@@ -195,20 +223,20 @@ public class BrokerTester {
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, "test"));
-			CellGatewayImpl brokerAgent = this.launcher.createAgent(cf);
+			Cell brokerAgent = this.launcher.createAgent(cf);
 
-			List<CellGatewayImpl> traderAgents = new ArrayList<CellGatewayImpl>();
+			List<Cell> traderAgents = new ArrayList<Cell>();
 
 			for (int i = 0; i < 50; i++) {
-				CellGatewayImpl a = this.launcher.createAgent(CellConfig.newConfig(traderType1 + i));
+				Cell a = this.launcher.createAgent(CellConfig.newConfig(traderType1 + i));
 				traderAgents.add(a);
-				a.getCommunicator().write(DatapointBuilder.newDatapoint("type").setValue(traderType1));
+				a.getCommunicator().write(dpb.newDatapoint("type").setValue(traderType1));
 			}
 
 			for (int i = 0; i < 15; i++) {
-				CellGatewayImpl a = this.launcher.createAgent(CellConfig.newConfig(traderType2 + i));
+				Cell a = this.launcher.createAgent(CellConfig.newConfig(traderType2 + i));
 				traderAgents.add(a);
-				a.getCommunicator().write(DatapointBuilder.newDatapoint("type").setValue(traderType2));
+				a.getCommunicator().write(dpb.newDatapoint("type").setValue(traderType2));
 			}
 
 			synchronized (this) {
@@ -223,21 +251,33 @@ public class BrokerTester {
 
 			log.debug("Register depots for all agents");
 			traderAgents.forEach(a -> {
-				JsonRpcRequest req = new JsonRpcRequest("registerdepot", 0);
+				//JsonRpcRequest req = new JsonRpcRequest("registerdepot", 0);
 				try {
-					req.setParameters(a.getCell().getLocalName(), a.getCommunicator().read("type").getValueAsString());
-					a.getCommunicator().execute(brokerAgentName, brokerServiceName, req, 1000);
+					//req.setParameters(a.getName(), a.getCommunicator().read("type").getValueAsString());
+					//a.getCommunicator().execute(brokerAgentName, brokerServiceName, req, 1000);
+					Request req = (new Request())
+					.setParameter("agentname", a.getName())
+					.setParameter("agenttype", a.getCommunicator().read("type").getValueAsString());
+					
+					Response result = a.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName + "/" + "registerdepot", req
+							, 200000);
+				
+					log.debug("registered depot={}", req);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-				log.debug("registered depot={}", req);
+				
 			});
 
 			log.debug("Read statistics");
-			JsonRpcRequest req = new JsonRpcRequest("gettypes", 0);
-			JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
+			//JsonRpcRequest req = new JsonRpcRequest("gettypes", 0);
+			//JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getName(), statisticsService, req, 100000);
+			
+			Response result = brokerAgent.getCommunicator().execute(brokerAgent.getName() + ":" + statisticsService + "/" + "getstats", (new Request())
+					, 200000);
+			
 			JsonElement typesEncoded = result.getResult().getAsJsonObject().get("types");
 			List<Types> list = (new Gson()).fromJson(typesEncoded, new TypeToken<List<Types>>() {}.getType());
 			Optional<Types> opt = list.stream().filter(o -> o.getType().equals(traderType1)).findFirst();
@@ -270,10 +310,11 @@ public class BrokerTester {
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
 					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class))
+					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+						.setProperty(StatisticsCollector.DATAADDRESS, "test"))
 					.addCellfunction(CellFunctionConfig.newConfig("depotstatistics", DepotStaticticsGraphToolFunction.class));
 
-			CellGatewayImpl brokerAgent = this.launcher.createAgent(cf);
+			Cell brokerAgent = this.launcher.createAgent(cf);
 
 //			List<CellGatewayImpl> traderAgents = new ArrayList<CellGatewayImpl>();
 //

@@ -70,7 +70,7 @@ public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 		//String key = data.keySet().iterator().next();
 		JsonObject object;
 		try {
-			object = data.getAsJsonObject();
+			object = this.getValueFromJsonDatapoint(data).getAsJsonObject();
 			
 			//Check if OHLC data
 			if (object.has("open")) {

@@ -5,7 +5,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class EMAIndicator extends CellFunctionThreadImpl {
 
@@ -14,6 +22,7 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 	// === fixed variables ===//
 	public final static String ATTRIBUTESTOCKMARKETADDRESS = "stockmarketaddress";
 	private final static String IDPRICE = "price";
+	public static final String METHODCALCULATESIGNAL = "calculatesignal";
 
 	// === Get through config ===//
 	private double initEmaLong = 10;
@@ -43,20 +52,52 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 		this.emaShortPeriod = initEmaShort;
 
 		// Subscribe price address but without trigger to start
-		Datapoint stockMarket = DatapointBuilder.newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, ""));
+		Datapoint stockMarket = this.getDatapointBuilder().newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, ""));
 
 		// Add subscription to the stock market price
-		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, stockMarket.getAddress(), stockMarket.getAgent(), SyncMode.SUBSCRIBEONLY));
+		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, stockMarket.getAgent() + ":" + stockMarket.getAddress(), SyncMode.SUBSCRIBEONLY));
+		
+		// Add subfunctions
+		this.addRequestHandlerFunction(METHODCALCULATESIGNAL, (Request input) -> calculateSignal(input));
 
 	}
+	
+	private Response calculateSignal(Request req) {
+		Response result = new Response(req);
+		
+		try {
+			JsonObject calc = new JsonObject();
 
-	@Override
-	public JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-		JsonRpcResponse result = null;
+			if (this.emaShortPrevious < this.emaLongPrevious && this.emaShort > this.emaLong) {
+				log.debug("Buy signal as short EMA crosses long EMA from beneath");
+				// if (depot.getLiquid()>this.closePrice * 1) {
+				this.buySignal = true;
+				// log.debug("Enough liquid there. Set buy signal");
+				// } else {
+				// log.debug("No enough money, no buy signal");
+				// }
 
-		// Calculate signals
-		result = new JsonRpcResponse(parameterdata, this.calculateSignal());
+			}
 
+			if (this.emaShortPrevious > this.emaLongPrevious && this.emaShortPeriod < this.emaLong) {
+				// if (this.depot.getAsset().stream().filter(a->a.getStockName().equals(this.stockName)).findFirst().isPresent()
+				// && (this.depot.getAsset().stream().filter(a->a.getVolume()>=1)).findFirst().isPresent()) {
+				this.sellSignal = true;
+				log.debug("Sell signa as short EMA crosses long EMA from above");
+				// } else {
+				// log.debug("No sell signal as the volume of stock is not enough");
+				// }
+			}
+
+			calc.addProperty("buy", this.buySignal);
+			calc.addProperty("sell", this.sellSignal);
+
+			result.setResult(calc);
+		} catch (Exception e) {
+			log.error("Cannot register depot", e);
+			result.setError(e.getMessage());
+		}
+		
 		return result;
 	}
 
@@ -65,23 +106,27 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
-	protected void updateDatapointsById(Map<String, Datapoint> data) {
-		// Update day values
-		if (data.containsKey(IDPRICE)) {
-			// Update emas
-			this.emaLongPrevious = this.emaLong;
-			this.emaShortPrevious = this.emaShort;
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		try {
+			if (id.equals(IDPRICE)) {
+				// Update emas
+				this.emaLongPrevious = this.emaLong;
+				this.emaShortPrevious = this.emaShort;
 
-			this.calculateIndicator();
+				this.calculateIndicator();
 
-			// Update prices
-			this.closePrice = this.getDatapointFromId(data, IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
-			this.highPrice = this.getDatapointFromId(data, IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
-			this.lowPrice = this.getDatapointFromId(data, IDPRICE).getValue().getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
+				// Update prices
+				this.closePrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
+				this.highPrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
+				this.lowPrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
 
+			}
+		} catch (Exception e) {
+			log.error("Cannot get data", e);
 		}
+		
 	}
 
 	private void calculateIndicator() {
@@ -102,34 +147,34 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 		return result;
 	}
 
-	private JsonObject calculateSignal() {
-		JsonObject result = new JsonObject();
+	@Override
+	protected void cellFunctionThreadInit() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
-		if (this.emaShortPrevious < this.emaLongPrevious && this.emaShort > this.emaLong) {
-			log.debug("Buy signal as short EMA crosses long EMA from beneath");
-			// if (depot.getLiquid()>this.closePrice * 1) {
-			this.buySignal = true;
-			// log.debug("Enough liquid there. Set buy signal");
-			// } else {
-			// log.debug("No enough money, no buy signal");
-			// }
+	@Override
+	protected void executeCustomPreProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
-		}
+	@Override
+	protected void executeFunction() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
-		if (this.emaShortPrevious > this.emaLongPrevious && this.emaShortPeriod < this.emaLong) {
-			// if (this.depot.getAsset().stream().filter(a->a.getStockName().equals(this.stockName)).findFirst().isPresent()
-			// && (this.depot.getAsset().stream().filter(a->a.getVolume()>=1)).findFirst().isPresent()) {
-			this.sellSignal = true;
-			log.debug("Sell signa as short EMA crosses long EMA from above");
-			// } else {
-			// log.debug("No sell signal as the volume of stock is not enough");
-			// }
-		}
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
-		result.addProperty("buy", this.buySignal);
-		result.addProperty("sell", this.sellSignal);
-
-		return result;
+	@Override
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

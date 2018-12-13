@@ -52,8 +52,8 @@ public class Launcher {
 	private void init() throws Exception {
 		try {
 			// Start JADE
-			log.info("Start JADE");
-			this.startJade();
+			//log.info("Start JADE");
+			//this.startJade();
 
 			// === General variables ===//
 			String stockName = "Fingerprint";
@@ -80,8 +80,7 @@ public class Launcher {
 			// === Controller agent implementation === //
 			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)
-							.setGenerateReponder(true))
+					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class))
 					// The codelet handler ist controller request receiver funtion
 					.addCellfunction(CellFunctionConfig.newConfig("userconsole", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
@@ -105,8 +104,7 @@ public class Launcher {
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, statisticsService)
-							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName)
-							.setGenerateReponder(true))
+							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName))
 					.addCellfunction(CellFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
 							.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
 
@@ -125,8 +123,7 @@ public class Launcher {
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) // First, the stock market generates a price
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
-							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)
-							.setGenerateReponder(true))
+							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
 					.addCellfunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
@@ -148,8 +145,7 @@ public class Launcher {
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
 								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
-								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
-								.setGenerateReponder(true))
+								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
 						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 			}
 

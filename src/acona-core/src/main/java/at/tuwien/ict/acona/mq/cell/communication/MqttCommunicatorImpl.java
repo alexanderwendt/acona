@@ -136,6 +136,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			connOpts.setCleanSession(true);
 			connOpts.setUserName(this.username);
 			connOpts.setPassword(this.password.toCharArray());
+			connOpts.setMaxInflight(2000);   //Set max handled messages at the same time. Set 2000.
 
 			// Connect the client
 			log.debug("Connecting to MQTT messaging at " + this.host);
@@ -228,6 +229,9 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					// Else, any other message that is subscribed
 					} else {
 						log.debug("Update subscribed data: {}", topic);
+						if (topic.equals(subscribedReplyAddress)==true) {
+							log.error("Topic: {}. Erroneous response from method {}", topic, jsonMessage);
+						}
 						cellFunction.updateSubscribedData(topic, jsonMessage);
 					}
 				}
@@ -291,7 +295,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			MqttMessage reqMessage = new MqttMessage(reqPayload.getBytes());
 			reqMessage.setQos(1);
 			
-			String dpPublish = (new DPBuilder()).newDatapoint(topic).getCompleteAddressAsTopic("");
+			String dpPublish = (new DPBuilder()).newDatapoint(topic).getCompleteAddressAsTopic(this.cellName);
 
 			log.debug("{}>Sending request to: " + dpPublish, this.cellName);
 

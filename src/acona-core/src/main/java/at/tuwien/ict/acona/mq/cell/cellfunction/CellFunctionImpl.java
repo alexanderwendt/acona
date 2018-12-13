@@ -479,18 +479,18 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return cell;
 	}
 
-	/**
-	 * Return the subscribed datapoint based on its ID in the function
-	 * 
-	 * @param data:
-	 *            inputmap from subscribed data
-	 * @param id:
-	 *            datapoint id defined in the config or in the code
-	 * @return
-	 */
-	protected Datapoint getDatapointFromId(Map<String, Datapoint> data, String id) {
-		return data.get(this.getSyncDatapointConfigs().get(id).getAddress());
-	}
+//	/**
+//	 * Return the subscribed datapoint based on its ID in the function
+//	 * 
+//	 * @param data:
+//	 *            inputmap from subscribed data
+//	 * @param id:
+//	 *            datapoint id defined in the config or in the code
+//	 * @return
+//	 */
+//	protected Datapoint getDatapointFromId(Map<String, Datapoint> data, String id) {
+//		return data.get(this.getSyncDatapointConfigs().get(id).getAddress());
+//	}
 
 	@Override
 	public String toString() {
@@ -549,6 +549,25 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	protected DPBuilder getDatapointBuilder() {
 		return dpBuilder;
+	}
+	
+	/**
+	 * In the update data method, datapoints are often received as JsonElement. This method converts it to a datapoint and gets the value. Usually, only the value is of interest.
+	 * 
+	 * @param dp
+	 * @return
+	 * @throws Exception
+	 */
+	protected JsonElement getValueFromJsonDatapoint(JsonElement dp) throws Exception {
+		JsonElement result = null;
+		
+		if (dp.isJsonObject()==true) {
+			result = this.getDatapointBuilder().toDatapoint(dp.getAsJsonObject()).getValue();
+		} else {
+			throw new Exception("JsonElement is no JsonObject");
+		}
+		
+		return result;
 	}
 
 	protected Map<String, Function<Request, Response>> getSubfunctions() {

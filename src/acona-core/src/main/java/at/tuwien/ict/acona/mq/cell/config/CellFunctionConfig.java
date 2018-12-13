@@ -77,7 +77,6 @@ public class CellFunctionConfig {
 	private CellFunctionConfig(String name, String className) {
 		this.configObject = new JsonObject();
 		this.configObject.add(CELLMANAGEDDATAPOINTS, new JsonArray());
-		this.setGenerateReponder(false);
 		this.setName(name).setClassName(className);
 	}
 
@@ -174,23 +173,23 @@ public class CellFunctionConfig {
 		return this.configObject.getAsJsonPrimitive(CELLFINISHSTATEAFTERSINGLERUN);
 	}
 
-	/**
-	 * @param isGenerateResponder
-	 * @return
-	 */
-	public CellFunctionConfig setGenerateReponder(boolean isGenerateResponder) {
-		this.configObject.addProperty(GENERATERESPONDER, isGenerateResponder);
-		return this;
-	}
+//	/**
+//	 * @param isGenerateResponder
+//	 * @return
+//	 */
+//	public CellFunctionConfig setGenerateReponder(boolean isGenerateResponder) {
+//		this.configObject.addProperty(GENERATERESPONDER, isGenerateResponder);
+//		return this;
+//	}
 
 	// ======================//
 
-	/**
-	 * @return
-	 */
-	public JsonPrimitive getGenerateReponder() {
-		return this.configObject.getAsJsonPrimitive(GENERATERESPONDER);
-	}
+//	/**
+//	 * @return
+//	 */
+//	public JsonPrimitive getGenerateReponder() {
+//		return this.configObject.getAsJsonPrimitive(GENERATERESPONDER);
+//	}
 
 	/**
 	 * @param responderProtocol

@@ -39,7 +39,7 @@ public class Broker extends CellFunctionThreadImpl {
 		stockName = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKNAME, "");
 
 		// === GENERATE RESPONDER NECESSARY ===//
-		this.getFunctionConfig().setGenerateReponder(true);
+		//this.getFunctionConfig().setGenerateReponder(true);
 
 		// Add subfunctions
 		this.addRequestHandlerFunction(REGISTERDEPOT, (Request input) -> registerDepot(input));
@@ -62,8 +62,8 @@ public class Broker extends CellFunctionThreadImpl {
 		Response result = new Response(req);
 		
 		try {
-			String agentName = req.getParameter("name", String.class);
-			String agentType = req.getParameter("type", String.class);
+			String agentName = req.getParameter("agentname", String.class);
+			String agentType = req.getParameter("agenttype", String.class);
 			
 			Depot depot = new Depot();
 			depot.setLiquid(0);
@@ -104,10 +104,12 @@ public class Broker extends CellFunctionThreadImpl {
 		Response result = new Response(req);
 		
 		try {
-			String agentName = req.getParameter("name", String.class);
+			String agentName = req.getParameter("agentname", String.class);
 		
 			this.getCommunicator().remove(this.createDepotAddress(agentName));
 			log.debug("Unregistered agent={}", agentName);
+			
+			result.setResultOK();
 		} catch (Exception e) {
 			log.error("Cannot register depot", e);
 			result.setError(e.getMessage());
@@ -124,7 +126,7 @@ public class Broker extends CellFunctionThreadImpl {
 		Response result = new Response(req);
 		
 		try {
-			String agentName = req.getParameter("name", String.class);
+			String agentName = req.getParameter("agentname", String.class);
 			result.setResult(this.getCommunicator().read(this.getCellName() + ":" + this.createDepotAddress(agentName)).getValue());
 			
 		} catch (Exception e) {
@@ -182,6 +184,8 @@ public class Broker extends CellFunctionThreadImpl {
 			depot.sell(stockName, volume, price);
 	
 			JsonElement jsonDepot = gson.toJsonTree(depot);
+			
+			result.setResult(jsonDepot);
 			this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
 			log.debug("Agent={}, Sold stock={}, volume={}, price={}. Depot={}", agentName, stockName, volume, price, jsonDepot);
 
@@ -198,7 +202,7 @@ public class Broker extends CellFunctionThreadImpl {
 		
 		try {
 			String agentName = req.getParameter("agentname", String.class);  
-			double amount = req.getParameter("price", Double.class);  
+			double amount = req.getParameter("amount", Double.class);  
 		
 			Depot depot = this.getDepot(agentName);
 			if (depot == null) {
@@ -226,7 +230,7 @@ public class Broker extends CellFunctionThreadImpl {
 		
 		try {
 			String agentName = req.getParameter("agentname", String.class);  
-			double amount = req.getParameter("price", Double.class);  
+			double amount = req.getParameter("amount", Double.class);  
 		
 		
 			Depot depot = this.getDepot(agentName);

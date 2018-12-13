@@ -58,10 +58,10 @@ public class CellFunctionHandlerImpl implements CellFunctionHandler {
 			}
 
 			// Create a responder to the cellfunction if it is set in the
-			if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
+			//if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
 				// this.hostCell.getCommunicator().createResponderForFunction(cellFunctionInstance);
-				log.info("Agent {}, function {}>Generate external responder to be able to answer incoming messages.", this.hostCell.getName(), cellFunctionInstance.getFunctionRootAddress());
-			}
+			//	log.info("Agent {}, function {}>Generate external responder to be able to answer incoming messages.", this.hostCell.getName(), cellFunctionInstance.getFunctionRootAddress());
+			//}
 		} catch (Exception e) {
 			log.error("Cannot register cell function " + cellFunctionInstance + ".", e);
 			throw new Exception(e.getMessage());

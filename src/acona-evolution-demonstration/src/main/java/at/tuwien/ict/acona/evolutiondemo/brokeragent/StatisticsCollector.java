@@ -36,9 +36,9 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		// Service shall be reachable from abroad
-		this.getFunctionConfig().setGenerateReponder(true);
+		//this.getFunctionConfig().setGenerateReponder(true);
 
-		dataaddress = this.getFunctionConfig().getProperty(DATAADDRESS);
+		dataaddress = this.getFunctionConfig().getProperty(DATAADDRESS, "data");
 
 		// Add subfunctions
 		this.addRequestHandlerFunction(GETSTATISTICSSUFFIX, (Request input) -> getStatistics(input));

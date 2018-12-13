@@ -8,7 +8,7 @@ public class RequestError {
 		this.error = error;
 	}
 
-	public String getError() {
+	public String getMessage() {
 		return error;
 	}
 
