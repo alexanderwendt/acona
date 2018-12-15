@@ -45,12 +45,13 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	}
 	
 	private Response getStatistics(Request req) {
-		Response result = new Response(req);
+		Response result = null;
 		
 		log.debug("Get result");
 		try {
-			JsonElement res = this.generateTypeStatistics();
-			result.setResult(res);
+			//JsonElement res = this.generateTypeStatistics();
+			//result.setResult(res);
+			this.setStart();
 		} catch (Exception e) {
 			log.error("Statistics caluclation error", e);
 			result = new Response(req);
@@ -59,7 +60,46 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 		
 		return result;
 	}
+	
+	private JsonElement getAgentValues() throws Exception {
+		JsonObject result = new JsonObject();
+		
+		// Read whole address space
+		List<Datapoint> agents = this.getCommunicator().readWildcard(DEPOTPREFIX + "." + "*");
+		List<JsonObject> depots = new ArrayList<JsonObject>();
+		for (Datapoint dp: agents) {
+			Depot d = dp.getValue(Depot.class);
+			JsonObject o = new JsonObject();
+			o.addProperty("name", d.getOwner() + ":" + d.getOwnerType());
+			o.addProperty("value", d.getTotalValue());
+			depots.add(o);
+		}
+		
+		// Read the date
+		String dateString = "";
+		Datapoint value = this.getCommunicator().read(dataaddress);
+		if (value.hasEmptyValue() == false) {
+			dateString = this.getCommunicator().read(dataaddress).getValue().getAsJsonObject().getAsJsonPrimitive("date").getAsString();
+		}
+		
+		//Create a list of agentname:type, total value
+		
+		
+		JsonElement depotsJson = (new Gson()).toJsonTree(depots);
+		result.add("depots", depotsJson);
+		result.addProperty("date", dateString);
+		
+		return result;
+	}
 
+	/**
+	 * Generate statistics.
+	 * 
+	 * Note: This method has to run in an own thread as it reads from other methods
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	private JsonElement generateTypeStatistics() throws Exception {
 		JsonObject result = new JsonObject();
 
@@ -70,7 +110,8 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 
 		// Read the date
 		String dateString = "";
-		if (this.getCommunicator().read(dataaddress).hasEmptyValue() == false) {
+		Datapoint value = this.getCommunicator().read(dataaddress);
+		if (value.hasEmptyValue() == false) {
 			dateString = this.getCommunicator().read(dataaddress).getValue().getAsJsonObject().getAsJsonPrimitive("date").getAsString();
 		}
 		// Calendar cal = Calendar.getInstance();
@@ -90,9 +131,9 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 			}
 		});
 
-		List<Types> types = new ArrayList<Types>();
+		List<SpeciesType> types = new ArrayList<SpeciesType>();
 		typeCount.forEach((k, v) -> {
-			types.add(new Types(k, v));
+			types.add(new SpeciesType(k, v));
 		});
 
 		JsonElement tree = (new Gson()).toJsonTree(types);
@@ -118,8 +159,13 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeFunction() throws Exception {
-		// TODO Auto-generated method stub
+		JsonElement res = this.generateTypeStatistics();
+		JsonElement resValues = this.getAgentValues();
+		res.getAsJsonObject().add("values", resValues.getAsJsonObject().get("depots"));
 		
+		//Response result = new Response(this.getOpenRequest());
+		//result.setResult(res);
+		this.closeOpenRequestWithResponse(res);
 	}
 
 	@Override

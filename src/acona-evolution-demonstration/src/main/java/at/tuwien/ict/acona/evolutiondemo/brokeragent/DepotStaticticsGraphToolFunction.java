@@ -23,8 +23,10 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 	private final static Logger log = LoggerFactory.getLogger(DepotStaticticsGraphToolFunction.class);
 
 	private TimeSeriesGraph graph;
+	private TimeSeriesGraph graph2;
 
-	private List<Types> species;
+	private List<SpeciesType> species;
+	private List<AgentValue> values;
 	private Day day;
 
 	@Override
@@ -33,14 +35,23 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 		graph.pack();
 		RefineryUtilities.positionFrameRandomly(graph);
 		graph.setVisible(true);
+		
+		graph2 = new TimeSeriesGraph("Agent value");
+		graph2.pack();
+		RefineryUtilities.positionFrameRandomly(graph2);
+		graph2.setVisible(true);
 
 		log.info("Species count Graph function initialized");
 	}
 
 	@Override
 	protected void executeFunction() throws Exception {
-		for (Types t : species) {
-			this.graph.updateDataset(t.getType(), day, t.getNumber());
+		for (SpeciesType t : species) {
+			this.graph.updateDataset(t.getType(), day, (int)t.getNumber());
+		}
+		
+		for (AgentValue t : values) {
+			this.graph2.updateDataset(t.getName(), day, t.getValue());
 		}
 	}
 
@@ -67,7 +78,7 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 		// Read datapoint
 		JsonObject object;
 		try {
-			object = data.getAsJsonObject();
+			object = this.getValueFromJsonDatapoint(data).getAsJsonObject();
 
 			// Get the date
 			String date = object.getAsJsonPrimitive("date").getAsString();
@@ -77,7 +88,8 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 			day = new Day(cal.getTime());
 
 			// Get the tree
-			species = (new Gson()).fromJson(object.get("types"), new TypeToken<List<Types>>() {}.getType());
+			species = (new Gson()).fromJson(object.get("types"), new TypeToken<List<SpeciesType>>() {}.getType());
+			values = (new Gson()).fromJson(object.get("values"), new TypeToken<List<AgentValue>>() {}.getType());
 
 			this.setStart();
 

@@ -74,6 +74,23 @@ dependencies {
     
     // https://mvnrepository.com/artifact/jfree/jfreechart
 	compile group: 'jfree', name: 'jfreechart', version: '1.0.13'
+	
+	   	//Jersey server for REST
+   	compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.7'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.7'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.7'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
+ 	compile 'com.sun.jersey.contribs:jersey-contribs:1.19.4'
+ 	// https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+	compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+   	
+   	//Jetty server
+   	compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.3.0.M1'
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    
+    //Jersey client
+    compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.26'
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
     
     
     // Declare the dependency for your favourite test framework you want to use in your tests.

@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,26 +15,26 @@ public class Evaluator extends CellFunctionCodelet {
 	public final static String STATISTICSCOLLECTORSERVICENAME = "statservicename";
 	public final static String STATISTICSDATAPOINTNAME = "statisticsdatapointname";
 
-	private String statServiceName = "";
-	private String statisticsDatapointName = "";
+	private String statServiceAddress = "";
+	private String statisticsDatapointAddress = "";
 
 	@Override
 	protected void cellFunctionCodeletInit() throws Exception {
-		statServiceName = this.getFunctionConfig().getProperty(STATISTICSCOLLECTORSERVICENAME);
-		statisticsDatapointName = this.getFunctionConfig().getProperty(STATISTICSDATAPOINTNAME);
+		statServiceAddress = this.getFunctionConfig().getProperty(STATISTICSCOLLECTORSERVICENAME);
+		statisticsDatapointAddress = this.getFunctionConfig().getProperty(STATISTICSDATAPOINTNAME);
 	}
 
 	@Override
 	protected void executeFunction() throws Exception {
 		// Read the statistics
-
-		JsonElement statistics = this.getCommunicator().execute(statServiceName + "/" + StatisticsCollector.GETSTATISTICSSUFFIX, new Request()).getResult();
+		log.info("Start evaluator to read agent statistics. Read from={}", statServiceAddress + "/" + StatisticsCollector.GETSTATISTICSSUFFIX);
+		JsonElement statistics = this.getCommunicator().execute(statServiceAddress, new Request()).getResult();
 		
 		
 
 		// Write the statistics to a datapoint
-		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(statisticsDatapointName).setValue(statistics));
-		log.debug("Written stats={} to {}", statistics, statisticsDatapointName);
+		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(statisticsDatapointAddress).setValue(statistics));
+		log.info("Written stats={} to {}", statistics, statisticsDatapointAddress);
 
 	}
 

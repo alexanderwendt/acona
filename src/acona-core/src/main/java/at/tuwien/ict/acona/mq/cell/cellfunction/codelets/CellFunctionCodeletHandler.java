@@ -83,6 +83,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
 		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEINTERNALMEMORYADDRESS, internalStateMemoryAddress);
 
+		this.setExecuteOnce(true);
 		this.setFinishedAfterSingleRun(false);
 		
 		
@@ -240,7 +241,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 				boolean isRunOrderStateReady = this.isRunOrderStateReady(currentRunOrder);
 				int nextRunOrder = this.getNextRunOrderState(currentRunOrder);
 
-				log.debug("startCommandSet={}, runOrderStateReady={}, currentRunOrder={}, nextRunOrder={}, emptyEecutionMap={}", this.startCodeletHandlerCommandSet, isRunOrderStateReady, currentRunOrder, nextRunOrder, emptyExecutionMap);
+				log.debug("startCommandSet={}, runOrderStateReady={}, currentRunOrder={}, nextRunOrder={}, emptyEecutionMap={}, executeOnce={}", this.startCodeletHandlerCommandSet, isRunOrderStateReady, currentRunOrder, nextRunOrder, emptyExecutionMap, this.isExecuteOnce());
 
 				if (this.startCodeletHandlerCommandSet == true) {
 					if (isRunOrderStateReady == true) {
@@ -266,7 +267,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 						Datapoint handlerState = getExtendedState();
 						log.debug("Current command={}, publish handerstate={}, isActive={}, allowedToRun={}, startCommandSet={}, newCodeletStartCommand={}.", this.currentCommand, handlerState, this.isActive(), this.isAllowedToRun(), this.isStartCommandIsSet(), this.startCodeletHandlerCommandSet);
-						this.getCommunicator().publishDatapoint(handlerState);
+						this.getCommunicator().write(handlerState);
 
 					} else {
 						StringBuilder runningCodelets = new StringBuilder();
@@ -306,7 +307,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	public void setCodeletState(ServiceState state, String codeletID) throws Exception {
 		if (this.getCodeletMap().containsKey(codeletID) == true) {
 			this.getCodeletMap().put(codeletID, state);
-			log.debug("Codelet={} updated its state to state={}. Run execution={}, codelet states={}", codeletID, state, this.getCurrentRunOrder(), this.getCodeletMap());
+			log.debug("Codelet={} updated its state to state={}. Run execution={}, \ncodelet states={}\ncodelets per run execution: {}", codeletID, state, this.getCurrentRunOrder(), this.getCodeletMap(), executionOrderMap);
 		} else {
 			log.error("Codelet={} that reported state={} is not registered in this codelet handler", codeletID, state);
 			throw new Exception("Codelet not registered");
@@ -463,6 +464,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 		this.startCodeletHandlerCommandSet = true;
 
+		//Executeonce is false to check if the codelets are alive
 		this.setExecuteOnce(false);
 		this.setExecuteRate(1000);
 		this.setStart();

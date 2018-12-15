@@ -3,8 +3,6 @@ package at.tuwien.ict.acona.evolutiondemo.stockmarketagent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Map;
-
 import org.jfree.data.time.Day;
 import org.jfree.ui.RefineryUtilities;
 import org.slf4j.Logger;
@@ -41,6 +39,7 @@ public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 
 	@Override
 	protected void executeFunction() throws Exception {
+		log.debug("Update graph data set");
 		this.graph.updateDataset(seriesName, day, open, high, low, close);
 		
 		
@@ -86,10 +85,10 @@ public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
 				cal.setTime(dateFormat.parse(date));    
 				day = new Day(cal.getTime());
+				log.debug("received update={}", object);
 				
 				this.setStart();
 				
-				log.debug("received update={}", object);
 			} else {
 				log.warn("No valid OHLC value={}", object);
 			}

@@ -529,6 +529,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	protected void setServiceState(ServiceState serviceState) throws Exception {
 		this.currentServiceState = serviceState;
+		//Write, in order to be able to get the state without subscribing it
 		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(STATESUFFIX)).setValue(serviceState.toString()));
 		//this.getCommunicator().publishTopic(this.getDatapointBuilder().newDatapoint(this.enhanceWithRootAddress(STATESUFFIX)).getCompleteAddressAsTopic(""), new JsonPrimitive(serviceState.toString()), true);
 
@@ -599,7 +600,7 @@ public abstract class CellFunctionImpl implements CellFunction {
 	 */
 	protected void setOpenRequest(Request openRequest) {
 		this.openRequest = openRequest;
-		log.warn("OpenRequest set from {} to {}", this.openRequest, openRequest);
+		log.debug("OpenRequest set from {} to {}", this.openRequest, openRequest);
 	}
 	
 	protected void closeOpenRequestWithOK(boolean closeOpenRequest) throws Exception {
@@ -610,6 +611,15 @@ public abstract class CellFunctionImpl implements CellFunction {
 				this.setOpenRequest(null);
 			}
 			
+		} else {
+			log.error("open request is null. Nothing can be returned");
+		}
+	}
+	
+	protected void closeOpenRequestWithResponse(JsonElement response) throws Exception {
+		if (this.getOpenRequest()!=null) {
+			this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest()).setResult(response)));
+			this.setOpenRequest(null);
 		} else {
 			log.error("open request is null. Nothing can be returned");
 		}

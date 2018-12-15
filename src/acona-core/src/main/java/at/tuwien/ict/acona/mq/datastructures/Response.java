@@ -82,8 +82,9 @@ public class Response {
 		return result;
 	}
 
-	public void setResult(JsonElement result) {
+	public Response setResult(JsonElement result) {
 		this.result = result;
+		return this;
 	}
 
 	public void setResult(List<?> result) throws Exception {

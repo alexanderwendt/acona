@@ -7,12 +7,12 @@
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet" level="WARN" />
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl" level="WARN" />
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.core.cellfunction.codelets.helpers" level="WARN" />
-  <logger name="at.tuwien.ict.acona.mq.cell.core" level="INFO" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.storage" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.communication" level="WARN" />
@@ -40,7 +40,7 @@
 	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->
     </encoder>
   </appender>
-  <root level="TRACE">
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

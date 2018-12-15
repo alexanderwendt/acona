@@ -1,25 +1,21 @@
 package at.tuwien.ict.acona.evolutiondemo.controlleragent;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-
 import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
-import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 
-	public static final String METHODSTARTCONTROLLER = "startcontroller";
+	public static final String METHODSTARTCONTROLLER = "start";
+	public static final String METHODINTERRUPTCONTROLLER = "interrupt";
 	
-	private final RequestReceiverUserConsole console = new RequestReceiverUserConsole(log, this);
+	//private final RequestReceiverUserConsole console = new RequestReceiverUserConsole(log, this);
 
 	private static Logger log = LoggerFactory.getLogger(ConsoleRequestReceiver.class);
 	// private Scanner scanner = new Scanner(System.in);
@@ -38,9 +34,10 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 		this.setExecuteOnce(true);
 		// this.setExecuteRate(1000);
 		this.setCommand(ControlCommand.STOP);
-		console.init();
+		//console.init();
 		
 		this.addRequestHandlerFunction(METHODSTARTCONTROLLER, (Request input) -> startController(input));
+		this.addRequestHandlerFunction(METHODINTERRUPTCONTROLLER, (Request input) -> interrupt(input));
 	}
 	
 	
@@ -59,7 +56,11 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 		}
 		
 		return result;
-		
+	}
+	
+	private Response interrupt(Request req) {
+		this.runAllowed = false;
+		return (new Response(req)).setResultOK();
 	}
 
 	@Override

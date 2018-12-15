@@ -75,7 +75,7 @@ public class DataAccess extends CellFunctionImpl {
 
 			result.setResult(readData);
 
-			log.debug("Read data from address={}", dp.getAddress());
+			log.debug("Read request {}. Read data from address={}, value={}", req, dp.getAddress(), readData);
 		} catch (Exception e) {
 			log.error("Cannot read from the database", e);
 			result.setError("Cannot read from database" + e);

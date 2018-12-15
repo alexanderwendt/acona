@@ -1,10 +1,10 @@
 package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
-public class Types {
+public class SpeciesType {
 	private String type;
 	private int number;
 	
-	public Types(String type, int number) {
+	public SpeciesType(String type, int number) {
 		super();
 		this.type = type;
 		this.number = number;
@@ -29,11 +29,9 @@ public class Types {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Types [type=");
 		builder.append(type);
-		builder.append(", number=");
+		builder.append("|");
 		builder.append(number);
-		builder.append("]");
 		return builder.toString();
 	}
 }

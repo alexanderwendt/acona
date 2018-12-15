@@ -118,7 +118,7 @@ public class Trader extends CellFunctionCodelet {
 	@Override
 	protected void executeFunction() throws Exception {
 
-		log.info("{}>Start agent caluclation", this.getCellName());
+		log.info("{}:{}>Start agent caluclation", this.getCellName(), this.agentType);
 		// Program logic
 		// 2. Check depot death
 		this.killSignal = this.killAgentOnDepotDeath();
@@ -132,7 +132,7 @@ public class Trader extends CellFunctionCodelet {
 			// 5. Execute signal
 			this.executeTrade();
 
-			log.info("{}:{}>Finished. Assets in the depot: {}", this.getCellName(), this.agentType, this.depot.getAssets());
+			log.info("{}:{}>Finished. Assets in the depot: {}", this.getCellName(), this.agentType, this.depot);
 
 		} else {
 			// If the kill signal has been set, the system shall exit.
