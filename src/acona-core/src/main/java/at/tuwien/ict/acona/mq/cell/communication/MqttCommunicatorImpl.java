@@ -224,7 +224,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					} else if (topic.equals(subscribedCommandAddress)) {
 						// this.setcommand(command)
 						// TODO: Add method;
-						log.warn("Commands shall not get here {}, {}", topic, jsonMessage);
+						log.info("Commands shall not get here {}, {}", topic, jsonMessage);
 
 					// Else, any other message that is subscribed
 					} else {

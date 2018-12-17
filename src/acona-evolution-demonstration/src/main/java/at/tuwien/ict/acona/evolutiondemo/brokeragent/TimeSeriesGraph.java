@@ -127,7 +127,7 @@ public class TimeSeriesGraph extends ApplicationFrame {
 		// Add series if it does not exists
 		if (index == -1) {
 			TimeSeries s1 = new TimeSeries(name);
-			s1.setMaximumItemCount(200);
+			s1.setMaximumItemCount(1000);
 			seriesCollection.addSeries(s1);
 			int newNumberOfSeries = seriesCollection.getSeriesCount();
 			index = newNumberOfSeries - 1;

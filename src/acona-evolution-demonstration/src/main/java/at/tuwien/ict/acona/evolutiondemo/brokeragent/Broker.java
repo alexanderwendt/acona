@@ -20,8 +20,10 @@ public class Broker extends CellFunctionThreadImpl {
 	private static final Logger log = LoggerFactory.getLogger(Broker.class);
 
 	public final static String ATTRIBUTESTOCKNAME = "stockname";
+	public final static String ATTRIBUTECOMMISSION = "commission";
 
 	private String stockName = "";
+	private double commission = 0;
 	private final static String PREFIXDEPOTADDRESS = "depot";
 	
 	public final static String REGISTERDEPOT = "registerdepot";
@@ -31,12 +33,14 @@ public class Broker extends CellFunctionThreadImpl {
 	public final static String GETDEPOTINFO = "getdepotinfo";
 	public final static String ADDMONEY = "addmoney";
 	public final static String REMOVEMONEY = "removemoney";
+	
 
 	private final Gson gson = new Gson();
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		stockName = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKNAME, "");
+		commission = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTECOMMISSION, "0"));
 
 		// === GENERATE RESPONDER NECESSARY ===//
 		//this.getFunctionConfig().setGenerateReponder(true);
@@ -49,10 +53,6 @@ public class Broker extends CellFunctionThreadImpl {
 		this.addRequestHandlerFunction(GETDEPOTINFO, (Request input) -> getDepotAsJson(input));
 		this.addRequestHandlerFunction(ADDMONEY, (Request input) -> addMoneyToDepot(input));
 		this.addRequestHandlerFunction(REMOVEMONEY, (Request input) -> removeMoneyFromDepot(input));
-		
-		
-		
-		
 		
 		log.debug("Broker initialized");
 
@@ -151,11 +151,15 @@ public class Broker extends CellFunctionThreadImpl {
 				throw new Exception("Depot " + agentName + " does not exist");
 			}
 
+			//Buy
 			depot.buy(stockName, volume, price);
 
+			//Remove money
+			depot.removeLiquid(this.commission*volume*price);
+			
 			JsonElement jsonDepot = gson.toJsonTree(depot);
 			this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
-			log.debug("Agent={}, Bought stock={}, volume={}, price={}. Depot={}", agentName, stockName, volume, price, jsonDepot);
+			log.debug("Agent={}, Bought stock={}, volume={}, price={}. Commission={}, Depot={}", agentName, stockName, volume, price, this.commission*volume*price, jsonDepot);
 			
 			result.setResult(jsonDepot);
 
@@ -181,13 +185,16 @@ public class Broker extends CellFunctionThreadImpl {
 				throw new Exception("Depot " + agentName + " does not exist");
 			}
 	
+			//Sell
 			depot.sell(stockName, volume, price);
+			//Remove money
+			depot.removeLiquid(this.commission*volume*price);
 	
 			JsonElement jsonDepot = gson.toJsonTree(depot);
 			
 			result.setResult(jsonDepot);
 			this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(this.createDepotAddress(agentName)).setValue(jsonDepot));
-			log.debug("Agent={}, Sold stock={}, volume={}, price={}. Depot={}", agentName, stockName, volume, price, jsonDepot);
+			log.debug("Agent={}, Sold stock={}, volume={}, price={}. Commission={} Depot={}", agentName, stockName, volume, price, this.commission*volume*price, jsonDepot);
 
 		} catch (Exception e) {
 			log.error("Cannot sell", e);

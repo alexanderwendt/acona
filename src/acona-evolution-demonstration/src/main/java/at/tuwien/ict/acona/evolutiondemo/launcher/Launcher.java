@@ -1,6 +1,10 @@
 package at.tuwien.ict.acona.evolutiondemo.launcher;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +62,6 @@ public class Launcher {
 
 	private void init() throws Exception {
 		try {
-			// Start JADE
-			//log.info("Start JADE");
-			//this.startJade();
-
 			// === General variables ===//
 			String stockName = "Fingerprint";
 
@@ -141,16 +141,52 @@ public class Launcher {
 			// === Traders ===//
 
 			// Create 100 trading agents that first buy a stock, then sell it
-			for (int i = 1; i <= 0; i++) {
-				String traderType = "type";
-				if (i % 3 == 0) {
-					traderType += "_even";
-				} else {
-					traderType += "_odd";
-				}
-
-				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
-						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+//			for (int i = 1; i <= 0; i++) {
+//				String traderType = "type";
+//				if (i % 3 == 0) {
+//					traderType += "_even";
+//				} else {
+//					traderType += "_odd";
+//				}
+//
+//				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
+//						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+//								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+//								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+//								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
+//								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+//								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
+//								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
+//						//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+//						.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
+//			}
+			
+			List<String> l = new ArrayList<String>();
+			for (int i = 1; i <= 50; i++) {
+				
+				int longMA = 0;
+				int shortMA = 0;
+				boolean breaker = true;
+				String key = "LS";
+				do {
+					longMA = (int)(Math.random()*100);
+					shortMA = (int)(Math.random()*longMA);
+					key = "L" + longMA + "S" + shortMA;
+					if (l.contains(key)==true) {
+						log.info("L {}, S {} already exists", longMA, shortMA);
+						breaker=false;
+					} else {
+						breaker=true;
+						log.info("Added agent, L {}, S {}", longMA, shortMA);
+						break;
+					}
+				} while (breaker==false);
+				
+				l.add(key);
+				String traderType = key;
+	
+				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + traderType)
+						.addCellfunction(CellFunctionConfig.newConfig("trader_" + traderType, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
@@ -158,20 +194,52 @@ public class Launcher {
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
 						//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-						.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
+						.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
+								.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+								.setProperty(EMAIndicator.ATTRIBUTEEMALONG, longMA)
+								.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
 			}
 			
-			Cell traderAgent2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "EMA1020")
-					.addCellfunction(CellFunctionConfig.newConfig("trader_1020", Trader.class)
-							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-							.setProperty(Trader.ATTRIBUTEAGENTTYPE, "EMA1020")
-							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
-							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
-							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-					//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
-					.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)));
+//			Cell traderAgentRand = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "Rnd")
+//			.addCellfunction(CellFunctionConfig.newConfig("trader_" + "Rnd", Trader.class)
+//					.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+//					.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+//					.setProperty(Trader.ATTRIBUTEAGENTTYPE, "Random")
+//					.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+//					.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
+//					.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
+//			//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+//			.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
+			
+//			Cell traderAgent2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "EMA1020")
+//					.addCellfunction(CellFunctionConfig.newConfig("trader_1020", Trader.class)
+//							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+//							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+//							.setProperty(Trader.ATTRIBUTEAGENTTYPE, "EMA1020")
+//							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+//							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
+//							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
+//					//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+//					//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
+//					.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
+//							.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+//							.setProperty(EMAIndicator.ATTRIBUTEEMALONG, 20)
+//							.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 10)));
+//			
+//			Cell traderAgent3 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "EMA05200")
+//					.addCellfunction(CellFunctionConfig.newConfig("trader_05200", Trader.class)
+//							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+//							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+//							.setProperty(Trader.ATTRIBUTEAGENTTYPE, "EMA05200")
+//							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+//							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
+//							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
+//					//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+//					//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
+//					.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
+//							.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+//							.setProperty(EMAIndicator.ATTRIBUTEEMALONG, 30)
+//							.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 2)));
 			
 			//Jsersey server to receive commands
 			CellConfig server = CellConfig.newConfig(serverAgentName)

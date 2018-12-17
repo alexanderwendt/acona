@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +27,7 @@ import at.tuwien.ict.acona.mq.cell.cellfunction.helper.SimpleController;
 import at.tuwien.ict.acona.mq.cell.cellfunction.helper.TimeRegisterFunction;
 import at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.DatapointMirroring;
 import at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.DatapointTransfer;
+import at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.SimpleReproduction;
 import at.tuwien.ict.acona.mq.cell.config.CellConfig;
 import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
@@ -1053,6 +1056,191 @@ public class MqCellCoreFunctionTester {
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 
 			assertEquals(result, expectedResult, 0.0);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
+	
+	/**
+	 * The agent shall replicate itself. An agent is created. On trigger, the agent creates a copy of itself. The test is passed if the second agent also contains a function from the first agent
+	 */
+	@Test
+	public void CFReproduceAgentTester() {
+		try {
+			String agentName = "parentagent";
+			String functionName = "increment";
+			String reproduceFunction = "reproduce";
+			String datapoint = agentName + ":" + "datapoint.test";
+			// String destinationAddress = CFDurationThreadTester.queryDatapointID;
+			// String resultAddress = CFDurationThreadTester.resultDatapointID;
+			// double value = 1.3;
+			// double expectedResult = value;
+
+			// Create cell
+			Cell agent = this.launcher.createAgent(CellConfig.newConfig(agentName)
+					.addCellfunction(CellFunctionConfig.newConfig(functionName, IncrementServiceThread.class)
+							.addManagedDatapoint(IncrementServiceThread.ATTRIBUTEINCREMENTDATAPOINT, datapoint,
+									SyncMode.SUBSCRIBEWRITEBACK))
+					.addCellfunction(CellFunctionConfig.newConfig("reproduce", SimpleReproduction.class)));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.info("=== All agents initialized ===");
+
+			// Run the first agent
+			agent.getCommunicator().execute(agent.getName() + ":" + functionName + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", false), 100000);
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			// Reproduce the agent
+			//agent.getCommunicator().write(dpb.newDatapoint(reproduceFunction + ".command").setValue("START"));
+			agent.getCommunicator().execute(agent.getName() + ":" + reproduceFunction + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", false), 100000);
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			// Run the second agent
+			Map<String, Cell> map = this.launcher.getExternalAgentControllerMap();
+			Cell newAgent = null;
+			for (Entry<String, Cell> k : map.entrySet()) {
+				log.debug("Agents={}", k.getKey());
+				if (k.getKey().contains(agentName) == true && k.getKey().equals(agentName) == false) {
+					newAgent = k.getValue();
+					log.info("The replicaagent is={}", k);
+					break;
+				}
+			}
+
+			log.info("Available agents={}", this.launcher.getExternalAgentControllerMap());
+			agent.getCommunicator().execute(agent.getName() + ":" + functionName + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", false), 100000);
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			log.debug("Values={}", agent.getDataStorage());
+
+			// Read the datapoint value
+
+			double readValue = newAgent.getCommunicator().read(datapoint).getValue().getAsDouble();
+			log.debug("correct value={}, actual value={}", 2.0, readValue);
+
+			assertEquals(2.0, readValue, 0.0);
+			log.info("Test passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+
+	}
+
+	/**
+	 * Create an agent without any certain function. Get the agent from the container and add a function into the running system. The function shall increment a value. If the value has been incremented,
+	 * the adding of the new function was successful.
+	 */
+	@Test
+	public void addPostFunctionTester() {
+		try {
+			String agentName = "FunctionLessAgent";
+			String functionName = "increment";
+			String datapoint = agentName + ":" + "datapoint.test";
+
+			// Create cell
+			Cell agent = this.launcher.createAgent(CellConfig.newConfig(agentName));
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			log.info("=== All agents initialized ===");
+
+			// Add the increment function post to start of the agent
+			CellFunctionConfig functionConf = CellFunctionConfig.newConfig(functionName, IncrementServiceThread.class)
+					.addManagedDatapoint(IncrementServiceThread.ATTRIBUTEINCREMENTDATAPOINT, datapoint, SyncMode.SUBSCRIBEWRITEBACK);
+
+			this.launcher.getAgent(agentName).addCellFunction(functionConf);
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			// Run the first agent
+			//agent.getCommunicator().write(DatapointBuilder.newDatapoint(functionName + ".command").setValue("START"));
+			agent.getCommunicator().execute(agent.getName() + ":" + functionName + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", false), 100000);
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			log.info("Available agents={}", this.launcher.getExternalAgentControllerMap());
+			//agent.getCommunicator().write(DatapointBuilder.newDatapoint(agentName + ":" + functionName + ".command").setValue("START"));
+			agent.getCommunicator().execute(agent.getName() + ":" + functionName + "/" + "command", 
+					(new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", false), 100000);
+
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			log.debug("Values={}", agent.getDataStorage());
+
+			// Read the datapoint value
+
+			double readValue = agent.getCommunicator().read(datapoint).getValue().getAsDouble();
+			log.debug("correct value={}, actual value={}", 2.0, readValue);
+
+			assertEquals(2.0, readValue, 0.0);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

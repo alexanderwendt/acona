@@ -1,8 +1,7 @@
 <configuration debug="true">
-  <evaluator name="TEST_EVALUATOR">
-    <expression>logger.contains("ControlGateway") &amp;&amp;
-	message.contains("TestTest")</expression>
-  </evaluator>
+  <!--<evaluator name="TEST_EVALUATOR">
+    <expression>logger.contains("ControlGateway") &amp;&amp; message.contains("TestTest")</expression>
+  </evaluator>-->
   
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="WARN" />
@@ -24,14 +23,15 @@
 
 	
 	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
-      <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
-        <expression>return logger.contains("BidirectionalGatewayAgent");</expression>
+      <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator"> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <!--<expression>return (message.toLowerCase().contains("traderagent"));</expression>-->
+		<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.launcher");</expression>
       </evaluator>
-      <OnMismatch>NEUTRAL</OnMismatch>
-      <OnMatch>DENY</OnMatch>
+      <OnMismatch>DENY</OnMismatch>
+      <OnMatch>NEUTRAL</OnMatch>
     </filter>
 	
-    <encoder>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <!--<pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%highlight(%-5level)) %-25(%cyan(%logger{0}))(%F:%L\) - %msg%n%throwable</pattern>-->
 	  <!--<pattern>%-30(%date{HH:mm:ss.SSS} [%thread]) %-20(%-5level)) %logger{0}(%F:%L\) - %msg%n%throwable</pattern>-->
 	  <!--<pattern>%-40(%date{HH:mm:ss.SSS} [%thread]) %-40(%-5level %logger{5}) - %msg%n%throwable</pattern>-->
@@ -40,7 +40,7 @@
 	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->
     </encoder>
   </appender>
-  <root level="WARN">
+  <root level="INFO">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

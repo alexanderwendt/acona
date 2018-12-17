@@ -20,11 +20,13 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 	// === fixed variables ===//
 	public final static String ATTRIBUTESTOCKMARKETADDRESS = "stockmarketaddress";
 	private final static String IDPRICE = "price";
-	public static final String METHODCALCULATESIGNAL = "calculatesignal";
+	public static final String GENERATESIGNAL = "generatesignal";
+	public static final String ATTRIBUTEEMALONG = "emalong";
+	public static final String ATTRIBUTEEMASHORT = "emashort";
 
 	// === Get through config ===//
-	private double initEmaLong = 10;
-	private double initEmaShort = 5;
+	//private double initEmaLong = 10;
+	//private double initEmaShort = 5;
 
 	// === static ===//
 	private double emaLongPeriod = 0;
@@ -42,21 +44,23 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 	private boolean sellSignal = false;
 
 	@Override
-	protected void cellFunctionInit() throws Exception {
+	protected void cellFunctionThreadInit() throws Exception {
 		// Get price
 
 		// Settings
-		this.emaLongPeriod = initEmaLong;
-		this.emaShortPeriod = initEmaShort;
+		//this.emaLongPeriod = initEmaLong;
+		//this.emaShortPeriod = initEmaShort;
 
 		// Subscribe price address but without trigger to start
-		Datapoint stockMarket = this.getDatapointBuilder().newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS, ""));
+		Datapoint stockMarket = this.getDatapointBuilder().newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS));
+		this.emaLong = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEEMALONG));
+		this.emaShort = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEEMASHORT));
 
 		// Add subscription to the stock market price
 		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, stockMarket.getAgent() + ":" + stockMarket.getAddress(), SyncMode.SUBSCRIBEONLY));
 		
 		// Add subfunctions
-		this.addRequestHandlerFunction(METHODCALCULATESIGNAL, (Request input) -> calculateSignal(input));
+		this.addRequestHandlerFunction(GENERATESIGNAL, (Request input) -> calculateSignal(input));
 
 	}
 	
@@ -75,6 +79,8 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 				// log.debug("No enough money, no buy signal");
 				// }
 
+			} else {
+				this.buySignal = false;
 			}
 
 			if (this.emaShortPrevious > this.emaLongPrevious && this.emaShortPeriod < this.emaLong) {
@@ -85,6 +91,8 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 				// } else {
 				// log.debug("No sell signal as the volume of stock is not enough");
 				// }
+			} else {
+				this.sellSignal = false;
 			}
 
 			calc.addProperty("buy", this.buySignal);
@@ -113,12 +121,13 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 				this.emaLongPrevious = this.emaLong;
 				this.emaShortPrevious = this.emaShort;
 
-				this.calculateIndicator();
-
 				// Update prices
 				this.closePrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
 				this.highPrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("high").getAsDouble();
 				this.lowPrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("low").getAsDouble();
+				
+				//Update calculation
+				this.calculateIndicator();
 
 			}
 		} catch (Exception e) {
@@ -143,12 +152,6 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 		result = (price - emaPrevious) * (2 / (period + 1)) + emaPrevious;
 
 		return result;
-	}
-
-	@Override
-	protected void cellFunctionThreadInit() throws Exception {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
