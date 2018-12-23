@@ -50,9 +50,9 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 			this.graph.updateDataset(t.getType(), day, (int)t.getNumber());
 		}
 		
-		for (AgentValue t : values) {
-			this.graph2.updateDataset(t.getName(), day, t.getValue());
-		}
+		//for (AgentValue t : values) {
+		//	this.graph2.updateDataset(t.getName(), day, t.getValue());
+		//}
 	}
 
 	@Override

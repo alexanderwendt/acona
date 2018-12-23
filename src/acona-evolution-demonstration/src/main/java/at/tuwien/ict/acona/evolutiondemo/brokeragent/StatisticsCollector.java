@@ -30,6 +30,9 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	public final static String DATAADDRESS = "dataaddress";
 	public final static String GETSTATISTICSSUFFIX = "getstats";
 	private final static String DEPOTPREFIX = "depot";
+	
+	private int previousNumberOfAgents = 0;
+	private int currentNumberOfAgents = 0;
 
 	private String dataaddress = "data";
 
@@ -75,6 +78,11 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 			depots.add(o);
 		}
 		
+		//Get replication statistics
+		this.currentNumberOfAgents = depots.size();
+		log.info("Born cells={}. Number of cells={}", this.currentNumberOfAgents - this.previousNumberOfAgents, this.currentNumberOfAgents);
+		this.previousNumberOfAgents = this.currentNumberOfAgents;
+		
 		// Read the date
 		String dateString = "";
 		Datapoint value = this.getCommunicator().read(dataaddress);
@@ -83,8 +91,6 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 		}
 		
 		//Create a list of agentname:type, total value
-		
-		
 		JsonElement depotsJson = (new Gson()).toJsonTree(depots);
 		result.add("depots", depotsJson);
 		result.addProperty("date", dateString);

@@ -58,6 +58,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	private Gson gson = new Gson();
 	private final DPBuilder dpBuilder = new DPBuilder();
 	private final JsonUtils util = new JsonUtils();
+	private int qos=1;
 
 	private Map<String, Response> incomingRequestMessages = new ConcurrentHashMap<>();
 	//private Map<String, JsonElement> incomingTrackedMessages = new ConcurrentHashMap<>();
@@ -293,7 +294,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 			// Create a request message and set the request payload
 			MqttMessage reqMessage = new MqttMessage(reqPayload.getBytes());
-			reqMessage.setQos(1);
+			reqMessage.setQos(qos);
 			
 			String dpPublish = (new DPBuilder()).newDatapoint(topic).getCompleteAddressAsTopic(this.cellName);
 
@@ -354,7 +355,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 			// Create a request message and set the request payload
 			MqttMessage responseMessage = new MqttMessage(responseString.getBytes());
-			responseMessage.setQos(1);
+			responseMessage.setQos(qos);
 
 			MqttTopic mqttTopic = mqttClient.getTopic(response.getReplyTo());
 			try {
@@ -653,7 +654,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			dp.setAgent(this.cellName);
 			MqttTopic top = this.mqttClient.getTopic(topic);
 			MqttMessage mqttMessage = new MqttMessage(dp.toJsonObject().toString().getBytes());
-			mqttMessage.setQos(1);
+			mqttMessage.setQos(qos);
 			top.publish(mqttMessage);
 			log.debug("{}>Published {} to {}", this.cellName, dp, topic);
 
@@ -673,7 +674,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	public void publishTopic(String topic, JsonElement message, boolean isPersistent) throws Exception {
 		// Publish only the topic, use the local address of the
 		MqttMessage mqttMessage = new MqttMessage(message.toString().getBytes());
-		mqttMessage.setQos(1);
+		mqttMessage.setQos(qos);
 		mqttMessage.setRetained(isPersistent);
 		try {
 			MqttTopic top = this.mqttClient.getTopic(topic);

@@ -25,10 +25,21 @@
 	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
       <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator"> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
         <!--<expression>return (message.toLowerCase().contains("traderagent"));</expression>-->
-		<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.launcher");</expression>
+		<!--<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.launcher");</expression>-->
+		<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.SystemTester");</expression>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>ACCEPT</OnMatch>
+    </filter>
+	
+	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+      <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator"> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <!--<expression>return (message.toLowerCase().contains("traderagent"));</expression>-->
+		<!--<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.launcher");</expression>-->
+		<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector");</expression>
       </evaluator>
       <OnMismatch>DENY</OnMismatch>
-      <OnMatch>NEUTRAL</OnMatch>
+      <OnMatch>ACCEPT</OnMatch>
     </filter>
 	
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">

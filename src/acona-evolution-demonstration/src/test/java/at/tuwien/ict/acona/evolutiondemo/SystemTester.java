@@ -145,9 +145,9 @@ public class SystemTester {
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, brokerAgentName + ":" + statisticsService + "/" + StatisticsCollector.GETSTATISTICSSUFFIX)
-							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName))
-					.addCellfunction(CellFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
-							.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
+							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName)));
+					//.addCellfunction(CellFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
+					//		.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
 
 			synchronized (this) {
 				try {
@@ -164,9 +164,9 @@ public class SystemTester {
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
-							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
-							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
+							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName)));
+					//.addCellfunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
+					//		.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
 			// === Traders ===//
 
@@ -298,17 +298,20 @@ public class SystemTester {
 			log.info("Registered codelets: {}", value);
 			
 			log.info("=== All agents initialized ===");
-			
-			for (int i = 1; i <= 10000; i++) {
+			int total=100000;
+			for (int i = 1; i <= total; i++) {
+				long starttime=System.currentTimeMillis();
 				//if (this.runAllowed == true) {
-					log.info("run {}/{}", i, 10000);
+				
 					// Execute the codelet handler once
-					controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+				controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 400000);
 
 				//} else {
 				//	log.warn("Running of simulator interrupted after {} runs", i);
 				//	break;
 				//}
+				long endTime=System.currentTimeMillis() - starttime;
+				log.info("run {}/{}. Duration={}s", i, total, ((double)endTime)/1000);
 
 			}
 			
