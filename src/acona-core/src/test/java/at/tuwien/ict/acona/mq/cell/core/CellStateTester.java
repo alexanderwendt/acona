@@ -84,26 +84,26 @@ public class CellStateTester {
 
 			// Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
-					.addCellfunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
+					.addFunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class))
+					.addFunction(CellFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
-					.addCellfunction(CellFunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
+					.addFunction(CellFunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
-					.addCellfunction(CellFunctionConfig.newConfig(codeletName3, IncrementOnConditionCodelet.class)
+					.addFunction(CellFunctionConfig.newConfig(codeletName3, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class));
 
 			Cell controller = this.launcher.createAgent(codeletAgentConfig);
 
@@ -206,10 +206,10 @@ public class CellStateTester {
 
 			// Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class));
+					.addFunction(CellFunctionConfig.newConfig(handlerName, CellFunctionCodeletHandler.class));
 
 			for (int i = 1; i <= 100; i++) {
-				codeletAgentConfig.addCellfunction(CellFunctionConfig
+				codeletAgentConfig.addFunction(CellFunctionConfig
 						.newConfig(codeletName + i, IncrementOnConditionCodelet.class)
 						.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 								controllerAgentName + ":" + handlerName)
@@ -218,7 +218,7 @@ public class CellStateTester {
 						.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(i)));
 			}
 
-			codeletAgentConfig.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class));
+			codeletAgentConfig.addFunction(CellFunctionConfig.newConfig(StateMonitor.class));
 
 			Cell controller = this.launcher.createAgent(codeletAgentConfig);
 

@@ -571,6 +571,12 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			log.debug("Written datapoint={} remote. Result={}", datapoint, resp.getResult());
 		}
 	}
+	
+	@Override
+	public void write(String address, JsonElement value) throws Exception {
+		this.write(this.dpBuilder.newDatapoint(address).setValue(value));
+		
+	}
 
 	@Override
 	public void write(List<Datapoint> datapoints) throws Exception {

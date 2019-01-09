@@ -19,6 +19,7 @@ public class IncrementFunction extends CellFunctionImpl {
 	@Override
 	protected void cellFunctionInit() throws Exception {
 		this.addRequestHandlerFunction("increment", (Request input) -> increment(input));
+		this.addRequestHandlerFunction("increment1", (Request input) -> increment(input));
 		this.getCommunicator().setDefaultTimeout(1000);
 
 		log.info("Created service class");

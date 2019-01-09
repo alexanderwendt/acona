@@ -122,6 +122,14 @@ public interface MqttCommunicator {
 	 * @throws Exception
 	 */
 	public void write(Datapoint datapoint) throws Exception;
+	
+	/**
+	 * Write a JsonElement content to the data storage of an agent to a certain address 
+	 * 
+	 * @param datapoint
+	 * @throws Exception
+	 */
+	public void write(String address, JsonElement value) throws Exception;
 
 	/**
 	 * Write a list of datapoints to the data storage of an agent

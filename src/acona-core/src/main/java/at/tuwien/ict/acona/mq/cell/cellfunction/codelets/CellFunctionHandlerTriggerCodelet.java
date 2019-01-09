@@ -54,7 +54,7 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 	}
 
 	@Override
-	public void shutDown() {
+	public void shutDownCodelet() {
 		// TODO Auto-generated method stub
 		
 	}

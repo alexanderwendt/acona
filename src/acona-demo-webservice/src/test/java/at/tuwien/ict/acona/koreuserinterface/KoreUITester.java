@@ -82,8 +82,8 @@ public class KoreUITester {
 			String datageneratorservice = "DataStructureGenerator";
 
 			CellConfig cf = CellConfig.newConfig(DataStructureAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(datageneratorservice, KoreDataStructureGeneratorMock.class))
-					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(CellFunctionConfig.newConfig(datageneratorservice, KoreDataStructureGeneratorMock.class))
+					.addFunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint("KORE", DataStructureAgent1Name + ":" + datageneratorservice + "/result", SyncMode.SUBSCRIBEONLY));
 			Cell weatherAgent = this.launcher.createAgent(cf);
 			

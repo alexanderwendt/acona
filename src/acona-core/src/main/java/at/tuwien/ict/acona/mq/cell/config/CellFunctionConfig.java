@@ -38,17 +38,32 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public static CellFunctionConfig newConfig(String name, String className) {
-		return new CellFunctionConfig(name, className);
+		return new CellFunctionConfig(name, className, new HashMap<String, Object>());
 	}
 
 	/**
+	 * Create an empty cell function without setting parameters
+	 * 
 	 * @param name
 	 * @param clzz
 	 * @return
 	 */
 	public static CellFunctionConfig newConfig(String name, Class<?> clzz) {
 		String className = clzz.getName();
-		return new CellFunctionConfig(name, className);
+		return new CellFunctionConfig(name, className, new HashMap<String, Object>());
+	}
+	
+	/**
+	 * Create a cell function with a map of parameters
+	 * 
+	 * @param name
+	 * @param clzz
+	 * @param params
+	 * @return
+	 */
+	public static CellFunctionConfig newConfig(String name, Class<?> clzz, Map<String, Object> params) {
+		String className = clzz.getName();
+		return new CellFunctionConfig(name, className, params);
 	}
 
 	/**
@@ -59,7 +74,7 @@ public class CellFunctionConfig {
 	 */
 	public static CellFunctionConfig newConfig(Class<?> clzz) {
 		String className = clzz.getName();
-		return new CellFunctionConfig(clzz.getSimpleName() + className.hashCode(), className);
+		return new CellFunctionConfig(clzz.getSimpleName() + className.hashCode(), className, new HashMap<String, Object>());
 	}
 
 	/**
@@ -69,14 +84,18 @@ public class CellFunctionConfig {
 	public static CellFunctionConfig newConfig(JsonObject config) {
 		return new CellFunctionConfig(config);
 	}
+	
+	
+	
 
 	/**
 	 * @param name
 	 * @param className
 	 */
-	private CellFunctionConfig(String name, String className) {
+	private CellFunctionConfig(String name, String className, Map<String, Object> params) {
 		this.configObject = new JsonObject();
 		this.configObject.add(CELLMANAGEDDATAPOINTS, new JsonArray());
+		params.forEach((k, v)->this.configObject.addProperty(k, String.valueOf(v)));
 		this.setName(name).setClassName(className);
 	}
 

@@ -71,7 +71,7 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld/currentweather";
 
 			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 						.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY)
 						.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 						.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"));
@@ -138,12 +138,12 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld/currentweather";
 
 			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 						.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY)
 						.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 						.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"))
 					//.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class))
-					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, weatherAgent1Name + ":" + StateMonitor.SYSTEMSTATEADDRESS, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY));
 			Cell weatherAgent = this.controller.createAgent(cf);
@@ -217,25 +217,25 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld.currentweather";
 
 			Cell weatherAgent1 = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY)
 							.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 							.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent2 = this.controller.createAgent(CellConfig.newConfig(weatherAgent2Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent2Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent3 = this.controller.createAgent(CellConfig.newConfig(weatherAgent3Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent3Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {
@@ -247,15 +247,15 @@ public class DemoWebServiceTester {
 
 			Cell calculator = this.controller.createAgent(CellConfig.newConfig(algorithmAgentName)
 					// .addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
-					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
+					.addFunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Vienna", weatherAgent2Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", weatherAgent3Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Mocktown", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, algorithmAgentName + ":" + StateMonitor.SYSTEMSTATEADDRESS, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmAgentName + ":" + algorithmService + ".result", SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("ui1", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {
@@ -306,7 +306,7 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld.currentweather";
 
 			CellConfig cf = CellConfig.newConfig(weatherAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY));

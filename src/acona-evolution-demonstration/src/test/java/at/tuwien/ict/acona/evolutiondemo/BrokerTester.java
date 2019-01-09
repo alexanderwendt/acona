@@ -81,7 +81,7 @@ public class BrokerTester {
 			String stockName = "Fingerprint";
 
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName));
 			Cell brokerAgent = this.launcher.createAgent(cf);
 
@@ -219,9 +219,9 @@ public class BrokerTester {
 			String stockName = "Fingerprint";
 
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, "test"));
 			Cell brokerAgent = this.launcher.createAgent(cf);
 
@@ -308,11 +308,11 @@ public class BrokerTester {
 			String stockName = "Fingerprint";
 
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 						.setProperty(StatisticsCollector.DATAADDRESS, "test"))
-					.addCellfunction(CellFunctionConfig.newConfig("depotstatistics", DepotStaticticsGraphToolFunction.class));
+					.addFunction(CellFunctionConfig.newConfig("depotstatistics", DepotStaticticsGraphToolFunction.class));
 
 			Cell brokerAgent = this.launcher.createAgent(cf);
 

@@ -1,18 +1,13 @@
 package at.tuwien.ict.acona.evolutiondemo.traderagent;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -165,7 +160,7 @@ public class Trader extends CellFunctionCodelet {
 
 
 	@Override
-	protected void shutDownCodelet() throws Exception {
+	public void shutDownCodelet() throws Exception {
 		// Delete the depot
 		this.deleteDepot();
 
@@ -402,18 +397,6 @@ public class Trader extends CellFunctionCodelet {
 		} else {
 			log.debug("No sell signal as the volume of stock is not enough");
 		}
-	}
-
-	@Override
-	public void resetCodelet() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void shutDown() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

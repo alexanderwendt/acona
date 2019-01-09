@@ -470,6 +470,28 @@ public abstract class CellFunctionImpl implements CellFunction {
 	public MqttCommunicator getCommunicator() {
 		return this.comm;
 	}
+	
+	/**
+	 * Write datapoint content to an address directly from the cell function
+	 * 
+	 * @param datapointAddress
+	 * @param datapointContent
+	 * @throws Exception
+	 */
+	protected void write(String datapointAddress, JsonElement datapointContent) throws Exception {
+		this.getCommunicator().write(datapointAddress, datapointContent);
+	}
+	
+	/**
+	 * Read the json content of a datapoint at a certain datapoint address directly from the cell function 
+	 * 
+	 * @param datapointAddress
+	 * @return
+	 * @throws Exception
+	 */
+	protected JsonElement read(String datapointAddress) throws Exception {
+		return this.getCommunicator().read(datapointAddress).getValue();
+	}
 
 	protected <T> T getCustomSetting(String key, Class<T> type) {
 		return this.getFunctionConfig().getProperty(cellFunctionName, type);

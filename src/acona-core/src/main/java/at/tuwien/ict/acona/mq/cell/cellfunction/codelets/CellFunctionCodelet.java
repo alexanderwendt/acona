@@ -123,42 +123,6 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 		return result;
 	}
 
-//	@Override
-//	public synchronized JsonRpcResponse performOperation(JsonRpcRequest parameterdata, String caller) {
-//		JsonRpcResponse result = null;
-//		// React on the following inputs
-//		// Attributes: method=startcodelet
-//
-//		try {
-//			log.debug("{}>Received execute request={}", this.getFunctionName(), parameterdata);
-//
-//			result = this.performCodeletOperation(parameterdata, caller);
-//
-//			if (result == null) {
-//				switch (parameterdata.getMethod()) {
-//				case EXECUTECODELETMETHODNAME:
-//					log.debug("{}>Execute the codelet", this.getFunctionName());
-//					this.startCodelet();
-//					result = new JsonRpcResponse(parameterdata, new JsonPrimitive(CommVocabulary.ACKNOWLEDGEVALUE));
-//					break;
-//				default:
-//					throw new Exception(this.getFunctionName() + ">Method name " + parameterdata.getMethod() + " unknown");
-//				}
-//			}
-//
-//		} catch (Exception e) {
-//			log.warn("Method cannot be found", e);
-//			result = new JsonRpcResponse(parameterdata, new JsonRpcError("CodeletError", -1, e.getMessage(), e.getLocalizedMessage()));
-//		}
-//
-//		return result;
-//	}
-
-//	protected JsonRpcResponse performCodeletOperation(JsonRpcRequest parameterdata, String caller) {
-//		// throw new UnsupportedOperationException("This method is not supported by codelets.");
-//		return null;
-//	}
-
 	@Override
 	public void startCodelet() {
 		// Run thread
@@ -255,8 +219,12 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	 *             If the codelet is supposed to be shut down, put codelet specific shut-down code here. However, this function shall not be called from the codelet itself. The easiest way to shut down a
 	 *             codelet is to set the command EXIT.
 	 */
-	protected void shutDownCodelet() throws Exception {
+	public void shutDownCodelet() throws Exception {
 
+	}
+	
+	public void resetCodelet() {
+		
 	}
 
 	protected String getWorkingMemoryAddress() {
@@ -274,10 +242,5 @@ public abstract class CellFunctionCodelet extends CellFunctionThreadImpl impleme
 	protected void setInternalStateMemoryAddress(String internalStateMemoryAddress) {
 		this.internalStateMemoryAddress = internalStateMemoryAddress;
 	}
-
-//	@Override
-//	public CellFunctionType getFunctionType() {
-//		return CellFunctionType.CODELET;
-//	}
 
 }

@@ -70,39 +70,39 @@ public class Launcher {
 			// .addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 
 			Cell weatherAgent1 = this.controller.createAgent(CellConfig.newConfig(weatherAgent1Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "Palermo")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent2 = this.controller.createAgent(CellConfig.newConfig(weatherAgent2Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent2Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent3 = this.controller.createAgent(CellConfig.newConfig(weatherAgent3Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent3Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent4 = this.controller.createAgent(CellConfig.newConfig(weatherAgent4Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "innsbruck")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent4Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent5 = this.controller.createAgent(CellConfig.newConfig(weatherAgent5Name)
-					.addCellfunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(CellFunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "Abu Dhabi")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent5Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {
@@ -113,18 +113,18 @@ public class Launcher {
 			}
 
 			Cell calculator = this.controller.createAgent(CellConfig.newConfig(algorithmAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
+					.addFunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
 							// .addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Palermo", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Vienna", weatherAgent2Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", weatherAgent3Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Innsbruck", weatherAgent4Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Abu Dhabi", weatherAgent5Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, algorithmAgentName + ":" + StateMonitor.SYSTEMSTATEADDRESS, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmAgentName + ":" + algorithmService + ".result", SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("ui1", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(CellFunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {

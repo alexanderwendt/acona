@@ -8,6 +8,6 @@ public interface Codelet {
 	
 	public void resetCodelet();
 	
-	public void shutDown();
+	public void shutDownCodelet() throws Exception;
 
 }

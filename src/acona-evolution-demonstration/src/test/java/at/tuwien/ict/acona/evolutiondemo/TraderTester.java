@@ -97,7 +97,7 @@ public class TraderTester {
 			long startTimeSetup = System.currentTimeMillis();
 
 			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
+					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
 			controllerAgent.getCommunicator().setDefaultTimeout(60000);
 
 			synchronized (this) {
@@ -109,9 +109,9 @@ public class TraderTester {
 			}
 
 			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
 			synchronized (this) {
 				try {
@@ -122,7 +122,7 @@ public class TraderTester {
 			}
 
 			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -138,7 +138,7 @@ public class TraderTester {
 				}
 
 				Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
-						.addCellfunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+						.addFunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
@@ -146,7 +146,7 @@ public class TraderTester {
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 								.setProperty(Trader.ATTRIBUTETIMEOUT, 60000)
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-						.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+						.addFunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 				traderAgent.getCommunicator().setDefaultTimeout(60000);
 			}
 
@@ -375,7 +375,7 @@ public class TraderTester {
 
 			// Controller agent
 			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
+					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
 
 			synchronized (this) {
 				try {
@@ -387,9 +387,9 @@ public class TraderTester {
 
 			// Broker Agent
 			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
 			synchronized (this) {
 				try {
@@ -401,7 +401,7 @@ public class TraderTester {
 
 			// Stock market Agent
 			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -409,14 +409,14 @@ public class TraderTester {
 
 			// Single Trader agent
 			Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
+					.addFunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 							.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderTypePrefix + "-L" + EMALongPeriod + ":S" + EMAShortPeriod)
 							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+					.addFunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 
 			synchronized (this) {
 				try {
@@ -492,7 +492,7 @@ public class TraderTester {
 
 			// Controller agent
 			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
+					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
 
 			synchronized (this) {
 				try {
@@ -504,9 +504,9 @@ public class TraderTester {
 
 			// Broker Agent
 			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data")));
 
 			synchronized (this) {
@@ -519,7 +519,7 @@ public class TraderTester {
 
 			// Stock market Agent
 			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -527,14 +527,14 @@ public class TraderTester {
 
 			// Single Trader agent
 			Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
+					.addFunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 							.setProperty(Trader.ATTRIBUTEAGENTTYPE, "kamikazeType")
 							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+					.addFunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 
 			synchronized (this) {
 				try {

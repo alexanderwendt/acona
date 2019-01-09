@@ -120,9 +120,9 @@ public class SystemTester {
 			// === Controller agent implementation === //
 			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addCellfunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class))
+					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class))
 					// The codelet handler ist controller request receiver funtion
-					.addCellfunction(CellFunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
+					.addFunction(CellFunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
 
 			synchronized (this) {
@@ -136,12 +136,12 @@ public class SystemTester {
 			// === Broker ===//
 
 			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025))
-					.addCellfunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
-					.addCellfunction(CellFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
+					.addFunction(CellFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, brokerAgentName + ":" + statisticsService + "/" + StatisticsCollector.GETSTATISTICSSUFFIX)
@@ -160,7 +160,7 @@ public class SystemTester {
 			// === Stock market ===//
 
 			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addCellfunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
@@ -231,7 +231,7 @@ public class SystemTester {
 //			}
 			
 			Cell traderAgentRepro = this.launcher.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L33S11")
-			.addCellfunction(CellFunctionConfig.newConfig("trader_" + "L33S11", Trader.class)
+			.addFunction(CellFunctionConfig.newConfig("trader_" + "L33S11", Trader.class)
 					.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 					.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 					.setProperty(Trader.ATTRIBUTEAGENTTYPE, "L33S11")
@@ -241,11 +241,11 @@ public class SystemTester {
 					.setProperty(Trader.ATTRIBUTEMULTIPLY, true))
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
-			.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
+			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
 					.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 					.setProperty(EMAIndicator.ATTRIBUTEEMALONG, 33)
 					.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 11))
-			.addCellfunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
+			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
 			
 //						Cell traderAgent2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "EMA1020")
 //								.addCellfunction(CellFunctionConfig.newConfig("trader_1020", Trader.class)

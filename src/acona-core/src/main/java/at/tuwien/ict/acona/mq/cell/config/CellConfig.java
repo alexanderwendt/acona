@@ -1,5 +1,8 @@
 package at.tuwien.ict.acona.mq.cell.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -209,7 +212,36 @@ public class CellConfig {
 	 * @param config
 	 * @return
 	 */
-	public CellConfig addCellfunction(CellFunctionConfig config) {
+	public CellConfig addFunction(CellFunctionConfig config) {
+		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
+		return this;
+	}
+	
+	/**
+	 * Add a cell function from function values with parameters. 
+	 * 
+	 * @param name
+	 * @param clzz
+	 * @param params
+	 * @return
+	 */
+	public CellConfig addFunction(String name, Class<?> clzz, Map<String, Object> params) {
+		CellFunctionConfig config = CellFunctionConfig.newConfig(name, clzz, params);
+		
+		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
+		return this;
+	}
+	
+	/**
+	 * Add a cell function from function values without any custom parameters. 
+	 * 
+	 * @param name
+	 * @param clzz
+	 * @return
+	 */
+	public CellConfig addFunction(String name, Class<?> clzz) {
+		CellFunctionConfig config = CellFunctionConfig.newConfig(name, clzz, new HashMap<String, Object>());
+		
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
 		return this;
 	}
