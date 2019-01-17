@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.evolutiondemo;
+package at.tuwien.ict.acona.evolutiondemo.launcher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -6,31 +6,22 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Evaluator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.SpeciesType;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
+import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceLoaderGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.EMAIndicator;
-import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
 import at.tuwien.ict.acona.evolutiondemo.webserver.EvolutionService;
 import at.tuwien.ict.acona.evolutiondemo.webserver.JerseyRestServer;
@@ -41,53 +32,37 @@ import at.tuwien.ict.acona.mq.cell.config.CellConfig;
 import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
-import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
-import at.tuwien.ict.acona.mq.datastructures.Response;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 
-public class SystemTester {
+/**
+ * This class manages the launching of the whole cognitive system
+ * 
+ * @author wendt
+ *
+ */
+public class LauncherReplicator {
 
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
+	
+	private static LauncherReplicator launcher;
 
-	@BeforeEach
-	public void setUp() throws Exception {
+	public static void main(String[] args) {
+		log.info("Welcome to the ACONA Stock Market Evolution Demonstrator");
+
+		launcher = new LauncherReplicator();
 		try {
-
+			launcher.init();
 		} catch (Exception e) {
-			log.error("Cannot initialize test environment", e);
+			log.error("System initialization failed. Quit", e);
+			System.exit(-1);
 		}
+
 	}
 
-	@AfterEach
-	public void tearDown() throws Exception {
-		// Clear all cells
-		synchronized (this) {
-			try {
-				this.wait(10);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		this.controller.stopSystem();
-
-		synchronized (this) {
-			try {
-				this.wait(10);
-			} catch (InterruptedException e) {
-
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * 
-	 */
-	@Test
-	public void CompleteSystemReproduceTester() {
+	private void init() throws Exception {
 		try {
 			// === General variables ===//
 			String stockName = "Fingerprint";
@@ -138,7 +113,8 @@ public class SystemTester {
 			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
-							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025))
+							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
+							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data"))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
 					.addFunction(CellFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
@@ -160,11 +136,15 @@ public class SystemTester {
 			// === Stock market ===//
 
 			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
-							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
-							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
-							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
+					//.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					//		.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+					//		.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
+					//		.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
+					//		.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
+					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, PriceLoaderGenerator.class, Map.of(
+							PriceLoaderGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService,
+							PriceLoaderGenerator.ATTRIBUTEEXECUTIONORDER, 0,
+							PriceLoaderGenerator.ATTRIBUTESTOCKNAME, stockName)))	// First, the stock market generates a price, run order 0
 					.addFunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
@@ -189,7 +169,7 @@ public class SystemTester {
 //											.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
 //									//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 //									.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
-//						}
+//						} 
 			
 //			List<String> l = new ArrayList<String>();
 //			for (int i = 1; i <= 50; i++) {
@@ -230,11 +210,14 @@ public class SystemTester {
 //								.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
 //			}
 			
-			Cell traderAgentRepro = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L33S11")
-			.addFunction(CellFunctionConfig.newConfig("trader_" + "L33S11", Trader.class)
+			int cell1ShortMA = 50;
+			int cell1LongMA = 200;
+			
+			Cell traderAgentRepro1 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell1LongMA +  "S" + cell1ShortMA)
+			.addFunction(CellFunctionConfig.newConfig("trader_" + "L" + cell1LongMA +  "S" + cell1ShortMA, Trader.class)
 					.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 					.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-					.setProperty(Trader.ATTRIBUTEAGENTTYPE, "L33S11")
+					.setProperty(Trader.ATTRIBUTEAGENTTYPE, "L" + cell1LongMA +  "S" + cell1ShortMA)
 					.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 					.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
 					.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
@@ -243,39 +226,28 @@ public class SystemTester {
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
 			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
 					.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-					.setProperty(EMAIndicator.ATTRIBUTEEMALONG, 33)
-					.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 11))
+					.setProperty(EMAIndicator.ATTRIBUTEEMALONG, cell1LongMA)
+					.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, cell1ShortMA))
 			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
 			
-//						Cell traderAgent2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "EMA1020")
-//								.addCellfunction(CellFunctionConfig.newConfig("trader_1020", Trader.class)
-//										.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-//										.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-//										.setProperty(Trader.ATTRIBUTEAGENTTYPE, "EMA1020")
-//										.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
-//										.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
-//										.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-//								//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-//								//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
-//								.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
-//										.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-//										.setProperty(EMAIndicator.ATTRIBUTEEMALONG, 20)
-//										.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 10)));
-//						
-//						Cell traderAgent3 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "EMA05200")
-//								.addCellfunction(CellFunctionConfig.newConfig("trader_05200", Trader.class)
-//										.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-//										.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-//										.setProperty(Trader.ATTRIBUTEAGENTTYPE, "EMA05200")
-//										.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
-//										.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
-//										.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-//								//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-//								//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
-//								.addCellfunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
-//										.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-//										.setProperty(EMAIndicator.ATTRIBUTEEMALONG, 30)
-//										.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 2)));
+			
+			int cell2ShortMA = 10;
+			int cell2LongMA = 50;
+			
+			Cell traderAgentRepro2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell2LongMA +  "S" + cell2ShortMA)
+			.addFunction(CellFunctionConfig.newConfig("trader_" + "L" + cell2LongMA +  "S" + cell2ShortMA, Trader.class, Map.of(
+					Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService,
+					Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
+					Trader.ATTRIBUTEAGENTTYPE, "L" + cell2LongMA +  "S" + cell2ShortMA,
+					Trader.ATTRIBUTESIGNALADDRESS, signalService,
+					Trader.ATTRIBUTEEXECUTIONORDER, 1,
+					Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName,
+					Trader.ATTRIBUTEMULTIPLY, true)))
+			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class, Map.of(
+					EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
+					EMAIndicator.ATTRIBUTEEMALONG, cell2LongMA,
+					EMAIndicator.ATTRIBUTEEMASHORT, cell2ShortMA)))
+			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
 			
 			//Jsersey server to receive commands
 //			CellConfig server = CellConfig.newConfig(serverAgentName)
@@ -300,6 +272,7 @@ public class SystemTester {
 			log.info("=== All agents initialized ===");
 			int total=100000;
 			for (int i = 1; i <= total; i++) {
+				log.info("============= Start new run: {}/{}. ===============",i, total);
 				long starttime=System.currentTimeMillis();
 				//if (this.runAllowed == true) {
 				
@@ -311,7 +284,7 @@ public class SystemTester {
 				//	break;
 				//}
 				long endTime=System.currentTimeMillis() - starttime;
-				log.info("run {}/{}. Duration={}s", i, total, ((double)endTime)/1000);
+				log.info("Run {}/{} finished. Duration={}s", i, total, ((double)endTime)/1000);
 
 			}
 			
@@ -323,13 +296,11 @@ public class SystemTester {
 				}
 			}
 
-			log.info("Got money from agent 19={}. Correct answer={}", 1001, 1000);
-			assertEquals(1000, 1001);
-			log.info("All tests passed");
+			log.info("Exit");
 		} catch (Exception e) {
 			log.error("Error testing system", e);
-			fail("Error");
 		}
+
 	}
 
 }

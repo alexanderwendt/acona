@@ -40,7 +40,7 @@ public class TraderTester {
 
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private final DPBuilder dpb = new DPBuilder();
-	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
+	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -61,7 +61,7 @@ public class TraderTester {
 
 			}
 		}
-		this.launcher.stopSystem();
+		this.controller.stopSystem();
 
 		synchronized (this) {
 			try {
@@ -96,7 +96,7 @@ public class TraderTester {
 
 			long startTimeSetup = System.currentTimeMillis();
 
-			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
 			controllerAgent.getCommunicator().setDefaultTimeout(60000);
 
@@ -108,7 +108,7 @@ public class TraderTester {
 				}
 			}
 
-			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
+			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
@@ -121,7 +121,7 @@ public class TraderTester {
 				}
 			}
 
-			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
+			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
@@ -137,7 +137,7 @@ public class TraderTester {
 					traderType += "_odd";
 				}
 
-				Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
+				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
 						.addFunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
@@ -374,7 +374,7 @@ public class TraderTester {
 			// ==========================================//
 
 			// Controller agent
-			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
 
 			synchronized (this) {
@@ -386,7 +386,7 @@ public class TraderTester {
 			}
 
 			// Broker Agent
-			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
+			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
@@ -400,7 +400,7 @@ public class TraderTester {
 			}
 
 			// Stock market Agent
-			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
+			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
@@ -408,7 +408,7 @@ public class TraderTester {
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))); // Puts data on datapoint StockMarketAgent:data
 
 			// Single Trader agent
-			Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName)
+			Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName)
 					.addFunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
@@ -491,7 +491,7 @@ public class TraderTester {
 			// ==========================================//
 
 			// Controller agent
-			Cell controllerAgent = this.launcher.createAgent(CellConfig.newConfig(controllerAgentName)
+			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
 
 			synchronized (this) {
@@ -503,7 +503,7 @@ public class TraderTester {
 			}
 
 			// Broker Agent
-			Cell brokerAgent = this.launcher.createAgent(CellConfig.newConfig(brokerAgentName)
+			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
@@ -518,7 +518,7 @@ public class TraderTester {
 			}
 
 			// Stock market Agent
-			Cell stockMarketAgent = this.launcher.createAgent(CellConfig.newConfig(stockmarketAgentName)
+			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
 					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
@@ -526,7 +526,7 @@ public class TraderTester {
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))); // Puts data on datapoint StockMarketAgent:data
 
 			// Single Trader agent
-			Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName)
+			Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName)
 					.addFunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")

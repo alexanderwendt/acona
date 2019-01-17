@@ -92,6 +92,11 @@ dependencies {
     compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.26'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
     
+    // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core
+	compile group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.30.2'
+	compile group: 'tech.tablesaw', name: 'tablesaw-jsplot', version: '0.30.2'
+    
+    
     
     // Declare the dependency for your favourite test framework you want to use in your tests.
     // TestNG is also supported by the Gradle Test task. Just change the

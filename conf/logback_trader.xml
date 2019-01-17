@@ -2,6 +2,9 @@
   <!--<evaluator name="TEST_EVALUATOR">
     <expression>logger.contains("ControlGateway") &amp;&amp; message.contains("TestTest")</expression>
   </evaluator>-->
+  <property name="DEV_HOME" value="log"/>
+  <property name="logFileName" value="korelog"/>
+  <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
   
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="WARN" />
@@ -16,6 +19,9 @@
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.communication" level="WARN" />
   <logger name="org.eclipse.jetty" level="WARN"/>
+  
+  <logger name="at.tuwien.ict.acona.evolutiondemo.StatisticsCollector" level="INFO" />
+  
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <withJansi>false</withJansi>
@@ -36,8 +42,18 @@
 		<!--<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.launcher");</expression>-->
 		<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector");</expression>
       </evaluator>
-      <OnMismatch>DENY</OnMismatch>
+      <OnMismatch>NEUTRAL</OnMismatch>
       <OnMatch>ACCEPT</OnMatch>
+    </filter>
+	
+	<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+      <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator"> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+        <!--<expression>return (message.toLowerCase().contains("traderagent"));</expression>-->
+		<!--<expression>return logger.contains("at.tuwien.ict.acona.evolutiondemo.launcher");</expression>-->
+		<expression>return message.toLowerCase().contains(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");</expression>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>DENY</OnMatch>
     </filter>
 	
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -50,28 +66,60 @@
     </encoder>
   </appender>
   
-  <!-- Add a CSV Appender for statistics -->
-  <appender name="CSV" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>komuso.csv</File>
-    <Append>false</Append>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>komuso.%d{yyyy-MM-dd}.csv</FileNamePattern>
-    </rollingPolicy>
-    <MinIndex>1</MinIndex>
-    <MaxIndex>10</MaxIndex>
-    <!--triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy-->
-    <ImmediateFlush>true</ImmediateFlush>
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <pattern>%msg%n</pattern>
-    </layout>
+  <appender name="csv" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${DEV_HOME}/agenttypelog-${bySecond}.log</file>
+
+		<rollingPolicy
+				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+				<FileNamePattern>${DEV_HOME}/archived/${logFileName}.%i.log.zip
+				</FileNamePattern>
+				<MinIndex>1</MinIndex>
+				<MaxIndex>10</MaxIndex>
+		</rollingPolicy>
+
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%msg%n</Pattern>
+		</encoder>
+
   </appender>
   
+  <appender name="csvheader" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${DEV_HOME}/headerlog-${bySecond}.log</file>
+
+		<rollingPolicy
+				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+				<FileNamePattern>${DEV_HOME}/archived/${logFileName}.%i.log.zip
+				</FileNamePattern>
+				<MinIndex>1</MinIndex>
+				<MaxIndex>10</MaxIndex>
+		</rollingPolicy>
+
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%msg%n</Pattern>
+		</encoder>
+
+  </appender>
+
+  
   <!-- CSV logger -->
-  <logger name="csv">
+  <logger name="csvheader">
     <level value="DEBUG" />
-    <appender-ref ref="CSV" />
+    <appender-ref ref="csvheader" />
+  </logger>
+  
+  <logger name="csvbody">
+    <level value="DEBUG" />
+    <appender-ref ref="csv" />
   </logger>
   
   <root level="INFO">

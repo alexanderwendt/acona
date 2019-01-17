@@ -27,14 +27,14 @@ public class Evaluator extends CellFunctionCodelet {
 	@Override
 	protected void executeFunction() throws Exception {
 		// Read the statistics
-		log.info("Start evaluator to read agent statistics. Read from={}", statServiceAddress + "/" + StatisticsCollector.GETSTATISTICSSUFFIX);
+		log.debug("Start evaluator to read agent statistics. Read from={}", statServiceAddress + "/" + StatisticsCollector.GETSTATISTICSSUFFIX);
 		JsonElement statistics = this.getCommunicator().execute(statServiceAddress, new Request()).getResult();
 		
 		
 
 		// Write the statistics to a datapoint
 		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(statisticsDatapointAddress).setValue(statistics));
-		log.info("Written stats={} to {}", statistics, statisticsDatapointAddress);
+		log.info("Stats={} to {}", statistics, statisticsDatapointAddress);
 
 	}
 

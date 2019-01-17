@@ -11,6 +11,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
 import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
+import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
@@ -21,9 +23,11 @@ public class Broker extends CellFunctionThreadImpl {
 
 	public final static String ATTRIBUTESTOCKNAME = "stockname";
 	public final static String ATTRIBUTECOMMISSION = "commission";
+	public final static String PARAMPRICESOURCE = "priceaddress";
 
 	private String stockName = "";
 	private double commission = 0;
+	private String priceAddress = "";
 	private final static String PREFIXDEPOTADDRESS = "depot";
 	
 	public final static String REGISTERDEPOT = "registerdepot";
@@ -33,17 +37,19 @@ public class Broker extends CellFunctionThreadImpl {
 	public final static String GETDEPOTINFO = "getdepotinfo";
 	public final static String ADDMONEY = "addmoney";
 	public final static String REMOVEMONEY = "removemoney";
-	
 
 	private final Gson gson = new Gson();
+	
+	private double currentPrice = 0;
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
 		stockName = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKNAME, "");
 		commission = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTECOMMISSION, "0"));
+		priceAddress = this.getFunctionConfig().getProperty(PARAMPRICESOURCE);
 
 		// === GENERATE RESPONDER NECESSARY ===//
-		//this.getFunctionConfig().setGenerateReponder(true);
+		this.addManagedDatapoint(DatapointConfig.newConfig(PARAMPRICESOURCE, priceAddress, SyncMode.SUBSCRIBEONLY));
 
 		// Add subfunctions
 		this.addRequestHandlerFunction(REGISTERDEPOT, (Request input) -> registerDepot(input));
@@ -145,6 +151,10 @@ public class Broker extends CellFunctionThreadImpl {
 			String stockName = req.getParameter("stockname", String.class);  
 			double price = req.getParameter("price", Double.class);  
 			int volume = req.getParameter("volume", Integer.class); 
+			
+			if (price!=this.currentPrice) {
+				log.warn("Price difference {} to {}", price, this.currentPrice);
+			}
 		
 			Depot depot = this.getDepot(agentName);
 			if (depot == null) {
@@ -262,6 +272,43 @@ public class Broker extends CellFunctionThreadImpl {
 			
 			
 	}
+
+	@Override
+	protected void executeCustomPreProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void executeFunction() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void executeCustomPostProcessing() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
+		if (id.equals(PARAMPRICESOURCE)) {
+			try {
+				currentPrice = this.getValueFromJsonDatapoint(data).getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
+			} catch (Exception e) {
+				log.error("Cannot read price", e);
+			}
+			//log.warn("New price = {}", currentPrice);
+		}
+		
+	}
+
+	@Override
+	protected void shutDownThreadExecutor() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 //
@@ -334,41 +381,5 @@ public class Broker extends CellFunctionThreadImpl {
 	// Buy
 	// Sell
 	// Pay into depot
-
-	@Override
-	protected void shutDownImplementation() throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-@Override
-protected void executeCustomPreProcessing() throws Exception {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-protected void executeFunction() throws Exception {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-protected void executeCustomPostProcessing() throws Exception {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-protected void updateCustomDatapointsById(String id, JsonElement data) {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-protected void shutDownThreadExecutor() throws Exception {
-	// TODO Auto-generated method stub
-	
-}
 
 }

@@ -50,9 +50,9 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 			this.graph.updateDataset(t.getType(), day, (int)t.getNumber());
 		}
 		
-		//for (AgentValue t : values) {
-		//	this.graph2.updateDataset(t.getName(), day, t.getValue());
-		//}
+		for (AgentValue t : values) {
+			this.graph2.updateDataset(t.getName(), day, t.getValue());
+		}
 	}
 
 	@Override
@@ -83,7 +83,8 @@ public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
 			// Get the date
 			String date = object.getAsJsonPrimitive("date").getAsString();
 			Calendar cal = Calendar.getInstance();
-			SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+			//SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			cal.setTime(dateFormat.parse(date));
 			day = new Day(cal.getTime());
 

@@ -82,7 +82,8 @@ public class PriceGraphToolFunction extends CellFunctionThreadImpl {
 				String date = object.get("date").getAsString();
 				
 				Calendar cal = Calendar.getInstance();  
-				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+				//SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				cal.setTime(dateFormat.parse(date));    
 				day = new Day(cal.getTime());
 				log.debug("received update={}", object);

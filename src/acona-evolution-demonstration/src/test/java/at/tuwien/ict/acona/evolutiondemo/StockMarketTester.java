@@ -28,7 +28,7 @@ public class StockMarketTester {
 
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private final DPBuilder dpb = new DPBuilder();
-	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
+	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -49,7 +49,7 @@ public class StockMarketTester {
 
 			}
 		}
-		this.launcher.stopSystem();
+		this.controller.stopSystem();
 
 		synchronized (this) {
 			try {

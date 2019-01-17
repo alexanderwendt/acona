@@ -1,5 +1,7 @@
 package at.tuwien.ict.acona.evolutiondemo.traderagent;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +40,7 @@ public class Trader extends CellFunctionCodelet {
 
 	private String localDepotAddress = "localdepot";
 
-	private double initStartSize = 1000;
+	private double initStartSize = 10000;
 	private String initType = "type1";
 	private String initStockName = "Fingerprint";
 
@@ -77,7 +79,7 @@ public class Trader extends CellFunctionCodelet {
 		multiply = Boolean.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEMULTIPLY, "false"));
 		
 		this.multiplyLimit = startSize * 2.0;
-		this.deathLimit = startSize * 0.3;
+		this.deathLimit = startSize * 0.1;
 
 		this.agentType = this.getFunctionConfig().getProperty(ATTRIBUTEAGENTTYPE, initType);
 		this.stockName = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKNAME, initStockName);
@@ -119,7 +121,7 @@ public class Trader extends CellFunctionCodelet {
 	@Override
 	protected void executeFunction() throws Exception {
 
-		log.info("{}:{}>Start agent caluclation", this.getCellName(), this.agentType);
+		log.debug("{}:{}>Start agent calculation", this.getCellName(), this.agentType);
 		// Program logic
 		// 2. Check depot death
 		this.killSignal = this.killAgentOnDepotDeath();
@@ -135,7 +137,7 @@ public class Trader extends CellFunctionCodelet {
 			// 5. Execute signal
 			this.executeTrade();
 
-			log.info("{}:{}>Finished. Assets in the depot: {}", this.getCellName(), this.agentType, this.depot);
+			log.info("{}:{}>Depot: {}", this.getCellName(), this.agentType, this.depot);
 
 		} else {
 			// If the kill signal has been set, the system shall exit.
@@ -253,13 +255,16 @@ public class Trader extends CellFunctionCodelet {
 	private void multiplyAgent() throws Exception {
 		try {
 			// If depot size > 2x start size
-			if (this.depot.getTotalValue() >= this.multiplyLimit) {
+			if (this.depot.getTotalCurrentValue(Map.of(this.stockName, this.closePrice)) >= this.multiplyLimit) {
 				log.info("Time to split and create new cells");
 				//Sell everything and remove 1000 money
-				this.sellDefaultStock(this.depot.getAssets().get(0).getVolume());
+				if (this.depot.getAssets().isEmpty()==false) {
+					this.sellDefaultStock(this.depot.getAssets().get(0).getVolume());
+				}
 				
-				//Remove 1000 money
-				this.removeMoneyFromDepot(1000);
+				
+				//Remove init startsize money
+				this.removeMoneyFromDepot(this.initStartSize);
 				
 				this.getCommunicator().execute(this.getCellName() + ":" + "reproduce" + "/" + "command", 
 						(new Request())
@@ -309,8 +314,8 @@ public class Trader extends CellFunctionCodelet {
 	private boolean killAgentOnDepotDeath() throws Exception {
 		boolean isKilled = false;
 
-		if (this.depot.getTotalValue() < this.deathLimit) {
-			log.info("Agent dies. Depot={}, deathlimit={}", this.depot.getTotalValue(), this.deathLimit);
+		if (this.depot.getTotalBuyValue() < this.deathLimit) {
+			log.info("Agent dies. Depot={}, deathlimit={}", this.depot.getTotalBuyValue(), this.deathLimit);
 			// this.shutDownCodelet();
 			// this.getCell().takeDownCell();
 			isKilled = true;
@@ -336,14 +341,21 @@ public class Trader extends CellFunctionCodelet {
 	}
 
 	private void executeTrade() throws Exception {
-		log.info("Buy signal={}; sell signal={}", this.buySignal, this.sellSignal);
+		log.info("Buy={}; sell={}", this.buySignal, this.sellSignal);
 		if (this.buySignal == true) {
-			buyDefaultStock(1);
+			int amount = (int)(depot.getLiquid()/this.closePrice);
+			buyDefaultStock(amount);
 
 		}
 
 		if (this.sellSignal == true) {
-			sellDefaultStock(1);
+			//Sell all
+			if (this.depot.getAssets().stream().filter(a -> a.getStockName().equals(this.stockName)).findFirst().isPresent()
+					&& (this.depot.getAssets().stream().filter(a -> a.getVolume() >= 1)).findFirst().isPresent()) {
+				int amount = this.depot.getAssets().get(0).getVolume();
+				sellDefaultStock(amount);
+			}
+			
 
 		}
 	}

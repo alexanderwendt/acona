@@ -1,16 +1,21 @@
 package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
@@ -26,6 +31,8 @@ import at.tuwien.ict.acona.mq.datastructures.Response;
 public class StatisticsCollector extends CellFunctionThreadImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(StatisticsCollector.class);
+	private static final Logger logcsvBody = LoggerFactory.getLogger("csvbody");
+	private static final Logger logcsvHeader = LoggerFactory.getLogger("csvheader");
 
 	public final static String DATAADDRESS = "dataaddress";
 	public final static String GETSTATISTICSSUFFIX = "getstats";
@@ -35,6 +42,11 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	private int currentNumberOfAgents = 0;
 
 	private String dataaddress = "data";
+	
+	//Make statistics string
+	private final Map<String, Integer> typeCountMap = new HashMap<>();
+	private final List<String> typeNames = new ArrayList<>();
+	private final int maxAgentTypes = 100;
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
@@ -67,28 +79,44 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	private JsonElement getAgentValues() throws Exception {
 		JsonObject result = new JsonObject();
 		
+		// Read the date
+		String dateString = "";
+		double price = 0;
+		Datapoint value = this.getCommunicator().read(dataaddress);
+		if (value.hasEmptyValue() == false) {
+			dateString = value.getValue().getAsJsonObject().getAsJsonPrimitive("date").getAsString();
+			price = value.getValue().getAsJsonObject().getAsJsonPrimitive("close").getAsDouble();
+		} else {
+			throw new Exception("No price value available");
+		}
+		
 		// Read whole address space
-		List<Datapoint> agents = this.getCommunicator().readWildcard(DEPOTPREFIX + "." + "*");
+		List<Datapoint> agents = this.getCommunicator().readWildcard(DEPOTPREFIX + "." + "*").stream().filter(d->(DEPOTPREFIX + "." + "*").equals(d.getAddress())==false).collect(Collectors.toList());
+		
 		List<JsonObject> depots = new ArrayList<JsonObject>();
+		
 		for (Datapoint dp: agents) {
 			Depot d = dp.getValue(Depot.class);
+			
+			//FIXME: This is a simplified solution for just one stock
+			double totalAssetValue = 0;
+			if (d.getAssets().isEmpty()==false) {
+				totalAssetValue += d.getAssets().get(0).getVolume() * price;
+			}
+			
+			double totalValue = totalAssetValue + d.getLiquid();
+			
+			
 			JsonObject o = new JsonObject();
 			o.addProperty("name", d.getOwner() + ":" + d.getOwnerType());
-			o.addProperty("value", d.getTotalValue());
+			o.addProperty("value", totalValue);
 			depots.add(o);
 		}
 		
 		//Get replication statistics
 		this.currentNumberOfAgents = depots.size();
-		log.info("Born cells={}. Number of cells={}", this.currentNumberOfAgents - this.previousNumberOfAgents, this.currentNumberOfAgents);
+		log.info("Netto change of cells={}. Number of cells={}", this.currentNumberOfAgents - this.previousNumberOfAgents, this.currentNumberOfAgents);
 		this.previousNumberOfAgents = this.currentNumberOfAgents;
-		
-		// Read the date
-		String dateString = "";
-		Datapoint value = this.getCommunicator().read(dataaddress);
-		if (value.hasEmptyValue() == false) {
-			dateString = this.getCommunicator().read(dataaddress).getValue().getAsJsonObject().getAsJsonPrimitive("date").getAsString();
-		}
 		
 		//Create a list of agentname:type, total value
 		JsonElement depotsJson = (new Gson()).toJsonTree(depots);
@@ -112,7 +140,7 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 		Map<String, Integer> typeCount = new ConcurrentHashMap<String, Integer>();
 
 		// Read whole address space
-		List<Datapoint> agents = this.getCommunicator().readWildcard(DEPOTPREFIX + "." + "*");
+		List<Datapoint> agents = this.getCommunicator().readWildcard(DEPOTPREFIX + "." + "*").stream().filter(d->(DEPOTPREFIX + "." + "*").equals(d.getAddress())==false).collect(Collectors.toList());
 
 		// Read the date
 		String dateString = "";
@@ -166,13 +194,58 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	@Override
 	protected void executeFunction() throws Exception {
 		JsonElement res = this.generateTypeStatistics();
+		
 		JsonElement resValues = this.getAgentValues();
 		res.getAsJsonObject().add("values", resValues.getAsJsonObject().get("depots"));
+		
+		//Get type statistics for csv
+		String message = "";
+		
+		//[{"type":"L33S11","number":1}]
+		//Get timestamp as string
+		String timeStamp = res.getAsJsonObject().get("date").getAsString();
+		message += timeStamp + ";";
+		String header = "Timestamp;";
+		
+		ArrayList<SpeciesType> types = (new Gson()).fromJson(res.getAsJsonObject().get("types").getAsJsonArray(), new TypeToken<ArrayList<SpeciesType>>() {}.getType());
+		//Add types to map
+		types.forEach(t->this.typeCountMap.put(t.getType(), t.getNumber()));
+		for (SpeciesType t : types) {
+			if (this.typeNames.contains(t.getType())==false) {
+				typeNames.add(t.getType());
+			}
+		}
+		
+		//Delete types that don't exist
+		//if type exists in typecountmap but not in types, then set number=0
+		this.typeCountMap.keySet().forEach(k->{
+			boolean isPresent = types.stream().filter(t->k.equals(t.getType())).findFirst().isPresent();
+			if (isPresent==false) {
+				this.typeCountMap.put(k, 0);
+			}
+		});
+		
+		
+		
+		//Generate statistics
+		for (int i=0;i<this.maxAgentTypes;i++) {
+			if (i<this.typeNames.size()) {
+				message += this.typeCountMap.get(this.typeNames.get(i));
+				header += this.typeNames.get(i);
+			}
+			message += ";";
+			header += ";";
+		}
+		
+		logcsvBody.debug("" + message);
+		logcsvHeader.debug("" + header);
 		
 		//Response result = new Response(this.getOpenRequest());
 		//result.setResult(res);
 		this.closeOpenRequestWithResponse(res);
 	}
+	
+	
 
 	@Override
 	protected void executeCustomPostProcessing() throws Exception {

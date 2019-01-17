@@ -35,7 +35,7 @@ public class BrokerTester {
 
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private final DPBuilder dpb = new DPBuilder();
-	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
+	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -56,7 +56,7 @@ public class BrokerTester {
 
 			}
 		}
-		this.launcher.stopSystem();
+		this.controller.stopSystem();
 
 		synchronized (this) {
 			try {
@@ -83,9 +83,9 @@ public class BrokerTester {
 			CellConfig cf = CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName));
-			Cell brokerAgent = this.launcher.createAgent(cf);
+			Cell brokerAgent = this.controller.createAgent(cf);
 
-			Cell traderAgent = this.launcher.createAgent(CellConfig.newConfig(traderAgentName));
+			Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName));
 
 			// === Init finished ===//
 
@@ -223,18 +223,18 @@ public class BrokerTester {
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, "test"));
-			Cell brokerAgent = this.launcher.createAgent(cf);
+			Cell brokerAgent = this.controller.createAgent(cf);
 
 			List<Cell> traderAgents = new ArrayList<Cell>();
 
 			for (int i = 0; i < 50; i++) {
-				Cell a = this.launcher.createAgent(CellConfig.newConfig(traderType1 + i));
+				Cell a = this.controller.createAgent(CellConfig.newConfig(traderType1 + i));
 				traderAgents.add(a);
 				a.getCommunicator().write(dpb.newDatapoint("type").setValue(traderType1));
 			}
 
 			for (int i = 0; i < 15; i++) {
-				Cell a = this.launcher.createAgent(CellConfig.newConfig(traderType2 + i));
+				Cell a = this.controller.createAgent(CellConfig.newConfig(traderType2 + i));
 				traderAgents.add(a);
 				a.getCommunicator().write(dpb.newDatapoint("type").setValue(traderType2));
 			}
@@ -314,7 +314,7 @@ public class BrokerTester {
 						.setProperty(StatisticsCollector.DATAADDRESS, "test"))
 					.addFunction(CellFunctionConfig.newConfig("depotstatistics", DepotStaticticsGraphToolFunction.class));
 
-			Cell brokerAgent = this.launcher.createAgent(cf);
+			Cell brokerAgent = this.controller.createAgent(cf);
 
 //			List<CellGatewayImpl> traderAgents = new ArrayList<CellGatewayImpl>();
 //

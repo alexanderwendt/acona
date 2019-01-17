@@ -115,6 +115,7 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 		this.close = offset;
 		this.high = offset + 2;
 		this.low = offset - 2;
+		this.open = close;
 	}
 
 	@Override

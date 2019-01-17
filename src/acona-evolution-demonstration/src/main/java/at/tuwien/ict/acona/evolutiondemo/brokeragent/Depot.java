@@ -2,6 +2,7 @@ package at.tuwien.ict.acona.evolutiondemo.brokeragent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Depot {
@@ -88,10 +89,23 @@ public class Depot {
 		return asset;
 	}
 
-	public double getTotalValue() {
+	public double getTotalBuyValue() {
 		double result = this.getLiquid();
 		for (Asset a : this.asset) {
 			result += a.getAveragePrice() * a.getVolume();
+		}
+
+		return result;
+	}
+	
+	public double getTotalCurrentValue(Map<String, Double> currentPrice) {
+		double result = this.getLiquid();
+		for (Asset a : this.asset) {
+			if (currentPrice.containsKey(a.getStockName())) {
+				result += currentPrice.get(a.getStockName()) * a.getVolume();
+			} else {
+				result += a.getAveragePrice() * a.getVolume();
+			}
 		}
 
 		return result;

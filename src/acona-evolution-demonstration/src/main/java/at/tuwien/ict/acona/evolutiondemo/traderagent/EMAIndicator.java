@@ -53,8 +53,8 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 
 		// Subscribe price address but without trigger to start
 		Datapoint stockMarket = this.getDatapointBuilder().newDatapoint(this.getFunctionConfig().getProperty(ATTRIBUTESTOCKMARKETADDRESS));
-		this.emaLong = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEEMALONG));
-		this.emaShort = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEEMASHORT));
+		this.emaLongPeriod = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEEMALONG));
+		this.emaShortPeriod = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEEMASHORT));
 
 		// Add subscription to the stock market price
 		this.addManagedDatapoint(DatapointConfig.newConfig(IDPRICE, stockMarket.getAgent() + ":" + stockMarket.getAddress(), SyncMode.SUBSCRIBEONLY));
@@ -70,7 +70,7 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 		try {
 			JsonObject calc = new JsonObject();
 
-			if (this.emaShortPrevious < this.emaLongPrevious && this.emaShort > this.emaLong) {
+			if (this.emaShort > this.emaLong) {
 				log.debug("Buy signal as short EMA crosses long EMA from beneath");
 				// if (depot.getLiquid()>this.closePrice * 1) {
 				this.buySignal = true;
@@ -83,7 +83,7 @@ public class EMAIndicator extends CellFunctionThreadImpl {
 				this.buySignal = false;
 			}
 
-			if (this.emaShortPrevious > this.emaLongPrevious && this.emaShortPeriod < this.emaLong) {
+			if (this.emaShort < this.emaLong) {
 				// if (this.depot.getAsset().stream().filter(a->a.getStockName().equals(this.stockName)).findFirst().isPresent()
 				// && (this.depot.getAsset().stream().filter(a->a.getVolume()>=1)).findFirst().isPresent()) {
 				this.sellSignal = true;
