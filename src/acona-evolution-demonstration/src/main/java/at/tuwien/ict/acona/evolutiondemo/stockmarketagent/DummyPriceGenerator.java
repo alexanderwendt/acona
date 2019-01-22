@@ -80,7 +80,7 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 		functionResult = new JsonObject();
 		this.functionResult.addProperty("name", stockName);
 		this.functionResult.addProperty("run", this.currentPeriod);
-		this.functionResult.addProperty("date", cal.getTime().toString());
+		this.functionResult.addProperty("date", dateFormat.format(cal.getTime()));
 		this.functionResult.addProperty("open", this.close);
 		this.functionResult.addProperty("close", this.close);
 		this.functionResult.addProperty("high", this.high);

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.mq.cell.core.CellImpl;
@@ -245,21 +246,75 @@ public class CellConfig {
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
 		return this;
 	}
+	
+	/**
+	 * Get a cell function by name
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CellFunctionConfig getCellFunction(String name) {
+		CellFunctionConfig result = null;
+		
+		for (JsonElement e : this.getCellfunctions()) {
+			if (e.getAsJsonObject().get(CellFunctionConfig.CELLFUNCTIONNAME).getAsString().equals(name)) {
+				result = CellFunctionConfig.newConfig(e.getAsJsonObject());
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Replaces or adds an existing cellfunction config or adds it new
+	 * 
+	 * @param config
+	 */
+	public void replaceCellFunctionConfig(CellFunctionConfig config) {
+		this.removeCellFunctionConfig(config.getName());
+		
+		this.addFunction(config);
+	}
+	
+	/**
+	 * Get the position of a cell function in the function array
+	 * 
+	 * @param name
+	 * @return int [0,inf] for position and -1 if not found.
+	 */
+	private int getCellFunctionConfigIndex(String name) {
+		JsonArray arr = this.configObject.getAsJsonArray(CELLFUNCTIONS).getAsJsonArray();
+		int result = -1;
+		
+		for (int i = 0; i < arr.size(); i++) {
+			JsonObject function = arr.get(i).getAsJsonObject();
+			CellFunctionConfig config = CellFunctionConfig.newConfig(function);
+			if (config.getName().equals(name)) {
+				result = i;
+				break;
+			}
+		}
+		
+		return result;
+	}
 
 	/**
 	 * @param functionName
 	 */
 	public void removeCellFunctionConfig(String functionName) {
-		JsonArray arr = this.configObject.getAsJsonArray(CELLFUNCTIONS).getAsJsonArray();
-		int index = 0;
-		for (int i = 0; i < arr.size(); i++) {
-			JsonObject function = arr.get(i).getAsJsonObject();
-			CellFunctionConfig config = CellFunctionConfig.newConfig(function);
-			if (config.getName().equals(functionName)) {
-				index = i;
-				break;
-			}
-		}
+//		JsonArray arr = this.configObject.getAsJsonArray(CELLFUNCTIONS).getAsJsonArray();
+//		int index = 0;
+//		for (int i = 0; i < arr.size(); i++) {
+//			JsonObject function = arr.get(i).getAsJsonObject();
+//			CellFunctionConfig config = CellFunctionConfig.newConfig(function);
+//			if (config.getName().equals(functionName)) {
+//				index = i;
+//				break;
+//			}
+//		}
+		
+		int index = this.getCellFunctionConfigIndex(functionName);
 
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).remove(index);
 	}

@@ -3,7 +3,7 @@
     <expression>logger.contains("ControlGateway") &amp;&amp; message.contains("TestTest")</expression>
   </evaluator>-->
   <property name="DEV_HOME" value="log"/>
-  <property name="logFileName" value="korelog"/>
+  <property name="logFileName" value="archivetraderlog"/>
   <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
   
   <!--<logger name="at.tuwien.ict.acona.communicator.core.BidirectionalGatewayAgent" level="WARN"/>-->
@@ -71,10 +71,10 @@
 
 		<rollingPolicy
 				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-				<FileNamePattern>${DEV_HOME}/archived/${logFileName}.%i.log.zip
+				<FileNamePattern>${DEV_HOME}/archived/agenttypelog-${bySecond}.%i.log.zip
 				</FileNamePattern>
 				<MinIndex>1</MinIndex>
-				<MaxIndex>10</MaxIndex>
+				<MaxIndex>100</MaxIndex>
 		</rollingPolicy>
 
 		<triggeringPolicy
@@ -83,7 +83,7 @@
 		</triggeringPolicy>
 		
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>%msg%n</Pattern>
+			<Pattern>%d{HH:mm:ss.SSS};%msg%n</Pattern>
 		</encoder>
 
   </appender>
@@ -93,10 +93,10 @@
 
 		<rollingPolicy
 				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-				<FileNamePattern>${DEV_HOME}/archived/${logFileName}.%i.log.zip
+				<FileNamePattern>${DEV_HOME}/archived/headerlog-${bySecond}.%i.log.zip
 				</FileNamePattern>
 				<MinIndex>1</MinIndex>
-				<MaxIndex>10</MaxIndex>
+				<MaxIndex>100</MaxIndex>
 		</rollingPolicy>
 
 		<triggeringPolicy
@@ -105,7 +105,7 @@
 		</triggeringPolicy>
 		
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>%msg%n</Pattern>
+			<Pattern>%d{HH:mm:ss.SSS};%msg%n</Pattern>
 		</encoder>
 
   </appender>

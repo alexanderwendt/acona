@@ -238,10 +238,19 @@ public class CellImpl implements Cell, Runnable {
 	@Override
 	public void takeDownCell() {
 		// Close all functions
-		this.getFunctionHandler().getCellFunctionNames().forEach(name -> this.getFunctionHandler().getCellFunction(name).shutDownFunction());
-
+		try {
+			this.getFunctionHandler().getCellFunctionNames().forEach(name -> this.getFunctionHandler().getCellFunction(name).shutDownFunction());
+		} catch (Exception e) {
+			log.error("Cannot unregister functions", e);
+		}
+		
 		// Close notificator
-		this.notificator.shutDown();
+		try {
+			this.notificator.shutDown();
+		} catch (Exception e) {
+			log.error("Cannot stop notifacator", e);
+		}
+		
 		
 		
 		// this.doDelete();

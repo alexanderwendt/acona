@@ -42,11 +42,12 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 	private int currentNumberOfAgents = 0;
 
 	private String dataaddress = "data";
+	private long time = System.currentTimeMillis();
 	
 	//Make statistics string
 	private final Map<String, Integer> typeCountMap = new HashMap<>();
 	private final List<String> typeNames = new ArrayList<>();
-	private final int maxAgentTypes = 100;
+	private final int maxAgentTypes = 3000;
 
 	@Override
 	protected void cellFunctionThreadInit() throws Exception {
@@ -203,9 +204,12 @@ public class StatisticsCollector extends CellFunctionThreadImpl {
 		
 		//[{"type":"L33S11","number":1}]
 		//Get timestamp as string
+		long newTime = System.currentTimeMillis();
 		String timeStamp = res.getAsJsonObject().get("date").getAsString();
-		message += timeStamp + ";";
-		String header = "Timestamp;";
+		message += newTime - this.time + ";" + timeStamp + ";";
+		String header = "Timedifference;Timestamp;";
+		this.time = newTime;
+		
 		
 		ArrayList<SpeciesType> types = (new Gson()).fromJson(res.getAsJsonObject().get("types").getAsJsonArray(), new TypeToken<ArrayList<SpeciesType>>() {}.getType());
 		//Add types to map

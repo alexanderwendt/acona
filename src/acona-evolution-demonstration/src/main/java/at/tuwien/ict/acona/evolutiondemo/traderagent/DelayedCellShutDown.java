@@ -1,7 +1,5 @@
 package at.tuwien.ict.acona.evolutiondemo.traderagent;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +13,7 @@ public class DelayedCellShutDown extends CellFunctionThreadImpl {
 
 	protected static Logger log = LoggerFactory.getLogger(DelayedCellShutDown.class);
 
-	private int finaldelay = 1000;
+	private int finaldelay = 50;
 
 	public void killSwitch(int delay, Cell cell) throws Exception {
 		try {

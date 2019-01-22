@@ -103,6 +103,10 @@ public class Request {
 
 		return result;
 	}
+	
+	public boolean hasParameter(String key) {
+		return this.parameter.has(key);
+	}
 
 	/**
 	 * Add a parameter as JsonElement

@@ -1,0 +1,17 @@
+ <!-- Add a CSV Appender for statistics -->
+  <!--<appender name="CSV" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>komuso.csv</File>
+    <Append>false</Append>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>komuso.%d{yyyy-MM-dd}.csv</FileNamePattern>
+    </rollingPolicy>
+    <MinIndex>1</MinIndex>
+    <MaxIndex>10</MaxIndex>
+    <!--triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy-->
+    <!--<ImmediateFlush>true</ImmediateFlush>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>%msg%n</pattern>
+    </layout>
+  </appender>-->

@@ -1193,7 +1193,6 @@ public class MqCellCoreFunctionTester {
 			CellFunctionConfig functionConf = CellFunctionConfig.newConfig(functionName, IncrementServiceThread.class)
 					.addManagedDatapoint(IncrementServiceThread.ATTRIBUTEINCREMENTDATAPOINT, datapoint, SyncMode.SUBSCRIBEWRITEBACK);
 
-			this.launcher.getAgent(agentName).addCellFunction(functionConf);
 
 			synchronized (this) {
 				try {
@@ -1204,12 +1203,19 @@ public class MqCellCoreFunctionTester {
 			}
 
 			// Run the first agent
-			//agent.getCommunicator().write(DatapointBuilder.newDatapoint(functionName + ".command").setValue("START"));
-			agent.getCommunicator().execute(agent.getName() + ":" + functionName + "/" + "command", 
-					(new Request())
-					.setParameter("command", ControlCommand.START)
-					.setParameter("blocking", false), 100000);
+			try {
+				agent.getCommunicator().execute(agent.getName() + ":" + functionName + "/" + "command", 
+						(new Request())
+						.setParameter("command", ControlCommand.START)
+						.setParameter("blocking", false), 100);
+			} catch (Exception e) {
+				log.info("No function available", e);
+			}
+			
 
+			this.launcher.getAgent(agentName).addCellFunction(functionConf);
+			
+			
 			synchronized (this) {
 				try {
 					this.wait(1000);
@@ -1240,7 +1246,7 @@ public class MqCellCoreFunctionTester {
 			double readValue = agent.getCommunicator().read(datapoint).getValue().getAsDouble();
 			log.debug("correct value={}, actual value={}", 2.0, readValue);
 
-			assertEquals(2.0, readValue, 0.0);
+			assertEquals(1.0, readValue, 0.0);
 			log.info("Test passed");
 		} catch (Exception e) {
 			log.error("Error testing system", e);

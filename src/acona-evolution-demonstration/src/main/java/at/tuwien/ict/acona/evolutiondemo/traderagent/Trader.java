@@ -1,6 +1,7 @@
 package at.tuwien.ict.acona.evolutiondemo.traderagent;
 
 import java.util.Map;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +9,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
+import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunction;
 import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.cell.config.CellConfig;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -78,8 +82,8 @@ public class Trader extends CellFunctionCodelet {
 
 		multiply = Boolean.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEMULTIPLY, "false"));
 		
-		this.multiplyLimit = startSize * 2.0;
-		this.deathLimit = startSize * 0.1;
+		this.multiplyLimit = startSize * 1.3;
+		this.deathLimit = startSize * 0.3;
 
 		this.agentType = this.getFunctionConfig().getProperty(ATTRIBUTEAGENTTYPE, initType);
 		this.stockName = this.getFunctionConfig().getProperty(ATTRIBUTESTOCKNAME, initStockName);
@@ -103,6 +107,11 @@ public class Trader extends CellFunctionCodelet {
 	public void executeCodeletPreprocessing() throws Exception {
 		// Read depot
 		Response response = this.getCommunicator().execute(this.brokerAddress + "/" + "getdepotinfo", (new Request()).setParameter("agentname", this.getCell().getName()), 200000);
+		if (response.hasError()) {
+			log.warn("First try failed. Try a second time");
+			response = this.getCommunicator().execute(this.brokerAddress + "/" + "getdepotinfo", (new Request()).setParameter("agentname", this.getCell().getName()), 200000);
+		}
+		
 		
 		// Write to broker a new depot
 		//JsonRpcRequest req = new JsonRpcRequest("getdepotinfo", 1);
@@ -144,7 +153,14 @@ public class Trader extends CellFunctionCodelet {
 			this.setCommand(ControlCommand.EXIT);
 
 			DelayedCellShutDown killSwitch = new DelayedCellShutDown();
-			killSwitch.killSwitch(2000, this.getCell());
+			killSwitch.killSwitch(50, this.getCell());
+			synchronized (this) {
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {
+					
+				}
+			}
 			log.info("Cell will also be shut down");
 		}
 	}
@@ -164,7 +180,12 @@ public class Trader extends CellFunctionCodelet {
 	@Override
 	public void shutDownCodelet() throws Exception {
 		// Delete the depot
-		this.deleteDepot();
+		try {
+			this.deleteDepot();
+		} catch (Exception e) {
+			log.error("Cannot delete depot. Error:", e);
+		}
+		
 
 		log.info("{}>Agent is killed", this.getCell().getName());
 		// Then, agent is killed
@@ -262,14 +283,54 @@ public class Trader extends CellFunctionCodelet {
 					this.sellDefaultStock(this.depot.getAssets().get(0).getVolume());
 				}
 				
-				
 				//Remove init startsize money
-				this.removeMoneyFromDepot(this.initStartSize);
+				this.removeMoneyFromDepot(startSize * 0.3);
 				
-				this.getCommunicator().execute(this.getCellName() + ":" + "reproduce" + "/" + "command", 
-						(new Request())
-						.setParameter("command", ControlCommand.START)
-						.setParameter("blocking", true), 100000);
+				//Modify the configuration
+				CellConfig newCellConfig = this.getCell().getConfiguration();
+				CellFunctionConfig newSignalFunctionConfig = newCellConfig.getCellFunction(signalAddress);
+				CellFunctionConfig newTraderFunctionConfig = newCellConfig.getCellFunction("TraderFunction");
+				
+				//Get old values and modify them
+				int emaShort = Integer.valueOf(newSignalFunctionConfig.getProperty(EMAIndicator.ATTRIBUTEEMASHORT));
+				int emaLong = Integer.valueOf(newSignalFunctionConfig.getProperty(EMAIndicator.ATTRIBUTEEMALONG));
+				
+				//Generate new parameters with 30% probability
+				int newEmaShort = generateVariation(emaShort, 20, 1, emaLong-1, 0.3);
+				int newEmaLong = generateVariation(emaLong, 40, newEmaShort+1, 1000, 0.3);
+				
+				String type = "L" + newEmaLong + "S" + newEmaShort;
+				
+				//ExecutionOrder 1-10
+				int executionOrder = (int)(Math.random()*90)+1;
+				
+				//Set new config
+				newSignalFunctionConfig
+					.setProperty(EMAIndicator.ATTRIBUTEEMALONG, newEmaLong)
+					.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, newEmaShort);
+				
+				newTraderFunctionConfig.setProperty(Trader.ATTRIBUTEAGENTTYPE, type);
+				newTraderFunctionConfig.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, executionOrder);
+				newCellConfig.setName("T" + type);
+				
+				newCellConfig.replaceCellFunctionConfig(newTraderFunctionConfig);
+				newCellConfig.replaceCellFunctionConfig(newSignalFunctionConfig);
+				
+				this.getCommunicator().execute(this.getCellName() + ":" + "reproduce" + "/" + "executereplication", 
+						(new Request()).setParameter("config", newCellConfig.toJsonObject()), 100000);
+				
+				synchronized (this) {
+					try {
+						this.wait(100);
+					} catch (InterruptedException e) {
+						
+					}
+				}
+				
+//				this.getCommunicator().execute(this.getCellName() + ":" + "reproduce" + "/" + "command", 
+//						(new Request())
+//						.setParameter("command", ControlCommand.START)
+//						.setParameter("blocking", true), 100000);
 				
 				
 			}
@@ -278,6 +339,29 @@ public class Trader extends CellFunctionCodelet {
 			throw new Exception(e.getMessage());
 			
 		}
+	}
+	
+	/**
+	 * Generate a variation of a variable
+	 * 
+	 * @param startValue
+	 * @param sigma
+	 * @param limitBottom
+	 * @param limitTop
+	 * @param modificationProbability
+	 * @return
+	 */
+	private int generateVariation(int startValue, int sigma, int limitBottom, int limitTop, double modificationProbability) {
+		int result = startValue;
+		
+		if (Math.random() <= modificationProbability) {
+			do {
+				Random r = new Random();
+				result = (int)((double)startValue + (double)sigma * r.nextGaussian());
+			} while (limitBottom>result || limitTop<result);
+		}
+		
+		return result;
 	}
 	
 	private void removeMoneyFromDepot(double amount) throws Exception {

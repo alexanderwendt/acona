@@ -137,7 +137,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			connOpts.setCleanSession(true);
 			connOpts.setUserName(this.username);
 			connOpts.setPassword(this.password.toCharArray());
-			connOpts.setMaxInflight(2000);   //Set max handled messages at the same time. Set 2000.
+			connOpts.setMaxInflight(10000);   //Set max handled messages at the same time. Set 2000.
 
 			// Connect the client
 			log.debug("Connecting to MQTT messaging at " + this.host);

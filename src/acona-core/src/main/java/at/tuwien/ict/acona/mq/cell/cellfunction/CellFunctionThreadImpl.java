@@ -115,7 +115,7 @@ public abstract class CellFunctionThreadImpl extends CellFunctionImpl implements
 			// Add subfunction
 			this.addRequestHandlerFunction(COMMANDSUFFIX, (Request input) -> setCommandRequest(input));
 			// Add subscription of the topic (no datapoint)
-			this.getCommunicator().subscribeTopic(this.enhanceWithRootAddress(COMMANDSUFFIX));
+			//this.getCommunicator().subscribeTopic(this.enhanceWithRootAddress(COMMANDSUFFIX));
 
 		} catch (Exception e) {
 			log.error("CellFunction {} could not be initialized", this.getFunctionName(), e);

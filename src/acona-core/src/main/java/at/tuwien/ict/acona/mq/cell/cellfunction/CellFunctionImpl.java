@@ -314,6 +314,10 @@ public abstract class CellFunctionImpl implements CellFunction {
 		
 		return response;
 	}
+	
+	protected void addManagedDatapoint(String id, String address, SyncMode syncMode) {
+		this.addManagedDatapoint(DatapointConfig.newConfig(id, address, syncMode));
+	}
 
 	/**
 	 * Add a datapoint that shall be syncronized with read, subscribe or write. this method should be used in the init method of a function
@@ -386,16 +390,35 @@ public abstract class CellFunctionImpl implements CellFunction {
 			//this.getCommunicator().setDefaultTimeout(1);
 			
 			// Execute specific functions
-			this.shutDownImplementation();
+			try {
+				this.shutDownImplementation();
+			} catch (Exception e) {
+				log.error("Cannot shut down implementation", e);
+			}
+			
 
 			// Remove all subscriptions
-			this.removeSubscription();
-
+			try {
+				this.removeSubscription();
+			} catch (Exception e) {
+				log.error("Cannot remove subscriptions", e);
+			}
+			
 			// Close communicator
-			this.getCommunicator().shutDown();
+			try {
+				this.getCommunicator().shutDown();
+			} catch (Exception e) {
+				log.error("Cannot close communicator", e);
+			}
+			
 
 			// Execute general deregister
-			this.getCell().getFunctionHandler().deregisterActivatorInstance(this.getFunctionRootAddress());
+			try {
+				this.getCell().getFunctionHandler().deregisterActivatorInstance(this.getFunctionRootAddress());
+			} catch (Exception e) {
+				log.error("Canot unregister from function handler", e);
+			}
+			
 
 			// this.getCell().takeDownCell();
 			log.debug("Agent {}> ==== shut down function={} ====", this.getCell().getName(), this.getFunctionName());

@@ -243,6 +243,10 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public CellFunctionConfig setProperty(String name, String value) {
+		if (this.configObject.has(name)) {
+			this.configObject.remove(name);
+		}
+		
 		this.configObject.addProperty(name, value);
 		return this;
 	}
@@ -253,6 +257,10 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public CellFunctionConfig setProperty(String name, int value) {
+		if (this.configObject.has(name)) {
+			this.configObject.remove(name);
+		}
+		
 		this.configObject.addProperty(name, value);
 		return this;
 	}
@@ -263,6 +271,10 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public CellFunctionConfig setProperty(String name, double value) {
+		if (this.configObject.has(name)) {
+			this.configObject.remove(name);
+		}
+		
 		this.configObject.addProperty(name, value);
 		return this;
 	}
@@ -273,6 +285,10 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public CellFunctionConfig setProperty(String name, boolean value) {
+		if (this.configObject.has(name)) {
+			this.configObject.remove(name);
+		}
+		
 		this.configObject.addProperty(name, value);
 		return this;
 	}
@@ -283,6 +299,10 @@ public class CellFunctionConfig {
 	 * @return
 	 */
 	public CellFunctionConfig setProperty(String name, JsonObject value) {
+		if (this.configObject.has(name)) {
+			this.configObject.remove(name);
+		}
+		
 		this.configObject.add(name, value);
 		return this;
 	}
@@ -311,6 +331,10 @@ public class CellFunctionConfig {
 	 */
 	public CellFunctionConfig setProperty(String key, Object value) {
 		// TODO: Method not tested yet
+		if (this.configObject.has(key)) {
+			this.configObject.remove(key);
+		}
+		
 		this.configObject.add(key, new Gson().toJsonTree(value));
 		return this;
 	}

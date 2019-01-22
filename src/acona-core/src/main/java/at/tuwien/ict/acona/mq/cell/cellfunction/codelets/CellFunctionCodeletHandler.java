@@ -51,7 +51,7 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	// private String resultDatapointAddress = "";
 
-	private final static int METHODTIMEOUT = 9000;
+	private final static int METHODTIMEOUT = 19000;
 	// private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	// For your needs, use ConcurrentHashMap. It allows concurrent modification of the Map from several
@@ -215,21 +215,24 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 
 	@Override
 	public void registerCodelet(String callerAddress, int executionOrder) throws Exception {
-		this.getCodeletMap().put(callerAddress, ServiceState.INITIALIZING);
-		this.putCodeletExecutionOrder(callerAddress, executionOrder);
-
-		log.debug("Codelet={} registered", callerAddress);
+		synchronized (this) {
+			this.getCodeletMap().put(callerAddress, ServiceState.INITIALIZING);
+			this.putCodeletExecutionOrder(callerAddress, executionOrder);
+			
+			log.debug("Codelet={} registered", callerAddress);
+		}
 	}
 
 	@Override
 	public void deregisterCodelet(String codeletName) {
-		this.removeCodeletExecutionOrder(codeletName);
-		this.getCodeletMap().remove(codeletName);
-		log.debug("Codelet={} deregistered", codeletName);
-
+		synchronized (this) {
+			this.removeCodeletExecutionOrder(codeletName);
+			this.getCodeletMap().remove(codeletName);
+			log.debug("Codelet={} deregistered", codeletName);
+		}
 	}
 
-	private boolean updateCodeletHandlerState() {
+	private synchronized boolean updateCodeletHandlerState() {
 		boolean executeCodeletHandler = false;
 
 		try {
@@ -360,22 +363,31 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		} else {
 			log.debug("Current run order={} of total run orders={}. Run codelets.", this.getCurrentRunOrder(), this.retrieveExecutionOrder());
 			// For each, send a message to start in parallel
-			this.getExecutionOrderMap().get(this.getCurrentRunOrder()).forEach((k) -> {
-				//String agentName = k.split(":")[0];
-				//String functionName = k.split(":")[1];
+			int runorder = this.getCurrentRunOrder();
+			try {
+				//synchronized (this.getExecutionOrderMap()) {
+				List<String> runList = new ArrayList<String>(this.getRunList(runorder));
+					runList.forEach((k) -> {
+						//String agentName = k.split(":")[0];
+						//String functionName = k.split(":")[1];
 
-				try {
-					Request request = (new Request());//new Request(EXECUTECODELETMETHODNAME, 0);
+						try {
+							Request request = (new Request());//new Request(EXECUTECODELETMETHODNAME, 0);
 
-					Response result = this.getCommunicator().execute(k + "/" + EXECUTECODELETMETHODNAME, request, METHODTIMEOUT);
-					log.debug("Started codelet={}", k);
-					if (result.hasError()) {
-						throw new Exception("Error at the starting of the codelet. " + result.getError());
-					}
-				} catch (Exception e1) {
-					log.error("Cannot execute the execute method in the codelets", e1);
-				}
-			});
+							Response result = this.getCommunicator().execute(k + "/" + EXECUTECODELETMETHODNAME, request, METHODTIMEOUT);
+							log.debug("Started codelet={}", k);
+							if (result.hasError()) {
+								throw new Exception("Error at the starting of the codelet. " + result.getError());
+							}
+						} catch (Exception e1) {
+							log.error("Cannot execute the execute method in the codelets", e1);
+						}
+					});
+				//}
+			} catch (Exception e) {
+				log.error("Execution error. Execution order map={}. Runorder={}", this.getExecutionOrderMap(), runorder, e);
+				throw new Exception(e.getMessage());
+			}
 		}
 	}
 
@@ -450,7 +462,12 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	protected void executeCustomPreProcessing() throws Exception {
 		// Check the state of the codelet handler
 		// Check that all codelets are ready (it shall always be true, else there is an error)
-		this.codeletHandlerRunAllowed = this.updateCodeletHandlerState(); // If state is updated and allowed to run, the thread can run
+		try {
+			this.codeletHandlerRunAllowed = this.updateCodeletHandlerState(); // If state is updated and allowed to run, the thread can run
+		} catch (Exception e) {
+			log.error("Cannot check if run is allowed", e);
+		}
+		
 	}
 
 	@Override
@@ -473,6 +490,10 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	private Map<String, ServiceState> getCodeletMap() {
 		return codeletMap;
 	}
+	
+	private List<String> getRunList(int runOrder) {
+		return Collections.synchronizedList(this.executionOrderMap.get(runOrder));
+	}
 
 	/**
 	 * Add codelet execution order
@@ -489,7 +510,8 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 		if (this.getExecutionOrderMap().containsKey(order)) {
 			// Add to existing list
 			// synchronized (this.executionOrderMap) {
-			this.getExecutionOrderMap().get(order).add(name);
+			//this.getExecutionOrderMap().get(order).add(name);
+			this.getRunList(order).add(name);
 			// }
 
 			log.debug("Add codelet={} to existing order={}", name, order);
@@ -508,24 +530,46 @@ public class CellFunctionCodeletHandler extends CellFunctionThreadImpl implement
 	 * @param name
 	 */
 	private void removeCodeletExecutionOrder(String name) {
-		synchronized (this.executionOrderMap) {
-			Iterator<Entry<Integer, List<String>>> iter = this.executionOrderMap.entrySet().iterator();
-
-			while (iter.hasNext()) {
-				Entry<Integer, List<String>> e = iter.next();
-				e.getValue().remove(name);
-				// log.warn("Removeale={}", e);
-				if (e.getValue().isEmpty()) {
-					iter.remove();
-					this.executionOrderMap.remove(e.getKey());
+		//Search all places, where this codelet exists and remove it from there
+		List<Integer> keyList = new ArrayList<Integer>();
+		for (Entry<Integer, List<String>> e : this.executionOrderMap.entrySet()) {
+			while (this.getRunList(e.getKey()).contains(name)) {
+				this.getRunList(e.getKey()).remove(name);
+			}
+			
+			if (e.getValue().isEmpty()) {
+				keyList.add(e.getKey());
+				if (this.getCurrentRunOrder()==e.getKey()) {
 					int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
 					this.setCurrentRunOrder(nextRunOrder);
-					log.debug("Removed codelet={} with execution order={}", name, e.getKey());
 				}
+				
+				log.debug("Removed codelet={} with execution order={}", name, e.getKey());
 			}
-
-			log.debug("Remaining codelets={}", this.executionOrderMap);
 		}
+		
+		for (Integer i : keyList) {
+			this.executionOrderMap.remove(i);
+		}
+		
+		//synchronized (this.executionOrderMap) {
+//			Iterator<Entry<Integer, List<String>>> iter = this.executionOrderMap.entrySet().iterator();
+//
+//			while (iter.hasNext()) {
+//				Entry<Integer, List<String>> e = iter.next();
+//				e.getValue().remove(name);
+//				// log.warn("Removeale={}", e);
+//				if (e.getValue().isEmpty()) {
+//					iter.remove();
+//					this.executionOrderMap.remove(e.getKey());
+//					int nextRunOrder = this.getNextRunOrderState(this.getCurrentRunOrder());
+//					this.setCurrentRunOrder(nextRunOrder);
+//					log.debug("Removed codelet={} with execution order={}", name, e.getKey());
+//				}
+//			}
+
+		log.debug("Remaining codelets={}", this.executionOrderMap);
+		//}
 	}
 
 	/**

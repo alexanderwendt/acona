@@ -42,8 +42,8 @@ public class CellFunctionHandlerTriggerCodelet extends CellFunctionCodelet {
 
 		Request req = new Request();
 
-		this.getCommunicator().execute(codeletHandlerAddress + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, req); //executeServiceQueryDatapoints(codeletHandlerAgent, codeletHandlerAddress, req, codeletHandlerAgent, codeletHandlerAddress + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), this.getCommunicator().getDefaultTimeout());
-
+		this.getCommunicator().execute(codeletHandlerAddress + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, req); 
+		
 		log.info("=== Codelet handler={} finished. ===", codeletHandlerAddress);
 	}
 

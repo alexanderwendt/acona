@@ -83,7 +83,7 @@ public class LauncherReplicator {
 			String statisticsDatapointName = brokerAgentName + ":" + "stats";
 
 			// === Traders ===//
-			String traderAgentName = "TraderAgent";
+			String traderAgentName = "T";
 			String signalService = "signal";
 			
 			String reproduceFunction = "reproduce";
@@ -119,7 +119,7 @@ public class LauncherReplicator {
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
 					.addFunction(CellFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
+							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 100)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, brokerAgentName + ":" + statisticsService + "/" + StatisticsCollector.GETSTATISTICSSUFFIX)
 							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName))
 					.addFunction(CellFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
@@ -214,7 +214,7 @@ public class LauncherReplicator {
 			int cell1LongMA = 200;
 			
 			Cell traderAgentRepro1 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell1LongMA +  "S" + cell1ShortMA)
-			.addFunction(CellFunctionConfig.newConfig("trader_" + "L" + cell1LongMA +  "S" + cell1ShortMA, Trader.class)
+			.addFunction(CellFunctionConfig.newConfig("TraderFunction", Trader.class)
 					.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 					.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 					.setProperty(Trader.ATTRIBUTEAGENTTYPE, "L" + cell1LongMA +  "S" + cell1ShortMA)
@@ -231,23 +231,41 @@ public class LauncherReplicator {
 			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
 			
 			
-			int cell2ShortMA = 10;
-			int cell2LongMA = 50;
+//			int cell2ShortMA = 10;
+//			int cell2LongMA = 50;
+//			
+//			Cell traderAgentRepro2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell2LongMA +  "S" + cell2ShortMA)
+//			.addFunction(CellFunctionConfig.newConfig("trader_" + "L" + cell2LongMA +  "S" + cell2ShortMA, Trader.class, Map.of(
+//					Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService,
+//					Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
+//					Trader.ATTRIBUTEAGENTTYPE, "L" + cell2LongMA +  "S" + cell2ShortMA,
+//					Trader.ATTRIBUTESIGNALADDRESS, signalService,
+//					Trader.ATTRIBUTEEXECUTIONORDER, 1,
+//					Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName,
+//					Trader.ATTRIBUTEMULTIPLY, true)))
+//			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class, Map.of(
+//					EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
+//					EMAIndicator.ATTRIBUTEEMALONG, cell2LongMA,
+//					EMAIndicator.ATTRIBUTEEMASHORT, cell2ShortMA)))
+//			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
+//			
+//			int cell3ShortMA = 2;
+//			int cell3LongMA = 20;
 			
-			Cell traderAgentRepro2 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell2LongMA +  "S" + cell2ShortMA)
-			.addFunction(CellFunctionConfig.newConfig("trader_" + "L" + cell2LongMA +  "S" + cell2ShortMA, Trader.class, Map.of(
-					Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService,
-					Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
-					Trader.ATTRIBUTEAGENTTYPE, "L" + cell2LongMA +  "S" + cell2ShortMA,
-					Trader.ATTRIBUTESIGNALADDRESS, signalService,
-					Trader.ATTRIBUTEEXECUTIONORDER, 1,
-					Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName,
-					Trader.ATTRIBUTEMULTIPLY, true)))
-			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class, Map.of(
-					EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
-					EMAIndicator.ATTRIBUTEEMALONG, cell2LongMA,
-					EMAIndicator.ATTRIBUTEEMASHORT, cell2ShortMA)))
-			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
+//			Cell traderAgentRepro3 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell3LongMA +  "S" + cell3ShortMA)
+//			.addFunction(CellFunctionConfig.newConfig("trader_" + "L" + cell3LongMA +  "S" + cell3ShortMA, Trader.class, Map.of(
+//					Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService,
+//					Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
+//					Trader.ATTRIBUTEAGENTTYPE, "L" + cell3LongMA +  "S" + cell3ShortMA,
+//					Trader.ATTRIBUTESIGNALADDRESS, signalService,
+//					Trader.ATTRIBUTEEXECUTIONORDER, 1,
+//					Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName,
+//					Trader.ATTRIBUTEMULTIPLY, true)))
+//			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class, Map.of(
+//					EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data",
+//					EMAIndicator.ATTRIBUTEEMALONG, cell3LongMA,
+//					EMAIndicator.ATTRIBUTEEMASHORT, cell3ShortMA)))
+//			.addFunction(CellFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
 			
 			//Jsersey server to receive commands
 //			CellConfig server = CellConfig.newConfig(serverAgentName)
@@ -277,7 +295,12 @@ public class LauncherReplicator {
 				//if (this.runAllowed == true) {
 				
 					// Execute the codelet handler once
-				controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 400000);
+				try {
+					controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+				} catch (Exception e) {
+					log.error("Controller service timeout. Continue.", e);
+				}
+				
 
 				//} else {
 				//	log.warn("Running of simulator interrupted after {} runs", i);

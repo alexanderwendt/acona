@@ -113,7 +113,7 @@ public class SystemControllerImpl implements SystemController {
 	 * @return
 	 * @throws Exception
 	 */
-	public Cell createAgent(CellConfig cellConfig) throws Exception {
+	public synchronized Cell createAgent(CellConfig cellConfig) throws Exception {
 		// Check if the agent already exists
 		Cell existingAgent = this.getAgent(cellConfig.getName());
 		if (existingAgent != null) {
@@ -124,7 +124,7 @@ public class SystemControllerImpl implements SystemController {
 		// Create the object
 		Cell cell = new CellImpl();
 		cell.init(cellConfig);
-
+		
 		this.agentControllerMap.put(cellConfig.getName(), cell);
 
 		log.info("Agent added={}", cell.getName());
