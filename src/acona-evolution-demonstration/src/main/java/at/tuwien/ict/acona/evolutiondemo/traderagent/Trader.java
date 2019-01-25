@@ -33,6 +33,7 @@ public class Trader extends CellFunctionCodelet {
 	public final static String ATTRIBUTESTOCKNAME = "stockname";
 	
 	public final static String ATTRIBUTEMULTIPLY = "multiple";
+	public final static String ATTRIBUTEMUTATE = "allowmutations";
 
 	private final static String IDPRICE = "price";
 	private final Gson gson = new Gson();
@@ -61,6 +62,7 @@ public class Trader extends CellFunctionCodelet {
 	private double deathLimit = 0;
 	
 	private boolean multiply = false;
+	private boolean allowMutations = true;
 
 	// Dynamic values
 	private Depot depot = null;
@@ -81,6 +83,7 @@ public class Trader extends CellFunctionCodelet {
 		this.startSize = Double.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTESTARTSIZE, String.valueOf(initStartSize)));
 
 		multiply = Boolean.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEMULTIPLY, "false"));
+		allowMutations = Boolean.valueOf(this.getFunctionConfig().getProperty(Trader.ATTRIBUTEMUTATE, "true"));
 		
 		this.multiplyLimit = startSize * 1.3;
 		this.deathLimit = startSize * 0.3;
@@ -295,9 +298,16 @@ public class Trader extends CellFunctionCodelet {
 				int emaShort = Integer.valueOf(newSignalFunctionConfig.getProperty(EMAIndicator.ATTRIBUTEEMASHORT));
 				int emaLong = Integer.valueOf(newSignalFunctionConfig.getProperty(EMAIndicator.ATTRIBUTEEMALONG));
 				
-				//Generate new parameters with 30% probability
-				int newEmaShort = generateVariation(emaShort, 20, 1, emaLong-1, 0.3);
-				int newEmaLong = generateVariation(emaLong, 40, newEmaShort+1, 1000, 0.3);
+				int newEmaShort;
+				int newEmaLong;
+				if (this.allowMutations==true) {
+					//Generate new parameters with 30% probability
+					newEmaShort = generateVariation(emaShort, 20, 1, emaLong-1, 0.3);
+					newEmaLong = generateVariation(emaLong, 40, newEmaShort+1, 1000, 0.3);
+				} else {
+					newEmaShort = emaShort;
+					newEmaLong = emaLong;
+				}
 				
 				String type = "L" + newEmaLong + "S" + newEmaShort;
 				

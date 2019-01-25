@@ -258,9 +258,9 @@ public class Launcher {
 			
 			log.info("=== All agents initialized ===");
 			
-			for (int i = 1; i <= 10000; i++) {
+			for (int i = 1; i <= 100000; i++) {
 				//if (this.runAllowed == true) {
-					log.info("run {}/{}", i, 10000);
+					log.info("run {}/{}", i, 100000);
 					// Execute the codelet handler once
 					controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
 

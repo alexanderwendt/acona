@@ -210,8 +210,11 @@ public class LauncherReplicator {
 //								.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
 //			}
 			
-			int cell1ShortMA = 50;
-			int cell1LongMA = 200;
+			//int cell1ShortMA = 50;
+			//int cell1LongMA = 200;
+			
+			int cell1ShortMA = 91;
+			int cell1LongMA = 95;
 			
 			Cell traderAgentRepro1 = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + "L" + cell1LongMA +  "S" + cell1ShortMA)
 			.addFunction(CellFunctionConfig.newConfig("TraderFunction", Trader.class)
@@ -221,7 +224,8 @@ public class LauncherReplicator {
 					.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 					.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
 					.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
-					.setProperty(Trader.ATTRIBUTEMULTIPLY, true))
+					.setProperty(Trader.ATTRIBUTEMULTIPLY, true)
+					.setProperty(Trader.ATTRIBUTEMUTATE, false))
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
 			.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
