@@ -228,7 +228,9 @@ public class CellConfig {
 	 */
 	public CellConfig addFunction(String name, Class<?> clzz, Map<String, Object> params) {
 		CellFunctionConfig config = CellFunctionConfig.newConfig(name, clzz, params);
-		
+		if (params.containsKey(CellFunctionConfig.COMMUNICATORTIMEOUT)==true) {
+			config.setCommunicatorTimeout(Integer.valueOf(params.get(CellFunctionConfig.COMMUNICATORTIMEOUT).toString()));
+		}
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
 		return this;
 	}

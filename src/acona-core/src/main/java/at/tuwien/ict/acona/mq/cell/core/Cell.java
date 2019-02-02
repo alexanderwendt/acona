@@ -64,7 +64,7 @@ public interface Cell {
 	 * @param cellFunctionConfig
 	 * @throws Exception
 	 */
-	public void addCellFunction(CellFunctionConfig cellFunctionConfig) throws Exception;
+	public void addFunction(CellFunctionConfig cellFunctionConfig) throws Exception;
 
 	/**
 	 * Add a new cell function to a running cell from a cellfunction config.

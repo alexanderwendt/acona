@@ -127,6 +127,11 @@ public abstract class CellFunctionImpl implements CellFunction {
 			// Create and initialize the communicator
 			this.comm = new MqttCommunicatorImpl(this.cell.getDataStorage());
 			this.comm.init(host, username, password, this);
+			
+			// Get execute once as optional
+			if (this.getFunctionConfig().getCommunicatorTimeout() != null) {
+				this.getCommunicator().setDefaultTimeout(this.getFunctionConfig().getCommunicatorTimeout().getAsInt());
+			}
 
 			// === Internal init ===//
 			this.setServiceState(ServiceState.INITIALIZING);

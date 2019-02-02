@@ -177,7 +177,7 @@ public class CellImpl implements Cell, Runnable {
 //	}
 
 	@Override
-	public void addCellFunction(CellFunctionConfig cellFunctionConfig) throws Exception {
+	public void addFunction(CellFunctionConfig cellFunctionConfig) throws Exception {
 		try {
 			this.getBuilder().createCellFunctionFromConfig(cellFunctionConfig.toJsonObject());
 		} catch (Exception e) {

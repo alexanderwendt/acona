@@ -22,7 +22,8 @@ public class CellFunctionConfig {
 	public static final String CELLEXECUTEONCE = "executeonce";
 	public static final String CELLFINISHSTATEAFTERSINGLERUN = "finishstatftersinglerun"; // This variable can only be set in the code
 	public static final String GENERATERESPONDER = "generateresponder";
-	public static final String RESPONDERPROTOCOL = "responderprotocol";
+	//public static final String RESPONDERPROTOCOL = "responderprotocol";
+	public static final String COMMUNICATORTIMEOUT = "communicatortimeout";
 	// public static final String REGISTERSTATE = "registerstate";
 
 	// private static Logger log = LoggerFactory.getLogger(CellFunctionConfig.class);
@@ -214,16 +215,16 @@ public class CellFunctionConfig {
 	 * @param responderProtocol
 	 * @return
 	 */
-	public CellFunctionConfig setResponderProtocol(String responderProtocol) {
-		this.configObject.addProperty(RESPONDERPROTOCOL, responderProtocol);
+	public CellFunctionConfig setCommunicatorTimeout(int timeout) {
+		this.configObject.addProperty(COMMUNICATORTIMEOUT, timeout);
 		return this;
 	}
 
 	/**
 	 * @return
 	 */
-	public String getResponderProtocol() {
-		return this.getProperty(RESPONDERPROTOCOL, "");
+	public JsonPrimitive getCommunicatorTimeout() {
+		return this.configObject.getAsJsonPrimitive(COMMUNICATORTIMEOUT);
 	}
 
 	// public JsonPrimitive getRegisterState() {

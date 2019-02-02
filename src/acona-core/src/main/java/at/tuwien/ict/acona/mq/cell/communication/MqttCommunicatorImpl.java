@@ -316,7 +316,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 				// Get the message answer from the map
 				result = this.incomingRequestMessages.getOrDefault(correlationID, new Response(request, new RequestError("Timeout error")));
 				if (result.hasError() == true) {
-					log.error("Timeout after {}ms. No response from request on correlationID {}, topic {}, request={}", timeout, correlationID, dpPublish, request);
+					log.error("Function={}>Timeout after {}ms. No response from request on correlationID {}, topic {}, request={}", this.cellfunction.getFunctionName(), timeout, correlationID, dpPublish, request);
 					throw new Exception("Timeout after " + timeout + "ms. No response from request on topic " + dpPublish);
 				}
 				this.incomingRequestMessages.remove(correlationID);

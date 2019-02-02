@@ -1,21 +1,27 @@
 <configuration debug="true">
+  <property name="DEV_HOME" value="log/ACO"/>
+  <property name="logFileName" value="acolog"/>
+  <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+  
+  
   <evaluator name="TEST_EVALUATOR">
     <expression>logger.contains("ControlGateway") &amp;&amp;
 	message.contains("TestTest")</expression>
   </evaluator>
   
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet" level="INFO" />
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction" level="INFO" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl" level="WARN" />
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.mq.cell.core.cellfunction.codelets.helpers" level="DEBUG" />
-  <logger name="at.tuwien.ict.acona.mq.cell.core" level="DEBUG" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core.cellfunction.codelets.helpers" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.core" level="INFO" />
   <logger name="at.tuwien.ict.acona.mq.cell.storage" level="WARN" />
-  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions" level="INFO" />
   <logger name="at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.CFStateGenerator" level="WARN" />
   <logger name="at.tuwien.ict.acona.mq.cell.communication" level="WARN" />
+  <logger name="at.tuwien.ict.acona.mq.cell.communication.MqttCommunicatorImpl" level="WARN" />
   <logger name="org.eclipse.jetty" level="WARN"/>
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -40,7 +46,36 @@
 	  <!--<pattern>%-20(%date{HH:mm:ss.SSS} [%thread]) %highlight(%-5level) %cyan(%logger{20}) - %msg %n%ex{full}</pattern>-->
     </encoder>
   </appender>
-  <root level="DEBUG">
+  
+  <appender name="csv" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${DEV_HOME}/acolog-${bySecond}.log</file>
+
+		<rollingPolicy
+				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+				<FileNamePattern>${DEV_HOME}/archived/acolog-${bySecond}.%i.log.zip
+				</FileNamePattern>
+				<MinIndex>1</MinIndex>
+				<MaxIndex>100</MaxIndex>
+		</rollingPolicy>
+
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d{HH:mm:ss.SSS};%msg%n</Pattern>
+		</encoder>
+
+  </appender>
+  
+  <!-- CSV logger -->
+  <logger name="csvbody">
+    <level value="DEBUG" />
+    <appender-ref ref="csv" />
+  </logger>
+  
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

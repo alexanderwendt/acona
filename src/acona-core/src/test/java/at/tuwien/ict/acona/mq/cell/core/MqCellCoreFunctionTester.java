@@ -1213,7 +1213,7 @@ public class MqCellCoreFunctionTester {
 			}
 			
 
-			this.launcher.getAgent(agentName).addCellFunction(functionConf);
+			this.launcher.getAgent(agentName).addFunction(functionConf);
 			
 			
 			synchronized (this) {

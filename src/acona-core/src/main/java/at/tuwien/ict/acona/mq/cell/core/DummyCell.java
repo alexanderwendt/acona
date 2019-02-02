@@ -48,7 +48,7 @@ public class DummyCell implements Cell {
 	}
 
 	@Override
-	public void addCellFunction(CellFunctionConfig cellFunctionConfig) throws Exception {
+	public void addFunction(CellFunctionConfig cellFunctionConfig) throws Exception {
 		// TODO Auto-generated method stub
 
 	}
