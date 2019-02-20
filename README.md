@@ -33,6 +33,7 @@ Use gradle to download all necessary libraries. For most of the projects, the se
 
 In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. in massOfSubscribersTest(), a chain of subscribing agents is demonstrated.
 
+
 Acona Documentation
 ====================================================
 A comprehensive documentation of the ACONA framework can be found within the repository in the folder https://github.com/aconaframework/acona/blob/master/docs/Acona_Manual/. 
