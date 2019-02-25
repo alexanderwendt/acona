@@ -39,11 +39,10 @@ The repository consists of the following folders
 
 There are multiple projects in the /src folder: 
 _obsolete: The former ACONA project that was based on Java JADE.
-acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function.
+acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function. The cognitive architecture has been presented in [2] and [4]
 
 
-![Cognitive Architecture with ACONA](docs/Support/KORE_Cognitive_Architecture.png?raw=true "Cognitive Architecture with ACONA" | width=100)
-
+<img src="docs/Support/KORE_Cognitive_Architecture.png" width="700">
 
 **acona-core**: The acona-core is the framework core, which is the base for all other projects. 
 acona-demo-webservice: A demo project, where ACONA implemented webservices to check the weather on some places
@@ -74,13 +73,13 @@ First, the motivation and the goals of the project are explained. Then the archi
 It is followed by an installation guide for eclipse and a tutorial to setup your first running ACONA application.
 
 The ACONA framework has been described in the following scientific publications:
-- Wendt, A., Wilker, S., Meisel, M., Sauter, T.: A Multi-Agent-Based Middleware for the Development of Complex Architectures, to be published in proceedings of 27th International Symposium on Industrial Electronics 2018 (ISIE), Australia, 2018
-- Wendt, A., Kollmann, S., Siafara, L., Biletskiy, Y.: Usage of Cognitive Architectures in the Development of Industrial Applications. In proceedings of  the 10th International Conference on Agents and Artificial Intelligence, ICAART 2018, Portugal, ISBN: 978-989-758-275-2; pp. 94-101, 2018
-- Wendt, A., Sauter, T.: Agent-Based Cognitive Architecture Framework. in proceedings of IEEE 21th Conference on Emerging Technologies & Factory Automation (ETFA), DOI: 10.1109/ETFA.2016.7733696, Berlin, Germany, 2016
+- [1] Wendt, A., Wilker, S., Meisel, M., Sauter, T.: A Multi-Agent-Based Middleware for the Development of Complex Architectures, to be published in proceedings of 27th International Symposium on Industrial Electronics 2018 (ISIE), Australia, 2018, url: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8433676
+- [2] Wendt, A., Kollmann, S., Siafara, L., Biletskiy, Y.: Usage of Cognitive Architectures in the Development of Industrial Applications. In proceedings of  the 10th International Conference on Agents and Artificial Intelligence, ICAART 2018, Portugal, ISBN: 978-989-758-275-2; pp. 94-101, 2018, url: https://publik.tuwien.ac.at/files/publik_268552.pdf
+- [3] Wendt, A., Sauter, T.: Agent-Based Cognitive Architecture Framework. in proceedings of IEEE 21th Conference on Emerging Technologies & Factory Automation (ETFA), DOI: 10.1109/ETFA.2016.7733696, Berlin, Germany, 2016, url: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7733696
 
 The ACONA framework has been applied in projects of the following publications:
-- Zucker, G., Sporr, A., Kollmann, S., Wendt, A., Chaido, L. S., Fernbach, A: A Cognitive System Architecture for Building Energy Management. in IEEE Transactions on Industrial Informatics, vol. 14, no. 6, pp. 2521-2529 June 2018, doi: 10.1109/TII.2018.2815739, 2018
-- Zucker, G., Wendt, A., Siafara, L., Schaat, S.: A Cognitive Architecture for Building Automation, published in proceedings of Industrial Electronics Society, IECON 2016-42nd Annual Conference of the IEEE, pp 6919-6924, DOI: 10.1109/IECON.2016.7793798, Florence, Italy, 2016
+- [4] Zucker, G., Sporr, A., Kollmann, S., Wendt, A., Chaido, L. S., Fernbach, A: A Cognitive System Architecture for Building Energy Management. in IEEE Transactions on Industrial Informatics, vol. 14, no. 6, pp. 2521-2529 June 2018, doi: 10.1109/TII.2018.2815739, 2018, url: https://ieeexplore.ieee.org/iel7/9424/8371343/08315469.pdf
+- [5] Zucker, G., Wendt, A., Siafara, L., Schaat, S.: A Cognitive Architecture for Building Automation, published in proceedings of Industrial Electronics Society, IECON 2016-42nd Annual Conference of the IEEE, pp 6919-6924, DOI: 10.1109/IECON.2016.7793798, Florence, Italy, 2016, url: https://publik.tuwien.ac.at/files/publik_258738.pdf
 
 
-![ACONA Logo](docs/Support/aconalogo.png?raw=true "Acona logo" | width=50)
+<img src="docs/Support/aconalogo.png" width="300">

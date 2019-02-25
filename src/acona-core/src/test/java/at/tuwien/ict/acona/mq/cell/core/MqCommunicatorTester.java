@@ -1,25 +1,10 @@
 package at.tuwien.ict.acona.mq.cell.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.Semaphore;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonPrimitive;
-
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionDummy;
-import at.tuwien.ict.acona.mq.cell.cellfunction.helper.RequesterResponseFunction;
-import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
-import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicatorImpl;
-import at.tuwien.ict.acona.mq.cell.storage.DataStorageImpl;
-import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
 public class MqCommunicatorTester {
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
