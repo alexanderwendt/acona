@@ -50,7 +50,7 @@ acona-demo-webservice: A demo project, where ACONA implemented webservices to ch
 acona-evolution-demonstration: A demo project to demonstrate evolutionary programming with trader agents in a stock market.
 
 
-<img src="docs/Support/Stock_Market_Example_V01.png" width="200">
+<img src="docs/Support/Stock_Market_Example_V01.png" width="500">
 
 
 Installation
