@@ -8,10 +8,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.DatapointBuilder;
+import com.google.gson.JsonElement;
+
 import at.tuwien.ict.acona.cognitivearchitecture.CognitiveProcess;
 import at.tuwien.ict.acona.cognitivearchitecture.datastructures.Option;
+import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
 public class SelectionCodelet extends CognitiveCodelet {
 
@@ -59,7 +61,7 @@ public class SelectionCodelet extends CognitiveCodelet {
 			Option selection = options.get(options.size() - 1).getValue(Option.class);
 			log.info("Selected option={}", selection);
 
-			this.getCommunicator().write(DatapointBuilder.newDatapoint(CognitiveProcess.SELECTEDOPTIONADDRESS).setValue(selection));
+			this.getCommunicator().write((new DPBuilder()).newDatapoint(CognitiveProcess.SELECTEDOPTIONADDRESS).setValue(selection));
 			log.info("Written selected option={}, address={}", selection, CognitiveProcess.SELECTEDOPTIONADDRESS);
 		} else {
 			log.info("No option was selected. The system will not perform any action");
@@ -67,9 +69,9 @@ public class SelectionCodelet extends CognitiveCodelet {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

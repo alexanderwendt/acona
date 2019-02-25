@@ -73,7 +73,7 @@ public class MqCellCoreFunctionTester {
 	}
 
 	/**
-	 * Create 1 cell. Write a value to the storage. Read the same value again.
+	 * Create 1 agent. Write a value to the storage. Read the same value again.
 	 * 
 	 */
 	@Test
@@ -112,7 +112,7 @@ public class MqCellCoreFunctionTester {
 	}
 
 	/**
-	 * Create 2 cells. Write a value from the client to the serve.r Read the same value again.
+	 * Create 2 cells. Write a value from the client to the server. Read the same value again. 2 agents are used here.
 	 * 
 	 */
 	@Test
@@ -145,56 +145,6 @@ public class MqCellCoreFunctionTester {
 			// Read that value from the server
 			String result = client.getCommunicator().read(agentNameServer + ":" + datapointAddress).getValueAsString();
 
-//			// Create the client agent
-//
-//			// Create inspectoragent
-//			CellGatewayImpl client = this.launchUtil
-//					.createAgent(CellConfig.newConfig("client", CellImpl.class.getName()));
-//			// Create receiver agent
-//			CellGatewayImpl receivergw = this.launchUtil
-//					.createAgent(CellConfig.newConfig(receiver, CellImpl.class.getName()));
-//
-//			synchronized (this) {
-//				try {
-//					this.wait(200);
-//				} catch (InterruptedException e) {
-//
-//				}
-//			}
-
-//			client.getCommunicator().setDefaultTimeout(100000);
-//			receivergw.getCommunicator().setDefaultTimeout(1000000);
-//			client.getCommunicator().write(receiver, DatapointBuilder.newDatapoint(datapointaddress).setValue(value));
-//			log.debug("Now read values");
-//			Datapoint resultdp = client.getCommunicator().read(receiver, datapointaddress, 1000000);
-//
-//			String result = resultdp.getValue().getAsString();
-//			log.info("Received result={}. Expected result={}", result, value);
-//
-//			synchronized (this) {
-//				try {
-//					this.wait(200);
-//				} catch (InterruptedException e) {
-//
-//				}
-//			}
-
-//			assertEquals(value, result);
-//			log.info("Test passed");
-
-//			int numberOfRuns = 2000;
-//
-//			final Semaphore sem = new Semaphore(0);
-//			RequesterResponseFunction responder = new RequesterResponseFunction();
-//			responder.init(sem, host, username, password, agentName, functionNameResponder, agentName + "/" + functionNameResponder + "/" + "increment", false);
-//
-//			RequesterResponseFunction requester = new RequesterResponseFunction();
-//			requester.setNumberOfRuns(200);
-//			requester.init(sem, host, username, password, agentName, functionNameRequester, agentName + "/" + functionNameResponder + "/" + "increment", true);
-
-			// Aquire run as both threads are finished
-//			sem.acquire();
-//
 			log.debug("correct value={}, actual value={}", value, result);
 			assertEquals(value, result);
 			log.info("Test passed");
@@ -264,7 +214,7 @@ public class MqCellCoreFunctionTester {
 	}
 
 	/**
-	 * Create 2 cells. Write a value from the client to the serve.r Read the same value again.
+	 * Create 2 agents. Test if one agent can subscribe a value from another agent.
 	 * 
 	 */
 	@Test
@@ -651,75 +601,18 @@ public class MqCellCoreFunctionTester {
 							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 
-//			SystemConfig totalConfig = SystemConfig.newConfig()
-//					.addController()
-//					.addMemory()
-//					.addService()
-//					.addService()
-//					.addService()
-//					.setTopController(controllerAgentName);
-
-			// this.launcher.createDebugUserInterface();
-
-			// this.launcher.init(totalConfig);
 			log.info("=== All agents initialized ===");
 
 			launcher.getAgent(memoryAgentName).getCommunicator()
 					.write(this.dpb.newDatapoint(processDatapoint).setValue(new JsonPrimitive(startValue)));
 			log.info("Datapoints on the way");
-			// memoryAgent.getCommunicator().write(Datapoint.newDatapoint(processDatapoint).setValue(new
-			// JsonPrimitive(startValue)));
-			// Start the system by setting start
-
-			// CellGateway controller = launcher.getTopController();
-
-			// Test the wrapper for controllers too
-			// ControllerCellGateway controllerCellGateway = new
-			// ControllerWrapper(controller);
 
 			controller.getCommunicator().execute(controller.getName() + ":" + controllerFunctionName + "/command", 
 					(new Request())
 					.setParameter("command", ControlCommand.START)
 					.setParameter("blocking", true), 100000);
-					
 
-			// controllerCellGateway.executeService("", "controllerservice", new
-			// JsonObject(), 10000);
-
-			//log.debug("Received state={}", state);
-
-			// Write the numbers in the database agents
-			// client1.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint1).setValue(String.valueOf(value1)));
-			// client2.getCommunicator().write(Datapoint.newDatapoint(memorydatapoint2).setValue(String.valueOf(value2)));
-			//
-			// //Query the service with start and then get the status
-			// //Set default timeout to a high number to be able to debug
-			// controlAgent.getCommunicator().setDefaultTimeout(100000);
-			// log.debug("Execute query");
-			// Datapoint resultState =
-			// controlAgent.getCommunicator().query(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive(ControlCommand.START.toString())),
-			// additionAgentName, Datapoint.newDatapoint(STATUSDATAPOINTNAME),
-			// additionAgentName, 100000);
-			// log.debug("Query executed with result={}", resultState);
-			//
-			// double sum = controlAgent.getCommunicator().read(resultdatapoint,
-			// outputmemoryAgentName).getValue().getAsJsonPrimitive().getAsDouble();
-			// client1.getCell().getCommunicator().write(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive("START")), drivetrackAgentName);
-			// this.comm.sendAsynchronousMessageToAgent(Message.newMessage().addReceiver(drivetrackAgentName).setContent(Datapoint.newDatapoint(commandDatapoint).setValue(new
-			// JsonPrimitive("START"))).setService(AconaServiceType.WRITE));
-
-			// synchronized (this) {
-			// try {
-			// this.wait(6000);
-			// } catch (InterruptedException e) {
-			//
-			// }
-			// }
-
-			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue()
-					.getAsDouble();
+			double result = launcher.getAgent(memoryAgentName).getCommunicator().read(processDatapoint).getValue().getAsDouble();
 
 			log.debug("correct value={}, actual value={}", expectedResult, result);
 

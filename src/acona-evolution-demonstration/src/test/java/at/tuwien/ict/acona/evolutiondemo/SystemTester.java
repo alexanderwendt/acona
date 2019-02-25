@@ -4,37 +4,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
-
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Broker;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Evaluator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
-import at.tuwien.ict.acona.evolutiondemo.brokeragent.SpeciesType;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.EMAIndicator;
-import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.RandomBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
-import at.tuwien.ict.acona.evolutiondemo.webserver.EvolutionService;
-import at.tuwien.ict.acona.evolutiondemo.webserver.JerseyRestServer;
 import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.SimpleReproduction;
@@ -42,9 +28,7 @@ import at.tuwien.ict.acona.mq.cell.config.CellConfig;
 import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.mq.cell.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
-import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
-import at.tuwien.ict.acona.mq.datastructures.Response;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 
 public class SystemTester {

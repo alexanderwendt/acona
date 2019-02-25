@@ -18,7 +18,7 @@ dependencies {
 	compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
 
 	//JADE
-	compile group: 'com.tilab.jade', name: 'jade', version: '4.5.0'
+	//compile group: 'com.tilab.jade', name: 'jade', version: '4.5.0'
 
 	//Jersey server for REST
    	//compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.26'
@@ -57,7 +57,7 @@ dependencies {
 	
     
     
-    compile project(':acona-cell')
+    compile project(':acona-core')
     //compile project(':ConfigurationManager')
 	//compile project(':CommonTools')
 	//compile project(':UserConsole')

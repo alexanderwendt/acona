@@ -1,11 +1,6 @@
 package at.tuwien.ict.acona.evolutiondemo.launcher;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -18,13 +13,10 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFun
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Evaluator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
-import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceLoaderGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.EMAIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
-import at.tuwien.ict.acona.evolutiondemo.webserver.EvolutionService;
-import at.tuwien.ict.acona.evolutiondemo.webserver.JerseyRestServer;
 import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
 import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
 import at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.SimpleReproduction;

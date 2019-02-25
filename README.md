@@ -7,6 +7,7 @@ The framework offers the following features:
  - Loose coupling between modules:
     - JSON Message-based communication
 	- Remote Procedure Calls
+	- Services
     - Encapsulation of functions within agents
     - Independent development of modules, which are connected through a system of services and datapoints.
    
@@ -17,24 +18,43 @@ The framework offers the following features:
 	- Combination of atomic building blocks into complex structures
 	
  - Maintainability:
-	- Developer friendly debugging possibilites, where the developer can access all agent cell functions at any time
+	- Developer friendly debugging possibilites, where the developer can access all agent agent functions at any time
 	- Possibility to unit test all functions through blocking caller functions of agents
 
-The agent base is Java Jade (http://jade.tilab.com). Each agent, which is called a cell, consists of a JSON configuration string, an internal data storage and one or more cell functions.
-The cell functions provide a range of possibilites to program an agent: A function can be automatically run in a certain interval or it can be triggered either directly from another function through a 
-JSON-RPC call or through a datapoint in the internal data storage.
+The communication base between modules is the popular IoT protocol MQTT. For this implementation, the Mosuitto MQTT messagebus was used together with the Paho library. Each agent 
+consists of a JSON configuration string, an internal data storage and one or more agent functions. The agent functions provide a range of possibilites to program an agent: 
+A function can be automatically run in a certain interval or it can be triggered either directly from another function through an RPC call or through the subscription of a datapoint 
+in the internal data storage.
 
-Installation
-====================================================
-Once you have downloaded the repository, there are multiple projects in the /src folder: The acona-cell is the framework. The project acona-evolution-demonstration is a multi agent system created to demonstrate 
+Repository
+==================================================== 
+The repository consists of the following folders
+/
+
+
+There are multiple projects in the /src folder: 
+_obsolete: The former ACONA project that was based on Java JADE.
+acona-core: The acona-core is the framework core, which is the base for all other projects. 
+acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function.
+
+![Cognitive Architecture with ACONA](docs/Support/KORE_Cognitive_Architecture.png?raw=true "Cognitive Architecture with ACONA")
+
+The project acona-evolution-demonstration is a multi agent system created to demonstrate 
 evolutionary programming for a stock market trading example. 
+
+![Evolutionary Programming in Stock Market Example](docs/Support/Stock_Market_Example_V01.png?raw=true "Evolutionary Programming in the Stock Market")
 
 Use gradle to download all necessary libraries. For most of the projects, the settings.gradle has to be either added or adapted. For the acona-evolution-demonstration, a custom project with a user console can be downloaded here: https://github.com/aconaframework/commonutils 
 
 In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. in massOfSubscribersTest(), a chain of subscribing agents is demonstrated.
 
 
-Acona Documentation
+
+Installation
+====================================================
+Once you have downloaded the repository from git@github.com:aconaframework/acona.git with an SSH key, 
+
+ACONA Documentation
 ====================================================
 A comprehensive documentation of the ACONA framework can be found within the repository in the folder https://github.com/aconaframework/acona/blob/master/docs/Acona_Manual/. 
 First, the motivation and the goals of the project are explained. Then the architecture is described very close to the actual code.
@@ -50,3 +70,4 @@ The ACONA framework has been applied in projects of the following publications:
 - Zucker, G., Wendt, A., Siafara, L., Schaat, S.: A Cognitive Architecture for Building Automation, published in proceedings of Industrial Electronics Society, IECON 2016-42nd Annual Conference of the IEEE, pp 6919-6924, DOI: 10.1109/IECON.2016.7793798, Florence, Italy, 2016
 
 
+![ACONA Logo](docs/Support/aconalogo.png?raw=true "Acona logo")

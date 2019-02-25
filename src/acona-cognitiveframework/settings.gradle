@@ -16,7 +16,7 @@ include 'services:webservice'
 */
 
 //Include a project from the drive
-include ':acona-cell'
+include ':acona-core'
 //include ':ConfigurationManager'
 //include ':CommonTools'
 //include ':UserConsole'
@@ -28,7 +28,7 @@ include ':acona-cell'
 
 //include ':OntologyConnector'
 
-project(':acona-cell').projectDir = new File('../acona/src/acona-cell')
+project(':acona-core').projectDir = new File('../acona-core')
 //project(':ConfigurationManager').projectDir = new File('C:/Projekte/11_CommonUtils/commonutils/src/ConfigurationManager')
 
 

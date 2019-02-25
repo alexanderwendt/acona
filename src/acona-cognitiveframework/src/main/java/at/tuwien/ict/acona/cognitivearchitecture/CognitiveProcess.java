@@ -1,16 +1,16 @@
 package at.tuwien.ict.acona.cognitivearchitecture;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet;
-import at.tuwien.ict.acona.cell.cellfunction.specialfunctions.CFStateGenerator;
-import at.tuwien.ict.acona.cell.config.CellConfig;
-import at.tuwien.ict.acona.cell.config.CellFunctionConfig;
 import at.tuwien.ict.acona.cognitivearchitecture.frameworkcodelets.ActionExecutionCodelet;
 import at.tuwien.ict.acona.cognitivearchitecture.frameworkcodelets.SelectionCodelet;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionHandlerTriggerCodelet;
+import at.tuwien.ict.acona.mq.cell.config.CellConfig;
+import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
 
 public class CognitiveProcess {
 
@@ -103,78 +103,78 @@ public class CognitiveProcess {
 		// Controller
 		CellConfig cognitiveAgentConfig = CellConfig.newConfig(cognitiveAgentName)
 				// Cellfunctions
-				.addCellfunction(CellFunctionConfig.newConfig(stateCollectorName, CFStateGenerator.class)
-						.setGenerateReponder(true)) // Responder active to be called
+				//.addFunction(CellFunctionConfig.newConfig(stateCollectorName, CFStateGenerator.class)
+				//		.setGenerateReponder(true)) // Responder active to be called
 				// Main codelethandler
-				.addCellfunction(CellFunctionConfig.newConfig(mainCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(mainCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
 
 				// Process codelethandlers
-				.addCellfunction(CellFunctionConfig.newConfig(startCleanCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(startCleanCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				.addCellfunction(CellFunctionConfig.newConfig(activateConceptsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(activateConceptsCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				.addCellfunction(CellFunctionConfig.newConfig(createGoalsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(createGoalsCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				.addCellfunction(CellFunctionConfig.newConfig(activateBeliefsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(activateBeliefsCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				.addCellfunction(CellFunctionConfig.newConfig(immediateActionsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(immediateActionsCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				.addCellfunction(CellFunctionConfig.newConfig(proposeOptionsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(proposeOptionsCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				// .addCellfunction(CellFunctionConfig.newConfig(proposeActionsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				// .addFunction(CellFunctionConfig.newConfig(proposeActionsCodeletHandlerName, CellFunctionCodeletHandler.class)
 				// .setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 				// .setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
-				.addCellfunction(CellFunctionConfig.newConfig(evaluteOptionsCodeletHandlerName, CellFunctionCodeletHandler.class)
+				.addFunction(CellFunctionConfig.newConfig(evaluteOptionsCodeletHandlerName, CellFunctionCodeletHandler.class)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEWORKINGMEMORYADDRESS, namespaceWorkingMemory)
 						.setProperty(CellFunctionCodeletHandler.ATTRIBUTEINTERNALMEMORYADDRESS, namespaceInternalStateMemory))
 
 				// Add trigger codelets that trigger the subcodelets
-				.addCellfunction(CellFunctionConfig.newConfig(startCleanCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(startCleanCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 1)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + startCleanCodeletHandlerName))
-				.addCellfunction(CellFunctionConfig.newConfig(activateConceptsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(activateConceptsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 2)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + activateConceptsCodeletHandlerName))
-				.addCellfunction(CellFunctionConfig.newConfig(createGoalsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(createGoalsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 3)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + createGoalsCodeletHandlerName))
-				.addCellfunction(CellFunctionConfig.newConfig(activateBeliefsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(activateBeliefsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 4)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + activateBeliefsCodeletHandlerName))
-				.addCellfunction(CellFunctionConfig.newConfig(immediateActionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(immediateActionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 5)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + immediateActionsCodeletHandlerName))
-				.addCellfunction(CellFunctionConfig.newConfig(proposeOptionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(proposeOptionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 6)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + proposeOptionsCodeletHandlerName))
-				// .addCellfunction(CellFunctionConfig.newConfig(proposeActionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				// .addFunction(CellFunctionConfig.newConfig(proposeActionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 				// .setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 				// .setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, "5")
 				// .setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + proposeActionsCodeletHandlerName))
-				.addCellfunction(CellFunctionConfig.newConfig(evaluteOptionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(evaluteOptionsCodeletTriggerName, CellFunctionHandlerTriggerCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 7)
 						.setProperty(CellFunctionHandlerTriggerCodelet.codeletHandlerServiceUriName, cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName))
 
 				// Direct codelets
-				.addCellfunction(CellFunctionConfig.newConfig(selectOptionCodeletName, SelectionCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(selectOptionCodeletName, SelectionCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 8))
-				.addCellfunction(CellFunctionConfig.newConfig(executeActionCodeletName, ActionExecutionCodelet.class)
+				.addFunction(CellFunctionConfig.newConfig(executeActionCodeletName, ActionExecutionCodelet.class)
 						.setProperty(CellFunctionCodelet.ATTRIBUTECODELETHANDLERADDRESS, mainCodeletHandlerServiceAddress)
 						.setProperty(CellFunctionCodelet.ATTRIBUTEEXECUTIONORDER, 9));
 

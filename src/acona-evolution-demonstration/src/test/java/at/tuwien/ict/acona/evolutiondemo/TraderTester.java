@@ -110,6 +110,8 @@ public class TraderTester {
 
 			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
+							.setProperty(Broker.PARAMPRICESOURCE, "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
@@ -388,6 +390,8 @@ public class TraderTester {
 			// Broker Agent
 			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
+							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
@@ -505,6 +509,8 @@ public class TraderTester {
 			// Broker Agent
 			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
 					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
+							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
 					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data")));

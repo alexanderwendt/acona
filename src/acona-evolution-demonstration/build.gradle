@@ -57,7 +57,7 @@ dependencies {
     compile 'org.fusesource.jansi:jansi:1.11'
 	//compile project(':acona-jadecommunicator')
 	compile project(':acona-core')
-	compile project(':simple-user-console')
+	//compile project(':simple-user-console')
 	
     
     //Jade library

@@ -10,13 +10,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcRequest;
-import at.tuwien.ict.acona.cell.datastructures.JsonRpcResponse;
 import at.tuwien.ict.acona.cognitivearchitecture.CognitiveProcess;
 import at.tuwien.ict.acona.cognitivearchitecture.datastructures.Option;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
+import at.tuwien.ict.acona.mq.datastructures.Request;
+import at.tuwien.ict.acona.mq.datastructures.Response;
 
 public class ActionExecutionCodelet extends CognitiveCodelet {
 
@@ -52,9 +53,8 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 				}
 
 				log.debug("Service name={}, method={}, parameters={}", serviceName, method, parameterList);
-
-				JsonRpcRequest req = new JsonRpcRequest(method, false, parameter);
-				JsonRpcResponse result = this.getCommunicator().execute(serviceName, req);
+				Request req = new Request(method, false, parameter);
+				Response result = this.getCommunicator().execute(serviceName, req);
 
 				if (result.hasError() == true) {
 					log.error("ERROR: The execution of the action failed. The error message is={}", result);
@@ -110,9 +110,9 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 	}
 
 	@Override
-	protected void updateDatapointsByIdOnThread(Map<String, Datapoint> data) {
+	protected void updateCustomDatapointsById(String id, JsonElement data) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

@@ -10,11 +10,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.cell.datastructures.Datapoint;
 import at.tuwien.ict.acona.cognitivearchitecture.CognitiveProcess;
 import at.tuwien.ict.acona.cognitivearchitecture.datastructures.Goal;
 import at.tuwien.ict.acona.cognitivearchitecture.datastructures.Option;
+import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
 public abstract class CognitiveCodelet extends CellFunctionCodelet {
 	private final static Logger log = LoggerFactory.getLogger(CognitiveCodelet.class);

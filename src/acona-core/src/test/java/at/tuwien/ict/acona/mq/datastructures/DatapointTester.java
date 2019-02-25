@@ -54,7 +54,7 @@ public class DatapointTester {
 	public void datapointConversionTest() {
 		log.info("Start datapoint conversion tester");
 		try {
-			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"VALUE\":\"Wrong value\"}";
+			String input = "{\"ADDRESS\":\"subscribe.test.address\",\"AGENT\":\"agent1\",\"VALUE\":\"Wrong value\"}";
 			// String input = "{\"ADDRESS\":\"subscribe.test.address\",\"TYPE\":\"\",\"VALUE\":\"MuHaahAhaAaahAAHA\"}";
 
 			Datapoint dp = dpb.toDatapoint(input);

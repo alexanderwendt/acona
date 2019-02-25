@@ -1,26 +1,12 @@
 package at.tuwien.ict.acona.evolutiondemo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.lang.invoke.MethodHandles;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
-import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
-import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.PriceGraphToolFunction;
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
 

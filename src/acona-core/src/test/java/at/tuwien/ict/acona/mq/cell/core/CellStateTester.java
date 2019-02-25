@@ -201,8 +201,8 @@ public class CellStateTester {
 
 			String processDatapoint = "workingmemory.changeme";
 			// values
-			double startValue = 1;
-			ServiceState expectedResult = ServiceState.FINISHED;
+			//double startValue = 1;
+			//ServiceState expectedResult = ServiceState.FINISHED;
 
 			// Agent with handler and 2 codelets
 			CellConfig codeletAgentConfig = CellConfig.newConfig(controllerAgentName)
@@ -232,11 +232,11 @@ public class CellStateTester {
 			log.info("=== All agents initialized ===");
 
 			log.debug("Send request to codeletHandler and see that it fails because the condition does not match");
-			controller.getCommunicator().execute(controllerAgentName + ":" + handlerName + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controller.getCommunicator().executeAsynchronous(controllerAgentName + ":" + handlerName + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request());
 
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(100);
 				} catch (InterruptedException e) {
 
 				}
