@@ -29,30 +29,36 @@ in the internal data storage.
 Repository
 ==================================================== 
 The repository consists of the following folders
-/
-
+/archive: Place for old deploys
+/conf: Common logback configuration files for the use with the acona framework
+/data: Data used for the projects
+/deploy: Compiled, running versions
+/docs: Project documentation
+/logs: Place for log files
+/src: Source files
 
 There are multiple projects in the /src folder: 
 _obsolete: The former ACONA project that was based on Java JADE.
-acona-core: The acona-core is the framework core, which is the base for all other projects. 
 acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function.
+acona-core: The acona-core is the framework core, which is the base for all other projects. 
 
 ![Cognitive Architecture with ACONA](docs/Support/KORE_Cognitive_Architecture.png?raw=true "Cognitive Architecture with ACONA")
 
-The project acona-evolution-demonstration is a multi agent system created to demonstrate 
-evolutionary programming for a stock market trading example. 
+acona-demo-webservice: A demo project, where ACONA implemented webservices to check the weather on some places
+acona-evolution-demonstration: A demo project to demonstrate evolutionary programming with trader agents in a stock market.
 
 ![Evolutionary Programming in Stock Market Example](docs/Support/Stock_Market_Example_V01.png?raw=true "Evolutionary Programming in the Stock Market")
+
+
+Installation
+====================================================
+Once you have downloaded the repository from git@github.com:aconaframework/acona.git with an SSH key, 
 
 Use gradle to download all necessary libraries. For most of the projects, the settings.gradle has to be either added or adapted. For the acona-evolution-demonstration, a custom project with a user console can be downloaded here: https://github.com/aconaframework/commonutils 
 
 In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. in massOfSubscribersTest(), a chain of subscribing agents is demonstrated.
 
 
-
-Installation
-====================================================
-Once you have downloaded the repository from git@github.com:aconaframework/acona.git with an SSH key, 
 
 ACONA Documentation
 ====================================================
