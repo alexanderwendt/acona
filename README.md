@@ -40,24 +40,32 @@ The repository consists of the following folders
 There are multiple projects in the /src folder: 
 _obsolete: The former ACONA project that was based on Java JADE.
 acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function.
-acona-core: The acona-core is the framework core, which is the base for all other projects. 
 
-![Cognitive Architecture with ACONA](docs/Support/KORE_Cognitive_Architecture.png?raw=true "Cognitive Architecture with ACONA")
 
+![Cognitive Architecture with ACONA](docs/Support/KORE_Cognitive_Architecture.png?raw=true "Cognitive Architecture with ACONA" | width=100)
+
+
+**acona-core**: The acona-core is the framework core, which is the base for all other projects. 
 acona-demo-webservice: A demo project, where ACONA implemented webservices to check the weather on some places
 acona-evolution-demonstration: A demo project to demonstrate evolutionary programming with trader agents in a stock market.
 
-![Evolutionary Programming in Stock Market Example](docs/Support/Stock_Market_Example_V01.png?raw=true "Evolutionary Programming in the Stock Market")
+
+![Evolutionary Programming in Stock Market Example](docs/Support/Stock_Market_Example_V01.png?raw=true "Evolutionary Programming in the Stock Market" | width=100)
+
 
 
 Installation
 ====================================================
-Once you have downloaded the repository from git@github.com:aconaframework/acona.git with an SSH key, 
+1. Downloaded or clone the repository from https://github.com/aconaframework/acona.git.
+2. Install node.js and Ponte to get the Mosuitto MQTT Broker. Urls: https://nodejs.org/en/ and https://www.npmjs.com/package/ponte
+3. Import the projects in e.g. eclipse with gradle to get the necessary libraries. For most of the projects, the settings.gradle has to be either added or adapted.
 
-Use gradle to download all necessary libraries. For most of the projects, the settings.gradle has to be either added or adapted. For the acona-evolution-demonstration, a custom project with a user console can be downloaded here: https://github.com/aconaframework/commonutils 
+In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. 
+in at.tuwien.ict.acona.mq.cell.core.MqCellCoreFunctionTester.chainOfSubscribersTest(), a chain of subscribing agents is demonstrated. 
 
-In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. in massOfSubscribersTest(), a chain of subscribing agents is demonstrated.
-
+To get an adapted log, you can setup your run configurations to use the logback configuration files in the /conf folder. 
+Working directory: ${workspace_loc}/acona
+VM arguments: -Dlogback.configurationFile=conf/logback.xml or any other file of the configuration
 
 
 ACONA Documentation
@@ -76,4 +84,4 @@ The ACONA framework has been applied in projects of the following publications:
 - Zucker, G., Wendt, A., Siafara, L., Schaat, S.: A Cognitive Architecture for Building Automation, published in proceedings of Industrial Electronics Society, IECON 2016-42nd Annual Conference of the IEEE, pp 6919-6924, DOI: 10.1109/IECON.2016.7793798, Florence, Italy, 2016
 
 
-![ACONA Logo](docs/Support/aconalogo.png?raw=true "Acona logo")
+![ACONA Logo](docs/Support/aconalogo.png?raw=true "Acona logo" | width=50)

@@ -18,7 +18,7 @@ include 'services:webservice'
 include ':acona-core'
 project(':acona-core').projectDir = new File('../acona-core')
 
-//include ':simple-user-console'
-//project(':simple-user-console').projectDir = new File('../../../commonutils/src/simple-user-console/')
+//include ':UserConsole'
+//project(':UserConsole').projectDir = new File('C:/Projekte/11_CommonUtils/commonutils/src/UserConsole')
 
-rootProject.name = 'acona-evolution-demonstration'
+rootProject.name = 'acona-demo-webservice'
