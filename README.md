@@ -29,24 +29,24 @@ in the internal data storage.
 Repository
 ==================================================== 
 The repository consists of the following folders
-/archive: Place for old deploys
-/conf: Common logback configuration files for the use with the acona framework
-/data: Data used for the projects
-/deploy: Compiled, running versions
-/docs: Project documentation
-/logs: Place for log files
-/src: Source files
+- /archive: Place for old deploys
+- /conf: Common logback configuration files for the use with the acona framework
+- /data: Data used for the projects
+- /deploy: Compiled, running versions
+- /docs: Project documentation
+- /logs: Place for log files
+- /src: Source files
 
 There are multiple projects in the /src folder: 
-_obsolete: The former ACONA project that was based on Java JADE.
-acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function. The cognitive architecture has been presented in [2] and [4]
+- _obsolete: The former ACONA project that was based on Java JADE.
+- acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function. The cognitive architecture has been presented in [2] and [4]
 
 
 <img src="docs/Support/KORE_Cognitive_Architecture.png" width="700">
 
-**acona-core**: The acona-core is the framework core, which is the base for all other projects. 
-acona-demo-webservice: A demo project, where ACONA implemented webservices to check the weather on some places
-acona-evolution-demonstration: A demo project to demonstrate evolutionary programming with trader agents in a stock market.
+- **acona-core**: The acona-core is the framework core, which is the base for all other projects. 
+- acona-demo-webservice: A demo project, where ACONA implemented webservices to check the weather on some places
+- acona-evolution-demonstration: A demo project to demonstrate evolutionary programming with trader agents in a stock market.
 
 
 <img src="docs/Support/Stock_Market_Example_V01.png" width="500">
