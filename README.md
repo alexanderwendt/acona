@@ -54,9 +54,12 @@ There are multiple projects in the /src folder:
 
 Installation
 ====================================================
-1. Downloaded or clone the repository from https://github.com/aconaframework/acona.git.
-2. Install node.js and Ponte to get the Mosuitto MQTT Broker. Urls: https://nodejs.org/en/ and https://www.npmjs.com/package/ponte
-3. Import the projects in e.g. eclipse with gradle to get the necessary libraries. For most of the projects, the settings.gradle has to be either added or adapted.
+1. Download and install the latest JAVA SDK 10+ or OpenSDK 10+. Acona uses Map.of(...), which is a feature of Java 10
+2. Downloaded or clone the repository from https://github.com/aconaframework/acona.git.
+3. Install node.js and Ponte to get the Mosuitto MQTT Broker. Urls: https://nodejs.org/en/ and https://www.npmjs.com/package/ponte
+4. Import the projects in e.g. eclipse with gradle to get the necessary libraries. For most of the projects, the settings.gradle has to be either added or adapted.
+
+Optional: To observe the values of the MQTT broker, the MQTTBox client is recommended to use. It can be downloaded from here: http://workswithweb.com/html/mqttbox/downloads.html
 
 In the src/test/java, the unit tests are put. The unit tests present good examples of how to use the framework, e.g. 
 in at.tuwien.ict.acona.mq.cell.core.MqCellCoreFunctionTester.chainOfSubscribersTest(), a chain of subscribing agents is demonstrated. 
