@@ -19,3 +19,7 @@ RemoteSystemsTempFiles
 /src/acona-cognitiveframework/gradlew
 /src/acona-cognitiveframework/gradlew.bat
 /src/acona-cognitiveframework/settings.gradle
+/src/acona-exp-distribution/gradlew.bat
+/src/acona-exp-distribution/settings.gradle
+/src/acona-exp-distribution/.project
+/src/acona-exp-distribution/gradlew
