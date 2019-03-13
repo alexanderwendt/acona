@@ -630,6 +630,12 @@ public abstract class CellFunctionImpl implements CellFunction {
 		return functionRootAddress;
 	}
 
+	/**
+	 * Adds the function rott address in front of the a suffix address
+	 * 
+	 * @param suffix
+	 * @return
+	 */
 	protected String enhanceWithRootAddress(String suffix) {
 		return this.getFunctionRootAddress() + "/" + suffix;
 	}
