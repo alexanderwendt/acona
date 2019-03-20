@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 
 /**
  * @author wendt A cell function that starts the jetty server and acts as a gateway for jetty to access the cognitive system
  */
-public class JerseyRestServer extends CellFunctionThreadImpl {
+public class JerseyRestServer extends AgentFunctionThreadImpl {
 	private final static Logger log = LoggerFactory.getLogger(JerseyRestServer.class);
 
 	private final static int PORT = 8001;

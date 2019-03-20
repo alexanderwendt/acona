@@ -10,13 +10,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
+import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
-public class Broker extends CellFunctionThreadImpl {
+public class Broker extends AgentFunctionThreadImpl {
 
 	// private Map<String, List<String>> agentTypeMap = new HashMap<String, List<String>>(); //Type, agentname
 	private static final Logger log = LoggerFactory.getLogger(Broker.class);
@@ -125,7 +125,7 @@ public class Broker extends CellFunctionThreadImpl {
 	}
 
 	private Depot getDepot(String agentName) throws JsonSyntaxException, Exception {
-		return gson.fromJson(this.getCommunicator().read(this.getCellName() + ":" + this.createDepotAddress(agentName)).getValue(), Depot.class);
+		return gson.fromJson(this.getCommunicator().read(this.getAgentName() + ":" + this.createDepotAddress(agentName)).getValue(), Depot.class);
 	}
 
 	private Response getDepotAsJson(Request req) {
@@ -133,7 +133,7 @@ public class Broker extends CellFunctionThreadImpl {
 		
 		try {
 			String agentName = req.getParameter("agentname", String.class);
-			result.setResult(this.getCommunicator().read(this.getCellName() + ":" + this.createDepotAddress(agentName)).getValue());
+			result.setResult(this.getCommunicator().read(this.getAgentName() + ":" + this.createDepotAddress(agentName)).getValue());
 			
 		} catch (Exception e) {
 			log.error("Cannot get depot", e);

@@ -22,10 +22,10 @@ import com.google.gson.reflect.TypeToken;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -81,9 +81,9 @@ public class KoreUITester {
 			//String weatherAgent2Name = "WeatherAgent2"; 
 			String datageneratorservice = "DataStructureGenerator";
 
-			CellConfig cf = CellConfig.newConfig(DataStructureAgent1Name)
-					.addFunction(CellFunctionConfig.newConfig(datageneratorservice, KoreDataStructureGeneratorMock.class))
-					.addFunction(CellFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+			AgentConfig cf = AgentConfig.newConfig(DataStructureAgent1Name)
+					.addFunction(AgentFunctionConfig.newConfig(datageneratorservice, KoreDataStructureGeneratorMock.class))
+					.addFunction(AgentFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint("KORE", DataStructureAgent1Name + ":" + datageneratorservice + "/result", SyncMode.SUBSCRIBEONLY));
 			Cell weatherAgent = this.launcher.createAgent(cf);
 			

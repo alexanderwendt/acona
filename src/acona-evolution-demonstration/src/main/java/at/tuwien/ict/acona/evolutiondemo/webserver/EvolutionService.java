@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.evolutiondemo.controlleragent.ConsoleRequestReceiver;
-import at.tuwien.ict.acona.mq.cell.cellfunction.specialfunctions.StateMonitor;
+import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.StateMonitor;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 
 @Path("evolution")

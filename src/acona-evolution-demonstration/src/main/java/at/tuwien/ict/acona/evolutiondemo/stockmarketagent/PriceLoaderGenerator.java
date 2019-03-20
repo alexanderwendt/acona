@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletImpl;
+import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.io.csv.CsvReadOptions.Builder;
@@ -30,7 +30,7 @@ import tech.tablesaw.io.csv.CsvReadOptions.Builder;
  * @author wendt
  *
  */
-public class PriceLoaderGenerator extends CellFunctionCodelet {
+public class PriceLoaderGenerator extends CodeletImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(PriceLoaderGenerator.class);
 	
@@ -123,7 +123,7 @@ public class PriceLoaderGenerator extends CellFunctionCodelet {
 		}
 		
 		
-		log.info("Generated price={}. Put it on address={}", functionResult, this.getCellName() + ":" + dataAddress);
+		log.info("Generated price={}. Put it on address={}", functionResult, this.getAgentName() + ":" + dataAddress);
 		log.info("Long cycle={}, short cycle={}",this.cycleCounter, this.index);
 		
 		this.getValueMap().put(dataAddress, this.getDatapointBuilder().newDatapoint(dataAddress).setValue(functionResult));

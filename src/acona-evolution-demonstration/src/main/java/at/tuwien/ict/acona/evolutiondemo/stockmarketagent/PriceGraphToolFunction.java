@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 
-public class PriceGraphToolFunction extends CellFunctionThreadImpl {
+public class PriceGraphToolFunction extends AgentFunctionThreadImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(PriceGraphToolFunction.class);
 	

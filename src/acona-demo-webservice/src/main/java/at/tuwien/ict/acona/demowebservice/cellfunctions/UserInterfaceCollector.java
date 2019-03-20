@@ -13,7 +13,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.demowebservice.launcher.GraphServer;
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
 
@@ -24,7 +24,7 @@ import at.tuwien.ict.acona.mq.datastructures.Datapoint;
  * @author wendt
  *
  */
-public class UserInterfaceCollector extends CellFunctionThreadImpl {
+public class UserInterfaceCollector extends AgentFunctionThreadImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(UserInterfaceCollector.class);	
 	private GraphServer gserver;

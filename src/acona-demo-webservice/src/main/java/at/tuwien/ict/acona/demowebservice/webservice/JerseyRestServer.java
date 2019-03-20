@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionImpl;
-import at.tuwien.ict.acona.mq.cell.communication.MqttCommunicator;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionImpl;
+import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
 
-public class JerseyRestServer  extends CellFunctionImpl {
+public class JerseyRestServer  extends AgentFunctionImpl {
 	private final static Logger log = LoggerFactory.getLogger(JerseyRestServer.class);
 	
 	private final static int PORT = 8001;
 	
 	@Override
-	protected void cellFunctionInit() throws Exception {
+	protected void agentFunctionInit() throws Exception {
 		//Setup the server
 		
 		Server jettyServer = null;

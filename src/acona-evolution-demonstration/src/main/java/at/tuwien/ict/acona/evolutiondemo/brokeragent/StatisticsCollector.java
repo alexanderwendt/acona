@@ -17,7 +17,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
@@ -28,7 +28,7 @@ import at.tuwien.ict.acona.mq.datastructures.Response;
  * @author wendt
  *
  */
-public class StatisticsCollector extends CellFunctionThreadImpl {
+public class StatisticsCollector extends AgentFunctionThreadImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(StatisticsCollector.class);
 	private static final Logger logcsvBody = LoggerFactory.getLogger("csvbody");

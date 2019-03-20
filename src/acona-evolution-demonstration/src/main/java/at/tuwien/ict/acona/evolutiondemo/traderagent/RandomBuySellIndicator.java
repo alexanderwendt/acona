@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
-public class RandomBuySellIndicator extends CellFunctionThreadImpl {
+public class RandomBuySellIndicator extends AgentFunctionThreadImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

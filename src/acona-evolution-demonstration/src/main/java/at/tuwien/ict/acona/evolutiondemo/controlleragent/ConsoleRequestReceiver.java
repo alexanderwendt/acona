@@ -4,13 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
+
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
-public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
+public class ConsoleRequestReceiver extends AgentFunctionThreadImpl {
 
 	public static final String METHODSTARTCONTROLLER = "start";
 	public static final String METHODINTERRUPTCONTROLLER = "interrupt";
@@ -71,7 +72,7 @@ public class ConsoleRequestReceiver extends CellFunctionThreadImpl {
 				if (this.runAllowed == true) {
 					log.info("run {}/{}", i, count);
 					// Execute the codelet handler once
-					this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+					this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 
 				} else {
 					log.warn("Running of simulator interrupted after {} runs", i);

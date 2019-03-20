@@ -11,9 +11,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 
-public class KoreDataStructureGeneratorMock extends CellFunctionThreadImpl {
+public class KoreDataStructureGeneratorMock extends AgentFunctionThreadImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(KoreDataStructureGeneratorMock.class);
 	private DecimalFormat df = new DecimalFormat("#.#");

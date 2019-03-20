@@ -26,10 +26,10 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.SpeciesType;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -96,8 +96,8 @@ public class TraderTester {
 
 			long startTimeSetup = System.currentTimeMillis();
 
-			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
+			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
 			controllerAgent.getCommunicator().setDefaultTimeout(60000);
 
 			synchronized (this) {
@@ -108,12 +108,12 @@ public class TraderTester {
 				}
 			}
 
-			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
 			synchronized (this) {
 				try {
@@ -123,8 +123,8 @@ public class TraderTester {
 				}
 			}
 
-			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -139,8 +139,8 @@ public class TraderTester {
 					traderType += "_odd";
 				}
 
-				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + i)
-						.addFunction(CellFunctionConfig.newConfig("trader_" + i, Trader.class)
+				Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName + "_" + i)
+						.addFunction(AgentFunctionConfig.newConfig("trader_" + i, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
@@ -148,7 +148,7 @@ public class TraderTester {
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 								.setProperty(Trader.ATTRIBUTETIMEOUT, 60000)
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-						.addFunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+						.addFunction(AgentFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 				traderAgent.getCommunicator().setDefaultTimeout(60000);
 			}
 
@@ -171,7 +171,7 @@ public class TraderTester {
 			//req.setParameterAsValue(0, false);
 			//controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 60000);
 			
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 
 			long stopTimeSystemTrade1 = System.currentTimeMillis();
 
@@ -180,7 +180,7 @@ public class TraderTester {
 			//req.setParameterAsValue(0, false);
 			//controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 60000);
 			
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 
 			
 			long stopTimeSystemTrade2 = System.currentTimeMillis();
@@ -376,8 +376,8 @@ public class TraderTester {
 			// ==========================================//
 
 			// Controller agent
-			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
+			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
 
 			synchronized (this) {
 				try {
@@ -388,12 +388,12 @@ public class TraderTester {
 			}
 
 			// Broker Agent
-			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
 			synchronized (this) {
 				try {
@@ -404,23 +404,23 @@ public class TraderTester {
 			}
 
 			// Stock market Agent
-			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))); // Puts data on datapoint StockMarketAgent:data
 
 			// Single Trader agent
-			Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName)
-					.addFunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
+			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 							.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderTypePrefix + "-L" + EMALongPeriod + ":S" + EMAShortPeriod)
 							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					.addFunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+					.addFunction(AgentFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 
 			synchronized (this) {
 				try {
@@ -437,14 +437,14 @@ public class TraderTester {
 			//req.setParameterAsValue(0, false);
 			//controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 			
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 			
 			
 			//req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 			//req.setParameterAsValue(0, false);
 			//controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
 
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 			
 			//req = new JsonRpcRequest("gettypes", 0);
 			//JsonRpcResponse result = brokerAgent.getCommunicator().execute(brokerAgent.getCell().getLocalName(), statisticsService, req, 100000);
@@ -495,8 +495,8 @@ public class TraderTester {
 			// ==========================================//
 
 			// Controller agent
-			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class)));
+			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
 
 			synchronized (this) {
 				try {
@@ -507,12 +507,12 @@ public class TraderTester {
 			}
 
 			// Broker Agent
-			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data")));
 
 			synchronized (this) {
@@ -524,23 +524,23 @@ public class TraderTester {
 			}
 
 			// Stock market Agent
-			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))); // Puts data on datapoint StockMarketAgent:data
 
 			// Single Trader agent
-			Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName)
-					.addFunction(CellFunctionConfig.newConfig(tradeService, Trader.class)
+			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 							.setProperty(Trader.ATTRIBUTEAGENTTYPE, "kamikazeType")
 							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					.addFunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+					.addFunction(AgentFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 
 			synchronized (this) {
 				try {
@@ -556,7 +556,7 @@ public class TraderTester {
 			//JsonRpcRequest req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 			//req.setParameterAsValue(0, false);
 			//controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getCell().getLocalName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 20000);
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 			
 			
 			// Get the depot amount
@@ -576,7 +576,7 @@ public class TraderTester {
 			depot = result1.getResult(new TypeToken<Depot>() {}); //brokerAgent.getCommunicator().execute(brokerAgentName + ":" + brokerServiceName, req2).getResult(new TypeToken<Depot>() {});
 			
 			//Check codelet handler
-			Datapoint stateres1 = controllerAgent.getCommunicator().read(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXTENDEDSTATESUFFIX);
+			Datapoint stateres1 = controllerAgent.getCommunicator().read(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXTENDEDSTATESUFFIX);
 			
 			
 			log.info("Current agent state={}. Codelet handler state={}", depot, stateres1.getValue());
@@ -584,8 +584,8 @@ public class TraderTester {
 			//req = new JsonRpcRequest(CellFunctionCodeletHandler.EXECUTECODELETEHANDLER, 1);
 			//req.setParameterAsValue(0, false);
 			
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
-			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
+			controllerAgent.getCommunicator().execute(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 			
 			
 			//controllerAgent.getCommunicator().executeServiceQueryDatapoints(controllerAgent.getName(), controllerService, req, controllerAgent.getCell().getLocalName(), controllerService + ".state", new JsonPrimitive(ServiceState.FINISHED.toString()), 5000);
@@ -614,7 +614,7 @@ public class TraderTester {
 			
 			//Check codelet handler
 			boolean codeletUnregistered = false;
-			Datapoint stateres2 = controllerAgent.getCommunicator().read(controllerAgentName + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXTENDEDSTATESUFFIX);
+			Datapoint stateres2 = controllerAgent.getCommunicator().read(controllerAgentName + ":" + controllerService + "/" + CodeletHandlerImpl.EXTENDEDSTATESUFFIX);
 			if (stateres2.getValue().getAsJsonObject().get("hasCodelets").getAsJsonArray().size()==1) {	//Only the broker shall be there
 				codeletUnregistered = true;
 			}

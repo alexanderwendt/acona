@@ -5,11 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 
-public class DelayedCellShutDown extends CellFunctionThreadImpl {
+public class DelayedCellShutDown extends AgentFunctionThreadImpl {
 
 	protected static Logger log = LoggerFactory.getLogger(DelayedCellShutDown.class);
 
@@ -20,7 +20,7 @@ public class DelayedCellShutDown extends CellFunctionThreadImpl {
 			this.finaldelay = delay;
 			// create and register instance
 			String name = cell.getName() + "_KillSwitch";
-			this.init(CellFunctionConfig.newConfig(name, DelayedCellShutDown.class), cell);
+			this.init(AgentFunctionConfig.newConfig(name, DelayedCellShutDown.class), cell);
 
 			Runnable t = new Runnable() {
 
@@ -34,7 +34,7 @@ public class DelayedCellShutDown extends CellFunctionThreadImpl {
 						}
 					}
 
-					getCell().takeDownCell();
+					getAgent().takeDownCell();
 				}
 
 			};

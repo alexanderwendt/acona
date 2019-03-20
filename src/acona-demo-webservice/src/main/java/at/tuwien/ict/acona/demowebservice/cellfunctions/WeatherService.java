@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.demowebservice.cellfunctions.weather.Weather;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Chunk;
 import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
 
@@ -28,7 +28,7 @@ import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
  * @author wendt
  *
  */
-public class WeatherService extends CellFunctionThreadImpl {
+public class WeatherService extends AgentFunctionThreadImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(WeatherService.class);
 	

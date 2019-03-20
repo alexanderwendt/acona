@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
-import at.tuwien.ict.acona.mq.cell.core.CellImpl;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
+import at.tuwien.ict.acona.mq.core.core.AgentImpl;
 
 /**
  * This is a wrapper class for all types of jade initialization. it starts agents and containers
@@ -113,7 +113,7 @@ public class SystemControllerImpl implements SystemController {
 	 * @return
 	 * @throws Exception
 	 */
-	public synchronized Cell createAgent(CellConfig cellConfig) throws Exception {
+	public synchronized Cell createAgent(AgentConfig cellConfig) throws Exception {
 		// Check if the agent already exists
 		Cell existingAgent = this.getAgent(cellConfig.getName());
 		if (existingAgent != null) {
@@ -122,7 +122,7 @@ public class SystemControllerImpl implements SystemController {
 		}
 
 		// Create the object
-		Cell cell = new CellImpl();
+		Cell cell = new AgentImpl();
 		cell.init(cellConfig);
 		
 		this.agentControllerMap.put(cellConfig.getName(), cell);

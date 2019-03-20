@@ -9,17 +9,17 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunction;
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunction;
+import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletImpl;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
-public class Trader extends CellFunctionCodelet {
+public class Trader extends CodeletImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(Trader.class);
 
@@ -109,10 +109,10 @@ public class Trader extends CellFunctionCodelet {
 	@Override
 	public void executeCodeletPreprocessing() throws Exception {
 		// Read depot
-		Response response = this.getCommunicator().execute(this.brokerAddress + "/" + "getdepotinfo", (new Request()).setParameter("agentname", this.getCell().getName()), 200000);
+		Response response = this.getCommunicator().execute(this.brokerAddress + "/" + "getdepotinfo", (new Request()).setParameter("agentname", this.getAgent().getName()), 200000);
 		if (response.hasError()) {
 			log.warn("First try failed. Try a second time");
-			response = this.getCommunicator().execute(this.brokerAddress + "/" + "getdepotinfo", (new Request()).setParameter("agentname", this.getCell().getName()), 200000);
+			response = this.getCommunicator().execute(this.brokerAddress + "/" + "getdepotinfo", (new Request()).setParameter("agentname", this.getAgent().getName()), 200000);
 		}
 		
 		
@@ -133,7 +133,7 @@ public class Trader extends CellFunctionCodelet {
 	@Override
 	protected void executeFunction() throws Exception {
 
-		log.debug("{}:{}>Start agent calculation", this.getCellName(), this.agentType);
+		log.debug("{}:{}>Start agent calculation", this.getAgentName(), this.agentType);
 		// Program logic
 		// 2. Check depot death
 		this.killSignal = this.killAgentOnDepotDeath();
@@ -149,14 +149,14 @@ public class Trader extends CellFunctionCodelet {
 			// 5. Execute signal
 			this.executeTrade();
 
-			log.info("{}:{}>Depot: {}", this.getCellName(), this.agentType, this.depot);
+			log.info("{}:{}>Depot: {}", this.getAgentName(), this.agentType, this.depot);
 
 		} else {
 			// If the kill signal has been set, the system shall exit.
 			this.setCommand(ControlCommand.EXIT);
 
 			DelayedCellShutDown killSwitch = new DelayedCellShutDown();
-			killSwitch.killSwitch(50, this.getCell());
+			killSwitch.killSwitch(50, this.getAgent());
 			synchronized (this) {
 				try {
 					this.wait(100);
@@ -190,7 +190,7 @@ public class Trader extends CellFunctionCodelet {
 		}
 		
 
-		log.info("{}>Agent is killed", this.getCell().getName());
+		log.info("{}>Agent is killed", this.getAgent().getName());
 		// Then, agent is killed
 	}
 
@@ -209,7 +209,7 @@ public class Trader extends CellFunctionCodelet {
 //		JsonRpcRequest req = new JsonRpcRequest("registerdepot", 0);
 //		req.setParameters(this.getCell().getName(), this.agentType);
 //		JsonRpcResponse result1 = this.getCommunicator().execute(this.brokerAddress, req);
-		Response result1 = this.getCommunicator().execute(this.brokerAddress + "/" + "registerdepot", (new Request()).setParameter("agentname", this.getCell().getName()).setParameter("agenttype", this.agentType), 200000);
+		Response result1 = this.getCommunicator().execute(this.brokerAddress + "/" + "registerdepot", (new Request()).setParameter("agentname", this.getAgent().getName()).setParameter("agenttype", this.agentType), 200000);
 		
 		
 		// Add money to broker
@@ -220,7 +220,7 @@ public class Trader extends CellFunctionCodelet {
 		//JsonRpcRequest req2 = new JsonRpcRequest("addmoney", 0);
 		//req2.setParameters(this.getCell().getName(), this.startSize);
 		//JsonRpcResponse result2 = this.getCommunicator().execute(this.brokerAddress, req2);
-		Response result2 = this.getCommunicator().execute(this.brokerAddress + "/" + "addmoney", (new Request()).setParameter("agentname", this.getCell().getName()).setParameter("amount", this.startSize), 200000);
+		Response result2 = this.getCommunicator().execute(this.brokerAddress + "/" + "addmoney", (new Request()).setParameter("agentname", this.getAgent().getName()).setParameter("amount", this.startSize), 200000);
 		
 		if (result2.hasError() == true) {
 			throw new Exception("Cannot add money= " + this.startSize + " to depot. " + result2.getError().getMessage());
@@ -246,7 +246,7 @@ public class Trader extends CellFunctionCodelet {
 			
 			try {
 				result1 = this.getCommunicator().execute(this.brokerAddress + "/" + "sell", (new Request())
-						.setParameter("agentname", this.getCell().getName())
+						.setParameter("agentname", this.getAgent().getName())
 						.setParameter("stockname", a.getStockName())
 						.setParameter("price", this.closePrice)
 						.setParameter("volume", a.getVolume()), 200000);
@@ -264,7 +264,7 @@ public class Trader extends CellFunctionCodelet {
 		//JsonRpcResponse result1 = this.getCommunicator().execute(this.brokerAddress, req);
 		
 		Response result2 = this.getCommunicator().execute(this.brokerAddress + "/" + "unregisterdepot", (new Request())
-				.setParameter("agentname", this.getCell().getName())
+				.setParameter("agentname", this.getAgent().getName())
 				, 200000);
 
 		// Check if unregister error
@@ -290,9 +290,9 @@ public class Trader extends CellFunctionCodelet {
 				this.removeMoneyFromDepot(startSize * 0.3);
 				
 				//Modify the configuration
-				CellConfig newCellConfig = this.getCell().getConfiguration();
-				CellFunctionConfig newSignalFunctionConfig = newCellConfig.getCellFunction(signalAddress);
-				CellFunctionConfig newTraderFunctionConfig = newCellConfig.getCellFunction("TraderFunction");
+				AgentConfig newCellConfig = this.getAgent().getConfiguration();
+				AgentFunctionConfig newSignalFunctionConfig = newCellConfig.getCellFunction(signalAddress);
+				AgentFunctionConfig newTraderFunctionConfig = newCellConfig.getCellFunction("TraderFunction");
 				
 				//Get old values and modify them
 				int emaShort = Integer.valueOf(newSignalFunctionConfig.getProperty(EMAIndicator.ATTRIBUTEEMASHORT));
@@ -326,7 +326,7 @@ public class Trader extends CellFunctionCodelet {
 				newCellConfig.replaceCellFunctionConfig(newTraderFunctionConfig);
 				newCellConfig.replaceCellFunctionConfig(newSignalFunctionConfig);
 				
-				this.getCommunicator().execute(this.getCellName() + ":" + "reproduce" + "/" + "executereplication", 
+				this.getCommunicator().execute(this.getAgentName() + ":" + "reproduce" + "/" + "executereplication", 
 						(new Request()).setParameter("config", newCellConfig.toJsonObject()), 100000);
 				
 				synchronized (this) {
@@ -384,7 +384,7 @@ public class Trader extends CellFunctionCodelet {
 				//JsonRpcResponse result = this.getCommunicator().execute(this.brokerAddress, request1);
 				
 				Request req = (new Request())
-						.setParameter("agentname", this.getCell().getName())
+						.setParameter("agentname", this.getAgent().getName())
 						.setParameter("amount", amount);
 				
 				Response result1 = this.getCommunicator().execute(this.brokerAddress + "/" + "removemoney", req, 200000);
@@ -463,7 +463,7 @@ public class Trader extends CellFunctionCodelet {
 			//JsonRpcResponse result = this.getCommunicator().execute(this.brokerAddress, request1);
 			
 			Request req = (new Request())
-					.setParameter("agentname", this.getCell().getName())
+					.setParameter("agentname", this.getAgent().getName())
 					.setParameter("stockname", this.stockName)
 					.setParameter("price", this.closePrice)
 					.setParameter("volume", amount);
@@ -486,7 +486,7 @@ public class Trader extends CellFunctionCodelet {
 				&& (this.depot.getAssets().stream().filter(a -> a.getVolume() >= 1)).findFirst().isPresent()) {			
 			
 			Request req = (new Request())
-					.setParameter("agentname", this.getCell().getName())
+					.setParameter("agentname", this.getAgent().getName())
 					.setParameter("stockname", this.stockName)
 					.setParameter("price", this.closePrice)
 					.setParameter("volume", amount);

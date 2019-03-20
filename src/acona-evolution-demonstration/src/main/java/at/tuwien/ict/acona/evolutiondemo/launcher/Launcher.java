@@ -19,11 +19,11 @@ import at.tuwien.ict.acona.evolutiondemo.traderagent.EMAIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
 import at.tuwien.ict.acona.evolutiondemo.webserver.EvolutionService;
 import at.tuwien.ict.acona.evolutiondemo.webserver.JerseyRestServer;
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodeletHandler;
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
@@ -84,11 +84,11 @@ public class Launcher {
 			
 
 			// === Controller agent implementation === //
-			Cell controllerAgent = this.controller.createAgent(CellConfig.newConfig(controllerAgentName)
+			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addFunction(CellFunctionConfig.newConfig(controllerService, CellFunctionCodeletHandler.class))
+					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class))
 					// The codelet handler ist controller request receiver funtion
-					.addFunction(CellFunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
+					.addFunction(AgentFunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
 
 			synchronized (this) {
@@ -101,17 +101,17 @@ public class Launcher {
 
 			// === Broker ===//
 
-			Cell brokerAgent = this.controller.createAgent(CellConfig.newConfig(brokerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
-					.addFunction(CellFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
+					.addFunction(AgentFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, brokerAgentName + ":" + statisticsService + "/" + StatisticsCollector.GETSTATISTICSSUFFIX)
 							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName))
-					.addFunction(CellFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
+					.addFunction(AgentFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
 							.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
 
 			synchronized (this) {
@@ -124,13 +124,13 @@ public class Launcher {
 
 			// === Stock market ===//
 
-			Cell stockMarketAgent = this.controller.createAgent(CellConfig.newConfig(stockmarketAgentName)
-					.addFunction(CellFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(CellFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
+					.addFunction(AgentFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
 			// === Traders ===//
@@ -180,8 +180,8 @@ public class Launcher {
 				l.add(key);
 				String traderType = key;
 	
-				Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName + "_" + traderType)
-						.addFunction(CellFunctionConfig.newConfig("trader_" + traderType, Trader.class)
+				Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName + "_" + traderType)
+						.addFunction(AgentFunctionConfig.newConfig("trader_" + traderType, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
@@ -189,7 +189,7 @@ public class Launcher {
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
 						//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-						.addFunction(CellFunctionConfig.newConfig(signalService, EMAIndicator.class)
+						.addFunction(AgentFunctionConfig.newConfig(signalService, EMAIndicator.class)
 								.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(EMAIndicator.ATTRIBUTEEMALONG, longMA)
 								.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
@@ -237,9 +237,9 @@ public class Launcher {
 //							.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, 2)));
 			
 			//Jsersey server to receive commands
-			CellConfig server = CellConfig.newConfig(serverAgentName)
+			AgentConfig server = AgentConfig.newConfig(serverAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addFunction(CellFunctionConfig.newConfig("jerseyserver", JerseyRestServer.class)
+					.addFunction(AgentFunctionConfig.newConfig("jerseyserver", JerseyRestServer.class)
 							.setProperty(EvolutionService.PARAMAGENTNAMES, controllerAgent.getName())
 							.setProperty(EvolutionService.PARAMCONTROLLERADDRESS, controllerAgent + ":" + controllerService));
 
@@ -253,7 +253,7 @@ public class Launcher {
 				}
 			}
 			
-			JsonElement value = controllerAgent.getCommunicator().read(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXTENDEDSTATESUFFIX).getValue();
+			JsonElement value = controllerAgent.getCommunicator().read(controllerAgent.getName() + ":" + controllerService + "/" + CodeletHandlerImpl.EXTENDEDSTATESUFFIX).getValue();
 			log.info("Registered codelets: {}", value);
 			
 			log.info("=== All agents initialized ===");
@@ -262,7 +262,7 @@ public class Launcher {
 				//if (this.runAllowed == true) {
 					log.info("run {}/{}", i, 100000);
 					// Execute the codelet handler once
-					controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CellFunctionCodeletHandler.EXECUTECODELETMETHODNAME, new Request(), 200000);
+					controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 
 				//} else {
 				//	log.warn("Running of simulator interrupted after {} runs", i);

@@ -28,9 +28,9 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFun
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.SpeciesType;
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.config.CellFunctionConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -86,14 +86,14 @@ public class BrokerTester {
 			String brokerServiceName = "BrokerService";
 			String stockName = "Fingerprint";
 
-			CellConfig cf = CellConfig.newConfig(brokerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+			AgentConfig cf = AgentConfig.newConfig(brokerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, "test"));
 			Cell brokerAgent = this.controller.createAgent(cf);
 
-			Cell traderAgent = this.controller.createAgent(CellConfig.newConfig(traderAgentName));
+			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName));
 
 			// === Init finished ===//
 
@@ -227,25 +227,25 @@ public class BrokerTester {
 			String statisticsService = "StatisticsService";
 			String stockName = "Fingerprint";
 
-			CellConfig cf = CellConfig.newConfig(brokerAgentName)
-					.addFunction(CellFunctionConfig.newConfig(brokerServiceName, Broker.class)
+			AgentConfig cf = AgentConfig.newConfig(brokerAgentName)
+					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, "data"))
-					.addFunction(CellFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, "data"));
 			Cell brokerAgent = this.controller.createAgent(cf);
 
 			List<Cell> traderAgents = new ArrayList<Cell>();
 
 			for (int i = 0; i < 50; i++) {
-				Cell a = this.controller.createAgent(CellConfig.newConfig(traderType1 + i));
+				Cell a = this.controller.createAgent(AgentConfig.newConfig(traderType1 + i));
 				traderAgents.add(a);
 				a.getCommunicator().write(dpb.newDatapoint("type").setValue(traderType1));
 			}
 
 			for (int i = 0; i < 15; i++) {
-				Cell a = this.controller.createAgent(CellConfig.newConfig(traderType2 + i));
+				Cell a = this.controller.createAgent(AgentConfig.newConfig(traderType2 + i));
 				traderAgents.add(a);
 				a.getCommunicator().write(dpb.newDatapoint("type").setValue(traderType2));
 			}

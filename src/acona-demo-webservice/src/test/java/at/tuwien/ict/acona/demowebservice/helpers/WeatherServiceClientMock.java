@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Chunk;
 import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
 
@@ -18,7 +18,7 @@ import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
  * @author wendt
  *
  */
-public class WeatherServiceClientMock extends CellFunctionThreadImpl {
+public class WeatherServiceClientMock extends AgentFunctionThreadImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(WeatherServiceClientMock.class);
 	

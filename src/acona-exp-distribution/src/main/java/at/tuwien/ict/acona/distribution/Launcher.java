@@ -4,8 +4,8 @@ import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.tuwien.ict.acona.mq.cell.config.CellConfig;
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -40,13 +40,13 @@ public class Launcher {
 
 	private void init() throws Exception {
 		try {
-			Cell agent = this.controller.createAgent(CellConfig.newConfig("Agent1")
-					//.addFunction("Sender", Sender.class)
+			Cell agent = this.controller.createAgent(AgentConfig.newConfig("Agent1")
+					.addFunction("Sender", Client.class)
 					.addFunction("Server", Server.class));
 			
 			
-			Cell agent2 = this.controller.createAgent(CellConfig.newConfig("Agent2")
-					.addFunction("Sender", Sender.class));
+			//Cell agent2 = this.controller.createAgent(CellConfig.newConfig("Agent2")
+			//		.addFunction("Sender", Sender.class));
 					//.addFunction("Server", Server.class));
 			
 			synchronized (this) {

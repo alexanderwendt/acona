@@ -13,10 +13,10 @@ import com.google.gson.JsonObject;
 import at.tuwien.ict.acona.cognitivearchitecture.CognitiveProcess;
 import at.tuwien.ict.acona.cognitivearchitecture.datastructures.Goal;
 import at.tuwien.ict.acona.cognitivearchitecture.datastructures.Option;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletImpl;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
-public abstract class CognitiveCodelet extends CellFunctionCodelet {
+public abstract class CognitiveCodelet extends CodeletImpl {
 	private final static Logger log = LoggerFactory.getLogger(CognitiveCodelet.class);
 
 	public final static String ATTRIBUTEGOALNAME = "goalname";

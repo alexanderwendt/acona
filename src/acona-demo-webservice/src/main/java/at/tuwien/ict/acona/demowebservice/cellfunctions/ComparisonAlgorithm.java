@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 import at.tuwien.ict.acona.mq.datastructures.Chunk;
 import at.tuwien.ict.acona.mq.datastructures.ChunkBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
@@ -24,7 +24,7 @@ import at.tuwien.ict.acona.mq.datastructures.Response;
  * on both a datapoint as well as in a service
  *
  */
-public class ComparisonAlgorithm extends CellFunctionThreadImpl {
+public class ComparisonAlgorithm extends AgentFunctionThreadImpl {
 	
 	private Chunk algorithmResult;
 	private final static Logger log = LoggerFactory.getLogger(ComparisonAlgorithm.class);

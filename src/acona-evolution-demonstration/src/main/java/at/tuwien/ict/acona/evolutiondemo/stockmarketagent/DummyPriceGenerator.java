@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.SyncMode;
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
-import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
+import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletImpl;
+import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 
 /**
  * This function generates a highest, lowest and close price for the system and writes it into the working memory of itself. On trigger, 
@@ -24,7 +24,7 @@ import at.tuwien.ict.acona.mq.cell.config.DatapointConfig;
  * @author wendt
  *
  */
-public class DummyPriceGenerator extends CellFunctionCodelet {
+public class DummyPriceGenerator extends CodeletImpl {
 	
 	private final static Logger log = LoggerFactory.getLogger(DummyPriceGenerator.class);
 	
@@ -93,7 +93,7 @@ public class DummyPriceGenerator extends CellFunctionCodelet {
 		
 		this.currentPeriod++;
 		
-		log.info("Generated price={}. Put it on address={}", functionResult, this.getCellName() + ":" + dataAddress);
+		log.info("Generated price={}. Put it on address={}", functionResult, this.getAgentName() + ":" + dataAddress);
 		
 		this.getValueMap().put(dataAddress, this.getDatapointBuilder().newDatapoint(dataAddress).setValue(functionResult));
 	}

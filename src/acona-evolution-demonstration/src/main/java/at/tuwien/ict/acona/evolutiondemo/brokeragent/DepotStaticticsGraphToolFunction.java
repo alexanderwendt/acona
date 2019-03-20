@@ -16,9 +16,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.CellFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
 
-public class DepotStaticticsGraphToolFunction extends CellFunctionThreadImpl {
+public class DepotStaticticsGraphToolFunction extends AgentFunctionThreadImpl {
 
 	private final static Logger log = LoggerFactory.getLogger(DepotStaticticsGraphToolFunction.class);
 

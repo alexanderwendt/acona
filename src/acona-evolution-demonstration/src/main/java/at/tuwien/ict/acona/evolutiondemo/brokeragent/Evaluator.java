@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
-import at.tuwien.ict.acona.mq.cell.cellfunction.codelets.CellFunctionCodelet;
+import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletImpl;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 
-public class Evaluator extends CellFunctionCodelet {
+public class Evaluator extends CodeletImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(Evaluator.class);
 

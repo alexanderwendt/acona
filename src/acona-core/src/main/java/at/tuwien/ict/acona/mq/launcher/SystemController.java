@@ -1,6 +1,6 @@
 package at.tuwien.ict.acona.mq.launcher;
 
-import at.tuwien.ict.acona.mq.cell.core.Cell;
+import at.tuwien.ict.acona.mq.core.core.Cell;
 
 public interface SystemController {
 	/**
