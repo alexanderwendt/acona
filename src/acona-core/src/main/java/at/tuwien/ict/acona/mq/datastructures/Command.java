@@ -2,6 +2,8 @@ package at.tuwien.ict.acona.mq.datastructures;
 
 import com.google.gson.JsonObject;
 
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
+
 public class Command {
 	public final static String CALLER = "caller";
 	public final static String COMMAND = "command";

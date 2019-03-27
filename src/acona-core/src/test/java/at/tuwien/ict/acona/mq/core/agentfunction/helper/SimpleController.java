@@ -7,8 +7,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.ServiceState;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;

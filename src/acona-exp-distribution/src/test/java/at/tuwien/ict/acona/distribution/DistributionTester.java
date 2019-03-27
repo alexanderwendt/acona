@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 
 public class DelayedCellShutDown extends AgentFunctionThreadImpl {
@@ -20,7 +20,7 @@ public class DelayedCellShutDown extends AgentFunctionThreadImpl {
 			this.finaldelay = delay;
 			// create and register instance
 			String name = cell.getName() + "_KillSwitch";
-			this.init(AgentFunctionConfig.newConfig(name, DelayedCellShutDown.class), cell);
+			this.init(FunctionConfig.newConfig(name, DelayedCellShutDown.class), cell);
 
 			Runnable t = new Runnable() {
 

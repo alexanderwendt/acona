@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicatorImpl;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
@@ -34,7 +34,7 @@ public class AgentCommunicatorFunctionImpl implements AgentFunction {
 	/**
 	 * Cell function configuration
 	 */
-	private AgentFunctionConfig config;
+	private FunctionConfig config;
 
 	/**
 	 * Communicator
@@ -58,7 +58,7 @@ public class AgentCommunicatorFunctionImpl implements AgentFunction {
 	private String password = "acona";
 
 	@Override
-	public void init(AgentFunctionConfig config, Cell cell) throws Exception {
+	public void init(FunctionConfig config, Cell cell) throws Exception {
 		try {
 			// === Extract fundamental settings ===//
 			// Extract settings
@@ -128,7 +128,7 @@ public class AgentCommunicatorFunctionImpl implements AgentFunction {
 	}
 
 	@Override
-	public AgentFunctionConfig getFunctionConfig() {
+	public FunctionConfig getFunctionConfig() {
 		return this.config;
 	}
 

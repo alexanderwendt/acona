@@ -1,4 +1,4 @@
-package at.tuwien.ict.acona.mq.datastructures;
+package at.tuwien.ict.acona.mq.core.agentfunction;
 
 public enum ControlCommand {
 	START,

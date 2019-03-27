@@ -16,7 +16,7 @@ import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicatorImpl;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
@@ -56,7 +56,7 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 	/**
 	 * Cell function configuration
 	 */
-	private AgentFunctionConfig config;
+	private FunctionConfig config;
 
 	/**
 	 * Communicator
@@ -108,7 +108,7 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 	}
 
 	@Override
-	public void init(AgentFunctionConfig config, Cell caller) throws Exception {
+	public void init(FunctionConfig config, Cell caller) throws Exception {
 		try {
 			// === Extract fundamental settings ===//
 			// Extract settings
@@ -123,6 +123,21 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 			log.debug("{}>Root address={}", this.agentFunctionName, this.functionRootAddress);
 
 			log.trace("Initialize an agent with config:{}", config);
+			
+			//Get hostdata
+			if (this.getFunctionConfig().getHost() != null) {
+				this.host = this.getFunctionConfig().getHost().getAsString();
+			}
+			
+			//Get name
+			if (this.getFunctionConfig().getUser() != null) {
+				this.username = this.getFunctionConfig().getUser().getAsString();
+			}
+			
+			//Get password
+			if (this.getFunctionConfig().getPassword() != null) {
+				this.password = this.getFunctionConfig().getPassword().getAsString();
+			}
 
 			// Create and initialize the communicator
 			this.comm = new MqttCommunicatorImpl(this.cell.getDataStorage());
@@ -479,7 +494,7 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 	}
 
 	@Override
-	public AgentFunctionConfig getFunctionConfig() {
+	public FunctionConfig getFunctionConfig() {
 		return this.config;
 	}
 

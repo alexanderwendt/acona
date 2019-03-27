@@ -213,7 +213,7 @@ public class AgentConfig {
 	 * @param config
 	 * @return
 	 */
-	public AgentConfig addFunction(AgentFunctionConfig config) {
+	public AgentConfig addFunction(FunctionConfig config) {
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
 		return this;
 	}
@@ -227,9 +227,9 @@ public class AgentConfig {
 	 * @return
 	 */
 	public AgentConfig addFunction(String name, Class<?> clzz, Map<String, Object> params) {
-		AgentFunctionConfig config = AgentFunctionConfig.newConfig(name, clzz, params);
-		if (params.containsKey(AgentFunctionConfig.COMMUNICATORTIMEOUT)==true) {
-			config.setCommunicatorTimeout(Integer.valueOf(params.get(AgentFunctionConfig.COMMUNICATORTIMEOUT).toString()));
+		FunctionConfig config = FunctionConfig.newConfig(name, clzz, params);
+		if (params.containsKey(FunctionConfig.COMMUNICATORTIMEOUT)==true) {
+			config.setCommunicatorTimeout(Integer.valueOf(params.get(FunctionConfig.COMMUNICATORTIMEOUT).toString()));
 		}
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
 		return this;
@@ -243,7 +243,7 @@ public class AgentConfig {
 	 * @return
 	 */
 	public AgentConfig addFunction(String name, Class<?> clzz) {
-		AgentFunctionConfig config = AgentFunctionConfig.newConfig(name, clzz, new HashMap<String, Object>());
+		FunctionConfig config = FunctionConfig.newConfig(name, clzz, new HashMap<String, Object>());
 		
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).add(config.toJsonObject());
 		return this;
@@ -255,12 +255,12 @@ public class AgentConfig {
 	 * @param name
 	 * @return
 	 */
-	public AgentFunctionConfig getCellFunction(String name) {
-		AgentFunctionConfig result = null;
+	public FunctionConfig getCellFunction(String name) {
+		FunctionConfig result = null;
 		
 		for (JsonElement e : this.getCellfunctions()) {
-			if (e.getAsJsonObject().get(AgentFunctionConfig.CELLFUNCTIONNAME).getAsString().equals(name)) {
-				result = AgentFunctionConfig.newConfig(e.getAsJsonObject());
+			if (e.getAsJsonObject().get(FunctionConfig.CELLFUNCTIONNAME).getAsString().equals(name)) {
+				result = FunctionConfig.newConfig(e.getAsJsonObject());
 				break;
 			}
 		}
@@ -273,7 +273,7 @@ public class AgentConfig {
 	 * 
 	 * @param config
 	 */
-	public void replaceCellFunctionConfig(AgentFunctionConfig config) {
+	public void replaceCellFunctionConfig(FunctionConfig config) {
 		this.removeCellFunctionConfig(config.getName());
 		
 		this.addFunction(config);
@@ -291,7 +291,7 @@ public class AgentConfig {
 		
 		for (int i = 0; i < arr.size(); i++) {
 			JsonObject function = arr.get(i).getAsJsonObject();
-			AgentFunctionConfig config = AgentFunctionConfig.newConfig(function);
+			FunctionConfig config = FunctionConfig.newConfig(function);
 			if (config.getName().equals(name)) {
 				result = i;
 				break;

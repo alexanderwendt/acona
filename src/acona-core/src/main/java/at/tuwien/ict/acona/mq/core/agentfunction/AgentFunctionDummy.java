@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -22,7 +22,7 @@ public class AgentFunctionDummy implements AgentFunction {
 	}
 
 	@Override
-	public void init(AgentFunctionConfig config, Cell cell) throws Exception {
+	public void init(FunctionConfig config, Cell cell) throws Exception {
 		// TODO Auto-generated method stub
 
 	}
@@ -38,7 +38,7 @@ public class AgentFunctionDummy implements AgentFunction {
 	}
 
 	@Override
-	public AgentFunctionConfig getFunctionConfig() {
+	public FunctionConfig getFunctionConfig() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -9,12 +9,12 @@ import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithmAlter
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
 import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.StateMonitor;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.launcher.SystemController;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
@@ -70,39 +70,39 @@ public class Launcher {
 			// .addCellfunction(CellFunctionConfig.newConfig(CFStateGenerator.class)));
 
 			Cell weatherAgent1 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent1Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "Palermo")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent2 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent2Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent2Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent3 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent3Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent3Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent4 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent4Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "innsbruck")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent4Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent5 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent5Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "Abu Dhabi")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent5Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {
@@ -113,18 +113,18 @@ public class Launcher {
 			}
 
 			Cell calculator = this.controller.createAgent(AgentConfig.newConfig(algorithmAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
+					.addFunction(FunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
 							// .addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Palermo", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Vienna", weatherAgent2Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", weatherAgent3Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Innsbruck", weatherAgent4Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Abu Dhabi", weatherAgent5Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addFunction(AgentFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(FunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, algorithmAgentName + ":" + StateMonitor.SYSTEMSTATEADDRESS, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmAgentName + ":" + algorithmService + ".result", SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("ui1", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {

@@ -2,7 +2,7 @@ package at.tuwien.ict.acona.mq.core.core;
 
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.storage.DataStorage;
 
 public class DummyAgent implements Cell {
@@ -48,7 +48,7 @@ public class DummyAgent implements Cell {
 	}
 
 	@Override
-	public void addFunction(AgentFunctionConfig cellFunctionConfig) throws Exception {
+	public void addFunction(FunctionConfig cellFunctionConfig) throws Exception {
 		// TODO Auto-generated method stub
 
 	}

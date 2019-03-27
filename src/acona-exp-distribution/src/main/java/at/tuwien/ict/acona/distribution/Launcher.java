@@ -4,9 +4,9 @@ import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;

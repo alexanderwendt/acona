@@ -17,7 +17,7 @@ import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerTriggerC
 import at.tuwien.ict.acona.mq.core.agentfunction.helper.IncrementNumberCodelet;
 import at.tuwien.ict.acona.mq.core.agentfunction.helper.IncrementOnConditionCodelet;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -78,8 +78,8 @@ public class Codelettester {
 
 			// Agent with handler and 3 codelets
 			AgentConfig codeletAgentConfig = AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(handlerName, CodeletHandlerImpl.class))
-					.addFunction(AgentFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
+					.addFunction(FunctionConfig.newConfig(handlerName, CodeletHandlerImpl.class))
+					.addFunction(FunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
@@ -158,20 +158,20 @@ public class Codelettester {
 
 			// Agent with handler and 3 codelets
 			AgentConfig codeletAgentConfig = AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(handlerName, CodeletHandlerImpl.class))
-					.addFunction(AgentFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
+					.addFunction(FunctionConfig.newConfig(handlerName, CodeletHandlerImpl.class))
+					.addFunction(FunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
-					.addFunction(AgentFunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
+					.addFunction(FunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(2)))
-					.addFunction(AgentFunctionConfig.newConfig(codeletName3, IncrementOnConditionCodelet.class)
+					.addFunction(FunctionConfig.newConfig(codeletName3, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, 2)
@@ -250,14 +250,14 @@ public class Codelettester {
 
 			// Agent with handler and 2 codelets
 			AgentConfig codeletAgentConfig = AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(handlerName, CodeletHandlerImpl.class))
-					.addFunction(AgentFunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
+					.addFunction(FunctionConfig.newConfig(handlerName, CodeletHandlerImpl.class))
+					.addFunction(FunctionConfig.newConfig(codeletName1, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, "1")
 							.setProperty(IncrementOnConditionCodelet.attributeCheckAddress, processDatapoint)
 							.setProperty(IncrementOnConditionCodelet.attributeConditionValue, new JsonPrimitive(1)))
-					.addFunction(AgentFunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
+					.addFunction(FunctionConfig.newConfig(codeletName2, IncrementOnConditionCodelet.class)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTECODELETHANDLERADDRESS,
 									controllerAgentName + ":" + handlerName)
 							.setProperty(IncrementOnConditionCodelet.ATTRIBUTEEXECUTIONORDER, "4")
@@ -413,43 +413,43 @@ public class Codelettester {
 			AgentConfig cognitiveAgentConfig = AgentConfig.newConfig(cognitiveAgentName)
 					// Main codelethandler
 					.addFunction(
-							AgentFunctionConfig.newConfig(mainCodeletHandlerName, CodeletHandlerImpl.class)
+							FunctionConfig.newConfig(mainCodeletHandlerName, CodeletHandlerImpl.class)
 									.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 											namespaceWorkingMemory)
 									.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
 											namespaceInternalStateMemory))
 					// Process codelethandlers
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(activateConceptsCodeletHandlerName, CodeletHandlerImpl.class)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(createGoalsCodeletHandlerName, CodeletHandlerImpl.class)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(activateBeliefsCodeletHandlerName, CodeletHandlerImpl.class)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(proposeOptionsCodeletHandlerName, CodeletHandlerImpl.class)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(proposeActionsCodeletHandlerName, CodeletHandlerImpl.class)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(evaluteOptionsCodeletHandlerName, CodeletHandlerImpl.class)
 							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
@@ -457,42 +457,42 @@ public class Codelettester {
 									namespaceInternalStateMemory))
 					// Add main process codelets
 					// Add trigger codelets
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(activateConceptsCodeletTriggerName, CodeletHandlerTriggerCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									mainCodeletHandlerServiceAddress)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, "1")
 							.setProperty(CodeletHandlerTriggerCodelet.codeletHandlerServiceUriName,
 									cognitiveAgentName + ":" + activateConceptsCodeletHandlerName))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(createGoalsCodeletTriggerName, CodeletHandlerTriggerCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									mainCodeletHandlerServiceAddress)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, "2")
 							.setProperty(CodeletHandlerTriggerCodelet.codeletHandlerServiceUriName,
 									cognitiveAgentName + ":" + createGoalsCodeletHandlerName))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(activateBeliefsCodeletTriggerName, CodeletHandlerTriggerCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									mainCodeletHandlerServiceAddress)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, "3")
 							.setProperty(CodeletHandlerTriggerCodelet.codeletHandlerServiceUriName,
 									cognitiveAgentName + ":" + activateBeliefsCodeletHandlerName))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(proposeOptionsCodeletTriggerName, CodeletHandlerTriggerCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									mainCodeletHandlerServiceAddress)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, "4")
 							.setProperty(CodeletHandlerTriggerCodelet.codeletHandlerServiceUriName,
 									cognitiveAgentName + ":" + proposeOptionsCodeletHandlerName))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(proposeActionsCodeletTriggerName, CodeletHandlerTriggerCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									mainCodeletHandlerServiceAddress)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, "5")
 							.setProperty(CodeletHandlerTriggerCodelet.codeletHandlerServiceUriName,
 									cognitiveAgentName + ":" + proposeActionsCodeletHandlerName))
-					.addFunction(AgentFunctionConfig
+					.addFunction(FunctionConfig
 							.newConfig(evaluteOptionsCodeletTriggerName, CodeletHandlerTriggerCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									mainCodeletHandlerServiceAddress)
@@ -522,37 +522,37 @@ public class Codelettester {
 					// .addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT,
 					// namespaceWorkingMemory + "." + incrementDatapoint,
 					// SyncMode.SUBSCRIBEWRITEBACK)))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet11", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet11", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + activateConceptsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet12", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet12", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + createGoalsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet13", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet13", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + activateBeliefsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet14", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet14", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + proposeOptionsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet15", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet15", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + proposeActionsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint1))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet16", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet16", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
@@ -565,37 +565,37 @@ public class Codelettester {
 					// .addManagedDatapoint(DatapointConfig.newConfig(CFIncrementService.ATTRIBUTEINCREMENTDATAPOINT,
 					// namespaceWorkingMemory + "." + incrementDatapoint,
 					// SyncMode.SUBSCRIBEWRITEBACK)))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet21", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet21", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + activateConceptsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet22", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet22", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + createGoalsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet23", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet23", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + activateBeliefsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet24", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet24", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + proposeOptionsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet25", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet25", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + proposeActionsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESERVICENAME, incrementServiceName)
 							.setProperty(IncrementNumberCodelet.ATTRIBUTESUBADDRESS, incrementDatapoint2))
-					.addFunction(AgentFunctionConfig.newConfig("IncrementCodelet26", IncrementNumberCodelet.class)
+					.addFunction(FunctionConfig.newConfig("IncrementCodelet26", IncrementNumberCodelet.class)
 							.setProperty(CodeletImpl.ATTRIBUTECODELETHANDLERADDRESS,
 									cognitiveAgentName + ":" + evaluteOptionsCodeletHandlerName)
 							.setProperty(CodeletImpl.ATTRIBUTEEXECUTIONORDER, 0)

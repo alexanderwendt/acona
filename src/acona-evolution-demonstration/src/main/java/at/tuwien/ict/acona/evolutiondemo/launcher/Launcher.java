@@ -22,7 +22,7 @@ import at.tuwien.ict.acona.evolutiondemo.webserver.JerseyRestServer;
 import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
 import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -86,9 +86,9 @@ public class Launcher {
 			// === Controller agent implementation === //
 			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class))
+					.addFunction(FunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class))
 					// The codelet handler ist controller request receiver funtion
-					.addFunction(AgentFunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
+					.addFunction(FunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
 
 			synchronized (this) {
@@ -102,16 +102,16 @@ public class Launcher {
 			// === Broker ===//
 
 			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(FunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
-					.addFunction(AgentFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
+					.addFunction(FunctionConfig.newConfig("EvaluatorService", Evaluator.class)
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 2)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, brokerAgentName + ":" + statisticsService + "/" + StatisticsCollector.GETSTATISTICSSUFFIX)
 							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName))
-					.addFunction(AgentFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
+					.addFunction(FunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
 							.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
 
 			synchronized (this) {
@@ -125,12 +125,12 @@ public class Launcher {
 			// === Stock market ===//
 
 			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(FunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
 							.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(AgentFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
+					.addFunction(FunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
 			// === Traders ===//
@@ -181,7 +181,7 @@ public class Launcher {
 				String traderType = key;
 	
 				Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName + "_" + traderType)
-						.addFunction(AgentFunctionConfig.newConfig("trader_" + traderType, Trader.class)
+						.addFunction(FunctionConfig.newConfig("trader_" + traderType, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
@@ -189,7 +189,7 @@ public class Launcher {
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
 						//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-						.addFunction(AgentFunctionConfig.newConfig(signalService, EMAIndicator.class)
+						.addFunction(FunctionConfig.newConfig(signalService, EMAIndicator.class)
 								.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(EMAIndicator.ATTRIBUTEEMALONG, longMA)
 								.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
@@ -239,7 +239,7 @@ public class Launcher {
 			//Jsersey server to receive commands
 			AgentConfig server = AgentConfig.newConfig(serverAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addFunction(AgentFunctionConfig.newConfig("jerseyserver", JerseyRestServer.class)
+					.addFunction(FunctionConfig.newConfig("jerseyserver", JerseyRestServer.class)
 							.setProperty(EvolutionService.PARAMAGENTNAMES, controllerAgent.getName())
 							.setProperty(EvolutionService.PARAMCONTROLLERADDRESS, controllerAgent + ":" + controllerService));
 

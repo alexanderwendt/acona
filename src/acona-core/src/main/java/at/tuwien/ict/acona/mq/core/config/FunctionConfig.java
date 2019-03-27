@@ -11,12 +11,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
-import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
-import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 
-public class AgentFunctionConfig {
+public class FunctionConfig {
 	public static final String CELLFUNCTIONNAME = "functionname";
 	public static final String CELLFUNCTIONCLASS = "functionclass";
+	public static final String HOSTADDRESS = "host";
+	public static final String USER= "user";
+	public static final String PASSWORD = "password";
 	public static final String CELLMANAGEDDATAPOINTS = "syncdatapoints";
 	public static final String CELLEXECUTERATE = "executerate";
 	public static final String CELLEXECUTEONCE = "executeonce";
@@ -38,8 +39,8 @@ public class AgentFunctionConfig {
 	 * @param className
 	 * @return
 	 */
-	public static AgentFunctionConfig newConfig(String name, String className) {
-		return new AgentFunctionConfig(name, className, new HashMap<String, Object>());
+	public static FunctionConfig newConfig(String name, String className) {
+		return new FunctionConfig(name, className, new HashMap<String, Object>());
 	}
 
 	/**
@@ -49,9 +50,9 @@ public class AgentFunctionConfig {
 	 * @param clzz
 	 * @return
 	 */
-	public static AgentFunctionConfig newConfig(String name, Class<?> clzz) {
+	public static FunctionConfig newConfig(String name, Class<?> clzz) {
 		String className = clzz.getName();
-		return new AgentFunctionConfig(name, className, new HashMap<String, Object>());
+		return new FunctionConfig(name, className, new HashMap<String, Object>());
 	}
 	
 	/**
@@ -62,9 +63,9 @@ public class AgentFunctionConfig {
 	 * @param params
 	 * @return
 	 */
-	public static AgentFunctionConfig newConfig(String name, Class<?> clzz, Map<String, Object> params) {
+	public static FunctionConfig newConfig(String name, Class<?> clzz, Map<String, Object> params) {
 		String className = clzz.getName();
-		return new AgentFunctionConfig(name, className, params);
+		return new FunctionConfig(name, className, params);
 	}
 
 	/**
@@ -73,17 +74,17 @@ public class AgentFunctionConfig {
 	 * @param clzz
 	 * @return
 	 */
-	public static AgentFunctionConfig newConfig(Class<?> clzz) {
+	public static FunctionConfig newConfig(Class<?> clzz) {
 		String className = clzz.getName();
-		return new AgentFunctionConfig(clzz.getSimpleName() + className.hashCode(), className, new HashMap<String, Object>());
+		return new FunctionConfig(clzz.getSimpleName() + className.hashCode(), className, new HashMap<String, Object>());
 	}
 
 	/**
 	 * @param config
 	 * @return
 	 */
-	public static AgentFunctionConfig newConfig(JsonObject config) {
-		return new AgentFunctionConfig(config);
+	public static FunctionConfig newConfig(JsonObject config) {
+		return new FunctionConfig(config);
 	}
 	
 	
@@ -93,7 +94,7 @@ public class AgentFunctionConfig {
 	 * @param name
 	 * @param className
 	 */
-	private AgentFunctionConfig(String name, String className, Map<String, Object> params) {
+	private FunctionConfig(String name, String className, Map<String, Object> params) {
 		this.configObject = new JsonObject();
 		this.configObject.add(CELLMANAGEDDATAPOINTS, new JsonArray());
 		params.forEach((k, v)->this.configObject.addProperty(k, String.valueOf(v)));
@@ -103,7 +104,7 @@ public class AgentFunctionConfig {
 	/**
 	 * @param config
 	 */
-	private AgentFunctionConfig(JsonObject config) {
+	private FunctionConfig(JsonObject config) {
 		this.configObject = config;
 	}
 
@@ -111,7 +112,7 @@ public class AgentFunctionConfig {
 	 * @param name
 	 * @return
 	 */
-	private AgentFunctionConfig setName(String name) {
+	private FunctionConfig setName(String name) {
 		this.configObject.addProperty(CELLFUNCTIONNAME, name);
 		return this;
 	}
@@ -129,7 +130,7 @@ public class AgentFunctionConfig {
 	 * @param className
 	 * @return
 	 */
-	private AgentFunctionConfig setClassName(String className) {
+	private FunctionConfig setClassName(String className) {
 		this.configObject.addProperty(CELLFUNCTIONCLASS, className);
 		return this;
 	}
@@ -145,7 +146,7 @@ public class AgentFunctionConfig {
 	 * @param rateInMs
 	 * @return
 	 */
-	public AgentFunctionConfig setExecuterate(int rateInMs) {
+	public FunctionConfig setExecuterate(int rateInMs) {
 		this.configObject.addProperty(CELLEXECUTERATE, rateInMs);
 		return this;
 	}
@@ -163,7 +164,7 @@ public class AgentFunctionConfig {
 	 * @param isExecuteOnce
 	 * @return
 	 */
-	public AgentFunctionConfig setExecuteOnce(boolean isExecuteOnce) {
+	public FunctionConfig setExecuteOnce(boolean isExecuteOnce) {
 		this.configObject.addProperty(CELLEXECUTEONCE, isExecuteOnce);
 		return this;
 	}
@@ -181,7 +182,7 @@ public class AgentFunctionConfig {
 	 * @param isExecuteOnce
 	 * @return
 	 */
-	public AgentFunctionConfig setFinishStateAfterSingleRun(boolean isFinishedAfterSingleRun) {
+	public FunctionConfig setFinishStateAfterSingleRun(boolean isFinishedAfterSingleRun) {
 		this.configObject.addProperty(CELLFINISHSTATEAFTERSINGLERUN, isFinishedAfterSingleRun);
 		return this;
 	}
@@ -215,7 +216,7 @@ public class AgentFunctionConfig {
 	 * @param responderProtocol
 	 * @return
 	 */
-	public AgentFunctionConfig setCommunicatorTimeout(int timeout) {
+	public FunctionConfig setCommunicatorTimeout(int timeout) {
 		this.configObject.addProperty(COMMUNICATORTIMEOUT, timeout);
 		return this;
 	}
@@ -226,15 +227,48 @@ public class AgentFunctionConfig {
 	public JsonPrimitive getCommunicatorTimeout() {
 		return this.configObject.getAsJsonPrimitive(COMMUNICATORTIMEOUT);
 	}
-
-	// public JsonPrimitive getRegisterState() {
-	// return this.configObject.getAsJsonPrimitive(REGISTERSTATE);
-	// }
-
-	// public CellFunctionConfig setRegisterState(boolean registerState) {
-	// this.configObject.addProperty(REGISTERSTATE, registerState);
-	// return this;
-	// }
+	
+	/**
+	 * If no local host is used or other user and password than the standard data, use this method to set the connection.
+	 * 
+	 * @param host
+	 * @return
+	 */
+	public FunctionConfig setHostData(String host, String user, String password) {
+		this.configObject.addProperty(HOSTADDRESS, host);
+		this.configObject.addProperty(USER, user);
+		this.configObject.addProperty(PASSWORD, password);
+		
+		return this;
+	}
+	
+	/**
+	 * Get the MQTT host address
+	 * 
+	 * @return
+	 */
+	public JsonPrimitive getHost() {
+		return this.configObject.getAsJsonPrimitive(HOSTADDRESS);
+	}
+	
+	/**
+	 * Get user name
+	 * 
+	 * @return
+	 */
+	public JsonPrimitive getUser() {
+		return this.configObject.getAsJsonPrimitive(USER);
+	}
+	
+	/**
+	 * Get password
+	 * 
+	 * @return
+	 */
+	public JsonPrimitive getPassword() {
+		return this.configObject.getAsJsonPrimitive(PASSWORD);
+	}
+	
 
 	// ======================//
 
@@ -243,7 +277,7 @@ public class AgentFunctionConfig {
 	 * @param value
 	 * @return
 	 */
-	public AgentFunctionConfig setProperty(String name, String value) {
+	public FunctionConfig setProperty(String name, String value) {
 		if (this.configObject.has(name)) {
 			this.configObject.remove(name);
 		}
@@ -257,7 +291,7 @@ public class AgentFunctionConfig {
 	 * @param value
 	 * @return
 	 */
-	public AgentFunctionConfig setProperty(String name, int value) {
+	public FunctionConfig setProperty(String name, int value) {
 		if (this.configObject.has(name)) {
 			this.configObject.remove(name);
 		}
@@ -271,7 +305,7 @@ public class AgentFunctionConfig {
 	 * @param value
 	 * @return
 	 */
-	public AgentFunctionConfig setProperty(String name, double value) {
+	public FunctionConfig setProperty(String name, double value) {
 		if (this.configObject.has(name)) {
 			this.configObject.remove(name);
 		}
@@ -285,7 +319,7 @@ public class AgentFunctionConfig {
 	 * @param value
 	 * @return
 	 */
-	public AgentFunctionConfig setProperty(String name, boolean value) {
+	public FunctionConfig setProperty(String name, boolean value) {
 		if (this.configObject.has(name)) {
 			this.configObject.remove(name);
 		}
@@ -299,7 +333,7 @@ public class AgentFunctionConfig {
 	 * @param value
 	 * @return
 	 */
-	public AgentFunctionConfig setProperty(String name, JsonObject value) {
+	public FunctionConfig setProperty(String name, JsonObject value) {
 		if (this.configObject.has(name)) {
 			this.configObject.remove(name);
 		}
@@ -330,7 +364,7 @@ public class AgentFunctionConfig {
 	 * @param value
 	 * @return
 	 */
-	public AgentFunctionConfig setProperty(String key, Object value) {
+	public FunctionConfig setProperty(String key, Object value) {
 		// TODO: Method not tested yet
 		if (this.configObject.has(key)) {
 			this.configObject.remove(key);
@@ -414,7 +448,7 @@ public class AgentFunctionConfig {
 	 * @param config
 	 * @return
 	 */
-	public AgentFunctionConfig addManagedDatapoint(DatapointConfig config) {
+	public FunctionConfig addManagedDatapoint(DatapointConfig config) {
 		this.configObject.getAsJsonArray(CELLMANAGEDDATAPOINTS).add(config.toJsonObject());
 		return this;
 	}
@@ -424,7 +458,7 @@ public class AgentFunctionConfig {
 	 * @param mode
 	 * @return
 	 */
-	public AgentFunctionConfig addManagedDatapoint(String address, SyncMode mode) {
+	public FunctionConfig addManagedDatapoint(String address, SyncMode mode) {
 		return this.addManagedDatapoint(DatapointConfig.newConfig(address, address, mode));
 	}
 
@@ -435,7 +469,7 @@ public class AgentFunctionConfig {
 	 * @param syncMode
 	 * @return
 	 */
-	public AgentFunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
+	public FunctionConfig addManagedDatapoint(String id, String address, SyncMode syncMode) {
 		return this.addManagedDatapoint(DatapointConfig.newConfig(id, address, syncMode));
 	}
 

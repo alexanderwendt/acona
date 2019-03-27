@@ -9,7 +9,7 @@ import at.tuwien.ict.acona.mq.core.agentfunction.AgentCommunicatorFunctionImpl;
 import at.tuwien.ict.acona.mq.core.agentfunction.basicfunctions.DataAccess;
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.storage.DataStorage;
 import at.tuwien.ict.acona.mq.core.storage.DataStorageImpl;
 
@@ -44,7 +44,7 @@ public class AgentImpl implements Cell, Runnable {
 
 		// Add the basic function for communication
 		AgentCommunicatorFunctionImpl commFunction = new AgentCommunicatorFunctionImpl();
-		commFunction.init(AgentFunctionConfig.newConfig(agentName + "_" + "CommFunction", AgentCommunicatorFunctionImpl.class), this);
+		commFunction.init(FunctionConfig.newConfig(agentName + "_" + "CommFunction", AgentCommunicatorFunctionImpl.class), this);
 
 		// Get the communicator from the communicator cell function
 		// Important: Only cell functions can have communicators
@@ -77,7 +77,7 @@ public class AgentImpl implements Cell, Runnable {
 	private void initializeDefaultCellFunctions() throws Exception {
 		try {
 			DataAccess dataAccessFunction = new DataAccess();
-			dataAccessFunction.init(AgentFunctionConfig.newConfig("dataaccess", DataAccess.class), this);
+			dataAccessFunction.init(FunctionConfig.newConfig("dataaccess", DataAccess.class), this);
 
 			log.info("Basic database access functions initialized");
 		} catch (Exception e) {
@@ -177,7 +177,7 @@ public class AgentImpl implements Cell, Runnable {
 //	}
 
 	@Override
-	public void addFunction(AgentFunctionConfig cellFunctionConfig) throws Exception {
+	public void addFunction(FunctionConfig cellFunctionConfig) throws Exception {
 		try {
 			this.getBuilder().createCellFunctionFromConfig(cellFunctionConfig.toJsonObject());
 		} catch (Exception e) {

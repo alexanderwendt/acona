@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionThreadImpl;
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 

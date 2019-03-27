@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
 import at.tuwien.ict.acona.mq.core.agentfunction.helper.IncrementServiceThread;
 import at.tuwien.ict.acona.mq.core.agentfunction.helper.LoopController;
@@ -29,10 +30,9 @@ import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.DatapointMirro
 import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.DatapointTransfer;
 import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.SimpleReproduction;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -175,7 +175,7 @@ public class MqCellCoreFunctionTester {
 
 			// Create the server agent
 			AgentConfig serverConfig = AgentConfig.newConfig(agentNameServer)
-					.addFunction(AgentFunctionConfig.newConfig(DatapointTransfer.class)
+					.addFunction(FunctionConfig.newConfig(DatapointTransfer.class)
 							.setProperty(DatapointTransfer.PARAMSOURCEADDRESS, "<" + agentNameServer + ">/" + datapointSourceAddress)
 							.setProperty(DatapointTransfer.PARAMDESTINATIONADDRESS, "<" + agentNameServer + ">/" + datapointDestinationAddress));
 			Cell server = launcher.createAgent(serverConfig);
@@ -235,7 +235,7 @@ public class MqCellCoreFunctionTester {
 
 			// Create the server agent
 			AgentConfig clientConfig = AgentConfig.newConfig(agentNameClient)
-					.addFunction(AgentFunctionConfig.newConfig(DatapointTransfer.class)
+					.addFunction(FunctionConfig.newConfig(DatapointTransfer.class)
 							.setProperty(DatapointTransfer.PARAMSOURCEADDRESS, datapointSourceAddress)
 							.setProperty(DatapointTransfer.PARAMDESTINATIONADDRESS, datapointDestinationAddress));
 			Cell client = launcher.createAgent(clientConfig);
@@ -304,7 +304,7 @@ public class MqCellCoreFunctionTester {
 			inspectors.add(firstCell);
 			for (int i = 1; i < numberOfAgents; i++) {
 				Cell cell = (this.launcher.createAgent(AgentConfig.newConfig(agentNameTemplate + i)
-						.addFunction(AgentFunctionConfig.newConfig("updater", DatapointMirroring.class)
+						.addFunction(FunctionConfig.newConfig("updater", DatapointMirroring.class)
 								.addManagedDatapoint(datapointaddress, inspectors.get(i - 1).getName() + ":" + datapointaddress, SyncMode.SUBSCRIBEONLY))));
 				inspectors.add(cell);
 				cell.getFunctionHandler().getCellFunction("<" + agentNameTemplate + i + ">/" + "updater").getCommunicator().setDefaultTimeout(60000);
@@ -312,7 +312,7 @@ public class MqCellCoreFunctionTester {
 
 			// Add special time function
 			Cell timeRegister = this.launcher.createAgent(AgentConfig.newConfig("TimeRegister")
-					.addFunction(AgentFunctionConfig.newConfig("TimeRegisterFunction", TimeRegisterFunction.class)
+					.addFunction(FunctionConfig.newConfig("TimeRegisterFunction", TimeRegisterFunction.class)
 							.addManagedDatapoint("STOPTIME", agentNameTemplate + (numberOfAgents - 1) + ":" + datapointaddress, SyncMode.SUBSCRIBEONLY)));
 
 			long setupStopTime = System.currentTimeMillis();
@@ -395,11 +395,11 @@ public class MqCellCoreFunctionTester {
 
 			// Controller
 			AgentConfig controllerAgentConfig = AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerFunctionName, SimpleController.class)
+					.addFunction(FunctionConfig.newConfig(controllerFunctionName, SimpleController.class)
 							.setProperty("agentname", controllerAgentName)
 							.setProperty("servicename", ServiceName)
 							.setProperty("delay", "1000"))
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME, controllerAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell controller = this.launcher.createAgent(controllerAgentConfig);
 
@@ -488,7 +488,7 @@ public class MqCellCoreFunctionTester {
 
 			// Controller
 			AgentConfig controllerAgentConfig = AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
+					.addFunction(FunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
 							.setProperty("agent1", agentName1)
 							.setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3)
@@ -500,19 +500,19 @@ public class MqCellCoreFunctionTester {
 
 			// Create services
 			AgentConfig serviceAgent1 = AgentConfig.newConfig(agentName1)
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
 									memoryAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell service1 = this.launcher.createAgent(serviceAgent1);
 
 			AgentConfig serviceAgent2 = AgentConfig.newConfig(agentName2)
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
 									memoryAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell service2 = this.launcher.createAgent(serviceAgent2);
 
 			AgentConfig serviceAgent3 = AgentConfig.newConfig(agentName3)
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(DatapointConfig.newConfig(INCREMENTATIONDATAPOINTNAME,
 									memoryAgentName + ":" + processDatapoint, SyncMode.SUBSCRIBEWRITEBACK)));
 			Cell service3 = this.launcher.createAgent(serviceAgent3);
@@ -584,21 +584,21 @@ public class MqCellCoreFunctionTester {
 
 			// Use a system config to init the whole system
 			Cell controller = this.launcher.createAgent(AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
+					.addFunction(FunctionConfig.newConfig(controllerFunctionName, SequenceController.class)
 							.setProperty("agent1", agentName1).setProperty("agent2", agentName2)
 							.setProperty("agent3", agentName3).setProperty("servicename", ServiceName)
 							.setProperty("delay", "1")));
 			this.launcher.createAgent(AgentConfig.newConfig(memoryAgentName));
 			this.launcher.createAgent(AgentConfig.newConfig(agentName1)
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 			this.launcher.createAgent(AgentConfig.newConfig(agentName2)
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 			this.launcher.createAgent(AgentConfig.newConfig(agentName3)
-					.addFunction(AgentFunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(ServiceName, IncrementServiceThread.class)
 							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 
@@ -659,7 +659,7 @@ public class MqCellCoreFunctionTester {
 
 			// === Config ===//
 			Cell topController = this.launcher.createAgent(AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerServiceName, SimpleController.class)
+					.addFunction(FunctionConfig.newConfig(controllerServiceName, SimpleController.class)
 							.setProperty("agentname", serviceAgentName).setProperty("servicename", serviceName)
 							.setProperty("delay", "10")));
 			// SystemConfig totalConfig = SystemConfig.newConfig();
@@ -667,7 +667,7 @@ public class MqCellCoreFunctionTester {
 
 			this.launcher.createAgent(AgentConfig.newConfig(memoryAgentName));
 			this.launcher.createAgent(AgentConfig.newConfig(serviceAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(serviceName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(serviceName, IncrementServiceThread.class)
 							.addManagedDatapoint(INCREMENTATIONDATAPOINTNAME, memoryAgentName + ":" + processDatapoint,
 									SyncMode.READWRITEBACK)));
 
@@ -859,7 +859,7 @@ public class MqCellCoreFunctionTester {
 
 			// Add controller
 			Cell controller = this.launcher.createAgent(AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerServiceName, LoopController.class)
+					.addFunction(FunctionConfig.newConfig(controllerServiceName, LoopController.class)
 							.setProperty("agentnameprefix", serviceAgentName)
 							.setProperty("servicename", serviceName)
 							.setProperty("numberofagents", String.valueOf(numberOfAgents))
@@ -890,7 +890,7 @@ public class MqCellCoreFunctionTester {
 			// Add services
 			for (int i = 1; i <= numberOfAgents; i++) {
 				this.launcher.createAgent(AgentConfig.newConfig(serviceAgentName + i)
-						.addFunction(AgentFunctionConfig.newConfig(serviceName, IncrementServiceThread.class)
+						.addFunction(FunctionConfig.newConfig(serviceName, IncrementServiceThread.class)
 								.addManagedDatapoint(IncrementFunctionDatapointID, memoryAgentName + ":" + processDatapoint,
 										SyncMode.READWRITEBACK)));
 				synchronized (this) {
@@ -975,10 +975,10 @@ public class MqCellCoreFunctionTester {
 
 			// Create cell
 			Cell agent = this.launcher.createAgent(AgentConfig.newConfig(agentName)
-					.addFunction(AgentFunctionConfig.newConfig(functionName, IncrementServiceThread.class)
+					.addFunction(FunctionConfig.newConfig(functionName, IncrementServiceThread.class)
 							.addManagedDatapoint(IncrementServiceThread.ATTRIBUTEINCREMENTDATAPOINT, datapoint,
 									SyncMode.SUBSCRIBEWRITEBACK))
-					.addFunction(AgentFunctionConfig.newConfig("reproduce", SimpleReproduction.class)));
+					.addFunction(FunctionConfig.newConfig("reproduce", SimpleReproduction.class)));
 
 			synchronized (this) {
 				try {
@@ -1084,7 +1084,7 @@ public class MqCellCoreFunctionTester {
 			log.info("=== All agents initialized ===");
 
 			// Add the increment function post to start of the agent
-			AgentFunctionConfig functionConf = AgentFunctionConfig.newConfig(functionName, IncrementServiceThread.class)
+			FunctionConfig functionConf = FunctionConfig.newConfig(functionName, IncrementServiceThread.class)
 					.addManagedDatapoint(IncrementServiceThread.ATTRIBUTEINCREMENTDATAPOINT, datapoint, SyncMode.SUBSCRIBEWRITEBACK);
 
 

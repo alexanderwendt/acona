@@ -28,10 +28,10 @@ import at.tuwien.ict.acona.evolutiondemo.brokeragent.DepotStaticticsGraphToolFun
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.StatisticsCollector;
 import at.tuwien.ict.acona.evolutiondemo.stockmarketagent.DummyPriceGenerator;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.SpeciesType;
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
@@ -87,7 +87,7 @@ public class BrokerTester {
 			String stockName = "Fingerprint";
 
 			AgentConfig cf = AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, "test"));
@@ -228,11 +228,11 @@ public class BrokerTester {
 			String stockName = "Fingerprint";
 
 			AgentConfig cf = AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, "data"))
-					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(FunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, "data"));
 			Cell brokerAgent = this.controller.createAgent(cf);
 

@@ -28,7 +28,7 @@ import at.tuwien.ict.acona.evolutiondemo.traderagent.PermanentBuySellIndicator;
 import at.tuwien.ict.acona.evolutiondemo.traderagent.Trader;
 import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
@@ -97,7 +97,7 @@ public class TraderTester {
 			long startTimeSetup = System.currentTimeMillis();
 
 			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
+					.addFunction(FunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
 			controllerAgent.getCommunicator().setDefaultTimeout(60000);
 
 			synchronized (this) {
@@ -109,11 +109,11 @@ public class TraderTester {
 			}
 
 			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addFunction(FunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
 			synchronized (this) {
 				try {
@@ -124,7 +124,7 @@ public class TraderTester {
 			}
 
 			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(FunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -140,7 +140,7 @@ public class TraderTester {
 				}
 
 				Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName + "_" + i)
-						.addFunction(AgentFunctionConfig.newConfig("trader_" + i, Trader.class)
+						.addFunction(FunctionConfig.newConfig("trader_" + i, Trader.class)
 								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
@@ -148,7 +148,7 @@ public class TraderTester {
 								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 								.setProperty(Trader.ATTRIBUTETIMEOUT, 60000)
 								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-						.addFunction(AgentFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+						.addFunction(FunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 				traderAgent.getCommunicator().setDefaultTimeout(60000);
 			}
 
@@ -377,7 +377,7 @@ public class TraderTester {
 
 			// Controller agent
 			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
+					.addFunction(FunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
 
 			synchronized (this) {
 				try {
@@ -389,11 +389,11 @@ public class TraderTester {
 
 			// Broker Agent
 			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
+					.addFunction(FunctionConfig.newConfig(statisticsService, StatisticsCollector.class)));
 
 			synchronized (this) {
 				try {
@@ -405,7 +405,7 @@ public class TraderTester {
 
 			// Stock market Agent
 			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(FunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -413,14 +413,14 @@ public class TraderTester {
 
 			// Single Trader agent
 			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(tradeService, Trader.class)
+					.addFunction(FunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 							.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderTypePrefix + "-L" + EMALongPeriod + ":S" + EMAShortPeriod)
 							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					.addFunction(AgentFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+					.addFunction(FunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 
 			synchronized (this) {
 				try {
@@ -496,7 +496,7 @@ public class TraderTester {
 
 			// Controller agent
 			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
+					.addFunction(FunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class)));
 
 			synchronized (this) {
 				try {
@@ -508,11 +508,11 @@ public class TraderTester {
 
 			// Broker Agent
 			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data")
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(FunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data")));
 
 			synchronized (this) {
@@ -525,7 +525,7 @@ public class TraderTester {
 
 			// Stock market Agent
 			Cell stockMarketAgent = this.controller.createAgent(AgentConfig.newConfig(stockmarketAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
+					.addFunction(FunctionConfig.newConfig(stockmarketServiceName, DummyPriceGenerator.class)
 							.setProperty(DummyPriceGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0)
 							.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 1)
@@ -533,14 +533,14 @@ public class TraderTester {
 
 			// Single Trader agent
 			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(tradeService, Trader.class)
+					.addFunction(FunctionConfig.newConfig(tradeService, Trader.class)
 							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 							.setProperty(Trader.ATTRIBUTEAGENTTYPE, "kamikazeType")
 							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
 							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1)
 							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName))
-					.addFunction(AgentFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
+					.addFunction(FunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 
 			synchronized (this) {
 				try {

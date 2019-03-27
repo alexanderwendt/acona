@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunction;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 
 public class AgentBuilder {
 
@@ -60,7 +60,7 @@ public class AgentBuilder {
 		AgentFunction result = null;
 
 		// Get all values
-		AgentFunctionConfig cellconfig = AgentFunctionConfig.newConfig(config);
+		FunctionConfig cellconfig = FunctionConfig.newConfig(config);
 		String className = cellconfig.getClassName();
 
 		// Generate the class

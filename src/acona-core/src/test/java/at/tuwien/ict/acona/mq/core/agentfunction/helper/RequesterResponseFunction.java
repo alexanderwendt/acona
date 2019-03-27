@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunction;
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.DummyAgent;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
@@ -49,7 +49,7 @@ public class RequesterResponseFunction implements Runnable {
 		// Put the registered functions here
 		// methods.put("increment", (Request input) -> increment(input));
 		AgentFunction incrementFunction = new IncrementFunction();
-		incrementFunction.init(AgentFunctionConfig.newConfig(functionName, IncrementFunction.class), new DummyAgent(agentName));
+		incrementFunction.init(FunctionConfig.newConfig(functionName, IncrementFunction.class), new DummyAgent(agentName));
 
 		this.comm = incrementFunction.getCommunicator();
 		// comm = new MqttCommunicatorImpl(new DataStorageImpl());

@@ -17,12 +17,12 @@ import at.tuwien.ict.acona.demowebservice.cellfunctions.ComparisonAlgorithm;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.UserInterfaceCollector;
 import at.tuwien.ict.acona.demowebservice.cellfunctions.WeatherService;
 import at.tuwien.ict.acona.demowebservice.helpers.WeatherServiceClientMock;
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
 import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.StateMonitor;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
@@ -71,7 +71,7 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld/currentweather";
 
 			AgentConfig cf = AgentConfig.newConfig(weatherAgent1Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 						.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY)
 						.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 						.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"));
@@ -138,12 +138,12 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld/currentweather";
 
 			AgentConfig cf = AgentConfig.newConfig(weatherAgent1Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 						.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY)
 						.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 						.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"))
 					//.addCellfunction(CellFunctionConfig.newConfig(StateMonitor.class))
-					.addFunction(AgentFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(FunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, weatherAgent1Name + ":" + StateMonitor.SYSTEMSTATEADDRESS, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY));
 			Cell weatherAgent = this.controller.createAgent(cf);
@@ -217,25 +217,25 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld.currentweather";
 
 			Cell weatherAgent1 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent1Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY)
 							.setProperty(WeatherServiceClientMock.CITYNAME, "abudhabi")
 							.setProperty(WeatherServiceClientMock.USERID, "5bac1f7f2b67f3fb3452350c23401903"))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent2 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent2Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent2Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			Cell weatherAgent3 = this.controller.createAgent(AgentConfig.newConfig(weatherAgent3Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherServiceClientMock.class)
 							.setProperty(WeatherService.CITYNAME, "stockholm")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent3Name + ":" + publishAddress, SyncMode.WRITEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {
@@ -247,15 +247,15 @@ public class DemoWebServiceTester {
 
 			Cell calculator = this.controller.createAgent(AgentConfig.newConfig(algorithmAgentName)
 					// .addCellfunction(CellFunctionConfig.newConfig(algorithmService, ComparisonAlgorithmAlternative.class)
-					.addFunction(AgentFunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
+					.addFunction(FunctionConfig.newConfig(algorithmService, ComparisonAlgorithm.class)
 							.addManagedDatapoint("Vienna", weatherAgent2Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Stockholm", weatherAgent3Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("Mocktown", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addFunction(AgentFunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
+					.addFunction(FunctionConfig.newConfig("LamprosUI", UserInterfaceCollector.class)
 							.addManagedDatapoint(UserInterfaceCollector.SYSTEMSTATEADDRESSID, algorithmAgentName + ":" + StateMonitor.SYSTEMSTATEADDRESS, SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("RESULT", algorithmAgentName + ":" + algorithmService + ".result", SyncMode.SUBSCRIBEONLY)
 							.addManagedDatapoint("ui1", weatherAgent1Name + ":" + publishAddress, SyncMode.SUBSCRIBEONLY))
-					.addFunction(AgentFunctionConfig.newConfig(StateMonitor.class)));
+					.addFunction(FunctionConfig.newConfig(StateMonitor.class)));
 
 			synchronized (this) {
 				try {
@@ -306,7 +306,7 @@ public class DemoWebServiceTester {
 			String publishAddress = "helloworld.currentweather";
 
 			AgentConfig cf = AgentConfig.newConfig(weatherAgent1Name)
-					.addFunction(AgentFunctionConfig.newConfig(weatherservice, WeatherService.class)
+					.addFunction(FunctionConfig.newConfig(weatherservice, WeatherService.class)
 							.setProperty(WeatherService.CITYNAME, "vienna")
 							.setProperty(WeatherService.USERID, "5bac1f7f2b67f3fb3452350c23401903")
 							.addManagedDatapoint(WeatherServiceClientMock.WEATHERADDRESSID, weatherAgent1Name + ":" + publishAddress, SyncMode.WRITEONLY));

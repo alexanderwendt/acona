@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 
 import at.tuwien.ict.acona.mq.core.communication.MqttCommunicator;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -22,7 +22,7 @@ public interface AgentFunction {
 	 * @return itself, in order to instantiate the cell and init at the same time
 	 * @throws Exception
 	 */
-	public void init(AgentFunctionConfig config, Cell cell) throws Exception;
+	public void init(FunctionConfig config, Cell cell) throws Exception;
 
 	/**
 	 * Return the name of the function, which has been specified in the config file
@@ -50,7 +50,7 @@ public interface AgentFunction {
 	 * 
 	 * @return
 	 */
-	public AgentFunctionConfig getFunctionConfig();
+	public FunctionConfig getFunctionConfig();
 
 //	/**
 //	 * Get the defined type of function, e.g. base functions shall not be shown in the monitoring of an application, only codelets and threads.

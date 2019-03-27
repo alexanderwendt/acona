@@ -21,7 +21,7 @@ import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
 import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletHandlerImpl;
 import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.SimpleReproduction;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.core.Cell;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Request;
@@ -87,9 +87,9 @@ public class LauncherReplicator {
 			// === Controller agent implementation === //
 			Cell controllerAgent = this.controller.createAgent(AgentConfig.newConfig(controllerAgentName)
 					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addFunction(AgentFunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class))
+					.addFunction(FunctionConfig.newConfig(controllerService, CodeletHandlerImpl.class))
 					// The codelet handler ist controller request receiver funtion
-					.addFunction(AgentFunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
+					.addFunction(FunctionConfig.newConfig("controller", ConsoleRequestReceiver.class)
 							.setProperty(ConsoleRequestReceiver.ATTRIBUTECONTROLLERSERVICE, controllerService)));
 
 			synchronized (this) {
@@ -103,18 +103,18 @@ public class LauncherReplicator {
 			// === Broker ===//
 
 			Cell brokerAgent = this.controller.createAgent(AgentConfig.newConfig(brokerAgentName)
-					.addFunction(AgentFunctionConfig.newConfig(brokerServiceName, Broker.class)
+					.addFunction(FunctionConfig.newConfig(brokerServiceName, Broker.class)
 							.setProperty(Broker.ATTRIBUTESTOCKNAME, stockName)
 							.setProperty(Broker.ATTRIBUTECOMMISSION, 0.0025)
 							.setProperty(Broker.PARAMPRICESOURCE, stockmarketAgentName + ":" + "data"))
-					.addFunction(AgentFunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
+					.addFunction(FunctionConfig.newConfig(statisticsService, StatisticsCollector.class)
 							.setProperty(StatisticsCollector.DATAADDRESS, stockmarketAgentName + ":" + "data"))
-					.addFunction(AgentFunctionConfig.newConfig("EvaluatorService", Evaluator.class)
+					.addFunction(FunctionConfig.newConfig("EvaluatorService", Evaluator.class)
 							.setProperty(Evaluator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 							.setProperty(Evaluator.ATTRIBUTEEXECUTIONORDER, 100)
 							.setProperty(Evaluator.STATISTICSCOLLECTORSERVICENAME, brokerAgentName + ":" + statisticsService + "/" + StatisticsCollector.GETSTATISTICSSUFFIX)
 							.setProperty(Evaluator.STATISTICSDATAPOINTNAME, statisticsDatapointName))
-					.addFunction(AgentFunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
+					.addFunction(FunctionConfig.newConfig("TypesGraph", DepotStaticticsGraphToolFunction.class)
 							.addManagedDatapoint(statisticsDatapointName, SyncMode.SUBSCRIBEONLY)));
 
 			synchronized (this) {
@@ -133,11 +133,11 @@ public class LauncherReplicator {
 					//		.setProperty(DummyPriceGenerator.ATTRIBUTEEXECUTIONORDER, 0) 		// First, the stock market generates a price, run order 0
 					//		.setProperty(DummyPriceGenerator.ATTRIBUTEMODE, 0)					//1=constant, 0=sin
 					//		.setProperty(DummyPriceGenerator.ATTRIBUTESTOCKNAME, stockName))
-					.addFunction(AgentFunctionConfig.newConfig(stockmarketServiceName, PriceLoaderGenerator.class, Map.of(
+					.addFunction(FunctionConfig.newConfig(stockmarketServiceName, PriceLoaderGenerator.class, Map.of(
 							PriceLoaderGenerator.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService,
 							PriceLoaderGenerator.ATTRIBUTEEXECUTIONORDER, 0,
 							PriceLoaderGenerator.ATTRIBUTESTOCKNAME, stockName)))	// First, the stock market generates a price, run order 0
-					.addFunction(AgentFunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
+					.addFunction(FunctionConfig.newConfig("OHLCGraph", PriceGraphToolFunction.class) // Stock market graph
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
 			// === Traders ===//
@@ -209,7 +209,7 @@ public class LauncherReplicator {
 			int cell1LongMA = 95;
 			
 			Cell traderAgentRepro1 = this.controller.createAgent(AgentConfig.newConfig(traderAgentName + "_" + "L" + cell1LongMA +  "S" + cell1ShortMA)
-			.addFunction(AgentFunctionConfig.newConfig("TraderFunction", Trader.class)
+			.addFunction(FunctionConfig.newConfig("TraderFunction", Trader.class)
 					.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
 					.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 					.setProperty(Trader.ATTRIBUTEAGENTTYPE, "L" + cell1LongMA +  "S" + cell1ShortMA)
@@ -220,11 +220,11 @@ public class LauncherReplicator {
 					.setProperty(Trader.ATTRIBUTEMUTATE, false))
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
 			//.addCellfunction(CellFunctionConfig.newConfig(signalService, RandomBuySellIndicator.class)));
-			.addFunction(AgentFunctionConfig.newConfig(signalService, EMAIndicator.class)
+			.addFunction(FunctionConfig.newConfig(signalService, EMAIndicator.class)
 					.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
 					.setProperty(EMAIndicator.ATTRIBUTEEMALONG, cell1LongMA)
 					.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, cell1ShortMA))
-			.addFunction(AgentFunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
+			.addFunction(FunctionConfig.newConfig(reproduceFunction, SimpleReproduction.class)));
 			
 			
 //			int cell2ShortMA = 10;

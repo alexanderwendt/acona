@@ -10,12 +10,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import at.tuwien.ict.acona.evolutiondemo.brokeragent.Depot;
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunction;
+import at.tuwien.ict.acona.mq.core.agentfunction.ControlCommand;
 import at.tuwien.ict.acona.mq.core.agentfunction.SyncMode;
 import at.tuwien.ict.acona.mq.core.agentfunction.codelets.CodeletImpl;
 import at.tuwien.ict.acona.mq.core.config.AgentConfig;
-import at.tuwien.ict.acona.mq.core.config.AgentFunctionConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
 import at.tuwien.ict.acona.mq.core.config.DatapointConfig;
-import at.tuwien.ict.acona.mq.datastructures.ControlCommand;
 import at.tuwien.ict.acona.mq.datastructures.Request;
 import at.tuwien.ict.acona.mq.datastructures.Response;
 
@@ -291,8 +291,8 @@ public class Trader extends CodeletImpl {
 				
 				//Modify the configuration
 				AgentConfig newCellConfig = this.getAgent().getConfiguration();
-				AgentFunctionConfig newSignalFunctionConfig = newCellConfig.getCellFunction(signalAddress);
-				AgentFunctionConfig newTraderFunctionConfig = newCellConfig.getCellFunction("TraderFunction");
+				FunctionConfig newSignalFunctionConfig = newCellConfig.getCellFunction(signalAddress);
+				FunctionConfig newTraderFunctionConfig = newCellConfig.getCellFunction("TraderFunction");
 				
 				//Get old values and modify them
 				int emaShort = Integer.valueOf(newSignalFunctionConfig.getProperty(EMAIndicator.ATTRIBUTEEMASHORT));
