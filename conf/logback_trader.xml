@@ -2,7 +2,7 @@
   <!--<evaluator name="TEST_EVALUATOR">
     <expression>logger.contains("ControlGateway") &amp;&amp; message.contains("TestTest")</expression>
   </evaluator>-->
-  <property name="DEV_HOME" value="log"/>
+  <property name="DEV_HOME" value="log/Stockmarket"/>
   <property name="logFileName" value="archivetraderlog"/>
   <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
   

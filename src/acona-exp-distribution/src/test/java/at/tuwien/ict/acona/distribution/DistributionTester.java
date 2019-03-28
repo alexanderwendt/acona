@@ -108,5 +108,54 @@ public class DistributionTester {
 			fail("Error");
 		}
 	}
+	
+	/**
+	 * Test a conrod with X machines and one connected ACOs.
+	 * 
+	 */
+	@Test
+	public void singlePublisherSingleSubscriber() {
+		try {
+			Cell agent = this.controller.createAgent(AgentConfig.newConfig("Agent1")
+					.addFunction("Sender", Client.class)
+					.addFunction("Server", Server.class));
+			
+			
+			//Cell agent2 = this.controller.createAgent(CellConfig.newConfig("Agent2")
+			//		.addFunction("Sender", Sender.class));
+					//.addFunction("Server", Server.class));
+			
+			synchronized (this) {
+				try {
+					this.wait(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			
+			log.info("=== All agents initialized ===");
+			
+			log.debug("Start execution of the sender");
+			agent.getCommunicator().execute("Sender/command", (new Request())
+					.setParameter("command", ControlCommand.START)
+					.setParameter("blocking", false), 100000);
+			
+
+			synchronized (this) {
+				try {
+					this.wait(100000);
+				} catch (InterruptedException e) {
+
+				}
+			}
+
+			//log.info("Got answer={}. Correct answer={}", pname, "Conrod");
+			assertEquals(true, false);
+			log.info("All tests passed");
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
+	}
 
 }

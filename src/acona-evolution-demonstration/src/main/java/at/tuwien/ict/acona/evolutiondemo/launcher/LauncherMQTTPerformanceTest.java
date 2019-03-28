@@ -34,18 +34,18 @@ import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
  * @author wendt
  *
  */
-public class Launcher {
+public class LauncherMQTTPerformanceTest {
 
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 	
-	private static Launcher launcher;
+	private static LauncherMQTTPerformanceTest launcher;
 
 	public static void main(String[] args) {
 		log.info("Welcome to the ACONA Stock Market Evolution Demonstrator");
 
-		launcher = new Launcher();
+		launcher = new LauncherMQTTPerformanceTest();
 		try {
 			launcher.init();
 		} catch (Exception e) {
@@ -54,6 +54,8 @@ public class Launcher {
 		}
 
 	}
+	
+	
 
 	private void init() throws Exception {
 		try {
@@ -135,57 +137,12 @@ public class Launcher {
 							.addManagedDatapoint("Fingdata", "data", SyncMode.SUBSCRIBEONLY))); // Puts data on datapoint StockMarketAgent:data); // Puts data on datapoint StockMarketAgent:data
 
 			// === Traders ===//
-			List<String> l = new ArrayList<String>();
-			
+			// Create the initial set of traders
 			//Generate 50 agents that don't replicate or mutate but with different MA values
-			for (int i = 1; i <= 50; i++) {
-				
-				int longMA = 0;
-				int shortMA = 0;
-				boolean breaker = true;
-				String key = "LS";
-				do {
-					longMA = (int)(Math.random()*100);
-					shortMA = (int)(Math.random()*longMA);
-					key = "L" + longMA + "S" + shortMA;
-					if (l.contains(key)==true) {
-						log.info("L {}, S {} already exists", longMA, shortMA);
-						breaker=false;
-					} else {
-						breaker=true;
-						log.info("Added agent, L {}, S {}", longMA, shortMA);
-						break;
-					}
-				} while (breaker==false);
-				
-				l.add(key);
-				String traderType = key;
-	
-				Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderAgentName + "_" + traderType)
-						.addFunction(FunctionConfig.newConfig("trader_" + traderType, Trader.class)
-								.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
-								.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-								.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
-								.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
-								.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
-								.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
-								.setProperty(Trader.ATTRIBUTEMULTIPLY, false)
-								.setProperty(Trader.ATTRIBUTEMUTATE, false))
-						//.addCellfunction(CellFunctionConfig.newConfig(signalService, PermanentBuySellIndicator.class)));
-						.addFunction(FunctionConfig.newConfig(signalService, EMAIndicator.class)
-								.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
-								.setProperty(EMAIndicator.ATTRIBUTEEMALONG, longMA)
-								.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
-			}
-			
-			//Jsersey server to receive commands
-			AgentConfig server = AgentConfig.newConfig(serverAgentName)
-					// Here a codelethandler is used. The agents are codelets of the codelet handler. Agents
-					.addFunction(FunctionConfig.newConfig("jerseyserver", JerseyRestServer.class)
-							.setProperty(EvolutionService.PARAMAGENTNAMES, controllerAgent.getName())
-							.setProperty(EvolutionService.PARAMCONTROLLERADDRESS, controllerAgent + ":" + controllerService));
-
-			//Cell serverCell = this.controller.createAgent(server);
+			int numberOfAgents = 50;
+			int longMA = 8;
+			int shortMA = 4;
+			generateAgentBatch(controllerAgentName, controllerService, stockmarketAgentName, brokerAgentName, brokerServiceName, signalService, numberOfAgents, longMA, shortMA);
 					
 			synchronized (this) {
 				try {
@@ -200,8 +157,13 @@ public class Launcher {
 			
 			log.info("=== All agents initialized ===");
 			
+			//increase the number of agents with x at each turn
+			int increaseTurn = 20;
 			for (int i = 1; i <= 100000; i++) {
 				log.info("run {}/{}", i, 100000);
+				
+				generateAgentBatch(controllerAgentName, controllerService, stockmarketAgentName, brokerAgentName, brokerServiceName, signalService, numberOfAgents, longMA, shortMA);
+				
 				// Execute the codelet handler
 				controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
 			}
@@ -211,6 +173,32 @@ public class Launcher {
 			throw new Exception(e.getMessage());
 		}
 
+	}
+
+
+
+	private void generateAgentBatch(String controllerAgentName, String controllerService, String stockmarketAgentName,
+			String brokerAgentName, String brokerServiceName, String signalService, int numberOfAgents, int longMA,
+			int shortMA) throws Exception {
+		for (int i = 1; i <= numberOfAgents; i++) {
+			String key = "L" + longMA + "S" + shortMA + "_" + i;
+			String traderType = key;
+
+			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderType)
+					.addFunction(FunctionConfig.newConfig("trader_" + traderType, Trader.class)
+							.setProperty(Trader.ATTRIBUTECODELETHANDLERADDRESS, controllerAgentName + ":" + controllerService)
+							.setProperty(Trader.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+							.setProperty(Trader.ATTRIBUTEAGENTTYPE, traderType)
+							.setProperty(Trader.ATTRIBUTESIGNALADDRESS, signalService)
+							.setProperty(Trader.ATTRIBUTEEXECUTIONORDER, 1) // Second, the traderstrade
+							.setProperty(Trader.ATTRIBUTEBROKERADDRESS, brokerAgentName + ":" + brokerServiceName)
+							.setProperty(Trader.ATTRIBUTEMULTIPLY, false)
+							.setProperty(Trader.ATTRIBUTEMUTATE, false))
+					.addFunction(FunctionConfig.newConfig(signalService, EMAIndicator.class)
+							.setProperty(EMAIndicator.ATTRIBUTESTOCKMARKETADDRESS, stockmarketAgentName + ":" + "data")
+							.setProperty(EMAIndicator.ATTRIBUTEEMALONG, longMA)
+							.setProperty(EMAIndicator.ATTRIBUTEEMASHORT, shortMA)));
+		}
 	}
 
 }
