@@ -117,13 +117,10 @@ public class DistributionTester {
 	public void singlePublisherSingleSubscriber() {
 		try {
 			Cell agent = this.controller.createAgent(AgentConfig.newConfig("Agent1")
-					.addFunction("Sender", Client.class)
-					.addFunction("Server", Server.class));
-			
-			
-			//Cell agent2 = this.controller.createAgent(CellConfig.newConfig("Agent2")
-			//		.addFunction("Sender", Sender.class));
-					//.addFunction("Server", Server.class));
+					.addFunction("Publisher", Publisher.class, Map.of(
+							Publisher.PUBLISHADDRESS, "testaddress/test"))
+					.addFunction("Subscriber", SubscriberClient.class));
+					
 			
 			synchronized (this) {
 				try {
@@ -133,12 +130,14 @@ public class DistributionTester {
 				}
 			}
 			
-			log.info("=== All agents initialized ===");
-			
 			log.debug("Start execution of the sender");
-			agent.getCommunicator().execute("Sender/command", (new Request())
+			agent.getCommunicator().execute("Publisher/command", (new Request())
 					.setParameter("command", ControlCommand.START)
 					.setParameter("blocking", false), 100000);
+			
+			log.info("=== All agents initialized ===");
+			
+
 			
 
 			synchronized (this) {

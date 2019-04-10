@@ -31,6 +31,8 @@ public class Publisher extends AgentFunctionThreadImpl {
 		publishToAddress = this.getFunctionConfig().getProperty(PUBLISHADDRESS);
 		
 		log.info("Init Senderservice");
+		
+		this.setStart();
 	}
 
 	@Override
@@ -45,7 +47,7 @@ public class Publisher extends AgentFunctionThreadImpl {
 		
 		log.debug("Publish a message. Message={}", message);
 		this.write(publishToAddress, new JsonPrimitive(message));
-		log.debug("message {} poste to address", message, publishToAddress);
+		log.debug("message {} post to address {}", message, "<" + this.getAgentName() + ">/" + publishToAddress);
 		
 	}
 

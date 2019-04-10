@@ -40,6 +40,8 @@ public class LauncherMQTTPerformanceTest {
 	private final DPBuilder dpb = new DPBuilder();
 	private SystemControllerImpl controller = SystemControllerImpl.getLauncher();
 	
+	private static int count = 0;
+	
 	private static LauncherMQTTPerformanceTest launcher;
 
 	public static void main(String[] args) {
@@ -158,11 +160,11 @@ public class LauncherMQTTPerformanceTest {
 			log.info("=== All agents initialized ===");
 			
 			//increase the number of agents with x at each turn
-			int increaseTurn = 20;
+			int increaseTurn = 10;
 			for (int i = 1; i <= 100000; i++) {
 				log.info("run {}/{}", i, 100000);
 				
-				generateAgentBatch(controllerAgentName, controllerService, stockmarketAgentName, brokerAgentName, brokerServiceName, signalService, numberOfAgents, longMA, shortMA);
+				generateAgentBatch(controllerAgentName, controllerService, stockmarketAgentName, brokerAgentName, brokerServiceName, signalService, increaseTurn, longMA, shortMA);
 				
 				// Execute the codelet handler
 				controllerAgent.getCommunicator().execute(controllerAgent.getName() + ":" + controllerService + "/" + CodeletHandlerImpl.EXECUTECODELETMETHODNAME, new Request(), 200000);
@@ -181,7 +183,8 @@ public class LauncherMQTTPerformanceTest {
 			String brokerAgentName, String brokerServiceName, String signalService, int numberOfAgents, int longMA,
 			int shortMA) throws Exception {
 		for (int i = 1; i <= numberOfAgents; i++) {
-			String key = "L" + longMA + "S" + shortMA + "_" + i;
+			String key = "L" + longMA + "S" + shortMA + "_" + count;
+			count++;
 			String traderType = key;
 
 			Cell traderAgent = this.controller.createAgent(AgentConfig.newConfig(traderType)
