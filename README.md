@@ -1,4 +1,4 @@
-Agent-Based COmplex Network Framework (ACONA)
+Agent-Based Complex Network Framework (ACONA)
 ==================================================== 
 The ACONA Framework is an agent-based middleware with the purpose to allow complete encapsulation functions of a complex system as well as data transfer between functions. It has put its fokus on flexibility, testability and extendability. It is being developed to 
 support the design of cognitive architectures, to allow the development of multi-agent systems and to support evolutionary programming of agents.
@@ -42,14 +42,14 @@ There are multiple projects in the /src folder:
 - acona-cognitiveframework: It is the skelleton of a general cognitive architecture, where codelets can be specified for the actual agent function. The cognitive architecture has been presented in [2] and [4]
 
 
-<img src="docs/Support/KORE_Cognitive_Architecture.png" width="700">
+<img src="docs/01_Images/KORE_Cognitive_Architecture.png" width="700">
 
 - **acona-core**: The acona-core is the framework core, which is the base for all other projects. 
 - acona-demo-webservice: A demo project, where ACONA implemented webservices to check the weather on some places
 - acona-evolution-demonstration: A demo project to demonstrate evolutionary programming with trader agents in a stock market.
 
 
-<img src="docs/Support/Stock_Market_Example_V01.png" width="500">
+<img src="docs/01_Images/Stock_Market_Example_V01.png" width="500">
 
 
 Installation
@@ -85,4 +85,4 @@ The ACONA framework has been applied in projects of the following publications:
 - [5] Zucker, G., Wendt, A., Siafara, L., Schaat, S.: A Cognitive Architecture for Building Automation, published in proceedings of Industrial Electronics Society, IECON 2016-42nd Annual Conference of the IEEE, pp 6919-6924, DOI: 10.1109/IECON.2016.7793798, Florence, Italy, 2016, url: https://publik.tuwien.ac.at/files/publik_258738.pdf
 
 
-<img src="docs/Support/aconalogo.png" width="300">
+<img src="docs/01_Images/aconalogo.png" width="300">
