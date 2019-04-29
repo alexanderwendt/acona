@@ -84,5 +84,8 @@ The ACONA framework has been applied in projects of the following publications:
 - [4] Zucker, G., Sporr, A., Kollmann, S., Wendt, A., Chaido, L. S., Fernbach, A: A Cognitive System Architecture for Building Energy Management. in IEEE Transactions on Industrial Informatics, vol. 14, no. 6, pp. 2521-2529 June 2018, doi: 10.1109/TII.2018.2815739, 2018, url: https://ieeexplore.ieee.org/iel7/9424/8371343/08315469.pdf
 - [5] Zucker, G., Wendt, A., Siafara, L., Schaat, S.: A Cognitive Architecture for Building Automation, published in proceedings of Industrial Electronics Society, IECON 2016-42nd Annual Conference of the IEEE, pp 6919-6924, DOI: 10.1109/IECON.2016.7793798, Florence, Italy, 2016, url: https://publik.tuwien.ac.at/files/publik_258738.pdf
 
+Further presentations, posters and documentation can be found here:
+- [Poster ACONA with applications](docs/04_ACONA_Description/Poster_Marketing_Workshop_ACONA_V02.pdf) 
+
 
 <img src="docs/01_Images/aconalogo.png" width="300">
