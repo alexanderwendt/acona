@@ -28,8 +28,8 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 	public final static String ATTRIBUTEEXECUTIONORDER = "executionorder";
 	public final static String ATTRIBUTETIMEOUT = "timeout";
 
-	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
-	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
+	//public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
+	//public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
 
 	// private String codeletStateDatapointAddress;
 
@@ -84,13 +84,13 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 				}
 
 				// Get the working memory addresses
-				if (response.getResult().getAsJsonObject().has(ATTRIBUTEWORKINGMEMORYADDRESS)) {
-					this.setWorkingMemoryAddress(response.getResult().getAsJsonObject().get(ATTRIBUTEWORKINGMEMORYADDRESS).getAsString());
+				if (response.getResult().getAsJsonObject().has(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS)) {
+					this.setWorkingMemoryAddress(response.getResult().getAsJsonObject().get(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS).getAsString());
 				}
 
 				// Get the internal state memory address
-				if (response.getResult().getAsJsonObject().has(ATTRIBUTEINTERNALMEMORYADDRESS)) {
-					this.setInternalStateMemoryAddress(response.getResult().getAsJsonObject().get(ATTRIBUTEINTERNALMEMORYADDRESS).getAsString());
+				if (response.getResult().getAsJsonObject().has(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS)) {
+					this.setInternalStateMemoryAddress(response.getResult().getAsJsonObject().get(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS).getAsString());
 				}
 
 			} catch (Exception e) {

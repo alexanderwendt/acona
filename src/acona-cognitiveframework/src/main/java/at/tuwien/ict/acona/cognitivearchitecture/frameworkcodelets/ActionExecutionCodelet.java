@@ -53,7 +53,8 @@ public class ActionExecutionCodelet extends CognitiveCodelet {
 				}
 
 				log.debug("Service name={}, method={}, parameters={}", serviceName, method, parameterList);
-				Request req = new Request(method, false, parameter);
+				//Request req = new Request(method, false, parameter);
+				Request req = Request.newRequest("DUMMY");
 				Response result = this.getCommunicator().execute(serviceName, req);
 
 				if (result.hasError() == true) {

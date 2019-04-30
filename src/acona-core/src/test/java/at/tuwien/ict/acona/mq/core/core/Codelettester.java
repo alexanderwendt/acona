@@ -414,46 +414,46 @@ public class Codelettester {
 					// Main codelethandler
 					.addFunction(
 							FunctionConfig.newConfig(mainCodeletHandlerName, CodeletHandlerImpl.class)
-									.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+									.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 											namespaceWorkingMemory)
-									.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+									.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 											namespaceInternalStateMemory))
 					// Process codelethandlers
 					.addFunction(FunctionConfig
 							.newConfig(activateConceptsCodeletHandlerName, CodeletHandlerImpl.class)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
 					.addFunction(FunctionConfig
 							.newConfig(createGoalsCodeletHandlerName, CodeletHandlerImpl.class)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
 					.addFunction(FunctionConfig
 							.newConfig(activateBeliefsCodeletHandlerName, CodeletHandlerImpl.class)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
 					.addFunction(FunctionConfig
 							.newConfig(proposeOptionsCodeletHandlerName, CodeletHandlerImpl.class)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
 					.addFunction(FunctionConfig
 							.newConfig(proposeActionsCodeletHandlerName, CodeletHandlerImpl.class)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
 					.addFunction(FunctionConfig
 							.newConfig(evaluteOptionsCodeletHandlerName, CodeletHandlerImpl.class)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEWORKINGMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS,
 									namespaceWorkingMemory)
-							.setProperty(CodeletHandlerImpl.ATTRIBUTEINTERNALMEMORYADDRESS,
+							.setProperty(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS,
 									namespaceInternalStateMemory))
 					// Add main process codelets
 					// Add trigger codelets

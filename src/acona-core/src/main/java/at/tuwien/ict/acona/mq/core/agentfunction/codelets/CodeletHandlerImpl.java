@@ -43,8 +43,9 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 	//public final static String KEYISBLOCKING = "blockingmethod";
 	//public final static String KEYSTATE = "state";
 
-	public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
-	public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
+	public final static String PARAMWORKINGMEMORYADDRESS = "workingmemoryaddress";
+	public final static String PARAMINTERNALMEMORYADDRESS = "internalmemoryaddress";
+	public final static String PARAMKEEPALIVERATE = "keepaliverate";
 
 	// private String codeletStateDatapointAddress;
 	private String workingMemoryAddress = "workingmemory";
@@ -53,6 +54,7 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 	// private String resultDatapointAddress = "";
 
 	private final static int METHODTIMEOUT = 19000;
+	private int keepAliveIntervalCheck = 5000;
 	// private final static int CODELETHANDLERTIMEOUT = 10000;
 
 	// For your needs, use ConcurrentHashMap. It allows concurrent modification of the Map from several
@@ -81,8 +83,9 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 	protected void cellFunctionThreadInit() throws Exception {
 		// this.resultDatapointAddress = this.getFunctionName() + "." + "result";
 		// this.codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
-		this.workingMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEWORKINGMEMORYADDRESS, workingMemoryAddress);
-		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(ATTRIBUTEINTERNALMEMORYADDRESS, internalStateMemoryAddress);
+		this.workingMemoryAddress = this.getFunctionConfig().getProperty(PARAMWORKINGMEMORYADDRESS, workingMemoryAddress);
+		this.internalStateMemoryAddress = this.getFunctionConfig().getProperty(PARAMINTERNALMEMORYADDRESS, internalStateMemoryAddress);
+		this.keepAliveIntervalCheck = Integer.valueOf(this.getFunctionConfig().getProperty(PARAMKEEPALIVERATE, String.valueOf(keepAliveIntervalCheck)));
 
 		this.setExecuteOnce(true);
 		this.setFinishedAfterSingleRun(false);
@@ -134,8 +137,8 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 			this.registerCodelet(callerAddress, executionOrder);
 			
 			JsonObject obj = new JsonObject();
-			obj.addProperty(ATTRIBUTEWORKINGMEMORYADDRESS, this.workingMemoryAddress);
-			obj.addProperty(ATTRIBUTEINTERNALMEMORYADDRESS, this.internalStateMemoryAddress);
+			obj.addProperty(PARAMWORKINGMEMORYADDRESS, this.workingMemoryAddress);
+			obj.addProperty(PARAMINTERNALMEMORYADDRESS, this.internalStateMemoryAddress);
 			  //JsonRpcResponse(parameter, obj);
 			result.setResult(obj);
 		} catch (Exception e) {
@@ -246,7 +249,7 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 				int nextRunOrder = this.getNextRunOrderState(currentRunOrder);
 
 				log.debug("startCommandSet={}, runOrderStateReady={}, currentRunOrder={}, nextRunOrder={}, emptyEecutionMap={}, executeOnce={}", this.startCodeletHandlerCommandSet, isRunOrderStateReady, currentRunOrder, nextRunOrder, emptyExecutionMap, this.isExecuteOnce());
-
+				
 				if (this.startCodeletHandlerCommandSet == true) {
 					if (isRunOrderStateReady == true) {
 						if (nextRunOrder == -1) { // All FINISH + next runorder=-1 -> all codelet runs finished
@@ -281,7 +284,7 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 							}
 						});
 
-						log.debug("{}>codelets are running: {}. No change of state.", this.getFunctionName(), runningCodelets.toString());
+						log.debug("{}>Pinging service to see if codelts are ready. Codelets are running: {}. No change of state.", this.getFunctionName(), runningCodelets.toString());
 					}
 				}
 			} else {
@@ -297,7 +300,7 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 
 			if (this.getCurrentState().equals(ServiceState.FINISHED)) {
 				this.setExecuteOnce(true);
-				this.setExecuteRate(1000);
+				this.setExecuteRate(this.keepAliveIntervalCheck);
 			}
 
 		} catch (Exception e) {
@@ -484,7 +487,7 @@ public class CodeletHandlerImpl extends AgentFunctionThreadImpl implements Codel
 
 		//Executeonce is false to check if the codelets are alive
 		this.setExecuteOnce(false);
-		this.setExecuteRate(1000);
+		this.setExecuteRate(keepAliveIntervalCheck);
 		this.setStart();
 	}
 
