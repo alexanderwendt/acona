@@ -526,6 +526,18 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 	}
 	
 	/**
+	 * Write arbitrary class values that can be serialized into Json
+	 * 
+	 * @param <T>
+	 * @param datapointAddress
+	 * @param value
+	 * @throws Exception
+	 */
+	protected <T> void  write(String datapointAddress, T value) throws Exception {
+		this.getCommunicator().write(this.getDatapointBuilder().newDatapoint(datapointAddress).setValue(value));
+	}
+	
+	/**
 	 * Read the json content of a datapoint at a certain datapoint address directly from the cell function 
 	 * 
 	 * @param datapointAddress
@@ -536,6 +548,28 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 		return this.getCommunicator().read(datapointAddress).getValue();
 	}
 
+	/**
+	 * Read and convert value to the target class.
+	 * 
+	 * @param <T>
+	 * @param datapointAddress
+	 * @param clzz
+	 * @return
+	 * @throws Exception
+	 */
+	protected <T> T read(String datapointAddress, Class<T> clzz) throws Exception {
+		return this.getCommunicator().read(datapointAddress).getValue(clzz);
+	}
+	
+	
+	/**
+	 * Get a custom function setting
+	 * 
+	 * @param <T>
+	 * @param key
+	 * @param type
+	 * @return
+	 */
 	protected <T> T getCustomSetting(String key, Class<T> type) {
 		return this.getFunctionConfig().getProperty(agentFunctionName, type);
 	}

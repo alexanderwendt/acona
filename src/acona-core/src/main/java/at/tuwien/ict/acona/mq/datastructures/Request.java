@@ -56,20 +56,32 @@ public class Request {
 		}
 	}
 
+	/**
+	 * Main constructor for a new request
+	 */
 	public Request() {
 		// Set correlation id
 		this.correlationid = UUID.randomUUID().toString();
 	}
 
 	/**
-	 * Create a new request from an existing reqiest string or json
+	 * Create a new request from an existing request string or json string
 	 * 
 	 * @param input
 	 * @return
 	 */
-	public static Request newRequest(String input) {
+	public static Request copyRequest(String input) {
 		Gson gson = new Gson();
 		return gson.fromJson(input, Request.class);
+	}
+	
+	/**
+	 * Create a new request
+	 * 
+	 * @return
+	 */
+	public static Request newRequest() {
+		return new Request();
 	}
 
 //	/**
@@ -84,6 +96,11 @@ public class Request {
 //		return new Request();
 //	}
 
+	/**
+	 * Convert Request content to json
+	 * 
+	 * @return
+	 */
 	public JsonObject toJson() {
 		if (util == null) {
 			util = new GsonUtils();
@@ -94,6 +111,12 @@ public class Request {
 		return result;
 	}
 
+	/**
+	 * Check if the JsonObject is a request
+	 * 
+	 * @param obj
+	 * @return
+	 */
 	public static boolean isRequest(JsonObject obj) {
 		boolean result = false;
 
@@ -104,6 +127,12 @@ public class Request {
 		return result;
 	}
 	
+	/**
+	 * Check if a parameter is present in the request
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public boolean hasParameter(String key) {
 		return this.parameter.has(key);
 	}

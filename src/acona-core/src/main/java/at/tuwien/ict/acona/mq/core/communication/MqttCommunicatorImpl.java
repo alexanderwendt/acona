@@ -205,7 +205,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					// If this is a received RPC call request. Start service for the service
 					} else if (topic.startsWith(subscribedServiceAddressPrefix) && jsonMessage instanceof JsonObject && Request.isRequest((JsonObject) jsonMessage)) {
 						// Run service
-						Request req = Request.newRequest(payloadString);
+						Request req = Request.copyRequest(payloadString);
 						// JsonElement responseMessage = req.getjsonMessage.get("message"); // The message can be any json structure
 						// Response response = handlerMap.get(topic).apply(req);
 
