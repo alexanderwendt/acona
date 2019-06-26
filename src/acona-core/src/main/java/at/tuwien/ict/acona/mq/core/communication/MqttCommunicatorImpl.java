@@ -155,7 +155,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					// If the topic is recived at the reply-to address, then there is a blocking function waiting for it.
 					// Check if the message is a JsonObject
 					String payloadString = new String(message.getPayload());
-					log.debug("{}> Recieved message={} from topic={}", agentName, payloadString, topic);
+					log.debug("{}> Recieved message={} from topic={}", agentName + "/" + cellFunction.getFunctionName(), payloadString, topic);
 					
 					if (topic==null) {
 						throw new Exception("Received a message without any topic. Topic=NULL. Message= " + payloadString);
@@ -225,7 +225,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					} else if (topic.equals(subscribedCommandAddress)) {
 						// this.setcommand(command)
 						// TODO: Add method;
-						log.info("Commands shall not get here {}, {}", topic, jsonMessage);
+						log.debug("Commands shall not get here {}, {}", topic, jsonMessage);
 
 					// Else, any other message that is subscribed
 					} else {
@@ -356,8 +356,11 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			// Create a request message and set the request payload
 			MqttMessage responseMessage = new MqttMessage(responseString.getBytes());
 			responseMessage.setQos(qos);
+			
+			String replyToAddress = response.getReplyTo();
+			String enhancedReplyToTopic = this.dpBuilder.newDatapoint(replyToAddress).getCompleteAddressAsTopic(this.agentName);
 
-			MqttTopic mqttTopic = mqttClient.getTopic(response.getReplyTo());
+			MqttTopic mqttTopic = mqttClient.getTopic(enhancedReplyToTopic);
 			try {
 				mqttTopic.publish(responseMessage);
 			} catch (MqttPersistenceException e) {

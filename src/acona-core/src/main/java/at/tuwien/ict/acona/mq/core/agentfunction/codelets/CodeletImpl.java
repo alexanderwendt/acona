@@ -14,29 +14,19 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 
 	private final static Logger log = LoggerFactory.getLogger(CodeletImpl.class);
 
-	//public final static String SETSTATESERVICENAME = "setstate";
-	//public final static String REGISTERCODELETSERVICENAME = "registercodelet";
-	//public final static String DEREGISTERCODELETSERVICENAME = "deregistercodelet";
 	public final static String EXECUTECODELETNAME = "execute";
-	//public final static String KEYMETHOD = "method";
-	//public final static String KEYCALLERADDRESS = "calleraddress";
 	public final static String KEYEXECUTIONORDERNAME = "executionorder";
-	//public final static String KEYSTATE = "state";
 	private final static int DEFAULTTIMEOUT = 20000;
 
 	public final static String ATTRIBUTECODELETHANDLERADDRESS = "handleraddress";
 	public final static String ATTRIBUTEEXECUTIONORDER = "executionorder";
 	public final static String ATTRIBUTETIMEOUT = "timeout";
-
-	//public final static String ATTRIBUTEWORKINGMEMORYADDRESS = "workingmemoryaddress";
-	//public final static String ATTRIBUTEINTERNALMEMORYADDRESS = "internalmemoryaddress";
-
-	// private String codeletStateDatapointAddress;
+	public final static String ATTRIBUTEDOREGISTER = "doregister";
 
 	private String codeletHandlerAddress = "";
-	//private String codeletHandlerServiceName = "";
 	private String callerAddress = "";
 	private int exeutionOrder = 0;
+	private boolean doRegister = true;
 	private int timeout = DEFAULTTIMEOUT;
 
 	private String workingMemoryAddress = "workingmemory";
@@ -46,10 +36,7 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 	protected void cellFunctionThreadInit() throws Exception {
 		try {
 			// Set the caller address
-			this.callerAddress = this.getFunctionRootAddress();  //this.getCell().getName() + ":" + this.getFunctionName();
-
-			// Set the system state datapoint
-			// codeletStateDatapointAddress = this.getFunctionName() + "." + "state";
+			this.callerAddress = this.getFunctionRootAddress();
 
 			this.setFinishedAfterSingleRun(false); // The finish shall be set manually.
 
@@ -57,45 +44,51 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 			this.cellFunctionCodeletInit();
 
 			// Get the codelethandler data
-			this.codeletHandlerAddress = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS);
-			//this.codeletHandlerServiceName = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS).split(":")[1];
+			// Get codelet handler address. It shall be used if do register is true
+			this.codeletHandlerAddress = this.getFunctionConfig().getProperty(ATTRIBUTECODELETHANDLERADDRESS, "");
+			// Get execution order for the codelet.
 			this.exeutionOrder = Integer.valueOf(this.getFunctionConfig().getProperty(KEYEXECUTIONORDERNAME, "0"));
+			// Register the codelet in a codelet handler
+			this.doRegister = Boolean.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTEDOREGISTER, "true"));
+			// Timeout for execution
 			this.timeout = Integer.valueOf(this.getFunctionConfig().getProperty(ATTRIBUTETIMEOUT, String.valueOf(DEFAULTTIMEOUT)));
 			
 			// Add subfunctions
 			this.addRequestHandlerFunction(EXECUTECODELETNAME, (Request input) -> executeCodelet(input));
 
 			// Register codelet in the codelethandler
-			try {
-				Request request = new Request();
-				request.setParameter("caller", callerAddress);
-				request.setParameter("order", this.exeutionOrder);
-				
-				//Request request = new Request(REGISTERCODELETSERVICENAME, 2);
-				//request.setParameterAsValue(0, callerAddress);
-				//request.setParameterAsValue(1, this.exeutionOrder);
+			if (this.doRegister==true) {
+				try {
+					Request request = new Request();
+					request.setParameter("caller", callerAddress);
+					request.setParameter("order", this.exeutionOrder);
 
-				Response response = this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CodeletHandlerImpl.REGISTERCODELETSERVICENAME, request, this.timeout);
-				updateServiceStateInCodeletHandler(ServiceState.FINISHED);
+					Response response = this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CodeletHandlerImpl.REGISTERCODELETSERVICENAME, request, this.timeout);
+					updateServiceStateInCodeletHandler(ServiceState.FINISHED);
 
-				// Check the result
-				if (response.hasError()) {
-					throw new Exception("Cannot register the codelet. Maybe the codelet handler has not been started yet");
+					// Check the result
+					if (response.hasError()) {
+						throw new Exception("Cannot register the codelet. Maybe the codelet handler has not been started yet");
+					}
+
+					// Get the working memory addresses
+					if (response.getResult().getAsJsonObject().has(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS)) {
+						this.setWorkingMemoryAddress(response.getResult().getAsJsonObject().get(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS).getAsString());
+					}
+
+					// Get the internal state memory address
+					if (response.getResult().getAsJsonObject().has(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS)) {
+						this.setInternalStateMemoryAddress(response.getResult().getAsJsonObject().get(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS).getAsString());
+					}
+					
+					log.debug("{}>Registered in codelet handler {}", this.getFunctionName(), this.codeletHandlerAddress);
+
+				} catch (Exception e) {
+					log.error("{}>Cannot register codelet", this.getFunctionName(), e);
+					throw new Exception(e.getMessage());
 				}
-
-				// Get the working memory addresses
-				if (response.getResult().getAsJsonObject().has(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS)) {
-					this.setWorkingMemoryAddress(response.getResult().getAsJsonObject().get(CodeletHandlerImpl.PARAMWORKINGMEMORYADDRESS).getAsString());
-				}
-
-				// Get the internal state memory address
-				if (response.getResult().getAsJsonObject().has(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS)) {
-					this.setInternalStateMemoryAddress(response.getResult().getAsJsonObject().get(CodeletHandlerImpl.PARAMINTERNALMEMORYADDRESS).getAsString());
-				}
-
-			} catch (Exception e) {
-				log.error("{}>Cannot register codelet", this.getFunctionName(), e);
-				throw new Exception(e.getMessage());
+			} else {
+				log.warn("Codelet not registered in any codelet handler. A custom codelet handler must trigger it.");
 			}
 		} catch (Exception e1) {
 			log.error("{}>Cannot initialize codelet", this.getFunctionName(), e1);
@@ -134,13 +127,7 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 		updateServiceStateInCodeletHandler(ServiceState.RUNNING);
 		
 		// Set state to running
-		//Request request = new Request(); //new JsonRpcRequest(SETSTATESERVICENAME, 2);
-		//request.setParameter("caller", callerAddress);
-		//request.setParameter("state", ServiceState.RUNNING.toString());
-		//request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.RUNNING.toString());
 		log.debug("Set state running");
-		//this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CellFunctionCodeletHandler.SETSTATESERVICENAME, request, this.timeout);
-		//this.setServiceState(ServiceState.RUNNING);
 
 		// Execute the codelet specific preprocessing
 		this.executeCodeletPreprocessing();
@@ -160,18 +147,7 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 		updateServiceStateInCodeletHandler(ServiceState.FINISHED);
 		
 		// Set state of the codelet to finished
-		//Request request = new Request(); //new JsonRpcRequest(SETSTATESERVICENAME, 2);
-		//request.setParameter("caller", callerAddress);
-		//request.setParameter("state", ServiceState.FINISHED.toString());
-		
-		//Request request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
 		log.debug("Set state finished");
-		//request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, ServiceState.FINISHED.toString());
-		
-		
-		//this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CellFunctionCodeletHandler.SETSTATESERVICENAME, request, this.timeout);
-
-		
 	}
 
 	protected void executeCodeletPostprocessing() throws Exception {
@@ -182,12 +158,9 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 		this.setServiceState(state);
 		
 		// Set state of the codelet to finished
-		Request request = new Request(); //new JsonRpcRequest(SETSTATESERVICENAME, 2);
+		Request request = new Request();
 		request.setParameter("caller", callerAddress);
 		request.setParameter("state", state.toString());
-				
-		//JsonRpcRequest request = new JsonRpcRequest(SETSTATESERVICENAME, 2);
-		//request.setParameterAsValue(0, callerAddress).setParameterAsValue(1, state.toString());
 
 		Response response = this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CodeletHandlerImpl.SETSTATESERVICENAME, request, this.timeout);
 
@@ -201,12 +174,9 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 	protected void shutDownThreadExecutor() throws Exception {
 		this.shutDownCodelet();
 
-		Request request = new Request(); //new JsonRpcRequest(SETSTATESERVICENAME, 2);
+		Request request = new Request();
 		request.setParameter("caller", callerAddress);
 		
-		//Request request = new JsonRpcRequest(DEREGISTERCODELETSERVICENAME, 1);
-		//request.setParameterAsValue(0, callerAddress);
-
 		Response response = this.getCommunicator().execute(this.codeletHandlerAddress + "/" + CodeletHandlerImpl.UNREGISTERCODELETSERVICENAME, request, this.timeout);
 		if (response.hasError()) {
 			throw new Exception("Communication error. Error: " + response.getError());
