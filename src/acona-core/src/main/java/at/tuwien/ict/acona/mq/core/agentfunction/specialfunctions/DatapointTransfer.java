@@ -67,7 +67,7 @@ public class DatapointTransfer extends AgentFunctionImpl {
 		} else {
 			try {
 				this.getCommunicator().publishTopic(destination, data);
-				log.debug("Republished data {} to {}", data, destination);
+				log.debug("Republished data from {} to {}", topic, destination);
 			} catch (Exception e) {
 				log.error("Cannot republish {} to {}", data, destination);
 			}

@@ -78,6 +78,9 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 	 */
 	private String agentFunctionName;
 
+	/**
+	 * Function root address, if a function has been added to an agent
+	 */
 	private String functionRootAddress;
 
 	/**

@@ -85,15 +85,6 @@ public class AgentConfig {
 		// this.addBasicCellFunctions();
 	}
 
-//	private void addBasicCellFunctions() {
-//		this.addCellfunction(CellFunctionConfig.newConfig("write", BasicServiceWrite.class));
-//		this.addCellfunction(CellFunctionConfig.newConfig("read", BasicServiceRead.class));
-//		this.addCellfunction(CellFunctionConfig.newConfig("subscribe", BasicServiceSubscribe.class));
-//		this.addCellfunction(CellFunctionConfig.newConfig("unsubscribe", BasicServiceUnsubscribe.class));
-//		this.addCellfunction(CellFunctionConfig.newConfig("notify", BasicServiceNotifySubscribers.class));
-//		this.addCellfunction(CellFunctionConfig.newConfig("remove", BasicServiceRemove.class));
-//	}
-
 	private AgentConfig(JsonObject config) throws Exception {
 		if (this.isCellConfig(config)) {
 			this.configObject = config;
@@ -304,18 +295,7 @@ public class AgentConfig {
 	/**
 	 * @param functionName
 	 */
-	public void removeCellFunctionConfig(String functionName) {
-//		JsonArray arr = this.configObject.getAsJsonArray(CELLFUNCTIONS).getAsJsonArray();
-//		int index = 0;
-//		for (int i = 0; i < arr.size(); i++) {
-//			JsonObject function = arr.get(i).getAsJsonObject();
-//			CellFunctionConfig config = CellFunctionConfig.newConfig(function);
-//			if (config.getName().equals(functionName)) {
-//				index = i;
-//				break;
-//			}
-//		}
-		
+	public void removeCellFunctionConfig(String functionName) {		
 		int index = this.getCellFunctionConfigIndex(functionName);
 
 		this.configObject.getAsJsonArray(CELLFUNCTIONS).remove(index);

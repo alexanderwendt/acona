@@ -57,11 +57,6 @@ public class AgentFunctionHandlerImpl implements AgentFunctionHandler {
 				}
 			}
 
-			// Create a responder to the cellfunction if it is set in the
-			//if (cellFunctionInstance.getFunctionConfig().getGenerateReponder().getAsBoolean() == true) {
-				// this.hostCell.getCommunicator().createResponderForFunction(cellFunctionInstance);
-			//	log.info("Agent {}, function {}>Generate external responder to be able to answer incoming messages.", this.hostCell.getName(), cellFunctionInstance.getFunctionRootAddress());
-			//}
 		} catch (Exception e) {
 			log.error("Cannot register cell function " + cellFunctionInstance + ".", e);
 			throw new Exception(e.getMessage());
@@ -144,13 +139,5 @@ public class AgentFunctionHandlerImpl implements AgentFunctionHandler {
 		log.debug("A listener was unregistered");
 
 	}
-
-	// @Override
-	// public void updateState(CellFunction function, ServiceState state) {
-	// //Update this map
-	// this.functionStateMap.put(function.getFunctionName(), state);
-	// //Update all listeners
-	// this.listenerList.forEach(l -> l.notifyStateUpdate(function.getFunctionName(), state));
-	// }
 
 }
