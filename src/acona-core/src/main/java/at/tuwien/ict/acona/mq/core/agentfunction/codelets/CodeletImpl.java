@@ -143,7 +143,6 @@ public abstract class CodeletImpl extends AgentFunctionThreadImpl implements Cod
 		// Execute the codelet post processing
 		this.executeCodeletPostprocessing();
 
-		//this.setServiceState(ServiceState.FINISHED);
 		updateServiceStateInCodeletHandler(ServiceState.FINISHED);
 		
 		// Set state of the codelet to finished
