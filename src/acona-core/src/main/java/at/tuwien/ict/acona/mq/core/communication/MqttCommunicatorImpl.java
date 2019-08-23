@@ -324,7 +324,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			}
 
 		} catch (Exception e) {
-			log.error("Cannot send request", e);
+			log.error("Cannot send request");
 			throw new Exception(e.getMessage());
 		}
 
@@ -371,7 +371,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 				throw new Exception(e.getMessage());
 			}
 			
-			log.debug("Returning response {}", response);
+			log.debug("Returning response to address {}, response {}", enhancedReplyToTopic, response);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
