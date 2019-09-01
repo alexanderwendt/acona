@@ -17,12 +17,14 @@ public class Request {
 	public final static String CORRELATIONID = "correlationid";
 	public final static String REPLYTO = "replyto";
 	public final static String PARAMETER = "parameter";
+	public final static String TIMESTAMP = "timestamp";
 
 	private transient GsonUtils util = new GsonUtils();
 
 	private final String correlationid;
 	private String replyto = "";
 	private JsonObject parameter = new JsonObject();
+	private long timestamp = System.currentTimeMillis();
 
 //	/**
 //	 * Create the request with a reply-to address
@@ -51,6 +53,7 @@ public class Request {
 			this.correlationid = obj.get(CORRELATIONID).getAsString();
 			this.parameter = obj.get(PARAMETER).getAsJsonObject();
 			this.replyto = obj.get(REPLYTO).getAsString();
+			this.timestamp = obj.get(TIMESTAMP).getAsLong();
 		} else {
 			throw new Exception("No Request");
 		}
@@ -193,6 +196,14 @@ public class Request {
 
 	public void setReplyTo(String replyto) {
 		this.replyto = replyto;
+	}
+	
+	public long getTimeStamp() {
+		return this.timestamp;
+	}
+
+	public void setTimeStamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 //	/**

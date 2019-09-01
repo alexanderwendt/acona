@@ -16,6 +16,7 @@ public class Response {
 	public final static String REPLYTO = "replyto";
 	public final static String RESULT = "result";
 	public final static String ERROR = "error";
+	public final static String TIMESTAMP = "timestamp";
 
 	private transient GsonUtils util = new GsonUtils();
 
@@ -23,6 +24,7 @@ public class Response {
 	private final String replyto;
 	private JsonElement result;
 	private RequestError error;
+	private long timestamp = System.currentTimeMillis();
 
 	public Response(Request request, JsonElement result) {
 		this.correlationid = request.getCorrelationId();
@@ -100,6 +102,14 @@ public class Response {
 
 	public boolean hasError() {
 		return (this.error != null ? true : false);
+	}
+	
+	public long getTimeStamp() {
+		return this.timestamp;
+	}
+
+	public void setTimeStamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public JsonObject toJson() {
