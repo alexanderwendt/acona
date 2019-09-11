@@ -60,7 +60,8 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 	private final JsonUtils util = new JsonUtils();
 	private int qos=1;
 
-	private Map<String, Response> incomingRequestMessages = new ConcurrentHashMap<>();
+	private Map<String, Response> incomingResponseMessages = new ConcurrentHashMap<>();
+	private String outgoingRequestId = "";
 	//private Map<String, JsonElement> incomingTrackedMessages = new ConcurrentHashMap<>();
 	//As only one request can be made at a time, only one message must be stored
 	//private Response incomingRequestMessage = null;
@@ -195,13 +196,19 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 						// log.debug("7");
 						log.debug("Received Reply-to topic for the MQTT client:" + "Reply-To: " + jsonMessage);
 
-						incomingRequestMessages.put(response.getCorrelationid(), response);
-						// log.debug("8");
-						// log.debug("Sync1");
-						latch.release(); // unblock main thread
-						// log.debug("Sync2");
+						if (response.getCorrelationid().equals(outgoingRequestId)) {
+							incomingResponseMessages.put(response.getCorrelationid(), response);
+							// log.debug("8");
+							// log.debug("Sync1");
+							latch.release(); // unblock main thread
+							// log.debug("Sync2");
 
-						// log.debug("9");
+							// log.debug("9");
+						} else {
+							log.warn("Received replyto message without any request that expects a response. Message ignored. Response: {}", response);
+						}
+						
+						
 					// If this is a received RPC call request. Start service for the service
 					} else if (topic.startsWith(subscribedServiceAddressPrefix) && jsonMessage instanceof JsonObject && Request.isRequest((JsonObject) jsonMessage)) {
 						// Run service
@@ -306,6 +313,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			if (isSychronousCall == true) {
 				// Wait for till we have received a response
 				try {
+					outgoingRequestId = correlationID;	//Set the outgoing correlation id to wait for a response
 					log.debug("{}> Message sent to {}, wait for answer for {}ms, correlationoid={}", agentName, dpPublish, timeout, correlationID);
 					latch.tryAcquire(timeout, TimeUnit.MILLISECONDS); // block here until message received
 				} catch (InterruptedException e) {
@@ -314,12 +322,12 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 				}
 
 				// Get the message answer from the map
-				result = this.incomingRequestMessages.getOrDefault(correlationID, new Response(request, new RequestError("Timeout error")));
+				result = this.incomingResponseMessages.getOrDefault(correlationID, new Response(request, new RequestError("Timeout error")));
 				if (result.hasError() == true) {
-					log.error("Function={}>Timeout after {}ms. No response from request on correlationID {}, topic {}, request={}", this.cellfunction.getFunctionName(), timeout, correlationID, dpPublish, request);
+					log.error("Function={}>Timeout after {}ms. No response from request on correlationID {}, topic {}, request={}, result={}", this.cellfunction.getFunctionName(), timeout, correlationID, dpPublish, request, result);
 					throw new Exception("Timeout after " + timeout + "ms. No response from request on topic " + dpPublish);
 				}
-				this.incomingRequestMessages.remove(correlationID);
+				this.incomingResponseMessages.remove(correlationID);
 				log.debug("Got message={}", result);
 			}
 
