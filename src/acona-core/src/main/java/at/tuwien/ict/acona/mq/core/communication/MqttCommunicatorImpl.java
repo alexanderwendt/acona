@@ -39,6 +39,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
 import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunction;
+import at.tuwien.ict.acona.mq.core.agentfunction.AgentFunctionImpl;
 import at.tuwien.ict.acona.mq.core.storage.DataStorage;
 import at.tuwien.ict.acona.mq.datastructures.DPBuilder;
 import at.tuwien.ict.acona.mq.datastructures.Datapoint;
@@ -53,6 +54,8 @@ import at.tuwien.ict.acona.mq.utils.JsonUtils;
  */
 public class MqttCommunicatorImpl implements MqttCommunicator {
 
+	public final static String REPLYTOSUFFIX = "replyto";
+	
 	private static final Logger log = LoggerFactory.getLogger(MqttCommunicatorImpl.class);
 
 	private Gson gson = new Gson();
@@ -127,10 +130,10 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 				this.rootAddress += "/" + cellfunction.getFunctionName();
 			}
 
-			this.subscribedReplyAddress = this.rootAddress + "/replyto";
+			this.subscribedReplyAddress = this.rootAddress + "/" + REPLYTOSUFFIX;
 			this.subscribedServiceAddressPrefix = this.rootAddress;
 			this.subscribedCommandAddress = this.rootAddress + "/command";
-			this.publishedStateAddress = this.rootAddress + "/state";
+			this.publishedStateAddress = this.rootAddress + "/" + AgentFunctionImpl.STATESUFFIX;
 
 			// Create an Mqtt client
 			mqttClient = new MqttClient(this.host, this.agentName + "_" + this.cellfunction.getFunctionName(), new MemoryPersistence());	//Memory persistance to keep all messages in the memory and not HDD

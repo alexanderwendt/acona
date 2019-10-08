@@ -41,9 +41,9 @@ public class DatapointTransfer extends AgentFunctionImpl {
 
 		this.addManagedDatapoint(DatapointConfig.newConfig(source, source, SyncMode.SUBSCRIBEONLY));
 
-		log.debug("Datastorageupdate will happen for the following datapoint: source {} -> destination {}", source, destination);
+		log.info("Datastorageupdate will happen for the following datapoint: source {} -> destination {}", source, destination);
 
-		log.info("{}>Datapoint Transfer function initialized", this.getFunctionName());
+		log.debug("{}> Datapoint Transfer function initialized. Send from {} to {}, mode {}", this.getFunctionName(), source, destination, mode);
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public class DataAccess extends AgentFunctionImpl {
 		this.addRequestHandlerFunction(METHODNAMEUNSUBSCRIBE, (Request input) -> unsubscribe(input));
 		this.addRequestHandlerFunction(METHODNAMEREMOVE, (Request input) -> remove(input));
 
-		log.info("{}>Initialized.", this.getFunctionName());
+		log.info("{}>Agent basic function Data Access initialized.", this.getFunctionName());
 	}
 
 	@Override

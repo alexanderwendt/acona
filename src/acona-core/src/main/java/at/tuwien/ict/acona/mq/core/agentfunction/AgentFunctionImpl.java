@@ -160,6 +160,7 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 
 			// Init the child function
 			this.agentFunctionInit();
+			log.info("Initialized services={}. Responses returned on {}", this.getSubfunctions().keySet(), this.enhanceWithRootAddress(MqttCommunicatorImpl.REPLYTOSUFFIX));
 
 			// Get subscriptions from config and add to subscription list
 			this.getFunctionConfig().getManagedDatapoints().forEach(s -> {
@@ -171,6 +172,8 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 
 			// === Register subscriptions === //
 			this.subscribeDatapoints();
+			
+			log.info("{}> Function {} initalized.", this.getAgentName(), this.getFunctionRootAddress());
 
 		} catch (Exception e) {
 			log.error("Cannot init function with config={}", config, e);
@@ -274,7 +277,7 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 			log.error("Cannot subscribe input to service function {}", this.enhanceWithRootAddress(topicSuffix));
 			throw new Exception(e.getMessage());
 		}
-		log.info("Added function to {}", topic);
+		log.debug("Added function to {}", topic);
 
 	}
 
@@ -350,6 +353,7 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 	protected void addManagedDatapoint(DatapointConfig config) {
 		if (config.getSyncMode().equals(SyncMode.SUBSCRIBEONLY)) { // Subscribe only
 			this.subscriptionConfigs.put(config.getId(), config);
+			log.debug("Added subscribed datapoint {}", config.getAddress());
 		} else if (config.getSyncMode().equals(SyncMode.SUBSCRIBEWRITEBACK)) { // Subscribe and write back to the source
 			this.subscriptionConfigs.put(config.getId(), config);
 			this.writeDatapointConfigs.put(config.getId(), config);
