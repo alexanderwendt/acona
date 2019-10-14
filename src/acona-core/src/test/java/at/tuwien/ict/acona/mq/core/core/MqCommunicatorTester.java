@@ -1,14 +1,24 @@
 package at.tuwien.ict.acona.mq.core.core;
 
+import static org.junit.Assert.fail;
+
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.tuwien.ict.acona.mq.core.agentfunction.specialfunctions.DatapointTransfer;
+import at.tuwien.ict.acona.mq.core.config.AgentConfig;
+import at.tuwien.ict.acona.mq.core.config.FunctionConfig;
+import at.tuwien.ict.acona.mq.launcher.SystemControllerImpl;
+
 public class MqCommunicatorTester {
 	private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	// private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
+	private SystemControllerImpl launcher = SystemControllerImpl.getLauncher();
 
 	@Before
 	public void setUp() throws Exception {
@@ -52,6 +62,49 @@ public class MqCommunicatorTester {
 //
 //			}
 //		}
+	}
+	
+	/**
+	 * 
+	 */
+	@Test
+	public void testSetOtherPort() {
+		try {
+			String host1 = "tcp://127.0.0.1:8883";
+			String host2 = "tcp://127.0.0.1:6883";
+			String username = "acona1";
+			String password = "acona1";
+
+			AgentConfig acoconf = AgentConfig.newConfig("CommunicationTester").setHost(host1)
+					.addFunction(FunctionConfig.newConfig(DatapointTransfer.class)
+							.setProperty(DatapointTransfer.PARAMSOURCEADDRESS, "<" + "CommunicationTester" + ">/" + "origin")
+							.setProperty(DatapointTransfer.PARAMDESTINATIONADDRESS, "<" + "CommunicationTester" + ">/" + "target")
+							//);
+							.setHostData(host2, username, password));
+				
+			log.debug("Do not instantiate the cell.");
+				//Cell aco = this.launcher.createAgent(acoconf);
+				
+				synchronized (this) {
+					try {
+						this.wait(100);
+					} catch (InterruptedException e) {
+
+					}
+				}
+				
+				log.info("=== Init finished ===");
+			
+			assert(acoconf.getHost()==host1);
+			assert(acoconf.getCellfunctions().get(0).getAsJsonObject().get("host").getAsJsonPrimitive().getAsString().equals(host2));
+			
+			log.info("Test passed");
+
+			// launcher.stopSystem();
+		} catch (Exception e) {
+			log.error("Error testing system", e);
+			fail("Error");
+		}
 	}
 
 //	/**

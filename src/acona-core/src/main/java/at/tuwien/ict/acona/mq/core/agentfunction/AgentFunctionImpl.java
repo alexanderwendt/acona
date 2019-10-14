@@ -117,7 +117,11 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 			// Extract settings
 			this.config = config;
 			this.cell = caller;
-
+			
+			if (config.getHost()==null || config.getUser()==null || config.getPassword()==null) {
+				config.setHostData(this.cell.getConfiguration().getHost(), this.cell.getConfiguration().getUsername(), this.cell.getConfiguration().getPassword());
+			}
+			
 			// Get the settings but set also default values
 			// Get name
 			this.agentFunctionName = this.config.getName();

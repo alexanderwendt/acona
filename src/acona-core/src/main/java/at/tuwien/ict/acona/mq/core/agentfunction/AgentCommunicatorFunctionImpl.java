@@ -65,6 +65,17 @@ public class AgentCommunicatorFunctionImpl implements AgentFunction {
 			this.config = config;
 			this.cell = cell;
 
+			//Get override data
+			if (config.getHost()!=null) {
+				this.host = config.getHost().getAsString();
+			}
+			if (config.getUser()!=null) {
+				this.username = config.getUser().getAsString();
+			}
+			if (config.getPassword()!=null) {
+				this.password = config.getPassword().getAsString();
+			}
+			
 			// Get the settings but set also default values
 			// Get name
 			this.cellFunctionName = this.config.getName();

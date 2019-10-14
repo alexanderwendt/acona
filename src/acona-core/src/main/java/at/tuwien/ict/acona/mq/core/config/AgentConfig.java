@@ -22,6 +22,10 @@ public class AgentConfig {
 	// Keep the jsonobject in order to be able to add more settings. If only a
 	// class is used, flexibility is lost for creating
 	// new json
+	
+	private static final String defaulthost = "tcp://127.0.0.1:1883";
+	private static final String defaultusername = "acona";
+	private static final String defaultpassword = "acona";
 
 	private final JsonObject configObject;
 
@@ -33,7 +37,7 @@ public class AgentConfig {
 	 * @return
 	 */
 	public static AgentConfig newConfig(String name, String className) {
-		return new AgentConfig(name, className);
+		return new AgentConfig(name, className).setHost(defaulthost).setUsername(defaultusername).setPassword(defaultpassword);
 	}
 
 	/**
@@ -44,7 +48,7 @@ public class AgentConfig {
 	 * @return
 	 */
 	public static AgentConfig newConfig(String name, Class<?> clzz) {
-		return new AgentConfig(name, clzz.getName());
+		return new AgentConfig(name, clzz.getName()).setHost(defaulthost).setUsername(defaultusername).setPassword(defaultpassword);
 	}
 
 	/**
@@ -54,7 +58,7 @@ public class AgentConfig {
 	 * @return
 	 */
 	public static AgentConfig newConfig(String name) {
-		return new AgentConfig(name, AgentImpl.class.getName());
+		return new AgentConfig(name, AgentImpl.class.getName()).setHost(defaulthost).setUsername(defaultusername).setPassword(defaultpassword);
 	}
 
 	public static AgentConfig newConfig(JsonObject config) throws Exception {

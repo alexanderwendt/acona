@@ -275,6 +275,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 			log.debug("loc " + me.getLocalizedMessage());
 			log.debug("cause " + me.getCause());
 			log.debug("excep " + me);
+			log.error("Cannot connect to host {}", this.host);
 			throw new Exception(me.getMessage());
 		}
 

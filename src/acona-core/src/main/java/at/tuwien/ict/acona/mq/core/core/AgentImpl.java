@@ -44,7 +44,8 @@ public class AgentImpl implements Cell, Runnable {
 
 		// Add the basic function for communication
 		AgentCommunicatorFunctionImpl commFunction = new AgentCommunicatorFunctionImpl();
-		commFunction.init(FunctionConfig.newConfig(agentName + "_" + "CommFunction", AgentCommunicatorFunctionImpl.class), this);
+		commFunction.init(FunctionConfig.newConfig(agentName + "_" + "CommFunction", AgentCommunicatorFunctionImpl.class)
+				.setHostData(conf.getHost(), conf.getUsername(), conf.getPassword()), this);
 
 		// Get the communicator from the communicator cell function
 		// Important: Only cell functions can have communicators
@@ -78,7 +79,8 @@ public class AgentImpl implements Cell, Runnable {
 		try {
 			//Initialize access to the database in the agent
 			DataAccess dataAccessFunction = new DataAccess();
-			dataAccessFunction.init(FunctionConfig.newConfig("dataaccess", DataAccess.class), this);
+			dataAccessFunction.init(FunctionConfig.newConfig("dataaccess", DataAccess.class)
+					.setHostData(conf.getHost(), conf.getUsername(), conf.getPassword()), this);
 			log.info("Basic database access functions initialized");
 			
 			//Initialize remote adding of functions to the agent
