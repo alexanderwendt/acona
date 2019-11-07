@@ -21,6 +21,7 @@ public class Response {
 	private transient GsonUtils util = new GsonUtils();
 
 	private final String correlationid;
+	//FIXME: For a particular case, we needed to change the replyto. Therefore the final was removed. This was only used for routing purposes
 	private final String replyto;
 	private JsonElement result;
 	private RequestError error;

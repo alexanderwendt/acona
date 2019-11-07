@@ -732,9 +732,17 @@ public abstract class AgentFunctionImpl implements AgentFunction {
 		}
 	}
 	
-	protected void closeOpenRequestWithResponse(JsonElement response) throws Exception {
+	/**
+	 * Put the RESULT of the response in this function and the agent returns the message to the replyto address.
+	 * 
+	 * Hint: If you want to modify the replyto address, do it directly in the open request.
+	 * 
+	 * @param resultContent
+	 * @throws Exception
+	 */
+	protected void closeOpenRequestWithResponse(JsonElement resultContent) throws Exception {
 		if (this.getOpenRequest()!=null) {
-			this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest()).setResult(response)));
+			this.getCommunicator().sendResponseToOpenRequest((new Response(this.getOpenRequest()).setResult(resultContent)));
 			this.setOpenRequest(null);
 		} else {
 			log.error("open request is null. Nothing can be returned");
