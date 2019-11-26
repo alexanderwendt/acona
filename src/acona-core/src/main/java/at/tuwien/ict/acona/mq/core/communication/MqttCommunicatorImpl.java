@@ -158,7 +158,8 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 					// If the topic is recived at the reply-to address, then there is a blocking function waiting for it.
 					// Check if the message is a JsonObject
-					String payloadString = new String(message.getPayload());
+					String payloadString = new String(message.getPayload()).trim().strip();	//IMPORTATNT: Trim the string to ba able 
+																					//to accept strange stuff from c++ programs at the end of the line
 					log.debug("{}> Recieved message={} from topic={}", agentName + "/" + cellFunction.getFunctionName(), payloadString, topic);
 					
 					if (topic==null) {
