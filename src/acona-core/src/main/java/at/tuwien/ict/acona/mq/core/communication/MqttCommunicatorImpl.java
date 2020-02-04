@@ -160,7 +160,7 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 					// Check if the message is a JsonObject
 					String payloadString = new String(message.getPayload()).trim().strip();	//IMPORTATNT: Trim the string to ba able 
 																					//to accept strange stuff from c++ programs at the end of the line
-					log.debug("{}> Recieved message={} from topic={}", agentName + "/" + cellFunction.getFunctionName(), payloadString, topic);
+					log.debug("{}>messageArrived: Recieved message={} from topic={}", agentName + "/" + cellFunction.getFunctionName(), payloadString, topic);
 					
 					if (topic==null) {
 						throw new Exception("Received a message without any topic. Topic=NULL. Message= " + payloadString);
@@ -314,12 +314,14 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 
 			// Publish the request message
 			mqttClient.publish(dpPublish, reqMessage);
+			log.debug("Map of received messages: {}.", this.incomingResponseMessages);
 
 			if (isSychronousCall == true) {
 				// Wait for till we have received a response
 				try {
 					outgoingRequestId = correlationID;	//Set the outgoing correlation id to wait for a response
 					log.debug("{}> Message sent to {}, wait for answer for {}ms, correlationoid={}", agentName, dpPublish, timeout, correlationID);
+					log.debug("Map of received messages: {}.", this.incomingResponseMessages);
 					latch.tryAcquire(timeout, TimeUnit.MILLISECONDS); // block here until message received
 				} catch (InterruptedException e) {
 					log.error("Interruption error for request " + request, e);
@@ -327,18 +329,24 @@ public class MqttCommunicatorImpl implements MqttCommunicator {
 				}
 
 				// Get the message answer from the map
+				log.debug("Map of received messages: {}.", this.incomingResponseMessages);
 				result = this.incomingResponseMessages.getOrDefault(correlationID, new Response(request, new RequestError("Timeout error")));
 				if (result.hasError() == true) {
 					log.error("Function={}>Timeout after {}ms. No response from request on correlationID {}, topic {}, request={}, result={}", this.cellfunction.getFunctionName(), timeout, correlationID, dpPublish, request, result);
 					throw new Exception("Timeout after " + timeout + "ms. No response from request on topic " + dpPublish);
 				}
 				this.incomingResponseMessages.remove(correlationID);
+				log.debug("Remove message with corr id={}", correlationID);
+				log.debug("Map of received messages: {}.", this.incomingResponseMessages);
 				log.debug("Got message={}", result);
 			}
 
 		} catch (Exception e) {
 			log.error("Cannot send request");
 			throw new Exception(e.getMessage());
+		} finally {
+			//As the request has been finished, then the outgoing message id is reset.
+			outgoingRequestId = "";
 		}
 
 		return result;
